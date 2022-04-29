@@ -18,24 +18,24 @@ import org.mockito.Mockito;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.TransportService;
-import transportservice.RunPlugin;
+import transportservice.ExtensionsRunner;
 
 public class TestMainScript extends OpenSearchTestCase {
 
-    private RunPlugin runPlugin;
+    private ExtensionsRunner extensionsRunner;
     private Settings settings;
 
     @BeforeEach
     public void setUp() throws IOException {
 
-        this.runPlugin = new RunPlugin();
+        this.extensionsRunner = new ExtensionsRunner();
         this.settings = Settings.builder().put("node.name", "MainScriptTests").build();
     }
 
-    // test RunPlugin getTransportService return type is transport service
+    // test ExtensionsRunner getTransportService return type is transport service
     @Test
     public void testGetTransportService() throws IOException {
-        assert (runPlugin.getTransportService(settings) instanceof TransportService);
+        assert (extensionsRunner.getTransportService(settings) instanceof TransportService);
     }
 
     // test manager method invokes start on transport service
@@ -43,10 +43,10 @@ public class TestMainScript extends OpenSearchTestCase {
     public void testTransportServiceStarted() throws IOException {
 
         // retrieve and mock transport service
-        TransportService transportService = Mockito.spy(runPlugin.getTransportService(settings));
+        TransportService transportService = Mockito.spy(extensionsRunner.getTransportService(settings));
 
         // verify mocked object interaction in manager method
-        runPlugin.startTransportService(transportService);
+        extensionsRunner.startTransportService(transportService);
         Mockito.verify(transportService, times(1)).start();
     }
 
@@ -55,10 +55,10 @@ public class TestMainScript extends OpenSearchTestCase {
     public void testTransportServiceAcceptedIncomingRequests() throws IOException {
 
         // retrieve and mock transport service
-        TransportService transportService = Mockito.spy(runPlugin.getTransportService(settings));
+        TransportService transportService = Mockito.spy(extensionsRunner.getTransportService(settings));
 
         // verify mocked object interaction in manager method
-        runPlugin.startTransportService(transportService);
+        extensionsRunner.startTransportService(transportService);
         Mockito.verify(transportService, times(1)).acceptIncomingRequests();
     }
 }

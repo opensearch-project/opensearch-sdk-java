@@ -18,17 +18,17 @@ import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportSettings;
 
-import transportservice.RunPlugin;
+import transportservice.ExtensionsRunner;
 import transportservice.netty4.Netty4Transport;
 
 public class TestNetty4Transport extends OpenSearchTestCase {
 
-    private RunPlugin runPlugin;
+    private ExtensionsRunner extensionsRunner;
     private ThreadPool threadPool;
 
     @BeforeEach
     public void setUp() throws IOException {
-        this.runPlugin = new RunPlugin();
+        this.extensionsRunner = new ExtensionsRunner();
         this.threadPool = new TestThreadPool("test");
     }
 
@@ -43,7 +43,7 @@ public class TestNetty4Transport extends OpenSearchTestCase {
             .put("transport.profiles.client1.port", 0)
             .build();
 
-        Netty4Transport transport = runPlugin.getNetty4Transport(settings, threadPool);
+        Netty4Transport transport = extensionsRunner.getNetty4Transport(settings, threadPool);
 
         try {
             startNetty4Transport(transport);
@@ -66,7 +66,7 @@ public class TestNetty4Transport extends OpenSearchTestCase {
             .put("transport.profiles.client1.port", 0)
             .build();
 
-        Netty4Transport transport = runPlugin.getNetty4Transport(settings, threadPool);
+        Netty4Transport transport = extensionsRunner.getNetty4Transport(settings, threadPool);
 
         try {
             startNetty4Transport(transport);
@@ -91,7 +91,10 @@ public class TestNetty4Transport extends OpenSearchTestCase {
 
         try {
             // attempt creating netty object with invalid settings
-            IllegalStateException ex = expectThrows(IllegalStateException.class, () -> runPlugin.getNetty4Transport(settings, threadPool));
+            IllegalStateException ex = expectThrows(
+                IllegalStateException.class,
+                () -> extensionsRunner.getNetty4Transport(settings, threadPool)
+            );
             assertEquals("profile [no_port] has no port configured", ex.getMessage());
         } finally {
             terminate(threadPool);
@@ -108,7 +111,7 @@ public class TestNetty4Transport extends OpenSearchTestCase {
             .put("transport.profiles.default.port", 0) // default port configuration will overwrite attempt
             .build();
 
-        Netty4Transport transport = runPlugin.getNetty4Transport(settings, threadPool);
+        Netty4Transport transport = extensionsRunner.getNetty4Transport(settings, threadPool);
 
         try {
             startNetty4Transport(transport);

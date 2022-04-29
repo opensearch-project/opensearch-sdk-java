@@ -25,13 +25,13 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.PageCacheRecycler;
 import org.opensearch.discovery.PluginRequest;
 import org.opensearch.discovery.PluginResponse;
+import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.index.IndicesModuleNameResponse;
 import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.index.IndicesModuleResponse;
 import org.opensearch.indices.IndicesModule;
 import org.opensearch.indices.breaker.CircuitBreakerService;
 import org.opensearch.indices.breaker.NoneCircuitBreakerService;
-import org.opensearch.plugins.PluginsOrchestrator;
 import org.opensearch.search.SearchModule;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.ClusterConnectionManager;
@@ -52,7 +52,7 @@ import java.util.stream.Stream;
 import static java.util.Collections.emptySet;
 import static org.opensearch.common.UUIDs.randomBase64UUID;
 
-public class RunPlugin {
+public class ExtensionsRunner {
 
     public static final String REQUEST_EXTENSION_ACTION_NAME = "internal:discovery/extensions";
 
@@ -71,11 +71,11 @@ public class RunPlugin {
         .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostaddress())
         .put(TransportSettings.PORT.getKey(), extensionSettings.getHostport())
         .build();
-    private static final Logger logger = LogManager.getLogger(RunPlugin.class);
+    private static final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
     public static final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
 
-    public RunPlugin() throws IOException {}
+    public ExtensionsRunner() throws IOException {}
 
     public static ExtensionSettings getExtensionSettings() throws IOException {
         File file = new File(ExtensionSettings.EXTENSION_DESCRIPTOR);
@@ -180,7 +180,7 @@ public class RunPlugin {
         );
 
         transportService.registerRequestHandler(
-            PluginsOrchestrator.INDICES_EXTENSION_POINT_ACTION_NAME,
+            ExtensionsOrchestrator.INDICES_EXTENSION_POINT_ACTION_NAME,
             ThreadPool.Names.GENERIC,
             false,
             false,
@@ -189,7 +189,7 @@ public class RunPlugin {
 
         );
         transportService.registerRequestHandler(
-            PluginsOrchestrator.INDICES_EXTENSION_NAME_ACTION_NAME,
+            ExtensionsOrchestrator.INDICES_EXTENSION_NAME_ACTION_NAME,
             ThreadPool.Names.GENERIC,
             false,
             false,
@@ -207,14 +207,14 @@ public class RunPlugin {
 
     public static void main(String[] args) throws IOException {
 
-        RunPlugin runPlugin = new RunPlugin();
+        ExtensionsRunner extensionsRunner = new ExtensionsRunner();
 
         // configure and retrieve transport service with settings
-        TransportService transportService = runPlugin.getTransportService(settings);
+        TransportService transportService = extensionsRunner.getTransportService(settings);
 
         // start transport service and action listener
-        runPlugin.startTransportService(transportService);
-        runPlugin.startActionListener(0);
+        extensionsRunner.startTransportService(transportService);
+        extensionsRunner.startActionListener(0);
     }
 
 }

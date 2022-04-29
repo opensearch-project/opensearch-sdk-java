@@ -28,7 +28,7 @@ Run main script using `gradlew run`.
 This will execute the main script set within the root `build.gradle` file :
 
 ```
-mainClassName = 'transportservice.RunPlugin'
+mainClassName = 'transportservice.ExtensionsRunner'
 ```
 Bound addresses will then be logged to the terminal :
 

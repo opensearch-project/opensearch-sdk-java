@@ -21,7 +21,7 @@ import org.opensearch.transport.TransportSettings;
 import java.net.*;
 import java.io.*;
 
-import transportservice.RunPlugin;
+import transportservice.ExtensionsRunner;
 import transportservice.netty4.Netty4Transport;
 import org.opensearch.threadpool.ThreadPool;
 
@@ -46,9 +46,9 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
     @Test
     public void testSocketSetup() throws IOException {
 
-        RunPlugin runPlugin = new RunPlugin();
+        ExtensionsRunner extensionsRunner = new ExtensionsRunner();
         ThreadPool threadPool = new TestThreadPool("test");
-        Netty4Transport transport = runPlugin.getNetty4Transport(settings, threadPool);
+        Netty4Transport transport = extensionsRunner.getNetty4Transport(settings, threadPool);
 
         // start netty transport and ensure that address info is exposed
         try {
@@ -140,18 +140,18 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
     private void startTransportandClient(Settings settings, Thread client) throws IOException, InterruptedException {
 
         // retrieve transport service
-        RunPlugin runPlugin = new RunPlugin();
-        TransportService transportService = runPlugin.getTransportService(settings);
+        ExtensionsRunner extensionsRunner = new ExtensionsRunner();
+        TransportService transportService = extensionsRunner.getTransportService(settings);
 
         // start transport service
-        runPlugin.startTransportService(transportService);
+        extensionsRunner.startTransportService(transportService);
         assertEquals(Lifecycle.State.STARTED, transportService.lifecycleState());
 
         // connect client server to transport service
         client.start();
 
         // listen for messages, set timeout to close server socket connection
-        runPlugin.startActionListener(1000);
+        extensionsRunner.startActionListener(1000);
 
         // wait for client thread to finish execution, then close server socket connection
         client.join();
