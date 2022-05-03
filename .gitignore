@@ -1,0 +1,21 @@
+
+# intellij files
+.idea/
+*.iml
+*.ipr
+*.iws
+*.log
+build-idea/
+out/
+
+# gradle stuff
+.gradle/
+build/
+
+bin/
+
+# vscode stuff
+.vscode/
+
+# osx stuff
+.DS_Store
