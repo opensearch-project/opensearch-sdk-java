@@ -9,7 +9,7 @@
  * GitHub history for details.
  */
 
-package transportservice;
+package opensearchSDK.transport;
 
 public class ExtensionSettings {
 

@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package transportservice;
+package opensearchSDK.transport;
 
 import org.opensearch.common.SuppressForbidden;
 import org.opensearch.common.unit.TimeValue;

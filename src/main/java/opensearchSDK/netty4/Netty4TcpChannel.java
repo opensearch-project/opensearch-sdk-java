@@ -30,7 +30,7 @@
  * GitHub history for details.
  */
 
-package transportservice.netty4;
+package opensearchSDK.netty4;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;

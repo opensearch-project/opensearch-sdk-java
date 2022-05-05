@@ -30,17 +30,18 @@
  * GitHub history for details.
  */
 
-package transportservice;
+package opensearchSDK.transport;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.concurrent.Future;
+import opensearchSDK.netty4.Netty4Transport;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.concurrent.AbstractRefCounted;
 import org.opensearch.transport.TcpTransport;
-import transportservice.netty4.Netty4Transport;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;

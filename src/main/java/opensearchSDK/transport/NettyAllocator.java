@@ -30,7 +30,7 @@
  * GitHub history for details.
  */
 
-package transportservice;
+package opensearchSDK.transport;
 
 import io.netty.buffer.*;
 import io.netty.channel.Channel;

@@ -18,7 +18,8 @@ import org.mockito.Mockito;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.TransportService;
-import transportservice.ExtensionsRunner;
+
+import opensearchSDK.transport.ExtensionsRunner;
 
 public class TestMainScript extends OpenSearchTestCase {
 

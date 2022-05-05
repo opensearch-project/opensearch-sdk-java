@@ -44,7 +44,7 @@
  * GitHub history for details.
  */
 
-package transportservice;
+package opensearchSDK.transport;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
