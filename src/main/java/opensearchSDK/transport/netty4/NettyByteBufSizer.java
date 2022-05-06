@@ -30,7 +30,7 @@
  * GitHub history for details.
  */
 
-package opensearchSDK.transport;
+package opensearchSDK.transport.netty4;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;

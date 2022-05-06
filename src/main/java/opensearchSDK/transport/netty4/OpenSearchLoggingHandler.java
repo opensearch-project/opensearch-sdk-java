@@ -30,7 +30,7 @@
  * GitHub history for details.
  */
 
-package opensearchSDK.netty4;
+package opensearchSDK.transport.netty4;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.logging.LogLevel;

@@ -29,7 +29,7 @@
  * GitHub history for details.
  */
 
-package opensearchSDK.netty4;
+package opensearchSDK.transport.netty4;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
@@ -45,10 +45,6 @@ import io.netty.channel.FixedRecvByteBufAllocator;
 import io.netty.channel.RecvByteBufAllocator;
 import io.netty.channel.socket.nio.NioChannelOption;
 import io.netty.util.AttributeKey;
-import opensearchSDK.transport.Netty4NioSocketChannel;
-import opensearchSDK.transport.NettyAllocator;
-import opensearchSDK.transport.NettyByteBufSizer;
-import opensearchSDK.transport.SharedGroupFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

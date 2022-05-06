@@ -19,7 +19,7 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.TransportService;
 
-import opensearchSDK.transport.ExtensionsRunner;
+import opensearchSDK.ExtensionsRunner;
 
 public class TestMainScript extends OpenSearchTestCase {
 

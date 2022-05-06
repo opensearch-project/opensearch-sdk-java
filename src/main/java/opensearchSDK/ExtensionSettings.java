@@ -9,7 +9,7 @@
  * GitHub history for details.
  */
 
-package opensearchSDK.transport;
+package opensearchSDK;
 
 public class ExtensionSettings {
 
@@ -17,7 +17,7 @@ public class ExtensionSettings {
     private String hostaddress;
     private String hostport;
     // Change the location to extension.yml file of the extension
-    static final String EXTENSION_DESCRIPTOR = "src/test/resources/extension.yml";
+    public static final String EXTENSION_DESCRIPTOR = "src/test/resources/extension.yml";
 
     public String getExtensionname() {
         return extensionname;

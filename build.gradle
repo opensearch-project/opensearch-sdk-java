@@ -25,7 +25,7 @@ ext {
 apply plugin: 'application'
 apply from: 'gradle/formatting.gradle'
 
-mainClassName = 'opensearchSDK.transport.ExtensionsRunner'
+mainClassName = 'opensearchSDK.ExtensionsRunner'
 
 group 'org.example'
 version '1.0-SNAPSHOT'

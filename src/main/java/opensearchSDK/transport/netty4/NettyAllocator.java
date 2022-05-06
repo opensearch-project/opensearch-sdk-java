@@ -30,12 +30,13 @@
  * GitHub history for details.
  */
 
-package opensearchSDK.transport;
+package opensearchSDK.transport.netty4;
 
 import io.netty.buffer.*;
 import io.netty.channel.Channel;
 import io.netty.channel.ServerChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.Booleans;

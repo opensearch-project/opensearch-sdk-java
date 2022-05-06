@@ -30,7 +30,7 @@
  * GitHub history for details.
  */
 
-package opensearchSDK.transport;
+package opensearchSDK.transport.netty4;
 
 import io.netty.channel.Channel;
 import io.netty.channel.socket.nio.NioSocketChannel;

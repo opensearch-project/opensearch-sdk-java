@@ -18,8 +18,8 @@ import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportSettings;
 
-import opensearchSDK.netty4.Netty4Transport;
-import opensearchSDK.transport.ExtensionsRunner;
+import opensearchSDK.ExtensionsRunner;
+import opensearchSDK.transport.netty4.Netty4Transport;
 
 public class TestNetty4Transport extends OpenSearchTestCase {
 

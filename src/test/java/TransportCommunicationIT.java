@@ -19,8 +19,8 @@ import org.opensearch.test.OpenSearchIntegTestCase;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
 
-import opensearchSDK.netty4.Netty4Transport;
-import opensearchSDK.transport.ExtensionsRunner;
+import opensearchSDK.ExtensionsRunner;
+import opensearchSDK.transport.netty4.Netty4Transport;
 
 import java.net.*;
 import java.io.*;

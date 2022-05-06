@@ -30,12 +30,11 @@
  * GitHub history for details.
  */
 
-package opensearchSDK.transport;
+package opensearchSDK.transport.netty4;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.concurrent.Future;
-import opensearchSDK.netty4.Netty4Transport;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
