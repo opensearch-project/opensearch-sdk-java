@@ -18,11 +18,13 @@ import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.test.OpenSearchIntegTestCase;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
+
+import opensearchSDK.ExtensionsRunner;
+import opensearchSDK.transport.netty4.Netty4Transport;
+
 import java.net.*;
 import java.io.*;
 
-import transportservice.ExtensionsRunner;
-import transportservice.netty4.Netty4Transport;
 import org.opensearch.threadpool.ThreadPool;
 
 public class TransportCommunicationIT extends OpenSearchIntegTestCase {

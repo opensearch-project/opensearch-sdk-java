@@ -9,7 +9,7 @@
  * GitHub history for details.
  */
 
-package transportservice;
+package opensearchSDK;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -37,8 +37,11 @@ import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.ClusterConnectionManager;
 import org.opensearch.transport.ConnectionManager;
 import org.opensearch.transport.TransportService;
-import transportservice.netty4.Netty4Transport;
 import org.opensearch.transport.TransportSettings;
+
+import opensearchSDK.transport.netty4.Netty4Transport;
+import opensearchSDK.transport.netty4.SharedGroupFactory;
+
 import org.opensearch.transport.TransportInterceptor;
 
 import java.io.File;

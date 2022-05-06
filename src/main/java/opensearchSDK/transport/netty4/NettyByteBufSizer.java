@@ -30,21 +30,27 @@
  * GitHub history for details.
  */
 
-package transportservice.netty4;
+package opensearchSDK.transport.netty4;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.codec.MessageToMessageDecoder;
 
-final class OpenSearchLoggingHandler extends LoggingHandler {
+import java.util.List;
 
-    OpenSearchLoggingHandler() {
-        super(LogLevel.TRACE);
-    }
+@ChannelHandler.Sharable
+public class NettyByteBufSizer extends MessageToMessageDecoder<ByteBuf> {
 
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        // We do not want to log read complete events because we log inbound messages in the TcpTransport.
-        ctx.fireChannelReadComplete();
+    protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> out) {
+        int readableBytes = buf.readableBytes();
+        if (buf.capacity() >= 1024) {
+            ByteBuf resized = buf.discardReadBytes().capacity(readableBytes);
+            assert resized.readableBytes() == readableBytes;
+            out.add(resized.retain());
+        } else {
+            out.add(buf.retain());
+        }
     }
 }

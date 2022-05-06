@@ -15,7 +15,7 @@
  * not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -30,29 +30,21 @@
  * GitHub history for details.
  */
 
-package transportservice;
+package opensearchSDK.transport.netty4;
 
-import io.netty.channel.Channel;
-import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 
-import java.nio.channels.SocketChannel;
+final class OpenSearchLoggingHandler extends LoggingHandler {
 
-/**
- * Helper class to expose {@link #javaChannel()} method
- */
-public class Netty4NioSocketChannel extends NioSocketChannel {
-
-    public Netty4NioSocketChannel() {
-        super();
-    }
-
-    public Netty4NioSocketChannel(Channel parent, SocketChannel socket) {
-        super(parent, socket);
+    OpenSearchLoggingHandler() {
+        super(LogLevel.TRACE);
     }
 
     @Override
-    public SocketChannel javaChannel() {
-        return super.javaChannel();
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        // We do not want to log read complete events because we log inbound messages in the TcpTransport.
+        ctx.fireChannelReadComplete();
     }
-
 }
