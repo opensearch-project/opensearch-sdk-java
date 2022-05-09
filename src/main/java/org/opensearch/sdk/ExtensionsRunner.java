@@ -17,6 +17,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.Version;
 import org.opensearch.cluster.ClusterModule;
+import org.opensearch.cluster.ClusterServiceRequest;
+import org.opensearch.cluster.CreateComponentResponse;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.network.NetworkModule;
@@ -48,6 +50,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -60,6 +64,8 @@ public class ExtensionsRunner {
     public static final String REQUEST_EXTENSION_ACTION_NAME = "internal:discovery/extensions";
 
     private static ExtensionSettings extensionSettings = null;
+
+    private DiscoveryNode opensearchNode = null;
 
     static {
         try {
@@ -90,12 +96,59 @@ public class ExtensionsRunner {
     PluginResponse handlePluginsRequest(PluginRequest pluginRequest) {
         logger.info("Handling Plugins Request");
         PluginResponse pluginResponse = new PluginResponse("RealExtension");
+        opensearchNode = pluginRequest.getSourceNode();
         return pluginResponse;
     }
 
     IndicesModuleResponse handleIndicesModuleRequest(IndicesModuleRequest indicesModuleRequest) {
         logger.info("Indices Module Request");
         IndicesModuleResponse indicesModuleResponse = new IndicesModuleResponse(true, true, true);
+        
+        // CreateComponent
+        TransportService transportService = getTransportService(settings);
+        final CountDownLatch inProgressLatch = new CountDownLatch(1);
+
+        final TransportResponseHandler<CreateComponentResponse> createComponentResponseHandler = new TransportResponseHandler<
+            CreateComponentResponse>() {
+
+            @Override
+            public void handleResponse(CreateComponentResponse response) {
+                logger.info("received {}", response);
+                inProgressLatch.countDown();
+            }
+
+            @Override
+            public void handleException(TransportException exp) {
+                logger.debug(new ParameterizedMessage("CreateComponentRequest failed"), exp);
+                // inProgressLatch.countDown();
+            }
+
+            @Override
+            public String executor() {
+                return ThreadPool.Names.GENERIC;
+            }
+
+            @Override
+            public CreateComponentResponse read(StreamInput in) throws IOException {
+                return new CreateComponentResponse(in);
+            }
+        };
+        try {
+            logger.info("Sending request to opensearch");
+            transportService.connectToNode(opensearchNode);
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_EXTENSION_ACTION_NAME,
+                new ClusterServiceRequest("CLUSTER STATE"),
+                createComponentResponseHandler
+            );
+            inProgressLatch.await(100, TimeUnit.SECONDS);
+            logger.info("Received response from OpenSearch");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.toString());
+        }
+
         return indicesModuleResponse;
     }
 
