@@ -9,6 +9,8 @@
  * GitHub history for details.
  */
 
+package org.opensearch.sdk;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;

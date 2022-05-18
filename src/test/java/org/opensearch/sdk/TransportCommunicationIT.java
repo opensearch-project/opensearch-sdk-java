@@ -9,6 +9,8 @@
  * GitHub history for details.
  */
 
+package org.opensearch.sdk;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.common.component.Lifecycle;
@@ -19,8 +21,7 @@ import org.opensearch.test.OpenSearchIntegTestCase;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
 
-import opensearchSDK.ExtensionsRunner;
-import opensearchSDK.transport.netty4.Netty4Transport;
+import org.opensearch.sdk.netty4.Netty4Transport;
 
 import java.net.*;
 import java.io.*;

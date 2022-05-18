@@ -9,6 +9,8 @@
  * GitHub history for details.
  */
 
+package org.opensearch.sdk;
+
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,8 +20,7 @@ import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportSettings;
 
-import opensearchSDK.ExtensionsRunner;
-import opensearchSDK.transport.netty4.Netty4Transport;
+import org.opensearch.sdk.netty4.Netty4Transport;
 
 public class TestNetty4Transport extends OpenSearchTestCase {
 
