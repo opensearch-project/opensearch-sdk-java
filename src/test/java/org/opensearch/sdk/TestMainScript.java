@@ -9,6 +9,8 @@
  * GitHub history for details.
  */
 
+package org.opensearch.sdk;
+
 import static org.mockito.Mockito.times;
 
 import java.io.IOException;
@@ -18,8 +20,6 @@ import org.mockito.Mockito;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.TransportService;
-
-import opensearchSDK.ExtensionsRunner;
 
 public class TestMainScript extends OpenSearchTestCase {
 

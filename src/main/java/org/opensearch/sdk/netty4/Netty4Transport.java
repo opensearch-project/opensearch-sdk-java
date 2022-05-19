@@ -29,7 +29,7 @@
  * GitHub history for details.
  */
 
-package opensearchSDK.transport.netty4;
+package org.opensearch.sdk.netty4;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;

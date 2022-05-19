@@ -9,7 +9,7 @@
  * GitHub history for details.
  */
 
-package opensearchSDK;
+package org.opensearch.sdk;
 
 public class ExtensionSettings {
 

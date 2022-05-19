@@ -6,7 +6,7 @@
  * compatible open source license.
  */
 
-package opensearchSDK;
+package org.opensearch.sdk;
 
 import org.opensearch.common.SuppressForbidden;
 import org.opensearch.common.unit.TimeValue;

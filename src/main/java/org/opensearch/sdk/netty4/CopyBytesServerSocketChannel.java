@@ -43,7 +43,7 @@
  * Modifications Copyright OpenSearch Contributors. See
  * GitHub history for details.
  */
-package opensearchSDK.transport.netty4;
+package org.opensearch.sdk.netty4;
 
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.internal.SocketUtils;
