@@ -15,12 +15,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.ParameterizedMessage;
 import org.opensearch.Version;
 import org.opensearch.cluster.ClusterModule;
 import org.opensearch.cluster.ClusterServiceRequest;
 import org.opensearch.cluster.CreateComponentResponse;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
+import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
 import org.opensearch.common.settings.Settings;
@@ -40,6 +42,8 @@ import org.opensearch.transport.ClusterConnectionManager;
 import org.opensearch.transport.ConnectionManager;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
+import org.opensearch.transport.TransportException;
+import org.opensearch.transport.TransportResponseHandler;
 
 import org.opensearch.sdk.netty4.Netty4Transport;
 import org.opensearch.sdk.netty4.SharedGroupFactory;
@@ -100,12 +104,12 @@ public class ExtensionsRunner {
         return pluginResponse;
     }
 
-    IndicesModuleResponse handleIndicesModuleRequest(IndicesModuleRequest indicesModuleRequest) {
+    IndicesModuleResponse handleIndicesModuleRequest(IndicesModuleRequest indicesModuleRequest, TransportService transportService) {
         logger.info("Indices Module Request");
         IndicesModuleResponse indicesModuleResponse = new IndicesModuleResponse(true, true, true);
-        
+
         // CreateComponent
-        TransportService transportService = getTransportService(settings);
+        transportService.connectToNode(opensearchNode);
         final CountDownLatch inProgressLatch = new CountDownLatch(1);
 
         final TransportResponseHandler<CreateComponentResponse> createComponentResponseHandler = new TransportResponseHandler<
@@ -138,8 +142,8 @@ public class ExtensionsRunner {
             transportService.connectToNode(opensearchNode);
             transportService.sendRequest(
                 opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_ACTION_NAME,
-                new ClusterServiceRequest("CLUSTER STATE"),
+                ExtensionsOrchestrator.REQUEST_EXTENSION_CREATE_COMPONENT,
+                new ClusterServiceRequest(true),
                 createComponentResponseHandler
             );
             inProgressLatch.await(100, TimeUnit.SECONDS);
@@ -241,7 +245,7 @@ public class ExtensionsRunner {
             false,
             false,
             IndicesModuleRequest::new,
-            ((request, channel, task) -> channel.sendResponse(handleIndicesModuleRequest(request)))
+            ((request, channel, task) -> channel.sendResponse(handleIndicesModuleRequest(request, transportService)))
 
         );
         transportService.registerRequestHandler(
