@@ -15,14 +15,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.message.ParameterizedMessage;
 import org.opensearch.Version;
 import org.opensearch.cluster.ClusterModule;
-import org.opensearch.cluster.ClusterServiceRequest;
-import org.opensearch.cluster.CreateComponentResponse;
+import org.opensearch.cluster.ExtensionRequest;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
-import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
 import org.opensearch.common.settings.Settings;
@@ -42,8 +39,6 @@ import org.opensearch.transport.ClusterConnectionManager;
 import org.opensearch.transport.ConnectionManager;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
-import org.opensearch.transport.TransportException;
-import org.opensearch.transport.TransportResponseHandler;
 
 import org.opensearch.sdk.netty4.Netty4Transport;
 import org.opensearch.sdk.netty4.SharedGroupFactory;
@@ -111,42 +106,30 @@ public class ExtensionsRunner {
         // CreateComponent
         transportService.connectToNode(opensearchNode);
         final CountDownLatch inProgressLatch = new CountDownLatch(1);
-
-        final TransportResponseHandler<CreateComponentResponse> createComponentResponseHandler = new TransportResponseHandler<
-            CreateComponentResponse>() {
-
-            @Override
-            public void handleResponse(CreateComponentResponse response) {
-                logger.info("received {}", response);
-                inProgressLatch.countDown();
-            }
-
-            @Override
-            public void handleException(TransportException exp) {
-                logger.debug(new ParameterizedMessage("CreateComponentRequest failed"), exp);
-                // inProgressLatch.countDown();
-            }
-
-            @Override
-            public String executor() {
-                return ThreadPool.Names.GENERIC;
-            }
-
-            @Override
-            public CreateComponentResponse read(StreamInput in) throws IOException {
-                return new CreateComponentResponse(in);
-            }
-        };
         try {
             logger.info("Sending request to opensearch");
-            transportService.connectToNode(opensearchNode);
+            ClusterStateResponseHandler clusterStateResponseHandler = new ClusterStateResponseHandler();
             transportService.sendRequest(
                 opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_CREATE_COMPONENT,
-                new ClusterServiceRequest(true),
-                createComponentResponseHandler
+                ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_STATE,
+                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_STATE),
+                clusterStateResponseHandler
             );
-            inProgressLatch.await(100, TimeUnit.SECONDS);
+            ClusterSettingResponseHandler clusterSettingResponseHandler = new ClusterSettingResponseHandler();
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_SETTINGS,
+                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_SETTINGS),
+                clusterSettingResponseHandler
+            );
+            LocalNodeResponseHandler localNodeResponseHandler = new LocalNodeResponseHandler();
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_EXTENSION_LOCAL_NODE,
+                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_LOCAL_NODE),
+                localNodeResponseHandler
+            );
+            inProgressLatch.await(1, TimeUnit.SECONDS);
             logger.info("Received response from OpenSearch");
         } catch (Exception e) {
             e.printStackTrace();
