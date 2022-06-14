@@ -24,8 +24,7 @@ public class LocalNodeResponseHandler implements TransportResponseHandler<LocalN
 
     @Override
     public void handleException(TransportException exp) {
-        logger.debug(new ParameterizedMessage("LocalNodeRequest failed"), exp);
-        // inProgressLatch.countDown();
+        logger.info("LocalNodeRequest failed", exp);
     }
 
     @Override

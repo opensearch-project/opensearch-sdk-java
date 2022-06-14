@@ -24,8 +24,7 @@ public class ClusterSettingResponseHandler implements TransportResponseHandler<C
 
     @Override
     public void handleException(TransportException exp) {
-        logger.debug(new ParameterizedMessage("ClusterSettingRequest failed"), exp);
-        // inProgressLatch.countDown();
+        logger.info("ClusterSettingRequest failed", exp);
     }
 
     @Override

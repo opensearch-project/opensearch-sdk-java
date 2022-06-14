@@ -12,8 +12,8 @@ import org.opensearch.transport.TransportResponseHandler;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
-public class ClusterStateResponseHandler implements TransportResponseHandler<ExtensionClusterStateResponse> {
-    private static final Logger logger = LogManager.getLogger(ClusterStateResponseHandler.class);
+public class ExtensionClusterStateResponseHandler implements TransportResponseHandler<ExtensionClusterStateResponse> {
+    private static final Logger logger = LogManager.getLogger(ExtensionClusterStateResponseHandler.class);
     final CountDownLatch inProgressLatch = new CountDownLatch(1);
 
     @Override
@@ -24,8 +24,7 @@ public class ClusterStateResponseHandler implements TransportResponseHandler<Ext
 
     @Override
     public void handleException(TransportException exp) {
-        logger.debug(new ParameterizedMessage("ClusterStateRequest failed"), exp);
-        // inProgressLatch.countDown();
+        logger.info("ClusterStateRequest failed", exp);
     }
 
     @Override

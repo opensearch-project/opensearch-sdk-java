@@ -36,7 +36,7 @@ public class TestMainScript extends OpenSearchTestCase {
     // test ExtensionsRunner getTransportService return type is transport service
     @Test
     public void testGetTransportService() throws IOException {
-        assert (extensionsRunner.getTransportService(settings) instanceof TransportService);
+        assert (extensionsRunner.createTransportService(settings) instanceof TransportService);
     }
 
     // test manager method invokes start on transport service
@@ -44,7 +44,7 @@ public class TestMainScript extends OpenSearchTestCase {
     public void testTransportServiceStarted() throws IOException {
 
         // retrieve and mock transport service
-        TransportService transportService = Mockito.spy(extensionsRunner.getTransportService(settings));
+        TransportService transportService = Mockito.spy(extensionsRunner.createTransportService(settings));
 
         // verify mocked object interaction in manager method
         extensionsRunner.startTransportService(transportService);
@@ -56,7 +56,7 @@ public class TestMainScript extends OpenSearchTestCase {
     public void testTransportServiceAcceptedIncomingRequests() throws IOException {
 
         // retrieve and mock transport service
-        TransportService transportService = Mockito.spy(extensionsRunner.getTransportService(settings));
+        TransportService transportService = Mockito.spy(extensionsRunner.createTransportService(settings));
 
         // verify mocked object interaction in manager method
         extensionsRunner.startTransportService(transportService);

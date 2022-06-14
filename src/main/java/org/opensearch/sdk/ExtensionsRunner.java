@@ -19,6 +19,7 @@ import org.opensearch.Version;
 import org.opensearch.cluster.ClusterModule;
 import org.opensearch.cluster.ExtensionRequest;
 import org.opensearch.cluster.node.DiscoveryNode;
+import org.opensearch.common.concurrent.CompletableContext;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
@@ -49,6 +50,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -59,12 +61,9 @@ import static java.util.Collections.emptySet;
 import static org.opensearch.common.UUIDs.randomBase64UUID;
 
 public class ExtensionsRunner {
-
-    public static final String REQUEST_EXTENSION_ACTION_NAME = "internal:discovery/extensions";
-
     private static ExtensionSettings extensionSettings = null;
-
     private DiscoveryNode opensearchNode = null;
+    TransportService transportService = null;
 
     static {
         try {
@@ -93,28 +92,29 @@ public class ExtensionsRunner {
     }
 
     PluginResponse handlePluginsRequest(PluginRequest pluginRequest) {
-        logger.info("Handling Plugins Request");
+        logger.info("Registering Plugin Request received from OpenSearch");
         PluginResponse pluginResponse = new PluginResponse("RealExtension");
         opensearchNode = pluginRequest.getSourceNode();
         return pluginResponse;
     }
 
-    IndicesModuleResponse handleIndicesModuleRequest(IndicesModuleRequest indicesModuleRequest, TransportService transportService) {
-        logger.info("Indices Module Request");
+    IndicesModuleResponse handleIndicesModuleRequest(IndicesModuleRequest indicesModuleRequest) {
+        logger.info("Registering Indices Module Request received from OpenSearch");
         IndicesModuleResponse indicesModuleResponse = new IndicesModuleResponse(true, true, true);
 
         // CreateComponent
         transportService.connectToNode(opensearchNode);
         final CountDownLatch inProgressLatch = new CountDownLatch(1);
         try {
-            logger.info("Sending request to opensearch");
-            ClusterStateResponseHandler clusterStateResponseHandler = new ClusterStateResponseHandler();
+            logger.info("Sending Cluster State request to OpenSearch after creating index");
+            ExtensionClusterStateResponseHandler clusterStateResponseHandler = new ExtensionClusterStateResponseHandler();
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_STATE,
                 new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_STATE),
                 clusterStateResponseHandler
             );
+            logger.info("Sending Cluster Settings request to OpenSearch after creating index");
             ClusterSettingResponseHandler clusterSettingResponseHandler = new ClusterSettingResponseHandler();
             transportService.sendRequest(
                 opensearchNode,
@@ -122,6 +122,7 @@ public class ExtensionsRunner {
                 new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_SETTINGS),
                 clusterSettingResponseHandler
             );
+            logger.info("Sending Local Node request to OpenSearch after creating index");
             LocalNodeResponseHandler localNodeResponseHandler = new LocalNodeResponseHandler();
             transportService.sendRequest(
                 opensearchNode,
@@ -130,7 +131,7 @@ public class ExtensionsRunner {
                 localNodeResponseHandler
             );
             inProgressLatch.await(1, TimeUnit.SECONDS);
-            logger.info("Received response from OpenSearch");
+            logger.info("Received response from OpenSearch for ClusterState, ClusterSettings and LocalNode");
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.toString());
@@ -141,7 +142,7 @@ public class ExtensionsRunner {
 
     // Works as beforeIndexRemoved
     IndicesModuleNameResponse handleIndicesModuleNameRequest(IndicesModuleRequest indicesModuleRequest) {
-        logger.info("Indices Module Name Request");
+        logger.info("Registering Indices Module Name Request received from OpenSearch");
         IndicesModuleNameResponse indicesModuleNameResponse = new IndicesModuleNameResponse(true);
         return indicesModuleNameResponse;
     }
@@ -180,7 +181,7 @@ public class ExtensionsRunner {
         return transport;
     }
 
-    public TransportService getTransportService(Settings settings) throws IOException {
+    public TransportService createTransportService(Settings settings) throws IOException {
 
         ThreadPool threadPool = new ThreadPool(settings);
 
@@ -214,7 +215,7 @@ public class ExtensionsRunner {
         transportService.start();
         transportService.acceptIncomingRequests();
         transportService.registerRequestHandler(
-            REQUEST_EXTENSION_ACTION_NAME,
+            ExtensionsOrchestrator.REQUEST_EXTENSION_ACTION_NAME,
             ThreadPool.Names.GENERIC,
             false,
             false,
@@ -228,7 +229,7 @@ public class ExtensionsRunner {
             false,
             false,
             IndicesModuleRequest::new,
-            ((request, channel, task) -> channel.sendResponse(handleIndicesModuleRequest(request, transportService)))
+            ((request, channel, task) -> channel.sendResponse(handleIndicesModuleRequest(request)))
 
         );
         transportService.registerRequestHandler(
@@ -242,6 +243,10 @@ public class ExtensionsRunner {
 
     }
 
+    public void setTransportService(TransportService transportService) {
+        this.transportService = transportService;
+    }
+
     // manager method for action listener
     public void startActionListener(int timeout) {
         final ActionListener actionListener = new ActionListener();
@@ -253,7 +258,8 @@ public class ExtensionsRunner {
         ExtensionsRunner extensionsRunner = new ExtensionsRunner();
 
         // configure and retrieve transport service with settings
-        TransportService transportService = extensionsRunner.getTransportService(settings);
+        TransportService transportService = extensionsRunner.createTransportService(settings);
+        extensionsRunner.setTransportService(transportService);
 
         // start transport service and action listener
         extensionsRunner.startTransportService(transportService);
