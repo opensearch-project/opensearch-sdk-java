@@ -19,7 +19,6 @@ import org.opensearch.Version;
 import org.opensearch.cluster.ClusterModule;
 import org.opensearch.cluster.ExtensionRequest;
 import org.opensearch.cluster.node.DiscoveryNode;
-import org.opensearch.common.concurrent.CompletableContext;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
@@ -50,9 +49,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -104,7 +100,7 @@ public class ExtensionsRunner {
 
         // CreateComponent
         transportService.connectToNode(opensearchNode);
-        final CountDownLatch inProgressLatch = new CountDownLatch(1);
+
         try {
             logger.info("Sending Cluster State request to OpenSearch after creating index");
             ExtensionClusterStateResponseHandler clusterStateResponseHandler = new ExtensionClusterStateResponseHandler();
@@ -130,7 +126,7 @@ public class ExtensionsRunner {
                 new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_LOCAL_NODE),
                 localNodeResponseHandler
             );
-            inProgressLatch.await(1, TimeUnit.SECONDS);
+
             logger.info("Received response from OpenSearch for ClusterState, ClusterSettings and LocalNode");
         } catch (Exception e) {
             e.printStackTrace();
