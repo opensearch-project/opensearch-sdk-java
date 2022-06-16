@@ -57,30 +57,22 @@ import static java.util.Collections.emptySet;
 import static org.opensearch.common.UUIDs.randomBase64UUID;
 
 public class ExtensionsRunner {
-    private static ExtensionSettings extensionSettings = null;
-    private DiscoveryNode opensearchNode = null;
-    TransportService transportService = null;
+    private ExtensionSettings extensionSettings = getExtensionSettings();
+    private DiscoveryNode opensearchNode;
+    private TransportService transportService;
 
-    static {
-        try {
-            extensionSettings = getExtensionSettings();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    public ExtensionsRunner() throws IOException {}
 
-    private static final Settings settings = Settings.builder()
+    private final Settings settings = Settings.builder()
         .put("node.name", extensionSettings.getExtensionname())
         .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostaddress())
         .put(TransportSettings.PORT.getKey(), extensionSettings.getHostport())
         .build();
-    private static final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
-    public static final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
+    private final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
+    private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
 
-    public ExtensionsRunner() throws IOException {}
-
-    public static ExtensionSettings getExtensionSettings() throws IOException {
+    private ExtensionSettings getExtensionSettings() throws IOException {
         File file = new File(ExtensionSettings.EXTENSION_DESCRIPTOR);
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
         ExtensionSettings extensionSettings = objectMapper.readValue(file, ExtensionSettings.class);
@@ -111,7 +103,7 @@ public class ExtensionsRunner {
                 clusterStateResponseHandler
             );
             logger.info("Sending Cluster Settings request to OpenSearch after creating index");
-            ClusterSettingResponseHandler clusterSettingResponseHandler = new ClusterSettingResponseHandler();
+            ClusterSettingsResponseHandler clusterSettingResponseHandler = new ClusterSettingsResponseHandler();
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_SETTINGS,
@@ -129,8 +121,7 @@ public class ExtensionsRunner {
 
             logger.info("Received response from OpenSearch for ClusterState, ClusterSettings and LocalNode");
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.toString());
+            logger.info("Failed to send request to OpenSearch", e);
         }
 
         return indicesModuleResponse;
@@ -186,7 +177,7 @@ public class ExtensionsRunner {
         final ConnectionManager connectionManager = new ClusterConnectionManager(settings, transport);
 
         // create transport service
-        final TransportService transportService = new TransportService(
+        transportService = new TransportService(
             settings,
             transport,
             threadPool,
@@ -239,8 +230,12 @@ public class ExtensionsRunner {
 
     }
 
-    public void setTransportService(TransportService transportService) {
-        this.transportService = transportService;
+    private TransportService getTransportService() {
+        return transportService;
+    }
+
+    private Settings getSettings() {
+        return settings;
     }
 
     // manager method for action listener
@@ -254,8 +249,10 @@ public class ExtensionsRunner {
         ExtensionsRunner extensionsRunner = new ExtensionsRunner();
 
         // configure and retrieve transport service with settings
-        TransportService transportService = extensionsRunner.createTransportService(settings);
-        extensionsRunner.setTransportService(transportService);
+        Settings settings = extensionsRunner.getSettings();
+        extensionsRunner.createTransportService(settings);
+        // extensionsRunner.setTransportService();
+        TransportService transportService = extensionsRunner.getTransportService();
 
         // start transport service and action listener
         extensionsRunner.startTransportService(transportService);

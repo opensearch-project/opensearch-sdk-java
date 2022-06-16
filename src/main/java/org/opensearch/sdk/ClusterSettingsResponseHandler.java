@@ -9,16 +9,13 @@ import org.opensearch.transport.TransportException;
 import org.opensearch.transport.TransportResponseHandler;
 
 import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
 
-public class ClusterSettingResponseHandler implements TransportResponseHandler<ClusterSettingsResponse> {
-    private static final Logger logger = LogManager.getLogger(ClusterSettingResponseHandler.class);
-    final CountDownLatch inProgressLatch = new CountDownLatch(1);
+public class ClusterSettingsResponseHandler implements TransportResponseHandler<ClusterSettingsResponse> {
+    private static final Logger logger = LogManager.getLogger(ClusterSettingsResponseHandler.class);
 
     @Override
     public void handleResponse(ClusterSettingsResponse response) {
         logger.info("received {}", response);
-        inProgressLatch.countDown();
     }
 
     @Override

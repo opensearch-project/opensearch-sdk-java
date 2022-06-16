@@ -9,16 +9,13 @@ import org.opensearch.transport.TransportException;
 import org.opensearch.transport.TransportResponseHandler;
 
 import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
 
 public class LocalNodeResponseHandler implements TransportResponseHandler<LocalNodeResponse> {
     private static final Logger logger = LogManager.getLogger(LocalNodeResponseHandler.class);
-    final CountDownLatch inProgressLatch = new CountDownLatch(1);
 
     @Override
     public void handleResponse(LocalNodeResponse response) {
         logger.info("received {}", response);
-        inProgressLatch.countDown();
     }
 
     @Override
