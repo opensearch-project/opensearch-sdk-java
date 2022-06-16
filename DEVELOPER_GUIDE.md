@@ -2,8 +2,10 @@
 # OpenSearch SDK Developer Guide
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
-	- [Git Clone IndependentPlugin Repo](#git-clone-independentplugin-repo)
-	- [Run Independent Plugin](#run-independent-plugin)
+	- [Git Clone OpenSearch-SDK Repo](#git-clone-OpenSearch-SDK-repo)
+	- [Git Clone OpenSearch Repo](#git-clone-opensearch-repo)
+	- [Publish OpenSearch Feature/Extensions branch to Maven local](#publish-opensearch-feature/extensions-branch-to-maven-local)
+	- [Run Extension](#run-extension)
 	- [Run Tests](#run-tests)
 	- [Send Message using Telnet](#send-message-using-telnet)
 
@@ -14,12 +16,18 @@ Read more about extensibility [here](https://github.com/opensearch-project/OpenS
 
 ## Getting Started
 
-### Git Clone IndependentPlugin Repo
-Fork [IndependentPlugin](https://github.com/owaiskazi19/IndependentPlugin) and clone locally, e.g. `git clone https://github.com/[your username]/IndependentPlugin.git`.
+### Git Clone OpenSearch SDK Repo
+Fork [OpenSearch SDK](https://github.com/opensearch-project/opensearch-sdk) and clone locally, e.g. `git clone https://github.com/[your username]/opensearch-sdk.git`.
 
-### Run Independent Plugin
+### Git Clone OpenSearch Repo
+Fork [OpenSearch](https://github.com/opensearch-project/OpenSearch) and clone locally, e.g. `git clone https://github.com/[your username]/OpenSearch.git`.
 
-Run main script using `gradlew run`.
+## Publish OpenSearch feature/extensions Branch to Maven local
+The work done to support the extensions framework is located on the `Feature/Extensions` branch of the OpenSearch project. It is necessary to publish the dependencies of this branch to your local maven repository prior to running the extension on a seperate process. In order to do this, first navigate to the directory that OpenSearch has been cloned to, checkout the correct branch, e.g. `git checkout feature/extensions`. Then run `./gradlew publishToMavenLocal`. It is necessary to publish dependencies to a local maven repository until this branch is merged to `main`, at which point all dependencies will be published to Maven central.
+
+### Run Extension
+
+Navigate to the directory that OpenSearch-SDK has been cloned to and run main script using `gradlew run`.
 
 ```
 ./gradlew run
@@ -46,7 +54,7 @@ Run tests :
 
 ### Send Message using Telnet
 
-To send a message, first run the IndependentPlugin :
+To send a message, first run the OpenSearch-SDK :
 
 ```
 ./gradlew run
@@ -61,7 +69,7 @@ Trying 127.0.0.1...
 Connected to localhost.
 Escape character is '^]'.
 ```
-The original terminal used to run the independent plugin will log the connection request :
+The original terminal used to run the OpenSearch-SDK will log the connection request :
 ```
 [opensearch[NettySizeHeaderFrameDecoderTests][transport_worker][T#5]] TRACE transportservice.TcpTransport - Tcp transport channel accepted: Netty4TcpChannel{localAddress=/127.0.0.1:5555, remoteAddress=/127.0.0.1:57302}
 [opensearch[NettySizeHeaderFrameDecoderTests][transport_worker][T#5]] TRACE transportservice.netty4.OpenSearchLoggingHandler - [id: 0x8c1cc239, L:/127.0.0.1:5555 - R:/127.0.0.1:57302] REGISTERED
