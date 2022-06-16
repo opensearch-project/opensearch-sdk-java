@@ -28,6 +28,7 @@ The work done to support the extensions framework is located on the `feature/ext
 - First navigate to the directory that OpenSearch has been cloned to
 - Checkout the correct branch, e.g. `git checkout feature/extensions`.
 - Run `./gradlew publishToMavenLocal`. 
+- Run `./gradlew check` to make sure the build is successful.
 
 It is necessary to publish dependencies to a local maven repository until this branch is merged to `main`, at which point all dependencies will be published to Maven central.
 
