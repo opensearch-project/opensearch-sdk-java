@@ -45,6 +45,9 @@ Bound addresses will then be logged to the terminal :
 [main] INFO  transportservice.TransportService - profile [test]: publish_address {127.0.0.1:5555}, bound_addresses {[::1]:5555}, {127.0.0.1:5555}
 ```
 
+Once the bound addresses are logged to the terminal, navigate to the directory that OpenSearch has been cloned to and start OpenSearch feature/extensions branch using `./gradlew run`.
+It is important that the extension is already up and running prior to starting OpenSearch, since extension discovery occurs only if the extension is already listening on a pre-defined port. Once discovery is complete and the data transfer connection between both nodes has been established, OpenSearch and the extension will now be able to comminicate. 
+
 ### Run Tests
 
 Run tests :
