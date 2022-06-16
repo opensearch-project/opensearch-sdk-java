@@ -5,7 +5,7 @@
 	- [Git Clone OpenSearch-SDK Repo](#git-clone-OpenSearch-SDK-repo)
 	- [Git Clone OpenSearch Repo](#git-clone-opensearch-repo)
 	- [Publish OpenSearch Feature/Extensions branch to Maven local](#publish-opensearch-feature/extensions-branch-to-maven-local)
-	- [Run Extension](#run-extension)
+	- [Run OpenSearch-SDK](#run-opensearch-sdk)
 	- [Run Tests](#run-tests)
 	- [Send Message using Telnet](#send-message-using-telnet)
 
@@ -23,7 +23,7 @@ Fork [OpenSearch SDK](https://github.com/opensearch-project/opensearch-sdk) and 
 Fork [OpenSearch](https://github.com/opensearch-project/OpenSearch) and clone locally, e.g. `git clone https://github.com/[your username]/OpenSearch.git`.
 
 ## Publish OpenSearch feature/extensions Branch to Maven local
-The work done to support the extensions framework is located on the `feature/extensions` branch of the OpenSearch project. It is necessary to publish the dependencies of this branch to your local maven repository prior to running the extension on a seperate process. 
+The work done to support the extensions framework is located on the `feature/extensions` branch of the OpenSearch project. It is necessary to publish the dependencies of this branch to your local maven repository prior to running the OpenSearch SDK on a seperate process. 
 
 - First navigate to the directory that OpenSearch has been cloned to
 - Checkout the correct branch, e.g. `git checkout feature/extensions`.
@@ -33,7 +33,7 @@ It is necessary to publish dependencies to a local maven repository until this b
 
 ### Run OpenSearch SDK
 
-Navigate to the directory that OpenSearch-SDK has been cloned to and run main script using `gradlew run`.
+Navigate to the directory that OpenSearch-SDK has been cloned to and run main script using `./gradlew run`.
 
 ```
 ./gradlew run
@@ -52,7 +52,7 @@ Bound addresses will then be logged to the terminal :
 ```
 
 Once the bound addresses are logged to the terminal, navigate to the directory that OpenSearch has been cloned to and start OpenSearch feature/extensions branch using `./gradlew run`.
-It is important that the extension is already up and running prior to starting OpenSearch, since extension discovery occurs only if the extension is already listening on a pre-defined port. Once discovery is complete and the data transfer connection between both nodes has been established, OpenSearch and the extension will now be able to comminicate. 
+It is important that the OpenSearch SDK is already up and running prior to starting OpenSearch, since extension discovery occurs only if the OpenSearch SDK is already listening on a pre-defined port. Once discovery is complete and the data transfer connection between both nodes has been established, OpenSearch and the OpenSearch SDK will now be able to comminicate. 
 
 ### Run Tests
 
