@@ -23,9 +23,15 @@ Fork [OpenSearch SDK](https://github.com/opensearch-project/opensearch-sdk) and 
 Fork [OpenSearch](https://github.com/opensearch-project/OpenSearch) and clone locally, e.g. `git clone https://github.com/[your username]/OpenSearch.git`.
 
 ## Publish OpenSearch feature/extensions Branch to Maven local
-The work done to support the extensions framework is located on the `Feature/Extensions` branch of the OpenSearch project. It is necessary to publish the dependencies of this branch to your local maven repository prior to running the extension on a seperate process. In order to do this, first navigate to the directory that OpenSearch has been cloned to, checkout the correct branch, e.g. `git checkout feature/extensions`. Then run `./gradlew publishToMavenLocal`. It is necessary to publish dependencies to a local maven repository until this branch is merged to `main`, at which point all dependencies will be published to Maven central.
+The work done to support the extensions framework is located on the `feature/extensions` branch of the OpenSearch project. It is necessary to publish the dependencies of this branch to your local maven repository prior to running the extension on a seperate process. 
 
-### Run Extension
+- First navigate to the directory that OpenSearch has been cloned to
+- Checkout the correct branch, e.g. `git checkout feature/extensions`.
+- Run `./gradlew publishToMavenLocal`. 
+
+It is necessary to publish dependencies to a local maven repository until this branch is merged to `main`, at which point all dependencies will be published to Maven central.
+
+### Run OpenSearch SDK
 
 Navigate to the directory that OpenSearch-SDK has been cloned to and run main script using `gradlew run`.
 
