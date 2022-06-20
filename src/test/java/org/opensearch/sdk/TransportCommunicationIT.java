@@ -17,16 +17,17 @@ import org.opensearch.common.component.Lifecycle;
 import org.opensearch.common.network.NetworkAddress;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
+import org.opensearch.sdk.netty4.Netty4Transport;
 import org.opensearch.test.OpenSearchIntegTestCase;
+import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
 
-import org.opensearch.sdk.netty4.Netty4Transport;
-
-import java.net.*;
-import java.io.*;
-
-import org.opensearch.threadpool.ThreadPool;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.Socket;
 
 public class TransportCommunicationIT extends OpenSearchIntegTestCase {
 
