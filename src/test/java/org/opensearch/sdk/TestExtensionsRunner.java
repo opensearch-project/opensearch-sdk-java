@@ -21,7 +21,7 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.TransportService;
 
-public class TestMainScript extends OpenSearchTestCase {
+public class TestExtensionsRunner extends OpenSearchTestCase {
 
     private ExtensionsRunner extensionsRunner;
     private Settings settings;

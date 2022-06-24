@@ -17,7 +17,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.Version;
 import org.opensearch.cluster.ClusterModule;
-import org.opensearch.cluster.ExtensionRequest;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.network.NetworkModule;
@@ -26,6 +25,7 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.PageCacheRecycler;
 import org.opensearch.discovery.PluginRequest;
 import org.opensearch.discovery.PluginResponse;
+import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.index.IndicesModuleNameResponse;
 import org.opensearch.index.IndicesModuleRequest;
@@ -39,11 +39,10 @@ import org.opensearch.transport.ClusterConnectionManager;
 import org.opensearch.transport.ConnectionManager;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
+import org.opensearch.transport.TransportInterceptor;
 
 import org.opensearch.sdk.netty4.Netty4Transport;
 import org.opensearch.sdk.netty4.SharedGroupFactory;
-
-import org.opensearch.transport.TransportInterceptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -101,38 +100,6 @@ public class ExtensionsRunner {
         // CreateComponent
         DiscoveryNode opensearchNode = getOpensearchNode();
         transportService.connectToNode(opensearchNode);
-
-        try {
-            logger.info("Sending Cluster State request to OpenSearch after creating index");
-            ExtensionClusterStateResponseHandler clusterStateResponseHandler = new ExtensionClusterStateResponseHandler();
-            transportService.sendRequest(
-                opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_STATE,
-                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_STATE),
-                clusterStateResponseHandler
-            );
-            logger.info("Sending Cluster Settings request to OpenSearch after creating index");
-            ClusterSettingsResponseHandler clusterSettingResponseHandler = new ClusterSettingsResponseHandler();
-            transportService.sendRequest(
-                opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_SETTINGS,
-                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_SETTINGS),
-                clusterSettingResponseHandler
-            );
-            logger.info("Sending Local Node request to OpenSearch after creating index");
-            LocalNodeResponseHandler localNodeResponseHandler = new LocalNodeResponseHandler();
-            transportService.sendRequest(
-                opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_LOCAL_NODE,
-                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_LOCAL_NODE),
-                localNodeResponseHandler
-            );
-
-            logger.info("Received response from OpenSearch for ClusterState, ClusterSettings and LocalNode");
-        } catch (Exception e) {
-            logger.info("Failed to send request to OpenSearch", e);
-        }
-
         return indicesModuleResponse;
     }
 
@@ -208,6 +175,9 @@ public class ExtensionsRunner {
         // start transport service and accept incoming requests
         transportService.start();
         transportService.acceptIncomingRequests();
+
+        // Extension Request is the first request for the transport communication.
+        // This request will initialize the extension and will be a part of OpenSearch bootstrap
         transportService.registerRequestHandler(
             ExtensionsOrchestrator.REQUEST_EXTENSION_ACTION_NAME,
             ThreadPool.Names.GENERIC,
@@ -235,6 +205,54 @@ public class ExtensionsRunner {
             ((request, channel, task) -> channel.sendResponse(handleIndicesModuleNameRequest(request)))
         );
 
+    }
+
+    // Extension can use this API to get ClusterState from OpenSearch
+    public void sendClusterStateRequest(TransportService transportService) {
+        logger.info("Sending Cluster State request to OpenSearch");
+        ClusterStateResponseHandler clusterStateResponseHandler = new ClusterStateResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_STATE,
+                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_STATE),
+                clusterStateResponseHandler
+            );
+        } catch (Exception e) {
+            logger.info("Failed to send Cluster State request to OpenSearch", e);
+        }
+    }
+
+    // Extension can use this API to get ClusterSettings from OpenSearch
+    public void sendClusterSettingRequest(TransportService transportService) {
+        logger.info("Sending Cluster Settings request to OpenSearch");
+        ClusterSettingsResponseHandler clusterSettingResponseHandler = new ClusterSettingsResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_SETTINGS,
+                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_SETTINGS),
+                clusterSettingResponseHandler
+            );
+        } catch (Exception e) {
+            logger.info("Failed to send Cluster Settings request to OpenSearch", e);
+        }
+    }
+
+    // Extension can use this API to get LocalNode from OpenSearch
+    public void sendLocalNodeRequest(TransportService transportService) {
+        logger.info("Sending Local Node request to OpenSearch");
+        LocalNodeResponseHandler localNodeResponseHandler = new LocalNodeResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_EXTENSION_LOCAL_NODE,
+                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_LOCAL_NODE),
+                localNodeResponseHandler
+            );
+        } catch (Exception e) {
+            logger.info("Failed to send Cluster Settings request to OpenSearch", e);
+        }
     }
 
     private Settings getSettings() {

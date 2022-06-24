@@ -2,19 +2,19 @@ package org.opensearch.sdk;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.opensearch.action.admin.cluster.state.ClusterStateResponse;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.cluster.ExtensionClusterStateResponse;
 import org.opensearch.transport.TransportException;
 import org.opensearch.transport.TransportResponseHandler;
 
 import java.io.IOException;
 
-public class ExtensionClusterStateResponseHandler implements TransportResponseHandler<ExtensionClusterStateResponse> {
-    private static final Logger logger = LogManager.getLogger(ExtensionClusterStateResponseHandler.class);
+public class ClusterStateResponseHandler implements TransportResponseHandler<ClusterStateResponse> {
+    private static final Logger logger = LogManager.getLogger(ClusterStateResponseHandler.class);
 
     @Override
-    public void handleResponse(ExtensionClusterStateResponse response) {
+    public void handleResponse(ClusterStateResponse response) {
         logger.info("received {}", response);
     }
 
@@ -29,7 +29,7 @@ public class ExtensionClusterStateResponseHandler implements TransportResponseHa
     }
 
     @Override
-    public ExtensionClusterStateResponse read(StreamInput in) throws IOException {
-        return new ExtensionClusterStateResponse(in);
+    public ClusterStateResponse read(StreamInput in) throws IOException {
+        return new ClusterStateResponse(in);
     }
 }
