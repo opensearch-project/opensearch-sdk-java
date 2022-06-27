@@ -8,6 +8,7 @@
 	- [Run OpenSearch-SDK](#run-opensearch-sdk)
 	- [Run OpenSearch](#run-opensearch)
 	- [Run Tests](#run-tests)
+    - [Submitting Changes](#submitting-changes)
 
 ## Introduction
 Opensearch plugins have allowed the extension and ehancements of various core features however, current plugin architecture carries the risk of fatally impacting clusters should they fail. In order to ensure that plugins may run safely without impacting the system, our goal is to effectively isolate plugin interactions with OpenSearch by modularizing the [extension points](https://opensearch.org/blog/technical-post/2021/12/plugins-intro/) to which they hook onto. 
@@ -32,7 +33,7 @@ The work done to support the extensions framework is located on the `feature/ext
 
 It is necessary to publish dependencies to a local maven repository until this branch is merged to `main`, at which point all dependencies will be published to Maven central.
 
-### Run OpenSearch SDK
+## Run OpenSearch SDK
 
 Navigate to the directory that OpenSearch-SDK has been cloned to and run main script using `./gradlew run`.
 
@@ -52,7 +53,7 @@ Bound addresses will then be logged to the terminal :
 [main] INFO  transportservice.TransportService - profile [test]: publish_address {127.0.0.1:5555}, bound_addresses {[::1]:5555}, {127.0.0.1:5555}
 ```
 
-### Run OpenSearch
+## Run OpenSearch
 
 - Start a seperate terminal and navigate to the directory that OpenSearch has been cloned to using `cd OpenSearch`
 - Start OpenSearch feature/extensions branch using `./gradlew run`.
@@ -123,9 +124,13 @@ MESSAGE RECEIVED:ES-ǣ!internal:discovery/extensionsnode_extensionQSt9oKXFTSWqgX
 
 It is important that the OpenSearch SDK is already up and running on a seperate process prior to starting OpenSearch, since extension discovery occurs only if the OpenSearch SDK is already listening on a pre-defined port. Once discovery is complete and the data transfer connection between both nodes has been established, OpenSearch and the OpenSearch SDK will now be able to comminicate. 
 
-### Run Tests
+## Run Tests
 
 Run tests :
 ```
 ./gradlew clean build test
 ```
+
+## Submitting Changes
+
+See [CONTRIBUTING](CONTRIBUTING.md).
