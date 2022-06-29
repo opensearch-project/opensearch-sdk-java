@@ -55,7 +55,32 @@ Bound addresses will then be logged to the terminal :
 
 ## Run OpenSearch
 
-- Start a seperate terminal and navigate to the directory that OpenSearch has been cloned to using `cd OpenSearch`
+- Start a separate terminal and navigate to the directory that OpenSearch has been cloned to using `cd OpenSearch`.
+
+- Check if extensions directory exists in OpenSearch using `ls`.
+- If the directory does not exist, create it using `mkdir extensions`.
+- Navigate to the extensions folder using `cd extensions`.
+- Manually create a file titled `extensions.yml` within the extensions directory using an IDE or an in-line text editor.
+
+Sample extensions.yml file:
+
+```
+extensions:
+  - name: opensearch-sdk
+    uniqueId: opensearch-sdk-1
+    hostName: 'sdk_host'
+    hostAddress: '127.0.0.1'
+    port: '4532'
+    version: '1.0'
+    description: Extension for the Opensearch SDK Repo
+    opensearchVersion: '3.0.0'
+    javaVersion: '14'
+    className: sdk
+    customFolderName: opensearch-sdk
+    hasNativeController: false	
+```
+
+- Return to the OpenSearch directory by using `cd ..`.
 - Start OpenSearch feature/extensions branch using `./gradlew run`.
 
 During OpenSearch bootstrap, `ExtensionsOrchestrator` will then discover the extension listenening on a pre-defined port and execute the TCP handshake protocol to establish a data transfer connection. A request will be sent to the OpenSearch SDK and upon acknowledgment, the extension will respond with its name which will be logged onto terminal that OpenSearch is running on.
@@ -68,7 +93,7 @@ During OpenSearch bootstrap, `ExtensionsOrchestrator` will then discover the ext
 [2022-06-16T21:30:19,000][INFO ][o.o.e.ExtensionsOrchestrator] [runTask-0] received PluginResponse{examplepluginname}
 ```
 
-OpenSearch SDK terminal will also log all requests and responses it recieves from OpenSearch :
+OpenSearch SDK terminal will also log all requests and responses it receives from OpenSearch :
 
 TCP HandShake Request :
 ```
