@@ -97,7 +97,7 @@ public class ExtensionsRunner {
         logger.info("Registering Indices Module Request received from OpenSearch");
         IndicesModuleResponse indicesModuleResponse = new IndicesModuleResponse(true, true, true);
 
-        // CreateComponent
+        // handlePluginsRequest will set the opensearchNode while bootstraping of OpenSearch
         DiscoveryNode opensearchNode = getOpensearchNode();
         transportService.connectToNode(opensearchNode);
         return indicesModuleResponse;
