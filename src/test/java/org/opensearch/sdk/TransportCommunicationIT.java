@@ -145,7 +145,7 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
 
         // retrieve transport service
         ExtensionsRunner extensionsRunner = new ExtensionsRunner();
-        TransportService transportService = extensionsRunner.getTransportService(settings);
+        TransportService transportService = extensionsRunner.createTransportService(settings);
 
         // start transport service
         extensionsRunner.startTransportService(transportService);
