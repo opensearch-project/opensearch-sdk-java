@@ -1,6 +1,9 @@
 # Extensions Security Guidelines
 
-OpenSearch's support for extensions allows for taking already powerful use cases and expanding on them, this creates a larger surface area for misuse, vunerabilities, and malicious interactions.  This document outlines several areas for enhancements, features, and practices to incorperate into extensions for OpenSearch
+OpenSearch's support for extensions allows for taking already powerful use cases and expanding on them. With this increased functionality comes a larger surface area for misuse, vunerabilities, and malicious interactions.
+
+By capturing the current state of OpenSearch ecocsystem and the plans for extensions this document outlines several areas for enhancements, features, and practices to incorperate into extensions for OpenSearch.
+
 
 To keep concepts consistant, this document is using terminology from [NIST Glossary](https://csrc.nist.gov/glossary).
 
@@ -10,15 +13,15 @@ Additional terms:
 
 ## Host security
 
-The Java Security Manager is the mechanism for ensuring plugins are limited in what they can do to the host operation system resources (cpu/disk/memory/network/...).  As there are limitations and its deprecated with removal scheduled in the next release of the JVM.
+Plugins depend on use of the Java Security Manager is use to limit interactions on the host operation system resources (cpu/disk/memory/network/...).  JSM has been deprecated, with its removal scheduled in the next release of the JVM, see [OpenSearch discussion](https://github.com/opensearch-project/OpenSearch/issues/1687). Additional measures are needed to protect system resources.
 
-The current extensions design they operate via Rest APIs, by isolating extensions from using host they are prevented from executing operation system calls directly on hosts of the cluster.
+Extensions are sandboxed from the host system by operating via REST APIs.  This security boundary isolates extensions from executing operation system calls directly on OpenSearch hosts.
 
 ## Communications security (COMSEC)
 
-Data is transferred from the OpenSearch cluster to the extensions.  This is done via https requests between the nodes on the cluster and the extensions endpoint(s).
+Plugins are loaded into the same java virtual machine instance allowing communicate to OpenSearch through in process java APIs.  Plugins can issue REST API requests to the OpenSearch hosts reusing the standard node-to-node communications, internally called the transport client.
 
-Extensions should never directly communicate with other extensions, cross extensions work should always be proxied through OpenSearch.
+Extensions of OpenSearch communicate via https requests between the nodes on the cluster and the extensions endpoint(s).  This is a bi-direction communication also allows extensions to contact the OpenSearch cluster through its avaliable REST APIs.
 
 ## Data Security
 
