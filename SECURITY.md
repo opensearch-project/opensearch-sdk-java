@@ -25,17 +25,17 @@ Extensions of OpenSearch communicate via https requests between the nodes on the
 
 ## Data Security
 
-OpenSearch stores data in its memory and local file system storage, the security plugin provides mechanisms to control data access within OpenSearch.  Extensions have independent data storage.
+OpenSearch stores data in memory and local file system storage.  This data is stored unencrypted.
 
-Plugins store data inside of the OpenSearch cluster itself such as in system/hidden indices.
+Plugins can use the existing data systems of the OpenSearch.  Several classes of plugins extend storage options out to external services.
 
-## Access Control
+### Access Control
 
-OpenSearch offers access control through the security plugin, with checks action names and filters.  Actions registered within OpenSearch that are not permitted never reach the handler for a plugin or extension execution.
+With the security plugin installed, role based access control (RBAC) is available with a proprietary policy document format.  Access control over native OpenSearch data is possible with this plugin installed.
 
-Resource level access control is governed by the extension, when requests are processed the [user](https://github.com/opensearch-project/common-utils/blob/main/src/main/java/org/opensearch/commons/authuser/User.java) object from common-utils is checked for matching backendroles/roles.  Access control checks are managed wholy in the plugin.  Example from anomaly detection, [checkUserPermissions](https://github.com/opensearch-project/anomaly-detection/blob/875b03c1c7596cb34d74fea285c28d949cfb0d19/src/main/java/org/opensearch/ad/util/ParseUtils.java#L568).
+For resource that are managed by plugins, access control is governed within individual plugin, by examining [user](https://github.com/opensearch-project/common-utils/blob/main/src/main/java/org/opensearch/commons/authuser/User.java) object from OpenSearch's thread context permissions are avaliable for approval/denial. Example from anomaly detection, [checkUserPermissions](https://github.com/opensearch-project/anomaly-detection/blob/875b03c1c7596cb34d74fea285c28d949cfb0d19/src/main/java/org/opensearch/ad/util/ParseUtils.java#L568).  Uniform resource controls and models are needed to protect from misconfiguration and code defects.
 
-Available permissions and roles are defined in the security plugin, every extension needs to update the security plugin to provide these values, eg. [roles.xml](https://github.com/opensearch-project/security/blob/main/config/roles.yml).
+As Extensions do not have access OpenSearch's thread context, identity and its associated prileveages must be communicated through the REST APIs.
 
 ## Auditing
 
