@@ -4,12 +4,23 @@ OpenSearch's support for extensions allows for taking already powerful use cases
 
 By capturing the current state of OpenSearch ecocsystem and the plans for extensions this document outlines several areas for enhancements, features, and practices to incorperate into extensions for OpenSearch.
 
+## Document Phases
+These guidlines and this document are meant to evolve.  Some area might be complete adhead of others. Some areas or items might be marked as invalid/removed using markdown's strike-through.
 
+1. [X] Agreement of areas and 'as-is' state of OpenSearch Plugins and Extensions. **<-- Doc is here**
+2. [ ] All area have recommendations and areas of investigation are filed as issues and linked back on this document.
+3. [ ] All investigation conclusions are captured and linked in this document, effectively define the scope of work for these areas.  Implementation of work is can be completed or outstanding.
+4. [ ] All planned work has been completed, issues around this work can be completed or outstanding. 
+5. [ ] Document complete, future work and issue will be captured out of band instead of as updates this document.
+
+## Terms
 To keep concepts consistant, this document is using terminology from [NIST Glossary](https://csrc.nist.gov/glossary).
 
 Additional terms:
 * **Plugin** - reference to the existing functionality to extend OpenSearch functionality.
 * **Extension** - reference to the in development functionality to extend OpenSearch.
+
+# Areas
 
 ## Host security
 
