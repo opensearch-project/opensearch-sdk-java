@@ -54,18 +54,26 @@ With the security plugin installed, when actions are performed on the OpenSearch
 
 ## Installation
 
-Plugin installation is managed by using a binary on the node that extract plugin.zip files into the file system, this is done outside the active running of OpenSearch itself.  When OpenSearch starts it loads installed plugins into its JVM runtime.
+Plugin installation is managed by using a binary on the node that extract plugin zip files into the file system, this is done outside the active running of OpenSearch itself.  When OpenSearch starts it loads installed plugins into its JVM runtime.
+
+Extensions installation is managed through on disk configuration. 
 
 ## Versioning
 
-OpenSearch systems have ways to deprecate unsupported patterns, feature, and APIs.
+OpenSearch has a version number following [semver](https://semver.org/).
+
+Plugins for OpenSearch must match their version exactly the version of OpenSearch.  Older version numbers are not compatiable.
+
+Extensions version information is not tied to OpenSearch's version.
 
 ## Configuration
 
-Configuration of OpenSearch is split between on disk yml files and various in OpenSearch systems such as cluster settings.
+Configuration of OpenSearch uses on disk yml configuration files.  Other settings are manage in-memory through settings that are modifiable at runtime through APIs or indirectly.
 
-Plugins configuration is loaded and checked at service startup time for correctness.  If there is an error OpenSearch can fail to start.
+Plugins configuration is managed through the same systems as OpenSearch.
+
+Extensions configuration setup is tied to OpenSearch settings, extensions configuration are managed independantly of OpenSearch.
 
 ## Reliability
 
-OpenSearch plugins can create node instability if incorrectly configured, or there are code defects.
+OpenSearch plugins can create cluster or node instability if incorrectly configured or by software defects.

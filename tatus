@@ -1,0 +1,38 @@
+[1mdiff --git a/SECURITY.md b/SECURITY.md[m
+[1mindex 1c00684..5eb8c58 100644[m
+[1m--- a/SECURITY.md[m
+[1m+++ b/SECURITY.md[m
+[36m@@ -54,18 +54,26 @@[m [mWith the security plugin installed, when actions are performed on the OpenSearch[m
+ [m
+ ## Installation[m
+ [m
+[31m-Plugin installation is managed by using a binary on the node that extract plugin.zip files into the file system, this is done outside the active running of OpenSearch itself.  When OpenSearch starts it loads installed plugins into its JVM runtime.[m
+[32m+[m[32mPlugin installation is managed by using a binary on the node that extract plugin zip files into the file system, this is done outside the active running of OpenSearch itself.  When OpenSearch starts it loads installed plugins into its JVM runtime.[m
+[32m+[m
+[32m+[m[32mExtensions installation is managed through on disk configuration.[m[41m [m
+ [m
+ ## Versioning[m
+ [m
+[31m-OpenSearch systems have ways to deprecate unsupported patterns, feature, and APIs.[m
+[32m+[m[32mOpenSearch has a version number following [semver](https://semver.org/).[m
+[32m+[m
+[32m+[m[32mPlugins for OpenSearch must match their version exactly the version of OpenSearch.  Older version numbers are not compatiable.[m
+[32m+[m
+[32m+[m[32mExtensions version information is not tied to OpenSearch's version.[m
+ [m
+ ## Configuration[m
+ [m
+[31m-Configuration of OpenSearch is split between on disk yml files and various in OpenSearch systems such as cluster settings.[m
+[32m+[m[32mConfiguration of OpenSearch uses on disk yml configuration files.  Other settings are manage in-memory through settings that are modifiable at runtime through APIs or indirectly.[m
+[32m+[m
+[32m+[m[32mPlugins configuration is managed through the same systems as OpenSearch.[m
+ [m
+[31m-Plugins configuration is loaded and checked at service startup time for correctness.  If there is an error OpenSearch can fail to start.[m
+[32m+[m[32mExtensions configuration setup is tied to OpenSearch settings, extensions configuration are managed independantly of OpenSearch.[m
+ [m
+ ## Reliability[m
+ [m
+[31m-OpenSearch plugins can create node instability if incorrectly configured, or there are code defects.[m
+\ No newline at end of file[m
+[32m+[m[32mOpenSearch plugins can create cluster or node instability if incorrectly configured or by software defects.[m
+\ No newline at end of file[m
