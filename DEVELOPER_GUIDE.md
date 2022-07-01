@@ -53,7 +53,9 @@ Bound addresses will then be logged to the terminal :
 [main] INFO  transportservice.TransportService - profile [test]: publish_address {127.0.0.1:5555}, bound_addresses {[::1]:5555}, {127.0.0.1:5555}
 ```
 
-## Run OpenSearch
+## Create extensions.yml file
+
+Every extension will require metadata stored in an extensions.yml file in order to be loaded successfully.  In order to make the SDK look like an extension within OpenSearch, there must be an entry for the SDK within `extensions.yml`.
 
 - Start a separate terminal and navigate to the directory that OpenSearch has been cloned to using `cd OpenSearch`.
 
@@ -80,8 +82,10 @@ extensions:
     hasNativeController: false	
 ```
 
+## Run OpenSearch
+
 - Return to the OpenSearch directory by using `cd ..`.
-- Start OpenSearch feature/extensions branch using `./gradlew run`.
+- Start OpenSearch feature/extensions branch using `./bin/opensearch`.
 
 During OpenSearch bootstrap, `ExtensionsOrchestrator` will then discover the extension listenening on a pre-defined port and execute the TCP handshake protocol to establish a data transfer connection. A request will be sent to the OpenSearch SDK and upon acknowledgment, the extension will respond with its name which will be logged onto terminal that OpenSearch is running on.
 
