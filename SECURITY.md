@@ -42,7 +42,7 @@ Plugins can use the existing data systems of the OpenSearch.  Several classes of
 
 ### Access Control
 
-With the security plugin installed, role based access control (RBAC) is available with a proprietary policy document format.  Access control over native OpenSearch data is possible with this plugin installed.
+With the security plugin installed, role based access control (RBAC) is available with a policy document format specific to OpenSearch.  Access control over native OpenSearch data is possible with this plugin installed.
 
 For resource that are managed by plugins, access control is governed within individual plugin, by examining [user](https://github.com/opensearch-project/common-utils/blob/main/src/main/java/org/opensearch/commons/authuser/User.java) object from OpenSearch's thread context permissions are available for approval/denial. Example from anomaly detection, [checkUserPermissions](https://github.com/opensearch-project/anomaly-detection/blob/875b03c1c7596cb34d74fea285c28d949cfb0d19/src/main/java/org/opensearch/ad/util/ParseUtils.java#L568).  Uniform resource controls and models are needed to protect from misconfiguration and code defects.
 
@@ -62,9 +62,9 @@ Extensions installation is managed through on disk configuration.
 
 OpenSearch has a version number following [semver](https://semver.org/).
 
-Plugins for OpenSearch must match their version exactly the version of OpenSearch.  Older version numbers are not compatible.
+Plugins for OpenSearch must match their version exactly the version of OpenSearch.  Older version numbers are not compatible, so to resolve CVE in OpenSearch or in plugins - all components be re-released.
 
-Extensions version information is not tied to OpenSearch's version.
+Extensions version information is not tied to OpenSearch's version, extensions and OpenSearch are able to independantly release minor/patch versions to address CVEs.
 
 ## Configuration
 
