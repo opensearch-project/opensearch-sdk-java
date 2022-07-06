@@ -17,28 +17,28 @@ These guidelines and this document are meant to evolve, the follow list captures
 To keep concepts consistent, this document is using terminology from [NIST Glossary](https://csrc.nist.gov/glossary).
 
 Additional terms:
-* **Plugin** - reference to the existing functionality to extend OpenSearch functionality.
-* **Extension** - reference to the in development functionality to extend OpenSearch.
+* **Plugin** - reference to the existing functionality to extend OpenSearch functionality. Learn more from [Introduction to OpenSearch Plugins](https://opensearch.org/blog/technical-post/2021/12/plugins-intro/).
+* **Extension** - reference to the in development functionality to extend OpenSearch. Learn more from [Modular architecture in OpenSearch](https://github.com/opensearch-project/OpenSearch/issues/1422).
 
 # Areas
 
 ## Host security
 
-Plugins depend on use of the Java Security Manager (JSM) to limit interactions on the host operation system resources (cpu/disk/memory/network/...).  JSM has been deprecated, with its removal scheduled in the next release of the JVM, see [OpenSearch discussion](https://github.com/opensearch-project/OpenSearch/issues/1687). Additional measures are needed to protect system resources.
+Plugins depend on use of the Java Security Manager (JSM) to limit interactions on the host operation system resources (cpu/disk/memory/network/...).  JSM has been deprecated, with its removal scheduled in the next release of the JVM, see [OpenSearch discussion](https://github.com/opensearch-project/OpenSearch/issues/1687).   Additional measures are needed to protect system resources.
 
-Extensions are sandboxed from the host system by operating via REST APIs.  This security boundary isolates extensions from executing operation system calls directly on OpenSearch hosts.
+Extensions are sandboxed from the host system by operating via APIs.  This security boundary isolates extensions from executing operation system calls directly on OpenSearch hosts.
 
 ## Communications security (COMSEC)
 
-Plugins are loaded into the same java virtual machine instance allowing communicate to OpenSearch through in process java APIs.  Plugins can issue REST API requests to the OpenSearch hosts reusing the standard node-to-node communications, internally called the transport client.
+Plugins are loaded into the same java virtual machine instance allowing communicate to OpenSearch through in process java APIs.  Plugins can issue API requests to the OpenSearch hosts reusing the standard node-to-node communications, internally called the transport client.
 
-Extensions of OpenSearch communicate via https requests between the nodes on the cluster and the extensions endpoint(s).  This is a bi-direction communication also allows extensions to contact the OpenSearch cluster through its available REST APIs.
+Extensions of OpenSearch communicate via https requests between the nodes on the cluster and the extensions endpoint(s).  This is a bi-direction communication also allows extensions to contact the OpenSearch cluster through its available APIs.
 
 ## Data Security
 
 OpenSearch stores data in memory and local file system storage.  This data is stored unencrypted.
 
-Plugins can use the existing data systems of the OpenSearch.  Several classes of plugins extend storage options out to external services.
+Plugins can use the existing data systems of the OpenSearch.  Several implementations of plugins extend storage options out to external services.
 
 ### Access Control
 
@@ -46,7 +46,7 @@ With the security plugin installed, role based access control (RBAC) is availabl
 
 For resource that are managed by plugins, access control is governed within individual plugin. By examining [user](https://github.com/opensearch-project/common-utils/blob/main/src/main/java/org/opensearch/commons/authuser/User.java) object from OpenSearch's thread context permissions are available for approval/denial. An example from anomaly detection is [checkUserPermissions](https://github.com/opensearch-project/anomaly-detection/blob/875b03c1c7596cb34d74fea285c28d949cfb0d19/src/main/java/org/opensearch/ad/util/ParseUtils.java#L568).  Uniform resource controls and models are needed to protect from misconfiguration and code defects.
 
-As Extensions do not have access OpenSearch's thread context, identity and its associated privileges must be communicated through the REST APIs.
+As Extensions do not have access OpenSearch's thread context, identity and its associated privileges must be communicated through APIs.
 
 ## Auditing
 
@@ -54,7 +54,7 @@ With the security plugin installed, when actions are performed on the OpenSearch
 
 ## Installation
 
-Plugin installation is managed by using a binary on the node that extract plugin zip files into the file system, this is done outside the active running of OpenSearch itself.  When OpenSearch starts it loads installed plugins into its JVM runtime.
+Plugin installation is managed by using a binary on the node, it is used when OpenSearch is not running. The tool can perform signature the native plugins and extracts the plugin zip files into the file system.  When OpenSearch starts it discovers and loads installed plugins into its JVM runtime.
 
 Extensions installation is managed through on disk configuration. 
 
@@ -64,7 +64,7 @@ OpenSearch has a version number following [semver](https://semver.org/).
 
 Plugins for OpenSearch must match their version exactly the version of OpenSearch.  Older version numbers are not compatible, so to resolve CVE in OpenSearch or in plugins - all components be re-released.
 
-Extensions version information is not tied to OpenSearch's version, extensions and OpenSearch are able to independantly release minor/patch versions to address CVEs.
+Extensions version information is not tied to OpenSearch's version, extensions and OpenSearch are able to independently release minor/patch versions to address CVEs.
 
 ## Configuration
 
