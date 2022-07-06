@@ -58,6 +58,8 @@ Bound addresses will then be logged to the terminal :
 Every extension will require metadata stored in an extensions.yml file in order to be loaded successfully.  In order to make the SDK look like an extension within OpenSearch, there must be an entry for the SDK within `extensions.yml`.
 
 - Start a separate terminal and navigate to the directory that OpenSearch has been cloned to using `cd OpenSearch`.
+- Run `./gradlew assemble` to create a local distribution.
+- Navigate to the project root directory (i.e. `cd distribution/archives/linux-tar/build/install/opensearch-3.0.0-SNAPSHOT/`).
 
 - Check if extensions directory exists in OpenSearch using `ls`.
 - If the directory does not exist, create it using `mkdir extensions`.
