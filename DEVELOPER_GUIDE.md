@@ -21,7 +21,7 @@ Read more about extensibility [here](https://github.com/opensearch-project/OpenS
 Fork [OpenSearch SDK](https://github.com/opensearch-project/opensearch-sdk) and clone locally, e.g. `git clone https://github.com/[your username]/opensearch-sdk.git`.
 
 ### Git Clone OpenSearch Repo
-Fork [OpenSearch](https://github.com/opensearch-project/OpenSearch/tree/feature/extensions) and clone locally, e.g. `git clone https://github.com/[your username]/OpenSearch.git`.
+Fork [OpenSearch](https://github.com/opensearch-project/OpenSearch/), checkout feature/extensions branch, and clone locally, e.g. `git clone https://github.com/[your username]/OpenSearch.git`.
 
 ## Publish OpenSearch feature/extensions Branch to Maven local
 The work done to support the extensions framework is located on the `feature/extensions` branch of the OpenSearch project. It is necessary to publish the dependencies of this branch to your local maven repository prior to running the OpenSearch SDK on a seperate process. 
