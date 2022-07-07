@@ -62,7 +62,7 @@ Every extension will require metadata stored in an extensions.yml file in order 
 
 - Start a separate terminal and navigate to the directory that OpenSearch has been cloned to using `cd OpenSearch`.
 - Run `./gradlew assemble` to create a local distribution.
-- Navigate to the project root directory (i.e. `cd distribution/archives/linux-tar/build/install/opensearch-3.0.0-SNAPSHOT/`).
+- Navigate to the project root directory (i.e. `cd distribution/archives/linux-tar/build/install/opensearch-3.0.0-SNAPSHOT/`). Note: On Mac OS `linux-tar` should be replaced with `darwin-tar`.
 
 - Check if extensions directory exists in OpenSearch using `ls`.
 - If the directory does not exist, create it using `mkdir extensions`.
