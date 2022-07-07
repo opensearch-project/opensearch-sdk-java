@@ -82,7 +82,7 @@ extensions:
     description: Extension for the Opensearch SDK Repo
     opensearchVersion: '3.0.0'
     javaVersion: '14'
-    className: sdk
+    className: ExtensionsRunner
     customFolderName: opensearch-sdk
     hasNativeController: false	
 ```
