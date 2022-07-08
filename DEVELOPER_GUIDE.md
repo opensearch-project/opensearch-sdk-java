@@ -6,7 +6,8 @@
 	- [Git Clone OpenSearch Repo](#git-clone-opensearch-repo)
 	- [Publish OpenSearch Feature/Extensions branch to Maven local](#publish-opensearch-feature/extensions-branch-to-maven-local)
 	- [Run OpenSearch-SDK](#run-opensearch-sdk)
-	- [Run OpenSearch](#run-opensearch)
+	    - [Create extensions.yml file](#create_extensions_file)
+        - [Run OpenSearch](#run-opensearch)
 	- [Run Tests](#run-tests)
     - [Submitting Changes](#submitting-changes)
 
@@ -21,7 +22,7 @@ Read more about extensibility [here](https://github.com/opensearch-project/OpenS
 Fork [OpenSearch SDK](https://github.com/opensearch-project/opensearch-sdk) and clone locally, e.g. `git clone https://github.com/[your username]/opensearch-sdk.git`.
 
 ### Git Clone OpenSearch Repo
-Fork [OpenSearch](https://github.com/opensearch-project/OpenSearch) and clone locally, e.g. `git clone https://github.com/[your username]/OpenSearch.git`.
+Fork [OpenSearch](https://github.com/opensearch-project/OpenSearch/), checkout feature/extensions branch, and clone locally, e.g. `git clone https://github.com/[your username]/OpenSearch.git`.
 
 ## Publish OpenSearch feature/extensions Branch to Maven local
 The work done to support the extensions framework is located on the `feature/extensions` branch of the OpenSearch project. It is necessary to publish the dependencies of this branch to your local maven repository prior to running the OpenSearch SDK on a seperate process. 
@@ -53,10 +54,43 @@ Bound addresses will then be logged to the terminal :
 [main] INFO  transportservice.TransportService - profile [test]: publish_address {127.0.0.1:5555}, bound_addresses {[::1]:5555}, {127.0.0.1:5555}
 ```
 
+
+
+## Create extensions.yml file
+
+Every extension will require metadata stored in an extensions.yml file in order to be loaded successfully.  In order to make the SDK look like an extension within OpenSearch, there must be an entry for the SDK within `extensions.yml`.
+
+- Start a separate terminal and navigate to the directory that OpenSearch has been cloned to using `cd OpenSearch`.
+- Run `./gradlew assemble` to create a local distribution.
+- Navigate to the project root directory (i.e. `cd distribution/archives/linux-tar/build/install/opensearch-3.0.0-SNAPSHOT/`). Note: On Mac OS `linux-tar` should be replaced with `darwin-tar`.
+
+- Check if extensions directory exists in OpenSearch using `ls`.
+- If the directory does not exist, create it using `mkdir extensions`.
+- Navigate to the extensions folder using `cd extensions`.
+- Manually create a file titled `extensions.yml` within the extensions directory using an IDE or an in-line text editor.
+
+Sample extensions.yml file:
+
+```
+extensions:
+  - name: opensearch-sdk
+    uniqueId: opensearch-sdk-1
+    hostName: 'sdk_host'
+    hostAddress: '127.0.0.1'
+    port: '4532'
+    version: '1.0'
+    description: Extension for the Opensearch SDK Repo
+    opensearchVersion: '3.0.0'
+    javaVersion: '14'
+    className: ExtensionsRunner
+    customFolderName: opensearch-sdk
+    hasNativeController: false	
+```
+
 ## Run OpenSearch
 
-- Start a seperate terminal and navigate to the directory that OpenSearch has been cloned to using `cd OpenSearch`
-- Start OpenSearch feature/extensions branch using `./gradlew run`.
+- Return to the OpenSearch directory by using `cd ..`.
+- Start OpenSearch feature/extensions branch using `./bin/opensearch`.
 
 During OpenSearch bootstrap, `ExtensionsOrchestrator` will then discover the extension listenening on a pre-defined port and execute the TCP handshake protocol to establish a data transfer connection. A request will be sent to the OpenSearch SDK and upon acknowledgment, the extension will respond with its name which will be logged onto terminal that OpenSearch is running on.
 
@@ -68,7 +102,7 @@ During OpenSearch bootstrap, `ExtensionsOrchestrator` will then discover the ext
 [2022-06-16T21:30:19,000][INFO ][o.o.e.ExtensionsOrchestrator] [runTask-0] received PluginResponse{examplepluginname}
 ```
 
-OpenSearch SDK terminal will also log all requests and responses it recieves from OpenSearch :
+OpenSearch SDK terminal will also log all requests and responses it receives from OpenSearch :
 
 TCP HandShake Request :
 ```
