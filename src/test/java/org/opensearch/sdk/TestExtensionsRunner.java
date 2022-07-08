@@ -11,55 +11,124 @@
 
 package org.opensearch.sdk;
 
+import static java.util.Collections.emptySet;
+import static java.util.Collections.emptyMap;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.mock;
 
-import java.io.IOException;
+import java.net.InetAddress;
+import java.util.Collections;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.opensearch.Version;
+import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.common.transport.TransportAddress;
+import org.opensearch.discovery.PluginRequest;
+import org.opensearch.discovery.PluginResponse;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.TransportService;
+import org.opensearch.transport.Transport;
 
 public class TestExtensionsRunner extends OpenSearchTestCase {
 
     private ExtensionsRunner extensionsRunner;
     private Settings settings;
+    private TransportService transportService;
 
     @BeforeEach
-    public void setUp() throws IOException {
-
+    public void setUp() throws Exception {
         this.extensionsRunner = new ExtensionsRunner();
-        this.settings = Settings.builder().put("node.name", "MainScriptTests").build();
+        this.settings = Settings.builder().put("node.name", "sdk").build();
+        this.transportService = spy(
+            new TransportService(
+                Settings.EMPTY,
+                mock(Transport.class),
+                null,
+                TransportService.NOOP_TRANSPORT_INTERCEPTOR,
+                x -> null,
+                null,
+                Collections.emptySet()
+            )
+        );
     }
 
     // test ExtensionsRunner getTransportService return type is transport service
     @Test
-    public void testGetTransportService() throws IOException {
+    public void testGetTransportService() throws Exception {
         assert (extensionsRunner.createTransportService(settings) instanceof TransportService);
     }
 
     // test manager method invokes start on transport service
     @Test
-    public void testTransportServiceStarted() throws IOException {
-
-        // retrieve and mock transport service
-        TransportService transportService = Mockito.spy(extensionsRunner.createTransportService(settings));
+    public void testTransportServiceStarted() throws Exception {
 
         // verify mocked object interaction in manager method
         extensionsRunner.startTransportService(transportService);
-        Mockito.verify(transportService, times(1)).start();
+        verify(transportService, times(1)).start();
     }
 
     // test manager method invokes accept incoming requests on transport service
     @Test
-    public void testTransportServiceAcceptedIncomingRequests() throws IOException {
-
-        // retrieve and mock transport service
-        TransportService transportService = Mockito.spy(extensionsRunner.createTransportService(settings));
+    public void testTransportServiceAcceptedIncomingRequests() throws Exception {
 
         // verify mocked object interaction in manager method
         extensionsRunner.startTransportService(transportService);
-        Mockito.verify(transportService, times(1)).acceptIncomingRequests();
+        verify(transportService, times(1)).acceptIncomingRequests();
     }
+
+    @Test
+    public void testRegisterRequestHandler() throws Exception {
+
+        extensionsRunner.startTransportService(transportService);
+        verify(transportService, times(3)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
+    }
+
+    @Test
+    public void testHandlePluginsRequest() throws Exception {
+        DiscoveryNode sourceNode = new DiscoveryNode(
+            "test_node",
+            new TransportAddress(InetAddress.getByName("localhost"), 9876),
+            emptyMap(),
+            emptySet(),
+            Version.CURRENT
+        );
+        PluginRequest pluginRequest = new PluginRequest(sourceNode, null);
+        PluginResponse response = extensionsRunner.handlePluginsRequest(pluginRequest);
+        assertEquals(response.getName(), "RealExtension");
+
+        // Test if the source node is set after handlePluginRequest() is called during OpenSearch bootstrap
+        assertEquals(extensionsRunner.getOpensearchNode(), sourceNode);
+    }
+
+    @Test
+    public void testClusterStateRequest() throws Exception {
+
+        extensionsRunner.sendClusterStateRequest(transportService);
+
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any());
+    }
+
+    @Test
+    public void testClusterSettingRequest() throws Exception {
+
+        extensionsRunner.sendClusterSettingRequest(transportService);
+
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any());
+    }
+
+    @Test
+    public void testLocalNodeRequest() throws Exception {
+
+        extensionsRunner.sendLocalNodeRequest(transportService);
+
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any());
+    }
+
 }

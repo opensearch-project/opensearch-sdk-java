@@ -91,7 +91,7 @@ public class ExtensionsRunner {
         this.opensearchNode = opensearchNode;
     }
 
-    private DiscoveryNode getOpensearchNode() {
+    public DiscoveryNode getOpensearchNode() {
         return opensearchNode;
     }
 

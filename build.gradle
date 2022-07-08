@@ -105,8 +105,7 @@ test {
     useJUnitPlatform()
     jvmArgs '--enable-preview'
     systemProperty 'tests.security.manager', 'false'
-    testLogging.showStandardStreams = true
     testLogging {
-        events "passed", "skipped", "failed", "standardOut", "standardError"
+        events "passed", "skipped", "failed"
     }
 }
