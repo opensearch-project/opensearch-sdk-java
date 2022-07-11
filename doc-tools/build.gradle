@@ -1,0 +1,10 @@
+plugins {
+    id 'java'
+}
+
+group 'org.opensearch.sdk'
+version '1.0.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}

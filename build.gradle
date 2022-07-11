@@ -24,10 +24,11 @@ ext {
 
 apply plugin: 'application'
 apply from: 'gradle/formatting.gradle'
+apply from: 'gradle/missing-javadoc.gradle'
 
 mainClassName = 'org.opensearch.sdk.ExtensionsRunner'
 
-group 'org.example'
+group 'org.opensearch.sdk'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -64,6 +65,16 @@ dependencies {
     testImplementation "org.opensearch.test:framework:3.0.0-SNAPSHOT"
 
 }
+
+task javadocStrict(type: Javadoc) {
+  group = 'Documentation'
+  description = 'Run Javadoc in strict mode: with -Xdoclint:all and -Xwerror, on all members.'
+  source = sourceSets.main.allJava
+  classpath = sourceSets.main.runtimeClasspath
+  options.addStringOption('Xwerror', '-Xdoclint:all')
+  options.memberLevel = JavadocMemberLevel.PACKAGE
+}
+check.dependsOn javadocStrict
 
 test {
     useJUnitPlatform()
