@@ -52,7 +52,7 @@ Extensions are sandboxed from the host system by operating via APIs.  This secur
 
 ## Communications security (COMSEC)
 
-Plugins are loaded into the same java virtual machine instance allowing communication to OpenSearch through in-process java APIs, although this behavior will be deprecated over time in favor of using a common API endpoint.  Plugins can issue API requests to the OpenSearch hosts reusing the standard node-to-node communications, internally called the transport client.
+Plugins are loaded into the same java virtual machine instance allowing communicate to OpenSearch through in process java APIs. Plugins can issue API requests to the OpenSearch hosts reusing the standard node-to-node communications, internally called the transport client.
 
 Extensions of OpenSearch communicate via https requests between the nodes on the cluster and the extensions endpoint(s).  This is a bi-directional communication and also allows extensions to contact the OpenSearch cluster through its available APIs.
 
@@ -112,7 +112,7 @@ To stretch out the design process while fulfilling scenarios some security effor
  `:white_check_mark:`.
 
 ## Anomaly Detection Plugin
-Overall project is tracked with [[FEATURE] Migrate Anomaly Detector plugin to work as an Extension](https://github.com/opensearch-project/opensearch-sdk/issues/24).  By migrating this plugin it will exercise the general extensions and security specific scenarios.
+Overall project is tracked with [[FEATURE] Migrate Anomaly Detector plugin to work as an Extension](https://github.com/opensearch-project/OpenSearch/issues/3635).  By migrating this plugin it will exercise the general extensions and security specific scenarios.
 
 Additional background avaliable from [Security#1895](https://github.com/opensearch-project/security/issues/1895)
 
@@ -123,7 +123,7 @@ Replace [commons.authuser.User](https://github.com/opensearch-project/common-uti
 When OpenSearch sends a request to an extension, the identity of the requestor should be included with the request. More discussion in [Handling identity in extensions](https://github.com/opensearch-project/opensearch-sdk/issues/14).
 
 #### Resource user/role checks [sdk#40](https://github.com/opensearch-project/opensearch-sdk/issues/40)
-anomaly Detection has detectors that analyzer data and store its results so it can be inspected or alerted on, [more details](https://opensearch.org/docs/latest/monitoring-plugins/ad/index/). OpenSearch should be responsible for inspecting the user, roles, resources to ensure standard practices are used.  A permissions check API should be designed and implemented to offload this work from extensions creators.
+anomaly Detection has detectors that analyzer data and store its results so it can be inspected or alerted on, [more details](https://opensearch.org/docs/latest/monitoring-plugins/ad/index/). OpenSearch should be responsible for inspecting the user, roles, resources to ensure standard practices are used.  An access check API should be designed and implemented to offload this work from extensions creators.
 
 ### Delegate Authority  [OpenSearch#3850](https://github.com/opensearch-project/OpenSearch/issues/3850) :negative_squared_cross_mark:
 anomaly Detection runs background jobs to scan for anamolies and alerts that trigger if conditions are detected.  Background tasks should be tied to an idenity and a delegated identity so permissions can be verified.  The underlying systems depends on the [Job Scheduler](https://github.com/opensearch-project/job-scheduler/blob/main/src/main/java/org/opensearch/jobscheduler/scheduler/JobScheduler.java) plugin to execute these requests. 
