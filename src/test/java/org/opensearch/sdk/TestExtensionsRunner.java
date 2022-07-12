@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.mock;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -61,13 +62,13 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
     // test ExtensionsRunner getTransportService return type is transport service
     @Test
-    public void testGetTransportService() throws Exception {
+    public void testGetTransportService() {
         assert (extensionsRunner.createTransportService(settings) instanceof TransportService);
     }
 
     // test manager method invokes start on transport service
     @Test
-    public void testTransportServiceStarted() throws Exception {
+    public void testTransportServiceStarted() {
 
         // verify mocked object interaction in manager method
         extensionsRunner.startTransportService(transportService);
@@ -76,7 +77,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
     // test manager method invokes accept incoming requests on transport service
     @Test
-    public void testTransportServiceAcceptedIncomingRequests() throws Exception {
+    public void testTransportServiceAcceptedIncomingRequests() {
 
         // verify mocked object interaction in manager method
         extensionsRunner.startTransportService(transportService);
@@ -84,14 +85,14 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     }
 
     @Test
-    public void testRegisterRequestHandler() throws Exception {
+    public void testRegisterRequestHandler() {
 
         extensionsRunner.startTransportService(transportService);
         verify(transportService, times(3)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
     }
 
     @Test
-    public void testHandlePluginsRequest() throws Exception {
+    public void testHandlePluginsRequest() throws UnknownHostException {
         DiscoveryNode sourceNode = new DiscoveryNode(
             "test_node",
             new TransportAddress(InetAddress.getByName("localhost"), 9876),
@@ -108,7 +109,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     }
 
     @Test
-    public void testClusterStateRequest() throws Exception {
+    public void testClusterStateRequest() {
 
         extensionsRunner.sendClusterStateRequest(transportService);
 
@@ -116,7 +117,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     }
 
     @Test
-    public void testClusterSettingRequest() throws Exception {
+    public void testClusterSettingRequest() {
 
         extensionsRunner.sendClusterSettingRequest(transportService);
 
@@ -124,7 +125,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     }
 
     @Test
-    public void testLocalNodeRequest() throws Exception {
+    public void testLocalNodeRequest() {
 
         extensionsRunner.sendLocalNodeRequest(transportService);
 
