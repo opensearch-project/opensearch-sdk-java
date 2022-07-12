@@ -55,10 +55,18 @@ import java.util.stream.Stream;
 import static java.util.Collections.emptySet;
 import static org.opensearch.common.UUIDs.randomBase64UUID;
 
+/**
+ * The primary class to run an extension.
+ */
 public class ExtensionsRunner {
     private ExtensionSettings extensionSettings = readExtensionSettings();
     private DiscoveryNode opensearchNode;
 
+    /**
+     * Instantiates a new Extensions Runner.
+     *
+     * @throws IOException if the runner failed to create a Transport Service connection to an OpenSearch cluster.
+     */
     public ExtensionsRunner() throws IOException {}
 
     private final Settings settings = Settings.builder()
@@ -85,6 +93,12 @@ public class ExtensionsRunner {
         return opensearchNode;
     }
 
+    /**
+     * Handles a plugin request from OpenSearch.  This is the first request for the transport communication and will initialize the extension and will be a part of OpenSearch bootstrap.
+     *
+     * @param pluginRequest  The request to handle.
+     * @return A response to OpenSearch validating that this is an extension.
+     */
     PluginResponse handlePluginsRequest(PluginRequest pluginRequest) {
         logger.info("Registering Plugin Request received from OpenSearch");
         PluginResponse pluginResponse = new PluginResponse("RealExtension");
@@ -93,6 +107,13 @@ public class ExtensionsRunner {
         return pluginResponse;
     }
 
+    /**
+     * Handles a request for extension point indices from OpenSearch.  The {@link #handlePluginsRequest(PluginRequest)} method must have been called first to initialize the extension.
+     *
+     * @param indicesModuleRequest  The request to handle.
+     * @param transportService  The transport service communicating with OpenSearch.
+     * @return A response to OpenSearch with this extension's index and search listeners.
+     */
     IndicesModuleResponse handleIndicesModuleRequest(IndicesModuleRequest indicesModuleRequest, TransportService transportService) {
         logger.info("Registering Indices Module Request received from OpenSearch");
         IndicesModuleResponse indicesModuleResponse = new IndicesModuleResponse(true, true, true);
@@ -103,16 +124,28 @@ public class ExtensionsRunner {
         return indicesModuleResponse;
     }
 
-    // Works as beforeIndexRemoved
+    /**
+     * Handles a request for extension name from OpenSearch.  The {@link #handlePluginsRequest(PluginRequest)} method must have been called first to initialize the extension.
+     *
+     * @param indicesModuleRequest  The request to handle.
+     * @return A response acknowledging the request.
+     */
     IndicesModuleNameResponse handleIndicesModuleNameRequest(IndicesModuleRequest indicesModuleRequest) {
+        // Works as beforeIndexRemoved
         logger.info("Registering Indices Module Name Request received from OpenSearch");
         IndicesModuleNameResponse indicesModuleNameResponse = new IndicesModuleNameResponse(true);
         return indicesModuleNameResponse;
     }
 
-    // method : build netty transport
+    /**
+     * Initializes a Netty4Transport object. This object will be wrapped in a {@link TransportService} object.
+     *
+     * @param settings  The transport settings to configure.
+     * @param threadPool  A thread pool to use.
+     * @return The configured Netty4Transport object.
+     */
     public Netty4Transport getNetty4Transport(Settings settings, ThreadPool threadPool) {
-
+        // method : build netty transport
         NetworkService networkService = new NetworkService(Collections.emptyList());
         PageCacheRecycler pageCacheRecycler = new PageCacheRecycler(settings);
         IndicesModule indicesModule = new IndicesModule(Collections.emptyList());
@@ -144,7 +177,13 @@ public class ExtensionsRunner {
         return transport;
     }
 
-    public TransportService createTransportService(Settings settings) throws IOException {
+    /**
+     * Creates a TransportService object. This object will control communication between the extension and OpenSearch.
+     * 
+     * @param settings  The transport settings to configure.
+     * @return The configured TransportService object.
+     */
+    public TransportService createTransportService(Settings settings) {
 
         ThreadPool threadPool = new ThreadPool(settings);
 
@@ -169,8 +208,13 @@ public class ExtensionsRunner {
         );
     }
 
-    // manager method for transport service
+    /**
+     * Starts a TransportService.
+     * 
+     * @param transportService  The TransportService to start.
+     */
     public void startTransportService(TransportService transportService) {
+        // manager method for transport service
 
         // start transport service and accept incoming requests
         transportService.start();
@@ -207,8 +251,13 @@ public class ExtensionsRunner {
 
     }
 
-    // Extension can use this API to get ClusterState from OpenSearch
+    /**
+     * Requests the cluster state from OpenSearch.  The result will be handled by a {@link ClusterStateResponseHandler}.
+     * 
+     * @param transportService  The TransportService defining the connection to OpenSearch.
+     */
     public void sendClusterStateRequest(TransportService transportService) {
+        // Extension can use this API to get ClusterState from OpenSearch
         logger.info("Sending Cluster State request to OpenSearch");
         ClusterStateResponseHandler clusterStateResponseHandler = new ClusterStateResponseHandler();
         try {
@@ -223,24 +272,34 @@ public class ExtensionsRunner {
         }
     }
 
-    // Extension can use this API to get ClusterSettings from OpenSearch
-    public void sendClusterSettingRequest(TransportService transportService) {
+    /**
+     * Requests the cluster settings from OpenSearch.  The result will be handled by a {@link ClusterSettingResponseHandler}.
+     * 
+     * @param transportService  The TransportService defining the connection to OpenSearch.
+     */
+    public void sendClusterSettingsRequest(TransportService transportService) {
+        // Extension can use this API to get ClusterSettings from OpenSearch
         logger.info("Sending Cluster Settings request to OpenSearch");
-        ClusterSettingsResponseHandler clusterSettingResponseHandler = new ClusterSettingsResponseHandler();
+        ClusterSettingsResponseHandler clusterSettingsResponseHandler = new ClusterSettingsResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_SETTINGS,
                 new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_SETTINGS),
-                clusterSettingResponseHandler
+                clusterSettingsResponseHandler
             );
         } catch (Exception e) {
             logger.info("Failed to send Cluster Settings request to OpenSearch", e);
         }
     }
 
-    // Extension can use this API to get LocalNode from OpenSearch
+    /**
+     * Requests the local node from OpenSearch.  The result will be handled by a {@link ClusterSettingResponseHandler}.
+     * 
+     * @param transportService  The TransportService defining the connection to OpenSearch.
+     */
     public void sendLocalNodeRequest(TransportService transportService) {
+        // Extension can use this API to get LocalNode from OpenSearch
         logger.info("Sending Local Node request to OpenSearch");
         LocalNodeResponseHandler localNodeResponseHandler = new LocalNodeResponseHandler();
         try {
@@ -259,12 +318,23 @@ public class ExtensionsRunner {
         return settings;
     }
 
-    // manager method for action listener
+    /**
+     * Starts an ActionListener.
+     * 
+     * @param timeout  The timeout for the listener in milliseconds. A timeout of 0 means no timeout.
+     */
     public void startActionListener(int timeout) {
+        // manager method for action listener
         final ActionListener actionListener = new ActionListener();
         actionListener.runActionListener(true, timeout);
     }
 
+    /**
+     * Run the Extension. Imports settings, establishes a connection with an OpenSearch cluster via a Transport Service, and sets up a listener for responses.
+     *
+     * @param args  Unused
+     * @throws IOException if the runner failed to create the TransportService.
+     */
     public static void main(String[] args) throws IOException {
 
         ExtensionsRunner extensionsRunner = new ExtensionsRunner();
