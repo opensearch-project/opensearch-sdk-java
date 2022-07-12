@@ -29,7 +29,7 @@ apply from: 'gradle/missing-javadoc.gradle'
 mainClassName = 'org.opensearch.sdk.ExtensionsRunner'
 
 group 'org.opensearch.sdk'
-version '1.0-SNAPSHOT'
+version '1.0.0-SNAPSHOT'
 
 repositories {
     mavenLocal()

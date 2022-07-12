@@ -35,7 +35,7 @@ allprojects {
     }
 
     dependencies {
-      missingdoclet "org.opensearch:missing-doclet"
+      missingdoclet "org.opensearch.sdk:missing-doclet"
     }
 
     ext {
@@ -177,7 +177,7 @@ class MissingJavadocTask extends DefaultTask {
     opts << [ '-tag', 'opensearch.experimental:a:WARNING: This API is experimental and might change in incompatible ways in the next release.' ]
     opts << [ '-tag', 'opensearch.internal:a:NOTE: This API is for internal purposes only and might change in incompatible ways in the next release.' ]
 
-    opts << [ '-doclet', "org.opensearch.missingdoclet.MissingDoclet" ]
+    opts << [ '-doclet', "org.opensearch.sdk.missingdoclet.MissingDoclet" ]
     opts << [ '-docletpath', docletpath.asPath ]
     opts << [ '--missing-level', javadocMissingLevel ]
     if (javadocMissingIgnore) {
