@@ -52,11 +52,11 @@ Extensions are sandboxed from the host system by operating via APIs.  This secur
 
 ## Communications security (COMSEC)
 
-Plugins are loaded into the same java virtual machine instance allowing communicate to OpenSearch through in-process java APIs.  Plugins can issue API requests to the OpenSearch hosts reusing the standard node-to-node communications, internally called the transport client.
+Plugins are loaded into the same java virtual machine instance allowing communication to OpenSearch through in-process java APIs, although this behavior will be deprecated over time in favor of using a common API endpoint.  Plugins can issue API requests to the OpenSearch hosts reusing the standard node-to-node communications, internally called the transport client.
 
-Extensions of OpenSearch communicate via https requests between the nodes on the cluster and the extensions endpoint(s).  This is a bi-direction communication also allows extensions to contact the OpenSearch cluster through its available APIs.
+Extensions of OpenSearch communicate via https requests between the nodes on the cluster and the extensions endpoint(s).  This is a bi-directional communication and also allows extensions to contact the OpenSearch cluster through its available APIs.
 
-* :warning: The communication protocal has not been locked-in, following up with [Extensions to OpenSearch communication #34](https://github.com/opensearch-project/opensearch-sdk/issues/34).
+* :warning: The communication protocol has not been locked-in. Further discussion in [Extensions to OpenSearch communication #34](https://github.com/opensearch-project/opensearch-sdk/issues/34).
 
 ## Data Security
 
@@ -117,10 +117,10 @@ Overall project is tracked with [[FEATURE] Migrate Anomaly Detector plugin to wo
 Additional background avaliable from [Security#1895](https://github.com/opensearch-project/security/issues/1895)
 
 ### User identity [OpenSearch#3846](https://github.com/opensearch-project/OpenSearch/issues/3846) :negative_squared_cross_mark:
-Replace [commons.authuser.User](https://github.com/opensearch-project/common-utils/blob/main/src/main/java/org/opensearch/commons/authuser/User.java) the common identity object used by plugins.  The new object should be obtainable by the extension through other means than [InjectSecurity](https://github.com/opensearch-project/common-utils/blob/main/src/main/java/org/opensearch/commons/InjectSecurity.java#L69) depends on the thread context.
+Replace [commons.authuser.User](https://github.com/opensearch-project/common-utils/blob/main/src/main/java/org/opensearch/commons/authuser/User.java) which is presently the common identity object used by plugins.  The new object should conform to open identity standards and be obtainable by the extension through other means than [InjectSecurity](https://github.com/opensearch-project/common-utils/blob/main/src/main/java/org/opensearch/commons/InjectSecurity.java#L69) which depends on the thread context.
 
 #### Aquiring User objects [sdk#37](https://github.com/opensearch-project/opensearch-sdk/issues/37)
-When OpenSearch sents a request to an extension the identiy should be avaliable, more discussion see [Handling identity in extensions](https://github.com/opensearch-project/opensearch-sdk/issues/14).
+When OpenSearch sends a request to an extension, the identity of the requestor should be included with the request. More discussion in [Handling identity in extensions](https://github.com/opensearch-project/opensearch-sdk/issues/14).
 
 #### Resource user/role checks [sdk#40](https://github.com/opensearch-project/opensearch-sdk/issues/40)
 anomaly Detection has detectors that analyzer data and store its results so it can be inspected or alerted on, [more details](https://opensearch.org/docs/latest/monitoring-plugins/ad/index/). OpenSearch should be responsible for inspecting the user, roles, resources to ensure standard practices are used.  A permissions check API should be designed and implemented to offload this work from extensions creators.
