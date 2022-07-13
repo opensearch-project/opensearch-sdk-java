@@ -11,8 +11,17 @@
 
 package org.opensearch.sdk;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import static java.util.Collections.emptySet;
+import static org.opensearch.common.UUIDs.randomBase64UUID;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.Version;
@@ -33,30 +42,23 @@ import org.opensearch.index.IndicesModuleResponse;
 import org.opensearch.indices.IndicesModule;
 import org.opensearch.indices.breaker.CircuitBreakerService;
 import org.opensearch.indices.breaker.NoneCircuitBreakerService;
+import org.opensearch.sdk.netty4.Netty4Transport;
+import org.opensearch.sdk.netty4.SharedGroupFactory;
 import org.opensearch.search.SearchModule;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.ClusterConnectionManager;
 import org.opensearch.transport.ConnectionManager;
+import org.opensearch.transport.TransportInterceptor;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
-import org.opensearch.transport.TransportInterceptor;
 
-import org.opensearch.sdk.netty4.Netty4Transport;
-import org.opensearch.sdk.netty4.SharedGroupFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.Collections.emptySet;
-import static org.opensearch.common.UUIDs.randomBase64UUID;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 /**
  * The primary class to run an extension.
+ * <p>
+ * This class Javadoc will eventually be expanded with a full description/tutorial for users.
  */
 public class ExtensionsRunner {
     private ExtensionSettings extensionSettings = readExtensionSettings();
@@ -65,7 +67,7 @@ public class ExtensionsRunner {
     /**
      * Instantiates a new Extensions Runner.
      *
-     * @throws IOException if the runner failed to create a Transport Service connection to an OpenSearch cluster.
+     * @throws IOException if the runner failed to connect to the OpenSearch cluster.
      */
     public ExtensionsRunner() throws IOException {}
 
@@ -179,7 +181,7 @@ public class ExtensionsRunner {
 
     /**
      * Creates a TransportService object. This object will control communication between the extension and OpenSearch.
-     * 
+     *
      * @param settings  The transport settings to configure.
      * @return The configured TransportService object.
      */
@@ -210,7 +212,7 @@ public class ExtensionsRunner {
 
     /**
      * Starts a TransportService.
-     * 
+     *
      * @param transportService  The TransportService to start.
      */
     public void startTransportService(TransportService transportService) {
@@ -253,7 +255,7 @@ public class ExtensionsRunner {
 
     /**
      * Requests the cluster state from OpenSearch.  The result will be handled by a {@link ClusterStateResponseHandler}.
-     * 
+     *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
     public void sendClusterStateRequest(TransportService transportService) {
@@ -274,7 +276,7 @@ public class ExtensionsRunner {
 
     /**
      * Requests the cluster settings from OpenSearch.  The result will be handled by a {@link ClusterSettingResponseHandler}.
-     * 
+     *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
     public void sendClusterSettingsRequest(TransportService transportService) {
@@ -295,7 +297,7 @@ public class ExtensionsRunner {
 
     /**
      * Requests the local node from OpenSearch.  The result will be handled by a {@link ClusterSettingResponseHandler}.
-     * 
+     *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
     public void sendLocalNodeRequest(TransportService transportService) {
@@ -320,7 +322,7 @@ public class ExtensionsRunner {
 
     /**
      * Starts an ActionListener.
-     * 
+     *
      * @param timeout  The timeout for the listener in milliseconds. A timeout of 0 means no timeout.
      */
     public void startActionListener(int timeout) {

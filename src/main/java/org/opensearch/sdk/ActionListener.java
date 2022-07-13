@@ -8,11 +8,6 @@
 
 package org.opensearch.sdk;
 
-import org.opensearch.common.SuppressForbidden;
-import org.opensearch.common.unit.TimeValue;
-import org.opensearch.transport.ConnectionProfile;
-import org.opensearch.transport.TransportRequestOptions;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.InetAddress;
@@ -21,17 +16,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import org.opensearch.common.SuppressForbidden;
+import org.opensearch.common.unit.TimeValue;
+import org.opensearch.transport.ConnectionProfile;
+import org.opensearch.transport.TransportRequestOptions;
+
 /**
  * A listener for actions on the local port.
  */
 public class ActionListener {
-
-    /**
-     * Instantiate a new ActionListener.
-     */
-    public ActionListener() {
-        super();
-    }
 
     /**
      * Get the local ephemeral port.
@@ -46,6 +39,8 @@ public class ActionListener {
 
     /**
      * Run the action listener.
+     * This is presently a placeholder; when it receives a byte on the listening port, it terminates.
+     * Eventually some sort of operation will be added here.
      *
      * @param flag  If true, waits for the other side to send a message.
      * @param timeout  How long to wait, in milliseconds.  If zero, infinite timeout.
