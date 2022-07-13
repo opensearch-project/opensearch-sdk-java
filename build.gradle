@@ -92,6 +92,8 @@ task javadocStrict(type: Javadoc) {
   classpath = sourceSets.main.runtimeClasspath
   options.addStringOption('Xwerror', '-Xdoclint:all')
   options.memberLevel = JavadocMemberLevel.PACKAGE
+
+  exclude 'org/opensearch/sdk/netty4'
 }
 check.dependsOn javadocStrict
 
