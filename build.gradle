@@ -77,7 +77,8 @@ task requireJavadoc(type: JavaExec) {
   classpath = configurations.requireJavadoc
   args "src/main/java" 
   args "--dont-require-private=true"
-  // temporary to get tests to pass, will complete netty javadocs later
+  // temporary, the netty4 package will eventually be in OpenSearch main repo
+  // See https://github.com/opensearch-project/OpenSearch/issues/3118
   args "--exclude=netty4"
   // temporary until require-javadoc:1.0.4 allows suppressing getters and setters
   args "--dont-require=[sg]et[Hostaddress|Hostport|Extensionname]"
@@ -92,6 +93,10 @@ task javadocStrict(type: Javadoc) {
   classpath = sourceSets.main.runtimeClasspath
   options.addStringOption('Xdoclint:all', '-quiet')
   options.memberLevel = JavadocMemberLevel.PRIVATE
+  
+  // temporary, the netty4 package will eventually be in OpenSearch main repo
+  // See https://github.com/opensearch-project/OpenSearch/issues/3118
+  exclude 'org/opensearch/sdk/netty4'
 }
 check.dependsOn javadocStrict
 
