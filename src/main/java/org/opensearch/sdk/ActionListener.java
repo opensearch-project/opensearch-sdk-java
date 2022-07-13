@@ -40,7 +40,7 @@ public class ActionListener {
     /**
      * Run the action listener.
      * This is presently a placeholder; when it receives a byte on the listening port, it terminates.
-     * Eventually some sort of operation will be added here.
+     * Socket server to run extensions on the specified port provided in extensions.yml file after integrating SDK
      *
      * @param flag  If true, waits for the other side to send a message.
      * @param timeout  How long to wait, in milliseconds.  If zero, infinite timeout.

@@ -147,7 +147,6 @@ public class ExtensionsRunner {
      * @return The configured Netty4Transport object.
      */
     public Netty4Transport getNetty4Transport(Settings settings, ThreadPool threadPool) {
-        // method : build netty transport
         NetworkService networkService = new NetworkService(Collections.emptyList());
         PageCacheRecycler pageCacheRecycler = new PageCacheRecycler(settings);
         IndicesModule indicesModule = new IndicesModule(Collections.emptyList());
@@ -216,8 +215,6 @@ public class ExtensionsRunner {
      * @param transportService  The TransportService to start.
      */
     public void startTransportService(TransportService transportService) {
-        // manager method for transport service
-
         // start transport service and accept incoming requests
         transportService.start();
         transportService.acceptIncomingRequests();
@@ -259,7 +256,6 @@ public class ExtensionsRunner {
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
     public void sendClusterStateRequest(TransportService transportService) {
-        // Extension can use this API to get ClusterState from OpenSearch
         logger.info("Sending Cluster State request to OpenSearch");
         ClusterStateResponseHandler clusterStateResponseHandler = new ClusterStateResponseHandler();
         try {
@@ -280,7 +276,6 @@ public class ExtensionsRunner {
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
     public void sendClusterSettingsRequest(TransportService transportService) {
-        // Extension can use this API to get ClusterSettings from OpenSearch
         logger.info("Sending Cluster Settings request to OpenSearch");
         ClusterSettingsResponseHandler clusterSettingsResponseHandler = new ClusterSettingsResponseHandler();
         try {
@@ -301,7 +296,6 @@ public class ExtensionsRunner {
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
     public void sendLocalNodeRequest(TransportService transportService) {
-        // Extension can use this API to get LocalNode from OpenSearch
         logger.info("Sending Local Node request to OpenSearch");
         LocalNodeResponseHandler localNodeResponseHandler = new LocalNodeResponseHandler();
         try {
@@ -326,7 +320,6 @@ public class ExtensionsRunner {
      * @param timeout  The timeout for the listener in milliseconds. A timeout of 0 means no timeout.
      */
     public void startActionListener(int timeout) {
-        // manager method for action listener
         final ActionListener actionListener = new ActionListener();
         actionListener.runActionListener(true, timeout);
     }
