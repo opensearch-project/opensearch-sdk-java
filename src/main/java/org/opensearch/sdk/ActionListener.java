@@ -8,6 +8,11 @@
 
 package org.opensearch.sdk;
 
+import org.opensearch.common.SuppressForbidden;
+import org.opensearch.common.unit.TimeValue;
+import org.opensearch.transport.ConnectionProfile;
+import org.opensearch.transport.TransportRequestOptions;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.InetAddress;
@@ -15,11 +20,6 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
-import org.opensearch.common.SuppressForbidden;
-import org.opensearch.common.unit.TimeValue;
-import org.opensearch.transport.ConnectionProfile;
-import org.opensearch.transport.TransportRequestOptions;
 
 /**
  * A listener for actions on the local port.
