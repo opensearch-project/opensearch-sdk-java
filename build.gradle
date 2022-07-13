@@ -14,7 +14,6 @@ plugins {
     id "com.diffplug.spotless" version "6.3.0" apply false
 }
 
-
 ext {
     projectSubstitutions = [:]
     licenseFile = rootProject.file('LICENSE.txt')
@@ -24,7 +23,7 @@ ext {
 
 apply plugin: 'application'
 apply from: 'gradle/formatting.gradle'
-apply from: 'gradle/missing-javadoc.gradle'
+
 
 mainClassName = 'org.opensearch.sdk.ExtensionsRunner'
 
@@ -38,6 +37,12 @@ repositories {
     maven { url "https://d1nvenhzbhpy0q.cloudfront.net/snapshots/lucene/"}
     mavenCentral()
 }
+
+
+configurations {
+  requireJavadoc
+}
+
 
 dependencies {
     implementation "org.opensearch:opensearch:3.0.0-SNAPSHOT"
@@ -63,8 +68,19 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
     testImplementation "org.opensearch.test:framework:3.0.0-SNAPSHOT"
-
+    requireJavadoc "org.plumelib:require-javadoc:1.0.3"
 }
+
+task requireJavadoc(type: JavaExec) {
+  group = 'Documentation'
+  description = 'Ensures that Javadoc documentation exists.'
+  mainClass = "org.plumelib.javadoc.RequireJavadoc"
+  classpath = configurations.requireJavadoc
+  args "src/main/java" 
+  args "--dont-require-private=true"
+  args "--exclude=netty4"
+}
+check.dependsOn requireJavadoc
 
 task javadocStrict(type: Javadoc) {
   group = 'Documentation'
