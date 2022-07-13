@@ -79,19 +79,18 @@ task requireJavadoc(type: JavaExec) {
   args "--dont-require-private=true"
   // temporary to get tests to pass, will complete netty javadocs later
   args "--exclude=netty4"
-  // temporary unti require-javadoc:1.0.4 allows suppressing getters and setters
+  // temporary until require-javadoc:1.0.4 allows suppressing getters and setters
   args "--dont-require=[sg]et[Hostaddress|Hostport|Extensionname]"
 }
 check.dependsOn requireJavadoc
 
 // this task checks for the content/tags of javadocs
-// we exclude missing checks because they are handled above
 task javadocStrict(type: Javadoc) {
   group = 'Documentation'
   description = 'Run Javadoc in strict mode: with -Xdoclint:all and -Xwerror, on all members.'
   source = sourceSets.main.allJava
   classpath = sourceSets.main.runtimeClasspath
-  options.addStringOption('Xwerror', '-Xdoclint:all,-missing')
+  options.addStringOption('Xwerror', '-Xdoclint:all')
   options.memberLevel = JavadocMemberLevel.PACKAGE
 }
 check.dependsOn javadocStrict
