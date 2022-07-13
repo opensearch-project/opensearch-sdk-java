@@ -85,15 +85,14 @@ task requireJavadoc(type: JavaExec) {
 check.dependsOn requireJavadoc
 
 // this task checks for the content/tags of javadocs
+// we exclude missing checks because they are handled above
 task javadocStrict(type: Javadoc) {
   group = 'Documentation'
   description = 'Run Javadoc in strict mode: with -Xdoclint:all and -Xwerror, on all members.'
   source = sourceSets.main.allJava
   classpath = sourceSets.main.runtimeClasspath
-  options.addStringOption('Xwerror', '-Xdoclint:all')
+  options.addStringOption('Xwerror', '-Xdoclint:all,-missing')
   options.memberLevel = JavadocMemberLevel.PACKAGE
-
-  exclude 'org/opensearch/sdk/netty4'
 }
 check.dependsOn javadocStrict
 
