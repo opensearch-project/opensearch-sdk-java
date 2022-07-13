@@ -11,12 +11,18 @@
 
 package org.opensearch.sdk;
 
+/**
+ * This class encapsulates the settings for an Extension.
+ */
 public class ExtensionSettings {
 
     private String extensionname;
     private String hostaddress;
     private String hostport;
-    // Change the location to extension.yml file of the extension
+
+    /**
+     * Placeholder field. Change the location to extension.yml file of the extension.
+     */
     public static final String EXTENSION_DESCRIPTOR = "src/test/resources/extension.yml";
 
     public String getExtensionname() {

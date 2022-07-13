@@ -275,7 +275,7 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Requests the cluster settings from OpenSearch.  The result will be handled by a {@link ClusterSettingResponseHandler}.
+     * Requests the cluster settings from OpenSearch.  The result will be handled by a {@link ClusterSettingsResponseHandler}.
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
@@ -296,7 +296,7 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Requests the local node from OpenSearch.  The result will be handled by a {@link ClusterSettingResponseHandler}.
+     * Requests the local node from OpenSearch.  The result will be handled by a {@link LocalNodeResponseHandler}.
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */

@@ -77,8 +77,10 @@ task requireJavadoc(type: JavaExec) {
   classpath = configurations.requireJavadoc
   args "src/main/java" 
   args "--dont-require-private=true"
-  // temporary
+  // temporary to get tests to pass, will complete netty javadocs later
   args "--exclude=netty4"
+  // temporary unti require-javadoc:1.0.4 allows suppressing getters and setters
+  args "--dont-require=[sg]et[Hostaddress|Hostport|Extensionname]"
 }
 check.dependsOn requireJavadoc
 
