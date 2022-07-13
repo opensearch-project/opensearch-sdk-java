@@ -87,11 +87,11 @@ check.dependsOn requireJavadoc
 // this task checks for the content/tags of javadocs
 task javadocStrict(type: Javadoc) {
   group = 'Documentation'
-  description = 'Run Javadoc in strict mode: with -Xdoclint:all and -Xwerror, on all members.'
+  description = 'Run Javadoc in strict mode: with -Xdoclint:all, on all members.'
   source = sourceSets.main.allJava
   classpath = sourceSets.main.runtimeClasspath
-  options.addStringOption('Xwerror', '-Xdoclint:all')
-  options.memberLevel = JavadocMemberLevel.PACKAGE
+  options.addStringOption('Xdoclint:all', '-quiet')
+  options.memberLevel = JavadocMemberLevel.PRIVATE
 }
 check.dependsOn javadocStrict
 
