@@ -77,15 +77,17 @@ task requireJavadoc(type: JavaExec) {
   classpath = configurations.requireJavadoc
   args "src/main/java" 
   args "--dont-require-private=true"
-  // temporary, the netty4 package will eventually be in OpenSearch main repo
+  // the netty4 package will eventually be published to mavenCentral
   // See https://github.com/opensearch-project/OpenSearch/issues/3118
   args "--exclude=netty4"
-  // temporary until require-javadoc:1.0.4 allows suppressing getters and setters
+  // require-javadoc:1.0.4 will allow suppressing getters and setters
+  // tracking in https://github.com/plume-lib/require-javadoc/issues/143
+  // prefer using --dont-require-trivial-properties before adding more exceptions here
   args "--dont-require=[sg]et[Hostaddress|Hostport|Extensionname]"
 }
 check.dependsOn requireJavadoc
 
-// this task checks for the content/tags of javadocs
+// this task checks the content/tags of existing javadocs
 task javadocStrict(type: Javadoc) {
   group = 'Documentation'
   description = 'Run Javadoc in strict mode: with -Xdoclint:all, on all members.'
@@ -94,7 +96,7 @@ task javadocStrict(type: Javadoc) {
   options.addStringOption('Xdoclint:all', '-quiet')
   options.memberLevel = JavadocMemberLevel.PRIVATE
   
-  // temporary, the netty4 package will eventually be in OpenSearch main repo
+  // the netty4 package will eventually be published to mavenCentral
   // See https://github.com/opensearch-project/OpenSearch/issues/3118
   exclude 'org/opensearch/sdk/netty4'
 }
