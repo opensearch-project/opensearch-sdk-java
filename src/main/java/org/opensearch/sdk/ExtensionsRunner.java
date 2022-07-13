@@ -335,7 +335,7 @@ public class ExtensionsRunner {
      * Run the Extension. Imports settings, establishes a connection with an OpenSearch cluster via a Transport Service, and sets up a listener for responses.
      *
      * @param args  Unused
-     * @throws IOException if the runner failed to create the TransportService.
+     * @throws IOException if the runner failed to connect to the OpenSearch cluster.
      */
     public static void main(String[] args) throws IOException {
 

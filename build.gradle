@@ -14,6 +14,7 @@ plugins {
     id "com.diffplug.spotless" version "6.3.0" apply false
 }
 
+
 ext {
     projectSubstitutions = [:]
     licenseFile = rootProject.file('LICENSE.txt')
@@ -23,7 +24,6 @@ ext {
 
 apply plugin: 'application'
 apply from: 'gradle/formatting.gradle'
-
 
 mainClassName = 'org.opensearch.sdk.ExtensionsRunner'
 
@@ -38,11 +38,9 @@ repositories {
     mavenCentral()
 }
 
-
 configurations {
   requireJavadoc
 }
-
 
 dependencies {
     implementation "org.opensearch:opensearch:3.0.0-SNAPSHOT"
@@ -71,6 +69,7 @@ dependencies {
     requireJavadoc "org.plumelib:require-javadoc:1.0.3"
 }
 
+// this task tests for the presence of javadocs but not the content/tags
 task requireJavadoc(type: JavaExec) {
   group = 'Documentation'
   description = 'Ensures that Javadoc documentation exists.'
@@ -78,10 +77,12 @@ task requireJavadoc(type: JavaExec) {
   classpath = configurations.requireJavadoc
   args "src/main/java" 
   args "--dont-require-private=true"
+  // temporary
   args "--exclude=netty4"
 }
 check.dependsOn requireJavadoc
 
+// this task checks for the content/tags of javadocs
 task javadocStrict(type: Javadoc) {
   group = 'Documentation'
   description = 'Run Javadoc in strict mode: with -Xdoclint:all and -Xwerror, on all members.'
