@@ -25,28 +25,24 @@ public class ExtensionSettings {
      */
     public static final String EXTENSION_DESCRIPTOR = "src/test/resources/extension.yml";
 
-    public String getExtensionname() {
-        return extensionname;
+    public ExtensionSettings(String extensionname, String hostaddress, String hostport) {
+        this.extensionname = extensionname;
+        this.hostaddress = hostaddress;
+        this.hostport = hostport;
     }
 
-    public void setExtensionname(String extensionname) {
-        this.extensionname = extensionname;
+    public ExtensionSettings() {}
+
+    public String getExtensionname() {
+        return extensionname;
     }
 
     public String getHostaddress() {
         return hostaddress;
     }
 
-    public void setHostaddress(String hostaddress) {
-        this.hostaddress = hostaddress;
-    }
-
     public String getHostport() {
         return hostport;
-    }
-
-    public void setHostport(String hostport) {
-        this.hostport = hostport;
     }
 
     @Override
