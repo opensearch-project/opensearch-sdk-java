@@ -49,9 +49,9 @@ import static org.opensearch.common.util.concurrent.OpenSearchExecutors.daemonTh
 
 /**
  * Creates and returns {@link io.netty.channel.EventLoopGroup} instances. It will return a shared group for
- * both {@link #getHttpGroup()} and {@link #getTransportGroup()} if
- * {@link org.opensearch.http.netty4.Netty4HttpServerTransport#SETTING_HTTP_WORKER_COUNT} is configured to be 0.
- * If that setting is not 0, then it will return a different group in the {@link #getHttpGroup()} call.
+ * both {@code #getHttpGroup()} (disabled) and {@link #getTransportGroup()} if
+ * {@code org.opensearch.http.netty4.Netty4HttpServerTransport#SETTING_HTTP_WORKER_COUNT} (disabled) is configured to be 0.
+ * If that setting is not 0, then it will return a different group in the {@code #getHttpGroup()} (disabled) call.
  */
 public final class SharedGroupFactory {
 

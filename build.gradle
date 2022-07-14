@@ -27,8 +27,8 @@ apply from: 'gradle/formatting.gradle'
 
 mainClassName = 'org.opensearch.sdk.ExtensionsRunner'
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+group 'org.opensearch.sdk'
+version '1.0.0-SNAPSHOT'
 
 repositories {
     mavenLocal()
@@ -36,6 +36,10 @@ repositories {
     //maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
     maven { url "https://d1nvenhzbhpy0q.cloudfront.net/snapshots/lucene/"}
     mavenCentral()
+}
+
+configurations {
+  requireJavadoc
 }
 
 dependencies {
@@ -62,8 +66,40 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
     testImplementation "org.opensearch.test:framework:3.0.0-SNAPSHOT"
-
+    requireJavadoc "org.plumelib:require-javadoc:1.0.4"
 }
+
+// this task tests for the presence of javadocs but not the content/tags
+task requireJavadoc(type: JavaExec) {
+  group = 'Documentation'
+  description = 'Ensures that Javadoc documentation exists.'
+  mainClass = "org.plumelib.javadoc.RequireJavadoc"
+  classpath = configurations.requireJavadoc
+  args "src/main/java" 
+  // javadocs on private methods optional
+  args "--dont-require-private=true"
+  // javadocs on trivial getters/setters optional
+  args "--dont-require-trivial-properties"
+  // the netty4 package will eventually be published to mavenCentral
+  // See https://github.com/opensearch-project/OpenSearch/issues/3118
+  args "--exclude=netty4"
+}
+check.dependsOn requireJavadoc
+
+// this task checks the content/tags of existing javadocs
+task javadocStrict(type: Javadoc) {
+  group = 'Documentation'
+  description = 'Run Javadoc in strict mode: with -Xdoclint:all, on all members.'
+  source = sourceSets.main.allJava
+  classpath = sourceSets.main.runtimeClasspath
+  options.addStringOption('Xdoclint:all', '-quiet')
+  options.memberLevel = JavadocMemberLevel.PRIVATE
+  
+  // the netty4 package will eventually be published to mavenCentral
+  // See https://github.com/opensearch-project/OpenSearch/issues/3118
+  exclude 'org/opensearch/sdk/netty4'
+}
+check.dependsOn javadocStrict
 
 test {
     useJUnitPlatform()
