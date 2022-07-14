@@ -5,7 +5,7 @@ allprojects {
             // Normally this isn't necessary, but we have Java sources in
             // non-standard places
             target '**/*.java'
-
+            
             removeUnusedImports()
             eclipse().configFile rootProject.file('formatter/formatterConfig.xml')
             trimTrailingWhitespace()
@@ -22,5 +22,10 @@ allprojects {
                 paddedCell()
             }
         }
+        format("license", {
+            licenseHeaderFile("${rootProject.file("formatter/license-header.txt")}", "package ");
+            target("src/main/java/**/*.java")
+            targetExclude("**/netty4/*")
+        })
     }
 }
