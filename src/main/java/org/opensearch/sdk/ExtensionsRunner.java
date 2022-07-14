@@ -20,6 +20,8 @@ import org.opensearch.Version;
 import org.opensearch.cluster.ClusterModule;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
+import org.opensearch.common.io.stream.StreamInput;
+import org.opensearch.common.io.stream.StreamOutput;
 import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
 import org.opensearch.common.settings.Settings;
@@ -38,11 +40,7 @@ import org.opensearch.sdk.netty4.Netty4Transport;
 import org.opensearch.sdk.netty4.SharedGroupFactory;
 import org.opensearch.search.SearchModule;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.transport.ClusterConnectionManager;
-import org.opensearch.transport.ConnectionManager;
-import org.opensearch.transport.TransportInterceptor;
-import org.opensearch.transport.TransportService;
-import org.opensearch.transport.TransportSettings;
+import org.opensearch.transport.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -123,6 +121,7 @@ public class ExtensionsRunner {
         // handlePluginsRequest will set the opensearchNode while bootstraping of OpenSearch
         DiscoveryNode opensearchNode = getOpensearchNode();
         transportService.connectToNode(opensearchNode);
+        sendAddSettingsUpdateConsumer(transportService);
         return indicesModuleResponse;
     }
 
@@ -307,6 +306,45 @@ public class ExtensionsRunner {
             );
         } catch (Exception e) {
             logger.info("Failed to send Cluster Settings request to OpenSearch", e);
+        }
+    }
+
+    public void sendAddSettingsUpdateConsumer(TransportService transportService) {
+        Settings tmpsettings = Settings.builder().put("node.name", "my-node").build();
+        try {
+            transportService.sendRequest(
+                    opensearchNode,
+                    "internal:discovery/clustersettings/addsettingsupdateconsumer",
+                    new ExtensionRequest(ExtensionsOrchestrator.RequestType.valueOf("internal:discovery/clustersettings/addsettingsupdateconsumer")),
+                    new TransportResponseHandler<TransportResponse>() {
+                        @Override
+                        public void handleResponse(TransportResponse response) {
+                            logger.info("Send request to OpenSearch");
+                        }
+
+                        @Override
+                        public void handleException(TransportException exp) {
+                            logger.info("Exception", exp);
+                        }
+
+                        @Override
+                        public String executor() {
+                            return ThreadPool.Names.GENERIC;
+                        }
+
+                        @Override
+                        public TransportResponse read(StreamInput in) throws IOException {
+                            return new TransportResponse() {
+                                @Override
+                                public void writeTo(StreamOutput out) throws IOException {
+                                    Settings.writeSettingsToStream(tmpsettings, out);
+                                }
+                            };
+                        }
+                    }
+            );
+        } catch(Exception e) {
+            logger.error(e.toString());
         }
     }
 
