@@ -37,7 +37,7 @@ public class ExtensionSettings {
         return hostaddress;
     }
 
-    public void getHostaddress(String hostaddress) {
+    public void setHostaddress(String hostaddress) {
         this.hostaddress = hostaddress;
     }
 
