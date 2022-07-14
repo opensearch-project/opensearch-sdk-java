@@ -119,7 +119,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testClusterSettingRequest() {
 
-        extensionsRunner.sendClusterSettingRequest(transportService);
+        extensionsRunner.sendClusterSettingsRequest(transportService);
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any());
     }

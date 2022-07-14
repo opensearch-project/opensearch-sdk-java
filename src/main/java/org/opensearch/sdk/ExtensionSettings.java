@@ -25,13 +25,12 @@ public class ExtensionSettings {
      */
     public static final String EXTENSION_DESCRIPTOR = "src/test/resources/extension.yml";
 
-    public ExtensionSettings(String extensionname, String hostaddress, String hostport) {
-        this.extensionname = extensionname;
-        this.hostaddress = hostaddress;
-        this.hostport = hostport;
+    /**
+     * Jackson requires a default constructor.
+     */
+    private ExtensionSettings() {
+        super();
     }
-
-    public ExtensionSettings() {}
 
     public String getExtensionname() {
         return extensionname;
