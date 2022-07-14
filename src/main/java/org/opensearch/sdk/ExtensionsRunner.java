@@ -72,9 +72,9 @@ public class ExtensionsRunner {
     public ExtensionsRunner() throws IOException {}
 
     private final Settings settings = Settings.builder()
-        .put("node.name", extensionSettings.getExtensionname())
-        .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostaddress())
-        .put(TransportSettings.PORT.getKey(), extensionSettings.getHostport())
+        .put("node.name", extensionSettings.getExtensionName())
+        .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
+        .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
         .build();
     private final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
@@ -199,7 +199,7 @@ public class ExtensionsRunner {
             threadPool,
             NOOP_TRANSPORT_INTERCEPTOR,
             boundAddress -> DiscoveryNode.createLocal(
-                Settings.builder().put("node.name", extensionSettings.getExtensionname()).build(),
+                Settings.builder().put("node.name", extensionSettings.getExtensionName()).build(),
                 boundAddress.publishAddress(),
                 randomBase64UUID()
             ),

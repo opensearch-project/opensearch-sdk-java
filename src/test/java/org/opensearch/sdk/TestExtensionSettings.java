@@ -22,16 +22,16 @@ public class TestExtensionSettings extends OpenSearchTestCase {
 
     @Test
     public void testExtensionName() {
-        assertEquals(extensionSettings.getExtensionname(), "extension");
+        assertEquals(extensionSettings.getExtensionName(), "extension");
     }
 
     @Test
     public void testHostAddress() {
-        assertEquals(extensionSettings.getHostaddress(), "127.0.0.1");
+        assertEquals(extensionSettings.getHostAddress(), "127.0.0.1");
     }
 
     @Test
     public void testHostPort() {
-        assertEquals(extensionSettings.getHostport(), "4532");
+        assertEquals(extensionSettings.getHostPort(), "4532");
     }
 }
