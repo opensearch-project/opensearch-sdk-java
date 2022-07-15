@@ -22,5 +22,10 @@ allprojects {
                 paddedCell()
             }
         }
+        format("license", {
+            licenseHeaderFile("${rootProject.file("formatter/license-header.txt")}", "package ");
+            target("src/main/java/**/*.java")
+            targetExclude("**/netty4/*")
+        })
     }
 }
