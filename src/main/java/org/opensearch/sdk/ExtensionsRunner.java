@@ -103,7 +103,7 @@ public class ExtensionsRunner {
      */
     PluginResponse handlePluginsRequest(PluginRequest pluginRequest) {
         logger.info("Registering Plugin Request received from OpenSearch");
-        PluginResponse pluginResponse = new PluginResponse("RealExtension");
+        PluginResponse pluginResponse = new PluginResponse(extensionSettings.getExtensionName());
         opensearchNode = pluginRequest.getSourceNode();
         setOpensearchNode(opensearchNode);
         return pluginResponse;

@@ -102,7 +102,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         );
         PluginRequest pluginRequest = new PluginRequest(sourceNode, null);
         PluginResponse response = extensionsRunner.handlePluginsRequest(pluginRequest);
-        assertEquals(response.getName(), "RealExtension");
+        assertEquals(response.getName(), "extension");
 
         // Test if the source node is set after handlePluginRequest() is called during OpenSearch bootstrap
         assertEquals(extensionsRunner.getOpensearchNode(), sourceNode);
