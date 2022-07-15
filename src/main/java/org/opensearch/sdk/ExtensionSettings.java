@@ -16,42 +16,37 @@ package org.opensearch.sdk;
  */
 public class ExtensionSettings {
 
-    private String extensionname;
-    private String hostaddress;
-    private String hostport;
+    private String extensionName;
+    private String hostAddress;
+    private String hostPort;
 
     /**
      * Placeholder field. Change the location to extension.yml file of the extension.
      */
     public static final String EXTENSION_DESCRIPTOR = "src/test/resources/extension.yml";
 
-    public String getExtensionname() {
-        return extensionname;
+    /**
+     * Jackson requires a default constructor.
+     */
+    private ExtensionSettings() {
+        super();
     }
 
-    public void setExtensionname(String extensionname) {
-        this.extensionname = extensionname;
+    public String getExtensionName() {
+        return extensionName;
     }
 
-    public String getHostaddress() {
-        return hostaddress;
+    public String getHostAddress() {
+        return hostAddress;
     }
 
-    public void setHostaddress(String hostaddress) {
-        this.hostaddress = hostaddress;
-    }
-
-    public String getHostport() {
-        return hostport;
-    }
-
-    public void setHostport(String hostport) {
-        this.hostport = hostport;
+    public String getHostPort() {
+        return hostPort;
     }
 
     @Override
     public String toString() {
-        return "\nnodename: " + extensionname + "\nhostaddress: " + hostaddress + "\nhostPort: " + hostport + "\n";
+        return "\nnodename: " + extensionName + "\nhostaddress: " + hostAddress + "\nhostPort: " + hostPort + "\n";
     }
 
 }
