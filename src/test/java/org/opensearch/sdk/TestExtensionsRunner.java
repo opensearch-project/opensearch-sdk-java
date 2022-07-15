@@ -113,7 +113,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         extensionsRunner.sendClusterStateRequest(transportService);
 
-        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any());
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ClusterStateResponseHandler.class));
     }
 
     @Test
@@ -121,7 +121,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         extensionsRunner.sendClusterSettingsRequest(transportService);
 
-        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any());
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ClusterSettingsResponseHandler.class));
     }
 
     @Test
@@ -129,7 +129,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         extensionsRunner.sendLocalNodeRequest(transportService);
 
-        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any());
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(LocalNodeResponseHandler.class));
     }
 
 }
