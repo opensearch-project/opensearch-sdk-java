@@ -6,7 +6,6 @@ ignore:
   - DEVELOPER_GUIDE.md
   - SECURITY.md
   - formatter/license-header.txt
-  - settings.gradle
   - src/main/resources/log4j2.xml
 
 rules:
