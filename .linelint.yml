@@ -1,0 +1,18 @@
+# 'true' will fix files
+autofix: true
+
+ignore:
+  - CONTRIBUTING.md
+  - DEVELOPER_GUIDE.md
+  - SECURITY.md
+  - formatter/license-header.txt
+  - src/main/resources/log4j2.xml
+
+rules:
+  # checks if file ends in a newline character
+  end-of-file:
+    # set to true to enable this rule
+    enable: true
+
+    # if true also checks if file ends in a single newline character
+    single-new-line: true
