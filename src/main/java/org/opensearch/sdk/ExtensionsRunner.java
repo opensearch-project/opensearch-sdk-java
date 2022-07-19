@@ -24,7 +24,7 @@ import org.opensearch.common.io.stream.NamedWriteableAwareStreamInput;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
 import org.opensearch.common.io.stream.NamedWriteableRegistryParseResponse;
-import org.opensearch.common.io.stream.NamedWriteableRegistryRequest;
+import org.opensearch.extensions.DefaultExtensionPointRequest;
 import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.common.network.NetworkModule;
@@ -116,14 +116,14 @@ public class ExtensionsRunner {
         return pluginResponse;
     }
 
-    NamedWriteableRegistryResponse handleNamedWriteableRegistryRequest(NamedWriteableRegistryRequest request) {
+    NamedWriteableRegistryResponse handleNamedWriteableRegistryRequest(DefaultExtensionPointRequest request) {
 
         logger.info("Registering Named Writeable Registry Request recieved from OpenSearch.");
 
         // iterate through Extensions's named writeables and add to extension entries
-        Map<String, String> extensionEntries = new HashMap<>();
+        Map<String, Class> extensionEntries = new HashMap<>();
         for (NamedWriteableRegistry.Entry entry : this.namedWriteables) {
-            extensionEntries.put(entry.name, entry.categoryClass.getName());
+            extensionEntries.put(entry.name, entry.categoryClass);
         }
         NamedWriteableRegistryResponse namedWriteableRegistryResponse = new NamedWriteableRegistryResponse(extensionEntries);
         return namedWriteableRegistryResponse;
@@ -137,39 +137,35 @@ public class ExtensionsRunner {
         boolean status = false;
 
         // extract data from request and procress fully qualified category class name into class instance
-        try {
-            Class<C> categoryClass = (Class<C>) request.getCategoryClass();
-            byte[] context = request.getContext();
+        Class<C> categoryClass = (Class<C>) request.getCategoryClass();
+        byte[] context = request.getContext();
 
-            // transform byte array context into an input stream
-            try (InputStream inputStream = new ByteArrayInputStream(context, 0, context.length)) {
+        // transform byte array context into an input stream
+        try (InputStream inputStream = new ByteArrayInputStream(context, 0, context.length)) {
 
-                // convert input stream to stream input
-                try (
-                    StreamInput streamInput = new NamedWriteableAwareStreamInput(
-                        new InputStreamStreamInput(inputStream),
-                        namedWriteableRegistry
-                    )
-                ) {
+            // convert input stream to stream input
+            try (
+                StreamInput streamInput = new NamedWriteableAwareStreamInput(
+                    new InputStreamStreamInput(inputStream),
+                    namedWriteableRegistry
+                )
+            ) {
 
-                    // NamedWriteableAwareStreamInput extracts name from StreamInput, then uses both category class and name to extract
-                    // reader from provided registry
-                    // reader is then applied to the StreamInput object generated from the byte array (context)
-                    try {
-                        C c = streamInput.readNamedWriteable(categoryClass);
+                // NamedWriteableAwareStreamInput extracts name from StreamInput, then uses both category class and name to extract
+                // reader from provided registry
+                // reader is then applied to the StreamInput object generated from the byte array (context)
+                try {
+                    C c = streamInput.readNamedWriteable(categoryClass);
 
-                        // TODO : current parse response to OpenSearch includes only the status of the parse request. Further research
-                        // needed to determine the workflow for extensions to utilize parsed objects after deserialization but this will be
-                        // within the scope of dynamic registration.
-                        status = true;
-                    } catch (UnsupportedOperationException e) {
-                        logger.info("Failed to parse named writeable", e);
-                    }
-
+                    // TODO : current parse response to OpenSearch includes only the status of the parse request. Further research
+                    // needed to determine the workflow for extensions to utilize parsed objects after deserialization but this will be
+                    // within the scope of dynamic registration.
+                    status = true;
+                } catch (UnsupportedOperationException e) {
+                    logger.info("Failed to parse named writeable", e);
                 }
+
             }
-        } catch (ClassNotFoundException e) {
-            logger.info(e);
         }
 
         NamedWriteableRegistryParseResponse namedWriteableRegistryParseResponse = new NamedWriteableRegistryParseResponse(status);
@@ -275,7 +271,7 @@ public class ExtensionsRunner {
             ThreadPool.Names.GENERIC,
             false,
             false,
-            NamedWriteableRegistryRequest::new,
+            DefaultExtensionPointRequest::new,
             (request, channel, task) -> channel.sendResponse(handleNamedWriteableRegistryRequest(request))
         );
 
