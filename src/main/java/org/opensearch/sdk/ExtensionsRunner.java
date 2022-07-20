@@ -110,6 +110,7 @@ public class ExtensionsRunner {
         opensearchNode = initializeExtensionsRequest.getSourceNode();
         setOpensearchNode(opensearchNode);
         return initializeExtensionsResponse;
+<<<<<<< HEAD
     }
 
     /**
@@ -128,6 +129,8 @@ public class ExtensionsRunner {
             default:
                 throw new Exception("Handler not present for the provided request");
         }
+=======
+>>>>>>> issue #28
     }
 
     /**
