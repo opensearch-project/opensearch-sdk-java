@@ -20,8 +20,8 @@ import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.PageCacheRecycler;
-import org.opensearch.discovery.PluginRequest;
-import org.opensearch.discovery.PluginResponse;
+import org.opensearch.discovery.InitializeExtensionsRequest;
+import org.opensearch.discovery.InitializeExtensionsResponse;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.index.IndicesModuleNameResponse;
@@ -97,12 +97,12 @@ public class ExtensionsRunner {
      * @param pluginRequest  The request to handle.
      * @return A response to OpenSearch validating that this is an extension.
      */
-    PluginResponse handlePluginsRequest(PluginRequest pluginRequest) {
+    InitializeExtensionsResponse handlePluginsRequest(InitializeExtensionsRequest initializeExtensionsRequest) {
         logger.info("Registering Plugin Request received from OpenSearch");
-        PluginResponse pluginResponse = new PluginResponse(extensionSettings.getExtensionName());
-        opensearchNode = pluginRequest.getSourceNode();
+        InitializeExtensionsResponse initializeExtensionsResponse = new InitializeExtensionsResponse("RealExtension");
+        opensearchNode = initializeExtensionsRequest.getSourceNode();
         setOpensearchNode(opensearchNode);
-        return pluginResponse;
+        return initializeExtensionsResponse;
     }
 
     /**
@@ -222,7 +222,7 @@ public class ExtensionsRunner {
             ThreadPool.Names.GENERIC,
             false,
             false,
-            PluginRequest::new,
+            InitializeExtensionsRequest::new,
             (request, channel, task) -> channel.sendResponse(handlePluginsRequest(request))
         );
 
