@@ -115,16 +115,17 @@ public class ExtensionsRunner {
      * Handles a request from OpenSearch and invokes the extension point API corresponding with the request type
      *
      * @param request  The request to handle.
+     * @throws Exception if the corresponding handler for the request is not present
      * @return A response to OpenSearch for the corresponding API
      */
-    TransportResponse handleOpenSearchRequest(OpenSearchRequest request) {
+    TransportResponse handleOpenSearchRequest(OpenSearchRequest request) throws Exception {
         // Read enum
         switch (request.getRequestType()) {
             case REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY:
                 return namedWriteableRegistryApi.handleNamedWriteableRegistryRequest(request);
             // Add additional request handlers here
             default:
-                return null;
+                throw new Exception("Handler not present for the provided request");
         }
     }
 
