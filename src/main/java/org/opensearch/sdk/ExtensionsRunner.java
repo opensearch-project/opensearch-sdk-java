@@ -75,6 +75,11 @@ public class ExtensionsRunner {
     };
     private NamedWriteableRegistryApi namedWriteableRegistryApi = new NamedWriteableRegistryApi();
 
+    /**
+     * Constructor for ExtensionsRunner
+     *
+     * @throws IOException if the runner failed to connect to the OpenSearch cluster.
+     */
     public ExtensionsRunner() throws IOException {}
 
     private ExtensionSettings readExtensionSettings() throws IOException {

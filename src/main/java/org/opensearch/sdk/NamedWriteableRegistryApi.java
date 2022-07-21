@@ -35,6 +35,9 @@ public class NamedWriteableRegistryApi {
     private List<NamedWriteableRegistry.Entry> namedWriteables;
     private final NamedWriteableRegistry namedWriteableRegistry;
 
+    /**
+     * Constructor for NamedWriteableRegistryApi. Creates and populated a NamedWriteableRegistry for this extension
+     */
     public NamedWriteableRegistryApi() {
         this.namedWriteables = getNamedWriteables();
         this.namedWriteableRegistry = new NamedWriteableRegistry(namedWriteables);
@@ -42,6 +45,8 @@ public class NamedWriteableRegistryApi {
 
     /**
      * Current placeholder for extension point override getNamedWriteables(), will invoke extension point override here
+     *
+     * @return A list of NamedWriteableRegistry entries that the extension wants to register within OpenSearch
      */
     private List<NamedWriteableRegistry.Entry> getNamedWriteables() {
         List<NamedWriteableRegistry.Entry> namedWriteables = new ArrayList<>();
@@ -67,9 +72,11 @@ public class NamedWriteableRegistryApi {
 
     /**
      * Handles a request from OpenSearch to parse a named writeable from a byte array generated from a {@link StreamInput} object.
-     * Works as {@see org.opensearch.common.io.stream.StreamInput#readNamedWriteable(Class)}
+     * Works as org.opensearch.common.io.stream.StreamInput#readNamedWriteable(Class)
      *
+     * @param <C> generic class that extends NamedWriteable
      * @param request  The request to handle.
+     * @throws IOException if InputStream generated from the byte array is unsuccessfully closed
      * @return A response acknowledging the request to parse has executed successfully
      */
     public <C extends NamedWriteable> BooleanResponse handleNamedWriteableRegistryParseRequest(NamedWriteableRegistryParseRequest request)
