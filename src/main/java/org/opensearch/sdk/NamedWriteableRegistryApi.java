@@ -45,7 +45,7 @@ public class NamedWriteableRegistryApi {
     }
 
     /**
-     * current placeholder for extension point override getNamedWriteables(), will invoke extension point override here
+     * Current placeholder for extension point override getNamedWriteables(), will invoke extension point override here
      */
     private List<NamedWriteableRegistry.Entry> getNamedWriteables() {
         List<NamedWriteableRegistry.Entry> namedWriteables = new ArrayList<>();
@@ -60,7 +60,7 @@ public class NamedWriteableRegistryApi {
      */
     public NamedWriteableRegistryResponse handleNamedWriteableRegistryRequest(OpenSearchRequest request) {
         logger.info("Registering Named Writeable Registry Request recieved from OpenSearch.");
-        // iterate through Extensions's named writeables and add to extension entries
+        // Iterate through Extensions's named writeables and add to extension entries
         Map<String, Class> extensionEntries = new HashMap<>();
         for (NamedWriteableRegistry.Entry entry : this.namedWriteables) {
             extensionEntries.put(entry.name, entry.categoryClass);
@@ -82,14 +82,14 @@ public class NamedWriteableRegistryApi {
         logger.info("Registering Named Writeable Registry Parse request from OpenSearch");
         boolean status = false;
 
-        // extract data from request and procress fully qualified category class name into class instance
+        // Extract data from request and procress fully qualified category class name into class instance
         Class<C> categoryClass = (Class<C>) request.getCategoryClass();
         byte[] context = request.getContext();
 
-        // transform byte array context into an input stream
+        // Transform byte array context into an input stream
         try (InputStream inputStream = new ByteArrayInputStream(context, 0, context.length)) {
 
-            // convert input stream to stream input
+            // Convert input stream to stream input
             try (
                 StreamInput streamInput = new NamedWriteableAwareStreamInput(
                     new InputStreamStreamInput(inputStream),
@@ -97,7 +97,7 @@ public class NamedWriteableRegistryApi {
                 )
             ) {
 
-                // apply reader to stream input generated from the request context
+                // Apply reader to stream input generated from the request context
                 try {
                     C c = streamInput.readNamedWriteable(categoryClass);
                     status = true;
