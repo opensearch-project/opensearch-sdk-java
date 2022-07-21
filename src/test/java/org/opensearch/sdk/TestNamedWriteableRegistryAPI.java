@@ -117,7 +117,7 @@ public class TestNamedWriteableRegistryAPI extends OpenSearchTestCase {
     }
 
     @Test
-    public void testInvalidNamedWriteableRegistryParseRequest() throws UnknownHostException, IOException {
+    public void testInvalidWriteableName() throws UnknownHostException, IOException {
         // convert stream output into byte array
         byte[] context = null;
         try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
