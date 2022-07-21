@@ -90,6 +90,9 @@ public class Netty4Utils {
     /**
      * Turns the given BytesReference into a ByteBuf. Note: the returned ByteBuf will reference the internal
      * pages of the BytesReference. Don't free the bytes of reference before the ByteBuf goes out of scope.
+     *
+     * @param reference  The reference to change into a ByteBuf.
+     * @return The reference as a ByteBuf.
      */
     public static ByteBuf toByteBuf(final BytesReference reference) {
         if (reference.length() == 0) {
@@ -118,6 +121,9 @@ public class Netty4Utils {
 
     /**
      * Wraps the given ChannelBuffer with a BytesReference
+     *
+     * @param buffer  The ByteBuf to wrap.
+     * @return The wrapped ByteBuf as a BytesReference.
      */
     public static BytesReference toBytesReference(final ByteBuf buffer) {
         final int readableBytes = buffer.readableBytes();

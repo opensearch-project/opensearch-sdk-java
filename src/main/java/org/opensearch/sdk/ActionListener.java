@@ -5,7 +5,6 @@
  * this file be licensed under the Apache-2.0 license or a
  * compatible open source license.
  */
-
 package org.opensearch.sdk;
 
 import org.opensearch.common.SuppressForbidden;
@@ -21,13 +20,30 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+/**
+ * A listener for actions on the local port.
+ */
 public class ActionListener {
 
+    /**
+     * Get the local ephemeral port.
+     *
+     * @return The socket address for localhost.
+     * @throws UnknownHostException if the local host name could not be resolved into an address.
+     */
     @SuppressForbidden(reason = "need local ephemeral port")
     protected static InetSocketAddress getLocalEphemeral() throws UnknownHostException {
         return new InetSocketAddress(InetAddress.getLocalHost(), 0);
     }
 
+    /**
+     * Run the action listener.
+     * This is presently a placeholder; when it receives a byte on the listening port, it terminates.
+     * Socket server to run extensions on the specified port provided in extensions.yml file after integrating SDK
+     *
+     * @param flag  If true, waits for the other side to send a message.
+     * @param timeout  How long to wait, in milliseconds.  If zero, infinite timeout.
+     */
     public void runActionListener(boolean flag, int timeout) {
         try (ServerSocket socket = new ServerSocket()) {
 
