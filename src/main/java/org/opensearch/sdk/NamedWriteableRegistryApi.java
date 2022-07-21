@@ -36,11 +36,30 @@ public class NamedWriteableRegistryApi {
     private final NamedWriteableRegistry namedWriteableRegistry;
 
     /**
-     * Constructor for NamedWriteableRegistryApi. Creates and populated a NamedWriteableRegistry for this extension
+     * Constructor for NamedWriteableRegistryApi. Creates a NamedWriteableRegistry for this extension
      */
     public NamedWriteableRegistryApi() {
         this.namedWriteables = getNamedWriteables();
         this.namedWriteableRegistry = new NamedWriteableRegistry(namedWriteables);
+    }
+
+    /**
+     * Constructor for NamedWriteableRegistryApi. Creates and populates a NamedWriteableRegistry with the given NamedWriteableRegistry entries for this extension
+     *
+     * @param extensionNamedWriteables List of NamedWriteableRegistry.Entry to be registered
+     */
+    public NamedWriteableRegistryApi(List<NamedWriteableRegistry.Entry> extensionNamedWriteables) {
+        this.namedWriteables = extensionNamedWriteables;
+        this.namedWriteableRegistry = new NamedWriteableRegistry(namedWriteables);
+    }
+
+    /**
+     * Getter for NamedWriteableRegistry
+     *
+     * @return The NamedWriteableRegistry of this Api
+     */
+    public NamedWriteableRegistry getRegistry() {
+        return this.namedWriteableRegistry;
     }
 
     /**
