@@ -76,7 +76,7 @@ public class ExtensionsRunner {
     private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
 
     /**
-     * Constructor for ExtensionsRunner
+     * Instantiates a new Extensions Runner.
      *
      * @throws IOException if the runner failed to connect to the OpenSearch cluster.
      */
