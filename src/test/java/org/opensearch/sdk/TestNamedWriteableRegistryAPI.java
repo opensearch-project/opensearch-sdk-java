@@ -117,6 +117,30 @@ public class TestNamedWriteableRegistryAPI extends OpenSearchTestCase {
     }
 
     @Test
+    public void testInvalidCategoryClass() throws UnknownHostException, IOException {
+        // convert stream output into byte array
+        byte[] context = null;
+        try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
+            try (OutputStreamStreamOutput out = new OutputStreamStreamOutput(buf)) {
+                out.writeString("test_name");
+                out.writeString("test_message");
+                context = buf.toByteArray();
+
+                // Category Class ExtensionRunner is not registered
+                NamedWriteableRegistryParseRequest request = new NamedWriteableRegistryParseRequest(
+                    ExtensionsRunner.class.getName(),
+                    context
+                );
+                Exception e = expectThrows(
+                    Exception.class,
+                    () -> namedWriteableRegistryAPI.handleNamedWriteableRegistryParseRequest(request)
+                );
+                assertEquals(e.getMessage(), "Unknown NamedWriteable category [" + ExtensionsRunner.class.getName() + "]");
+            }
+        }
+    }
+
+    @Test
     public void testInvalidWriteableName() throws UnknownHostException, IOException {
         // convert stream output into byte array
         byte[] context = null;
