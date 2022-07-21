@@ -28,27 +28,27 @@ import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.io.stream.StreamInput;
 
 /**
- * Api used to handle named writeable registry requests from OpenSearch
+ * API used to handle named writeable registry requests from OpenSearch
  */
-public class NamedWriteableRegistryApi {
+public class NamedWriteableRegistryAPI {
     private final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
     private List<NamedWriteableRegistry.Entry> namedWriteables;
     private final NamedWriteableRegistry namedWriteableRegistry;
 
     /**
-     * Constructor for NamedWriteableRegistryApi. Creates a NamedWriteableRegistry for this extension
+     * Constructor for NamedWriteableRegistryAPI. Creates a NamedWriteableRegistry for this extension
      */
-    public NamedWriteableRegistryApi() {
+    public NamedWriteableRegistryAPI() {
         this.namedWriteables = getNamedWriteables();
         this.namedWriteableRegistry = new NamedWriteableRegistry(namedWriteables);
     }
 
     /**
-     * Constructor for NamedWriteableRegistryApi. Creates and populates a NamedWriteableRegistry with the given NamedWriteableRegistry entries for this extension
+     * Constructor for NamedWriteableRegistryAPI. Creates and populates a NamedWriteableRegistry with the given NamedWriteableRegistry entries for this extension
      *
      * @param extensionNamedWriteables List of NamedWriteableRegistry.Entry to be registered
      */
-    public NamedWriteableRegistryApi(List<NamedWriteableRegistry.Entry> extensionNamedWriteables) {
+    public NamedWriteableRegistryAPI(List<NamedWriteableRegistry.Entry> extensionNamedWriteables) {
         this.namedWriteables = extensionNamedWriteables;
         this.namedWriteableRegistry = new NamedWriteableRegistry(namedWriteables);
     }
@@ -56,7 +56,7 @@ public class NamedWriteableRegistryApi {
     /**
      * Getter for NamedWriteableRegistry
      *
-     * @return The NamedWriteableRegistry of this Api
+     * @return The NamedWriteableRegistry of this API
      */
     public NamedWriteableRegistry getRegistry() {
         return this.namedWriteableRegistry;

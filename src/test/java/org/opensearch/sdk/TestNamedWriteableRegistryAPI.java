@@ -40,9 +40,9 @@ import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class TestNamedWriteableRegistryApi extends OpenSearchTestCase {
+public class TestNamedWriteableRegistryAPI extends OpenSearchTestCase {
     private List<NamedWriteableRegistry.Entry> namedWriteables;
-    private NamedWriteableRegistryApi namedWriteableRegistryApi;
+    private NamedWriteableRegistryAPI namedWriteableRegistryAPI;
 
     private static class Example implements NamedWriteable {
         public static final String INVALID_NAME = "invalid_name";
@@ -85,12 +85,12 @@ public class TestNamedWriteableRegistryApi extends OpenSearchTestCase {
     @BeforeEach
     public void setUp() throws Exception {
         this.namedWriteables = Collections.singletonList(new NamedWriteableRegistry.Entry(Example.class, Example.NAME, Example::new));
-        this.namedWriteableRegistryApi = new NamedWriteableRegistryApi(namedWriteables);
+        this.namedWriteableRegistryAPI = new NamedWriteableRegistryAPI(namedWriteables);
     }
 
     @Test
     public void testNamedWriteableRegistryCreation() {
-        assert (namedWriteableRegistryApi.getRegistry() instanceof NamedWriteableRegistry);
+        assert (namedWriteableRegistryAPI.getRegistry() instanceof NamedWriteableRegistry);
     }
 
     @Test
@@ -103,7 +103,7 @@ public class TestNamedWriteableRegistryApi extends OpenSearchTestCase {
             Version.CURRENT
         );
         OpenSearchRequest request = new OpenSearchRequest(OpenSearchRequestType.REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY);
-        NamedWriteableRegistryResponse response = namedWriteableRegistryApi.handleNamedWriteableRegistryRequest(request);
+        NamedWriteableRegistryResponse response = namedWriteableRegistryAPI.handleNamedWriteableRegistryRequest(request);
 
         // Verify that the api processes named writeable registry entries successfully within the response
         assertEquals(response.getRegistry().size(), 1);
@@ -132,7 +132,7 @@ public class TestNamedWriteableRegistryApi extends OpenSearchTestCase {
             context = buf.toByteArray();
 
             NamedWriteableRegistryParseRequest request = new NamedWriteableRegistryParseRequest(Example.class.getName(), context);
-            BooleanResponse response = namedWriteableRegistryApi.handleNamedWriteableRegistryParseRequest(request);
+            BooleanResponse response = namedWriteableRegistryAPI.handleNamedWriteableRegistryParseRequest(request);
 
             // verify that byte array deserialization was successful
             assertEquals(response.getStatus(), true);
@@ -162,7 +162,7 @@ public class TestNamedWriteableRegistryApi extends OpenSearchTestCase {
 
             try {
                 NamedWriteableRegistryParseRequest request = new NamedWriteableRegistryParseRequest(Example.class.getName(), context);
-                BooleanResponse response = namedWriteableRegistryApi.handleNamedWriteableRegistryParseRequest(request);
+                BooleanResponse response = namedWriteableRegistryAPI.handleNamedWriteableRegistryParseRequest(request);
             } catch (IllegalArgumentException e) {
                 assertEquals(e.getMessage(), "Unknown NamedWriteable [" + Example.class.getName() + "][" + Example.INVALID_NAME + "]");
             }
