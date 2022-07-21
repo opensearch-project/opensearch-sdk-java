@@ -113,13 +113,6 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
     @Test
     public void testHandleOpenSearchRequest() throws Exception {
-        DiscoveryNode sourceNode = new DiscoveryNode(
-            "test_node",
-            new TransportAddress(InetAddress.getByName("localhost"), 9876),
-            emptyMap(),
-            emptySet(),
-            Version.CURRENT
-        );
 
         OpenSearchRequest request = new OpenSearchRequest(OpenSearchRequestType.REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY);
         assertEquals(extensionsRunner.handleOpenSearchRequest(request).getClass(), NamedWriteableRegistryResponse.class);

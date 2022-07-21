@@ -11,11 +11,6 @@
 
 package org.opensearch.sdk;
 
-import static java.util.Collections.emptySet;
-import static java.util.Collections.emptyMap;
-
-import org.opensearch.Version;
-import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteable;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
@@ -23,7 +18,6 @@ import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.io.stream.OutputStreamStreamOutput;
 import org.opensearch.common.io.stream.StreamOutput;
-import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.extensions.BooleanResponse;
 import org.opensearch.extensions.OpenSearchRequest;
@@ -31,7 +25,6 @@ import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
@@ -95,13 +88,6 @@ public class TestNamedWriteableRegistryAPI extends OpenSearchTestCase {
 
     @Test
     public void testNamedWriteableRegistryRequest() throws UnknownHostException {
-        DiscoveryNode sourceNode = new DiscoveryNode(
-            "test_node",
-            new TransportAddress(InetAddress.getByName("localhost"), 9876),
-            emptyMap(),
-            emptySet(),
-            Version.CURRENT
-        );
         OpenSearchRequest request = new OpenSearchRequest(OpenSearchRequestType.REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY);
         NamedWriteableRegistryResponse response = namedWriteableRegistryAPI.handleNamedWriteableRegistryRequest(request);
 
@@ -111,61 +97,43 @@ public class TestNamedWriteableRegistryAPI extends OpenSearchTestCase {
     }
 
     @Test
-    public void testNamedWriteableRegistryParseRequest() throws UnknownHostException {
-        DiscoveryNode sourceNode = new DiscoveryNode(
-            "test_node",
-            new TransportAddress(InetAddress.getByName("localhost"), 9876),
-            emptyMap(),
-            emptySet(),
-            Version.CURRENT
-        );
-
+    public void testNamedWriteableRegistryParseRequest() throws UnknownHostException, IOException {
         // convert stream output into byte array
         byte[] context = null;
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        OutputStreamStreamOutput out = new OutputStreamStreamOutput(buf);
-        try {
+        try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
+            try (OutputStreamStreamOutput out = new OutputStreamStreamOutput(buf)) {
+                // named writeables are always preceded by the writeable name within the streaminput
+                out.writeString(Example.NAME);
+                out.writeString("test_message");
+                context = buf.toByteArray();
 
-            // named writeables are always preceded by the writeable name within the streaminput
-            out.writeString(Example.NAME);
-            out.writeString("test_message");
-            context = buf.toByteArray();
+                NamedWriteableRegistryParseRequest request = new NamedWriteableRegistryParseRequest(Example.class.getName(), context);
+                BooleanResponse response = namedWriteableRegistryAPI.handleNamedWriteableRegistryParseRequest(request);
 
-            NamedWriteableRegistryParseRequest request = new NamedWriteableRegistryParseRequest(Example.class.getName(), context);
-            BooleanResponse response = namedWriteableRegistryAPI.handleNamedWriteableRegistryParseRequest(request);
-
-            // verify that byte array deserialization was successful
-            assertEquals(response.getStatus(), true);
-        } catch (IOException e) {}
+                // verify that byte array deserialization was successful
+                assertEquals(response.getStatus(), true);
+            }
+        }
     }
 
     @Test
-    public void testInvalidNamedWriteableRegistryParseRequest() throws UnknownHostException {
-        DiscoveryNode sourceNode = new DiscoveryNode(
-            "test_node",
-            new TransportAddress(InetAddress.getByName("localhost"), 9876),
-            emptyMap(),
-            emptySet(),
-            Version.CURRENT
-        );
-
+    public void testInvalidNamedWriteableRegistryParseRequest() throws UnknownHostException, IOException {
         // convert stream output into byte array
         byte[] context = null;
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        OutputStreamStreamOutput out = new OutputStreamStreamOutput(buf);
-        try {
+        try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
+            try (OutputStreamStreamOutput out = new OutputStreamStreamOutput(buf)) {
+                // write the invalid name to the stream output
+                out.writeString(Example.INVALID_NAME);
+                out.writeString("test_message");
+                context = buf.toByteArray();
 
-            // write the invalid name to the stream output
-            out.writeString(Example.INVALID_NAME);
-            out.writeString("test_message");
-            context = buf.toByteArray();
-
-            try {
                 NamedWriteableRegistryParseRequest request = new NamedWriteableRegistryParseRequest(Example.class.getName(), context);
-                BooleanResponse response = namedWriteableRegistryAPI.handleNamedWriteableRegistryParseRequest(request);
-            } catch (IllegalArgumentException e) {
+                Exception e = expectThrows(
+                    Exception.class,
+                    () -> namedWriteableRegistryAPI.handleNamedWriteableRegistryParseRequest(request)
+                );
                 assertEquals(e.getMessage(), "Unknown NamedWriteable [" + Example.class.getName() + "][" + Example.INVALID_NAME + "]");
             }
-        } catch (IOException e) {}
+        }
     }
 }

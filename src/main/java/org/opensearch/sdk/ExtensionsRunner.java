@@ -73,7 +73,7 @@ public class ExtensionsRunner {
     private final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
-    private NamedWriteableRegistryAPI namedWriteableRegistryAPI = new NamedWriteableRegistryAPI();
+    private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
 
     /**
      * Constructor for ExtensionsRunner
@@ -121,7 +121,7 @@ public class ExtensionsRunner {
         // Read enum
         switch (request.getRequestType()) {
             case REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY:
-                return namedWriteableRegistryAPI.handleNamedWriteableRegistryRequest(request);
+                return namedWriteableRegistryApi.handleNamedWriteableRegistryRequest(request);
             // Add additional request handlers here
             default:
                 return null;
@@ -264,7 +264,7 @@ public class ExtensionsRunner {
             false,
             false,
             NamedWriteableRegistryParseRequest::new,
-            (request, channel, task) -> channel.sendResponse(namedWriteableRegistryAPI.handleNamedWriteableRegistryParseRequest(request))
+            (request, channel, task) -> channel.sendResponse(namedWriteableRegistryApi.handleNamedWriteableRegistryParseRequest(request))
         );
 
         transportService.registerRequestHandler(
