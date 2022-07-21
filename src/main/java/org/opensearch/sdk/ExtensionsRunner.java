@@ -24,10 +24,12 @@ import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.common.io.stream.StreamOutput;
 import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
+import org.opensearch.common.settings.ClusterSettingsListenerResponse;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.PageCacheRecycler;
 import org.opensearch.discovery.PluginRequest;
 import org.opensearch.discovery.PluginResponse;
+import org.opensearch.extensions.AddSettingsRequest;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.index.IndicesModuleNameResponse;
@@ -310,15 +312,15 @@ public class ExtensionsRunner {
     }
 
     public void sendAddSettingsUpdateConsumer(TransportService transportService) {
-        Settings tmpsettings = Settings.builder().put("node.name", "my-node").build();
         try {
             transportService.sendRequest(
                     opensearchNode,
-                    "internal:discovery/clustersettings/addsettingsupdateconsumer",
-                    new ExtensionRequest(ExtensionsOrchestrator.RequestType.valueOf("internal:discovery/clustersettings/addsettingsupdateconsumer")),
-                    new TransportResponseHandler<TransportResponse>() {
+                    ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_SETTINGS_ADD_SETTINGS_UPDATE_CONSUMER,
+                    //Change it to Setting
+                    new AddSettingsRequest("Temp"),
+                    new TransportResponseHandler<ClusterSettingsListenerResponse>() {
                         @Override
-                        public void handleResponse(TransportResponse response) {
+                        public void handleResponse(ClusterSettingsListenerResponse response) {
                             logger.info("Send request to OpenSearch");
                         }
 
@@ -333,13 +335,8 @@ public class ExtensionsRunner {
                         }
 
                         @Override
-                        public TransportResponse read(StreamInput in) throws IOException {
-                            return new TransportResponse() {
-                                @Override
-                                public void writeTo(StreamOutput out) throws IOException {
-                                    Settings.writeSettingsToStream(tmpsettings, out);
-                                }
-                            };
+                        public ClusterSettingsListenerResponse read(StreamInput in) throws IOException {
+                            return new ClusterSettingsListenerResponse(in);
                         }
                     }
             );
