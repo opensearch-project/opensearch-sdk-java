@@ -261,6 +261,8 @@ public class ExtensionsRunner {
         transportService.registerRequestHandler(
             ExtensionsOrchestrator.REQUEST_OPENSEARCH_PARSE_NAMED_WRITEABLE,
             ThreadPool.Names.GENERIC,
+            false,
+            false,
             NamedWriteableRegistryParseRequest::new,
             (request, channel, task) -> channel.sendResponse(namedWriteableRegistryApi.handleNamedWriteableRegistryParseRequest(request))
         );
