@@ -29,10 +29,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.Version;
 import org.opensearch.cluster.node.DiscoveryNode;
+import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.discovery.PluginRequest;
 import org.opensearch.discovery.PluginResponse;
+import org.opensearch.extensions.OpenSearchRequest;
+import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.Transport;
@@ -106,6 +109,22 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         // Test if the source node is set after handlePluginRequest() is called during OpenSearch bootstrap
         assertEquals(extensionsRunner.getOpensearchNode(), sourceNode);
+    }
+
+    @Test
+    public void testHandleOpenSearchRequest() throws Exception {
+        DiscoveryNode sourceNode = new DiscoveryNode(
+            "test_node",
+            new TransportAddress(InetAddress.getByName("localhost"), 9876),
+            emptyMap(),
+            emptySet(),
+            Version.CURRENT
+        );
+
+        OpenSearchRequest request = new OpenSearchRequest(OpenSearchRequestType.REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY);
+        assertEquals(extensionsRunner.handleOpenSearchRequest(request).getClass(), NamedWriteableRegistryResponse.class);
+
+        // Add additional OpenSearch request handler tests here for each default extension point
     }
 
     @Test
