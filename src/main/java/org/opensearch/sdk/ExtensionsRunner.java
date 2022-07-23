@@ -26,7 +26,7 @@ import org.opensearch.discovery.PluginRequest;
 import org.opensearch.discovery.PluginResponse;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
-import org.opensearch.index.IndicesModuleNameResponse;
+import org.opensearch.extensions.ExtensionBooleanResponse;;
 import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.index.IndicesModuleResponse;
 import org.opensearch.indices.IndicesModule;
@@ -71,8 +71,7 @@ public class ExtensionsRunner {
         .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
         .build();
     private final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
-    private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
-    };
+    private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR=new TransportInterceptor(){};
     private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
 
     /**
@@ -152,10 +151,10 @@ public class ExtensionsRunner {
      * @param indicesModuleRequest  The request to handle.
      * @return A response acknowledging the request.
      */
-    IndicesModuleNameResponse handleIndicesModuleNameRequest(IndicesModuleRequest indicesModuleRequest) {
+    ExtensionBooleanResponse handleIndicesModuleNameRequest(IndicesModuleRequest indicesModuleRequest) {
         // Works as beforeIndexRemoved
         logger.info("Registering Indices Module Name Request received from OpenSearch");
-        IndicesModuleNameResponse indicesModuleNameResponse = new IndicesModuleNameResponse(true);
+        ExtensionBooleanResponse indicesModuleNameResponse = new ExtensionBooleanResponse(true);
         return indicesModuleNameResponse;
     }
 

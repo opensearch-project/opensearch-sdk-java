@@ -23,7 +23,7 @@ import org.opensearch.common.io.stream.NamedWriteable;
 import org.opensearch.common.io.stream.NamedWriteableAwareStreamInput;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
-import org.opensearch.extensions.BooleanResponse;
+import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.io.stream.StreamInput;
 
@@ -98,8 +98,9 @@ public class NamedWriteableRegistryAPI {
      * @throws IOException if InputStream generated from the byte array is unsuccessfully closed
      * @return A response acknowledging the request to parse has executed successfully
      */
-    public <C extends NamedWriteable> BooleanResponse handleNamedWriteableRegistryParseRequest(NamedWriteableRegistryParseRequest request)
-        throws IOException {
+    public <C extends NamedWriteable> ExtensionBooleanResponse handleNamedWriteableRegistryParseRequest(
+        NamedWriteableRegistryParseRequest request
+    ) throws IOException {
 
         logger.info("Registering Named Writeable Registry Parse request from OpenSearch");
         boolean status = false;
@@ -130,7 +131,7 @@ public class NamedWriteableRegistryAPI {
             }
         }
 
-        BooleanResponse namedWriteableRegistryParseResponse = new BooleanResponse(status);
+        ExtensionBooleanResponse namedWriteableRegistryParseResponse = new ExtensionBooleanResponse(status);
         return namedWriteableRegistryParseResponse;
     }
 

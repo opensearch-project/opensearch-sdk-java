@@ -19,7 +19,7 @@ import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.io.stream.OutputStreamStreamOutput;
 import org.opensearch.common.io.stream.StreamOutput;
 import org.opensearch.test.OpenSearchTestCase;
-import org.opensearch.extensions.BooleanResponse;
+import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
 
@@ -108,7 +108,7 @@ public class TestNamedWriteableRegistryAPI extends OpenSearchTestCase {
                 context = buf.toByteArray();
 
                 NamedWriteableRegistryParseRequest request = new NamedWriteableRegistryParseRequest(Example.class.getName(), context);
-                BooleanResponse response = namedWriteableRegistryAPI.handleNamedWriteableRegistryParseRequest(request);
+                ExtensionBooleanResponse response = namedWriteableRegistryAPI.handleNamedWriteableRegistryParseRequest(request);
 
                 // verify that byte array deserialization was successful
                 assertEquals(response.getStatus(), true);
