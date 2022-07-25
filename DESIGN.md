@@ -57,8 +57,10 @@ extensions:
 
 
 ### Communication
+TBD
 
 ### OpenSearch SDK
+TBD
 
 ### Settings
 Walking through a similar example as plugin above, after extension registration is done, extension makes an API call to register custom settings to OpenSearch.
