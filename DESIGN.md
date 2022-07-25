@@ -73,4 +73,3 @@ Walking through a similar example as plugin above, after extension registration 
 
 - Will extensions replace plugins?  
   We see value in plugins as they are high performant which works well for index/search workloads.
-  
