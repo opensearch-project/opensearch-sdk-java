@@ -57,10 +57,13 @@ extensions:
 
 
 ### Communication
-TBD
+As we are running extensions on the port defined in the `extensions.yml`, the communication between OpenSearch and Extensions happens using a ServerSocket which binds the port and the host address. OpenSearch will initialize the extensions during the bootstrap by making a request to all the extensions running on different ports and thus creating a medium for the future requests.
 
 ### OpenSearch SDK
-TBD
+Currently, plugins relies on extension points to communicate with OpenSearch. To turn plugins into extensions, all the extension points should be converted into Transport APIs which will be present in the SDK. Plugins need to integrate SDK, call those APIs, and later SDK will take care of the communication and the required attributes from OpenSearch.
+
+### Latency
+https://github.com/opensearch-project/OpenSearch/issues/3012#issuecomment-1122682444
 
 ### Settings
 Walking through a similar example as plugin above, after extension registration is done, extension makes an API call to register custom settings to OpenSearch.
