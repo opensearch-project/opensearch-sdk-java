@@ -9,7 +9,7 @@ i.e critical workloads like ingestion/search traffic would be impacted because o
 This problem is exponentially grows when we would like to run a 3rd Party plugin from the community.  
 As OpenSearch and plugins run in the same process, it brings in security risk, dependency conflicts and reduces the velocity of releases.
 
-Introducing extensions, a simple and easy way to extend features of OpenSearch. It would support all plugin features and enable them to run in a different process or another node via OpenSearch SDK.
+Introducing extensions, a simple and easy way to extend features of OpenSearch. It would support all plugin features and enable them to run in a seperate process or on another node via OpenSearch SDK.
 
 Meta Issue: [Steps to make OpenSearch extensible](https://github.com/opensearch-project/OpenSearch/issues/2447)  
 Sandboxing: [Step towards modular architecture in OpenSearch](https://github.com/opensearch-project/OpenSearch/issues/1422)  
@@ -33,26 +33,22 @@ During the bootstrap of OpenSearch node, it class loads all the code under `~/pl
 ![](Docs/Extensions.png)
 
 Extensions are independent processes which are built using `opensearch-sdk`. They communicate with OpenSearch via [transport](https://github.com/opensearch-project/OpenSearch/tree/main/modules/transport-netty4) protocol which today is used to communicate between OpenSearch nodes.  
-Extensions are designed to extend features via APIs which are exposed using extension points of OpenSearch.  
+Extensions are designed to extend features via transport APIs which are exposed using extension points of OpenSearch.
 
 ### Discovery
-Extensions are discovered and configured via `extensions.yml` which is read by OpenSearch during the node bootstrap. `ExtensionsOrchestrator` reads through the config file at `~/extensions` and registers extensions within OpenSearch.
+Extensions are discovered and configured via `extensions.yml`, same way we currently have `plugin-descriptor.properties` which is read by OpenSearch during the node bootstrap. `ExtensionsOrchestrator` reads through the config file at `~/extensions` and registers extensions within OpenSearch.
 Here is an example extension configuration `extensions.yml`:
 
 ```
 extensions:
-  - name: opensearch-sdk
-    uniqueId: opensearch-sdk-1
-    hostName: 'sdk_host'
-    hostAddress: '127.0.0.1'
-    port: '4532'
-    version: '1.0'
-    description: Extension for the Opensearch SDK Repo
-    opensearchVersion: '3.0.0'
-    javaVersion: '14'
-    className: ExtensionsRunner
-    customFolderName: opensearch-sdk
-    hasNativeController: false	
+  - name: opensearch-sdk // extension name
+    uniqueId: opensearch-sdk-1 // identifier for the extension
+    hostName: 'sdk_host' // name of the host where extension is running
+    hostAddress: '127.0.0.1' // host to reach
+    port: '4532' // port to reach
+    version: '1.0' // extension version
+    description: Extension for the Opensearch SDK Repo // description of the extension
+    opensearchVersion: '3.0.0' // OpenSearch compatibility
 ```
 
 
@@ -64,11 +60,11 @@ Currently, plugins relies on extension points to communicate with OpenSearch. To
 
 ### Settings
 Walking through a similar example as plugin above, after extension registration is done, extension makes an API call to register custom settings to OpenSearch.
-`ExtensionsOrchestrator` recieves the requests, forwards it to `SettingsModule` to register a new setting and wala, the user is now able to toggle the setting via `_settings` Rest API.
+`ExtensionsOrchestrator` receives the requests, forwards it to `SettingsModule` to register a new setting and wala, the user is now able to toggle the setting via `_settings` Rest API.
 
 ## FAQ
 
 - Will extensions replace plugins?  
-  We see value in plugins as they are high performant which works well for index/search workloads.
+  Plugins will continue to be supported and extensions are preferred as they will be easier to develop, deploy, and operate.
 - How is the latency going to be for extensions?
   https://github.com/opensearch-project/OpenSearch/issues/3012#issuecomment-1122682444
