@@ -62,9 +62,6 @@ As we are running extensions on the port defined in the `extensions.yml`, the co
 ### OpenSearch SDK
 Currently, plugins relies on extension points to communicate with OpenSearch. To turn plugins into extensions, all the extension points should be converted into Transport APIs which will be present in the SDK. Plugins need to integrate SDK, call those APIs, and later SDK will take care of the communication and the required attributes from OpenSearch.
 
-### Latency
-https://github.com/opensearch-project/OpenSearch/issues/3012#issuecomment-1122682444
-
 ### Settings
 Walking through a similar example as plugin above, after extension registration is done, extension makes an API call to register custom settings to OpenSearch.
 `ExtensionsOrchestrator` recieves the requests, forwards it to `SettingsModule` to register a new setting and wala, the user is now able to toggle the setting via `_settings` Rest API.
@@ -73,3 +70,5 @@ Walking through a similar example as plugin above, after extension registration 
 
 - Will extensions replace plugins?  
   We see value in plugins as they are high performant which works well for index/search workloads.
+- How is the latency going to be for extensions?
+  https://github.com/opensearch-project/OpenSearch/issues/3012#issuecomment-1122682444
