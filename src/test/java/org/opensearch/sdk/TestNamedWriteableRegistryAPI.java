@@ -11,6 +11,7 @@
 
 package org.opensearch.sdk;
 
+import org.opensearch.common.io.stream.InputStreamStreamInput;
 import org.opensearch.common.io.stream.NamedWriteable;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
@@ -23,8 +24,10 @@ import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
@@ -106,14 +109,18 @@ public class TestNamedWriteableRegistryAPI extends OpenSearchTestCase {
                 out.writeString(Example.NAME);
                 out.writeString("test_message");
                 context = buf.toByteArray();
-
-                NamedWriteableRegistryParseRequest request = new NamedWriteableRegistryParseRequest(Example.class.getName(), context);
-                ExtensionBooleanResponse response = namedWriteableRegistryAPI.handleNamedWriteableRegistryParseRequest(request);
-
-                // verify that byte array deserialization was successful
-                assertEquals(response.getStatus(), true);
             }
         }
+
+        // Convert byte array to StreamInput
+        InputStream input = new ByteArrayInputStream(context);
+        StreamInput in = new InputStreamStreamInput(input);
+        NamedWriteableRegistryParseRequest request = new NamedWriteableRegistryParseRequest(Example.class, in);
+        ExtensionBooleanResponse response = namedWriteableRegistryAPI.handleNamedWriteableRegistryParseRequest(request);
+
+        // verify that byte array deserialization was successful
+        assertEquals(response.getStatus(), true);
+
     }
 
     @Test
@@ -125,19 +132,16 @@ public class TestNamedWriteableRegistryAPI extends OpenSearchTestCase {
                 out.writeString("test_name");
                 out.writeString("test_message");
                 context = buf.toByteArray();
-
-                // Category Class ExtensionRunner is not registered
-                NamedWriteableRegistryParseRequest request = new NamedWriteableRegistryParseRequest(
-                    ExtensionsRunner.class.getName(),
-                    context
-                );
-                Exception e = expectThrows(
-                    Exception.class,
-                    () -> namedWriteableRegistryAPI.handleNamedWriteableRegistryParseRequest(request)
-                );
-                assertEquals(e.getMessage(), "Unknown NamedWriteable category [" + ExtensionsRunner.class.getName() + "]");
             }
         }
+        // Convert byte array to StreamInput
+        InputStream input = new ByteArrayInputStream(context);
+        StreamInput in = new InputStreamStreamInput(input);
+
+        // Category Class ExtensionRunner is not registered
+        NamedWriteableRegistryParseRequest request = new NamedWriteableRegistryParseRequest(ExtensionsRunner.class, in);
+        Exception e = expectThrows(Exception.class, () -> namedWriteableRegistryAPI.handleNamedWriteableRegistryParseRequest(request));
+        assertEquals(e.getMessage(), "Unknown NamedWriteable category [" + ExtensionsRunner.class.getName() + "]");
     }
 
     @Test
@@ -150,14 +154,14 @@ public class TestNamedWriteableRegistryAPI extends OpenSearchTestCase {
                 out.writeString(Example.INVALID_NAME);
                 out.writeString("test_message");
                 context = buf.toByteArray();
-
-                NamedWriteableRegistryParseRequest request = new NamedWriteableRegistryParseRequest(Example.class.getName(), context);
-                Exception e = expectThrows(
-                    Exception.class,
-                    () -> namedWriteableRegistryAPI.handleNamedWriteableRegistryParseRequest(request)
-                );
-                assertEquals(e.getMessage(), "Unknown NamedWriteable [" + Example.class.getName() + "][" + Example.INVALID_NAME + "]");
             }
         }
+
+        // Convert byte array to StreamInput
+        InputStream input = new ByteArrayInputStream(context);
+        StreamInput in = new InputStreamStreamInput(input);
+        NamedWriteableRegistryParseRequest request = new NamedWriteableRegistryParseRequest(Example.class, in);
+        Exception e = expectThrows(Exception.class, () -> namedWriteableRegistryAPI.handleNamedWriteableRegistryParseRequest(request));
+        assertEquals(e.getMessage(), "Unknown NamedWriteable [" + Example.class.getName() + "][" + Example.INVALID_NAME + "]");
     }
 }
