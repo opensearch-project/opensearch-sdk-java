@@ -31,7 +31,7 @@ import org.opensearch.common.io.stream.StreamInput;
  * API used to handle named writeable registry requests from OpenSearch
  */
 public class NamedWriteableRegistryAPI {
-    private final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
+    private final Logger logger = LogManager.getLogger(NamedWriteableRegistryAPI.class);
     private List<NamedWriteableRegistry.Entry> namedWriteables;
     private final NamedWriteableRegistry namedWriteableRegistry;
 
