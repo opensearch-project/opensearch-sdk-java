@@ -53,8 +53,8 @@ public class SDKClient {
                 credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
                 try {
                     return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
-                            .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                            .setSSLContext(SSLContextBuilder.create().loadTrustMaterial(null, (chains, authType) -> true).build());
+                        .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                        .setSSLContext(SSLContextBuilder.create().loadTrustMaterial(null, (chains, authType) -> true).build());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -76,11 +76,12 @@ public class SDKClient {
      * Creates index on OpenSearch
      * @throws IOException if request failed
      */
-    public void createIndex(String index) throws IOException {
-            logger.info("Creating Index on OpenSearch");
-            // Create Index
-            CreateIndexRequest createIndexRequest = new CreateIndexRequest.Builder().index(index).build();
-            CreateIndexResponse createIndexResponse = client.indices().create(createIndexRequest);
-            logger.info("Created Index on OpenSearch", createIndexResponse);
+    public CreateIndexResponse createIndex(String index) throws IOException {
+        logger.info("Creating Index on OpenSearch");
+        // Create Index
+        CreateIndexRequest createIndexRequest = new CreateIndexRequest.Builder().index(index).build();
+        CreateIndexResponse createIndexResponse = client.indices().create(createIndexRequest);
+        logger.info("Created Index on OpenSearch", createIndexResponse);
+        return createIndexResponse;
     }
 }
