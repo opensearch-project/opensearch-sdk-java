@@ -122,7 +122,7 @@ public class NamedWriteableRegistryAPI {
 
                 // Apply reader to stream input generated from the request context
                 try {
-                    C c = streamInput.readNamedWriteable(categoryClass);
+                    C namedWriteable = streamInput.readNamedWriteable(categoryClass);
                     status = true;
                 } catch (UnsupportedOperationException e) {
                     logger.info("Failed to parse named writeable", e);
