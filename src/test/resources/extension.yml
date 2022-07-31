@@ -1,3 +1,7 @@
 extensionName: extension
 hostAddress: 127.0.0.1
 hostPort: 4532
+api:
+  - API1
+  - API2
+  - API3

@@ -7,6 +7,8 @@
  */
 package org.opensearch.sdk;
 
+import java.util.List;
+
 /**
  * This class encapsulates the settings for an Extension.
  */
@@ -15,6 +17,7 @@ public class ExtensionSettings {
     private String extensionName;
     private String hostAddress;
     private String hostPort;
+    private List<String> api;
 
     /**
      * Placeholder field. Change the location to extension.yml file of the extension.
@@ -40,9 +43,20 @@ public class ExtensionSettings {
         return hostPort;
     }
 
-    @Override
-    public String toString() {
-        return "\nnodename: " + extensionName + "\nhostaddress: " + hostAddress + "\nhostPort: " + hostPort + "\n";
+    public List<String> getApi() {
+        return api;
     }
 
+    @Override
+    public String toString() {
+        return "ExtensionSettings {extensionName="
+            + extensionName
+            + ", hostAddress="
+            + hostAddress
+            + ", hostPort="
+            + hostPort
+            + ", api="
+            + api
+            + "}";
+    }
 }
