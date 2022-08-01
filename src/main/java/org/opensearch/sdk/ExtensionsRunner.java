@@ -26,7 +26,7 @@ import org.opensearch.discovery.PluginRequest;
 import org.opensearch.discovery.PluginResponse;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
-import org.opensearch.extensions.ExtensionBooleanResponse;;
+import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.index.IndicesModuleResponse;
 import org.opensearch.indices.IndicesModule;
@@ -71,7 +71,8 @@ public class ExtensionsRunner {
         .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
         .build();
     private final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
-    private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR=new TransportInterceptor(){};
+    private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
+    };
     private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
 
     /**

@@ -93,20 +93,18 @@ public class NamedWriteableRegistryAPI {
      * Handles a request from OpenSearch to parse a named writeable from a byte array generated from a {@link StreamInput} object.
      * Works as org.opensearch.common.io.stream.StreamInput#readNamedWriteable(Class)
      *
-     * @param <C> generic class that extends NamedWriteable
      * @param request  The request to handle.
      * @throws IOException if InputStream generated from the byte array is unsuccessfully closed
      * @return A response acknowledging the request to parse has executed successfully
      */
-    public <C extends NamedWriteable> ExtensionBooleanResponse handleNamedWriteableRegistryParseRequest(
-        NamedWriteableRegistryParseRequest request
-    ) throws IOException {
+    public ExtensionBooleanResponse handleNamedWriteableRegistryParseRequest(NamedWriteableRegistryParseRequest request)
+        throws IOException {
 
         logger.info("Registering Named Writeable Registry Parse request from OpenSearch");
         boolean status = false;
 
         // Extract data from request and procress fully qualified category class name into class instance
-        Class<C> categoryClass = (Class<C>) request.getCategoryClass();
+        Class categoryClass = request.getCategoryClass();
         byte[] context = request.getContext();
 
         // Transform byte array context into an input stream
@@ -122,7 +120,9 @@ public class NamedWriteableRegistryAPI {
 
                 // Apply reader to stream input generated from the request context
                 try {
-                    C namedWriteable = streamInput.readNamedWriteable(categoryClass);
+
+                    // TODO : Determine how extensions utilize parsed object (https://github.com/opensearch-project/OpenSearch/issues/4067)
+                    NamedWriteable namedWriteable = streamInput.readNamedWriteable(categoryClass);
                     status = true;
                 } catch (UnsupportedOperationException e) {
                     logger.info("Failed to parse named writeable", e);
