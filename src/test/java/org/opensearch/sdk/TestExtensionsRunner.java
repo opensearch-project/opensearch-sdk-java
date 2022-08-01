@@ -40,13 +40,12 @@ import org.opensearch.transport.Transport;
 public class TestExtensionsRunner extends OpenSearchTestCase {
 
     private ExtensionsRunner extensionsRunner;
-    private Settings settings;
     private TransportService transportService;
 
+    @Override
     @BeforeEach
     public void setUp() throws Exception {
         this.extensionsRunner = new ExtensionsRunner();
-        this.settings = Settings.builder().put("node.name", "sdk").build();
         this.transportService = spy(
             new TransportService(
                 Settings.EMPTY,
@@ -58,12 +57,6 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
                 Collections.emptySet()
             )
         );
-    }
-
-    // test ExtensionsRunner getTransportService return type is transport service
-    @Test
-    public void testGetTransportService() {
-        assert (extensionsRunner.createTransportService(settings) instanceof TransportService);
     }
 
     // test manager method invokes start on transport service

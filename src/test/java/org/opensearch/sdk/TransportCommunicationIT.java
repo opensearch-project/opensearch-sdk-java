@@ -36,6 +36,7 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
     private final String host = "127.0.0.1";
     private volatile String clientResult;
 
+    @Override
     @BeforeEach
     public void setUp() {
 
@@ -145,10 +146,9 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
 
         // retrieve transport service
         ExtensionsRunner extensionsRunner = new ExtensionsRunner();
-        TransportService transportService = extensionsRunner.createTransportService(settings);
-
         // start transport service
-        extensionsRunner.startTransportService(transportService);
+        TransportService transportService = extensionsRunner.initializeExtensionTransportService(settings);
+
         assertEquals(Lifecycle.State.STARTED, transportService.lifecycleState());
 
         // connect client server to transport service
