@@ -81,9 +81,6 @@ task requireJavadoc(type: JavaExec) {
   args "--dont-require-private=true"
   // javadocs on trivial getters/setters optional
   args "--dont-require-trivial-properties"
-  // the netty4 package will eventually be published to mavenCentral
-  // See https://github.com/opensearch-project/OpenSearch/issues/3118
-  args "--exclude=netty4"
 }
 check.dependsOn requireJavadoc
 
