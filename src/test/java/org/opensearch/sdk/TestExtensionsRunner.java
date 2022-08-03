@@ -125,4 +125,11 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(LocalNodeResponseHandler.class));
     }
 
+    @Test
+    public void testRegisterApiRequest() {
+
+        extensionsRunner.sendRegisterApiRequest(transportService);
+
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(RegisterApiResponseHandler.class));
+    }
 }
