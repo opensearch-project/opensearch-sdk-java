@@ -24,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,7 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.discovery.PluginRequest;
 import org.opensearch.discovery.PluginResponse;
+import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.Transport;
@@ -93,12 +95,30 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
             emptySet(),
             Version.CURRENT
         );
-        PluginRequest pluginRequest = new PluginRequest(sourceNode, null);
+        List<DiscoveryExtension> extensions = List.of(
+            new DiscoveryExtension("sample-extension", "opensearch-sdk-1", null, null, null, null, null, null, null)
+        );
+        PluginRequest pluginRequest = new PluginRequest(sourceNode, extensions);
         PluginResponse response = extensionsRunner.handlePluginsRequest(pluginRequest);
-        assertEquals(response.getName(), "extension");
+        assertEquals("sample-extension", response.getName());
 
+        // Test if unique ID is set
+        assertEquals("opensearch-sdk-1", extensionsRunner.getUniqueId());
         // Test if the source node is set after handlePluginRequest() is called during OpenSearch bootstrap
-        assertEquals(extensionsRunner.getOpensearchNode(), sourceNode);
+        assertEquals(sourceNode, extensionsRunner.getOpensearchNode());
+    }
+
+    @Test
+    public void testHandlePluginsRequestInvalidName() throws UnknownHostException {
+        DiscoveryNode sourceNode = new DiscoveryNode(
+            "test_node",
+            new TransportAddress(InetAddress.getByName("localhost"), 9876),
+            emptyMap(),
+            emptySet(),
+            Version.CURRENT
+        );
+        PluginRequest pluginRequest = new PluginRequest(sourceNode, Collections.emptyList());
+        expectThrows(IllegalArgumentException.class, () -> extensionsRunner.handlePluginsRequest(pluginRequest));
     }
 
     @Test

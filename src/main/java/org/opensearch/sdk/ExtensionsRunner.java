@@ -22,6 +22,7 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.PageCacheRecycler;
 import org.opensearch.discovery.PluginRequest;
 import org.opensearch.discovery.PluginResponse;
+import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.extensions.RegisterApiRequest;
@@ -60,6 +61,7 @@ import static org.opensearch.common.UUIDs.randomBase64UUID;
 public class ExtensionsRunner {
     private ExtensionSettings extensionSettings = readExtensionSettings();
     private ExtensionApi extensionApi = readExtensionApi();
+    private String uniqueId;
     private DiscoveryNode opensearchNode;
     private TransportService extensionTransportService = null;
 
@@ -91,6 +93,14 @@ public class ExtensionsRunner {
         return objectMapper.readValue(file, ExtensionApi.class);
     }
 
+    private void setUniqueId(String id) {
+        this.uniqueId = id;
+    }
+
+    String getUniqueId() {
+        return uniqueId;
+    }
+
     private void setOpensearchNode(DiscoveryNode opensearchNode) {
         this.opensearchNode = opensearchNode;
     }
@@ -109,6 +119,18 @@ public class ExtensionsRunner {
     PluginResponse handlePluginsRequest(PluginRequest pluginRequest) {
         logger.info("Registering Plugin Request received from OpenSearch");
         opensearchNode = pluginRequest.getSourceNode();
+        // Fetch the unique ID
+        for (DiscoveryExtension de : pluginRequest.getExtensions()) {
+            if (de.getName().equals(extensionSettings.getExtensionName())) {
+                setUniqueId(de.getId());
+                break;
+            }
+        }
+        if (getUniqueId() == null) {
+            throw new IllegalArgumentException(
+                "Extension " + extensionSettings.getExtensionName() + " does not match any requested extension."
+            );
+        }
         setOpensearchNode(opensearchNode);
         extensionTransportService.connectToNode(opensearchNode);
         sendRegisterApiRequest(extensionTransportService);
@@ -271,7 +293,7 @@ public class ExtensionsRunner {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_API,
-                new RegisterApiRequest(transportService.getLocalNode().getId(), extensionApi.getApi()),
+                new RegisterApiRequest(getUniqueId(), extensionApi.getApi()),
                 registerApiResponseHandler
             );
         } catch (Exception e) {
