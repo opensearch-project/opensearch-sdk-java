@@ -265,13 +265,13 @@ public class ExtensionsRunner {
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
     public void sendRegisterApiRequest(TransportService transportService) {
-        logger.info("Sending Register API request to OpenSearch for " + extensionApi.getExtensionApi());
+        logger.info("Sending Register API request to OpenSearch for " + extensionApi.getApi());
         RegisterApiResponseHandler registerApiResponseHandler = new RegisterApiResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_API,
-                new RegisterApiRequest(transportService.getLocalNode().getId(), extensionApi.getExtensionApi()),
+                new RegisterApiRequest(transportService.getLocalNode().getId(), extensionApi.getApi()),
                 registerApiResponseHandler
             );
         } catch (Exception e) {

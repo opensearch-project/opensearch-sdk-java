@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class ExtensionApi {
 
-    private List<String> extensionApi = new ArrayList<>();
+    private List<String> api = new ArrayList<>();
 
     /**
      * Placeholder field. Change the location to extension_api.yml file of the extension.
@@ -29,12 +29,12 @@ public class ExtensionApi {
         super();
     }
 
-    public List<String> getExtensionApi() {
-        return new ArrayList<>(extensionApi);
+    public List<String> getApi() {
+        return new ArrayList<>(api);
     }
 
     @Override
     public String toString() {
-        return "ExtensionApi{api=" + extensionApi + "}";
+        return "ExtensionApi{api=" + api + "}";
     }
 }
