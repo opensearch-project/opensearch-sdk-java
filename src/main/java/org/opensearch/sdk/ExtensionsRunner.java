@@ -16,6 +16,8 @@ import org.opensearch.Version;
 import org.opensearch.cluster.ClusterModule;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
+import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
+import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
 import org.opensearch.common.settings.Settings;
@@ -24,7 +26,7 @@ import org.opensearch.discovery.PluginRequest;
 import org.opensearch.discovery.PluginResponse;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
-import org.opensearch.index.IndicesModuleNameResponse;
+import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.index.IndicesModuleResponse;
 import org.opensearch.indices.IndicesModule;
@@ -42,6 +44,8 @@ import org.opensearch.transport.ConnectionManager;
 import org.opensearch.transport.TransportInterceptor;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
+import org.opensearch.transport.TransportInterceptor;
+import org.opensearch.transport.TransportResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,14 +66,6 @@ import static org.opensearch.common.UUIDs.randomBase64UUID;
 public class ExtensionsRunner {
     private ExtensionSettings extensionSettings = readExtensionSettings();
     private DiscoveryNode opensearchNode;
-
-    /**
-     * Instantiates a new Extensions Runner.
-     *
-     * @throws IOException if the runner failed to connect to the OpenSearch cluster.
-     */
-    public ExtensionsRunner() throws IOException {}
-
     private final Settings settings = Settings.builder()
         .put("node.name", extensionSettings.getExtensionName())
         .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
@@ -78,6 +74,14 @@ public class ExtensionsRunner {
     private final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
+    private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
+
+    /**
+     * Instantiates a new Extensions Runner.
+     *
+     * @throws IOException if the runner failed to connect to the OpenSearch cluster.
+     */
+    public ExtensionsRunner() throws IOException {}
 
     private ExtensionSettings readExtensionSettings() throws IOException {
         File file = new File(ExtensionSettings.EXTENSION_DESCRIPTOR);
@@ -109,6 +113,24 @@ public class ExtensionsRunner {
     }
 
     /**
+     * Handles a request from OpenSearch and invokes the extension point API corresponding with the request type
+     *
+     * @param request  The request to handle.
+     * @throws Exception if the corresponding handler for the request is not present
+     * @return A response to OpenSearch for the corresponding API
+     */
+    TransportResponse handleOpenSearchRequest(OpenSearchRequest request) throws Exception {
+        // Read enum
+        switch (request.getRequestType()) {
+            case REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY:
+                return namedWriteableRegistryApi.handleNamedWriteableRegistryRequest(request);
+            // Add additional request handlers here
+            default:
+                throw new Exception("Handler not present for the provided request");
+        }
+    }
+
+    /**
      * Handles a request for extension point indices from OpenSearch.  The {@link #handlePluginsRequest(PluginRequest)} method must have been called first to initialize the extension.
      *
      * @param indicesModuleRequest  The request to handle.
@@ -131,10 +153,10 @@ public class ExtensionsRunner {
      * @param indicesModuleRequest  The request to handle.
      * @return A response acknowledging the request.
      */
-    IndicesModuleNameResponse handleIndicesModuleNameRequest(IndicesModuleRequest indicesModuleRequest) {
+    ExtensionBooleanResponse handleIndicesModuleNameRequest(IndicesModuleRequest indicesModuleRequest) {
         // Works as beforeIndexRemoved
         logger.info("Registering Indices Module Name Request received from OpenSearch");
-        IndicesModuleNameResponse indicesModuleNameResponse = new IndicesModuleNameResponse(true);
+        ExtensionBooleanResponse indicesModuleNameResponse = new ExtensionBooleanResponse(true);
         return indicesModuleNameResponse;
     }
 
@@ -227,6 +249,24 @@ public class ExtensionsRunner {
             false,
             PluginRequest::new,
             (request, channel, task) -> channel.sendResponse(handlePluginsRequest(request))
+        );
+
+        transportService.registerRequestHandler(
+            ExtensionsOrchestrator.REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY,
+            ThreadPool.Names.GENERIC,
+            false,
+            false,
+            OpenSearchRequest::new,
+            (request, channel, task) -> channel.sendResponse(handleOpenSearchRequest(request))
+        );
+
+        transportService.registerRequestHandler(
+            ExtensionsOrchestrator.REQUEST_OPENSEARCH_PARSE_NAMED_WRITEABLE,
+            ThreadPool.Names.GENERIC,
+            false,
+            false,
+            NamedWriteableRegistryParseRequest::new,
+            (request, channel, task) -> channel.sendResponse(namedWriteableRegistryApi.handleNamedWriteableRegistryParseRequest(request))
         );
 
         transportService.registerRequestHandler(
