@@ -46,8 +46,6 @@ import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
 import org.opensearch.transport.TransportInterceptor;
 import org.opensearch.transport.TransportResponse;
-import org.opensearch.sdk.netty4.Netty4Transport;
-import org.opensearch.sdk.netty4.SharedGroupFactory;
 
 import java.io.File;
 import java.io.IOException;
