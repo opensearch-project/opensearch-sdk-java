@@ -44,6 +44,7 @@ configurations {
 
 dependencies {
     implementation "org.opensearch:opensearch:3.0.0-SNAPSHOT"
+    implementation "org.opensearch.plugin:transport-netty4-client:3.0.0-SNAPSHOT"
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.1'
     implementation "io.netty:netty-all:4.1.73.Final"
@@ -51,15 +52,6 @@ dependencies {
         exclude module : 'hamcrest'
         exclude module : 'hamcrest-core'
     }
-    // Keeping it for now. Will remove it later once figure out the right dependencies
-//    implementation "io.netty:netty-buffer:4.1.73.Final"
-//    implementation "io.netty:netty-codec:4.1.73.Final"
-//    implementation "io.netty:netty-codec-http:4.1.73.Final"
-//    implementation "io.netty:netty-common:4.1.73.Final"
-//    implementation "io.netty:netty-handler:4.1.73.Final"
-//    implementation "io.netty:netty-resolver:4.1.73.Final"
-//    implementation "io.netty:netty-transportservice.transport:4.1.73.Final"
-    //implementation "org.apache.logging.log4j:log4j-1.2-api:2.17.1"
     implementation 'javax.xml.bind:jaxb-api:2.2.2'
     implementation 'com.fasterxml.jackson.core:jackson-databind: 2.12.6.1'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml: 2.12.6.1'
@@ -80,9 +72,6 @@ task requireJavadoc(type: JavaExec) {
   args "--dont-require-private=true"
   // javadocs on trivial getters/setters optional
   args "--dont-require-trivial-properties"
-  // the netty4 package will eventually be published to mavenCentral
-  // See https://github.com/opensearch-project/OpenSearch/issues/3118
-  args "--exclude=netty4"
 }
 check.dependsOn requireJavadoc
 
