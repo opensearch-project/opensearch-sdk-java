@@ -17,7 +17,7 @@ import org.opensearch.common.component.Lifecycle;
 import org.opensearch.common.network.NetworkAddress;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
-import org.opensearch.sdk.netty4.Netty4Transport;
+import org.opensearch.transport.netty4.Netty4Transport;
 import org.opensearch.test.OpenSearchIntegTestCase;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportService;

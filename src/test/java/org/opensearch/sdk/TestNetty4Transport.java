@@ -20,7 +20,7 @@ import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportSettings;
 
-import org.opensearch.sdk.netty4.Netty4Transport;
+import org.opensearch.transport.netty4.Netty4Transport;
 
 public class TestNetty4Transport extends OpenSearchTestCase {
 
