@@ -99,13 +99,13 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Handles a plugin request from OpenSearch.  This is the first request for the transport communication and will initialize the extension and will be a part of OpenSearch bootstrap.
+     * Handles a extensions request from OpenSearch.  This is the first request for the transport communication and will initialize the extension and will be a part of OpenSearch bootstrap.
      *
      * @param extensionInitRequest  The request to handle.
      * @return A response to OpenSearch validating that this is an extension.
      */
     InitializeExtensionsResponse handleExtensionInitRequest(InitializeExtensionsRequest extensionInitRequest) {
-        logger.info("Registering Plugin Request received from OpenSearch");
+        logger.info("Registering Extension Request received from OpenSearch");
         InitializeExtensionsResponse initializeExtensionsResponse = new InitializeExtensionsResponse("RealExtension");
         opensearchNode = extensionInitRequest.getSourceNode();
         setOpensearchNode(opensearchNode);

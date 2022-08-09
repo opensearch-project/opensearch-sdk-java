@@ -98,7 +98,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     }
 
     @Test
-    public void testHandlePluginsRequest() throws UnknownHostException {
+    public void testHandleExtensionInitRequest() throws UnknownHostException {
         DiscoveryNode sourceNode = new DiscoveryNode(
             "test_node",
             new TransportAddress(InetAddress.getByName("localhost"), 9876),
@@ -110,7 +110,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         InitializeExtensionsResponse response = extensionsRunner.handleExtensionInitRequest(extensionInitRequest);
         assertEquals(response.getName(), "extension");
 
-        // Test if the source node is set after handlePluginRequest() is called during OpenSearch bootstrap
+        // Test if the source node is set after handleExtensionInitRequest()) is called during OpenSearch bootstrap
         assertEquals(extensionsRunner.getOpensearchNode(), sourceNode);
     }
 
