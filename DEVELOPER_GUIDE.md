@@ -165,7 +165,16 @@ Run tests :
 ./gradlew clean build test
 ```
 
-## Run Tar file
+## Generate Artifact
+
+In opensearch-sdk navigate /build and look for distributions folder. If it is present than check for tar file in it. If it is not present then follow below step.
+```
+./gradlew clean
+./gradlew check
+./gradlew build
+```
+Then navigate to /src/test/resources and check if extension.yml file is there. If not then create it.
+Then check for tar in /build/distributions. To run the artifact i.e. tar file, run command mentioned below
 ```
 tar -xvf opensearch-sdk-1.0.0-SNAPSHOT.tar
 ```
