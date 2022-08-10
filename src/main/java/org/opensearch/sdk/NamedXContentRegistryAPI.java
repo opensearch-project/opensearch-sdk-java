@@ -39,7 +39,7 @@ public class NamedXContentRegistryAPI {
     }
 
     /**
-     * Constructor for NamedXContentRegistryAPI. Creates and populates a NamedXContentRegistry with the given NamedWriteableRegistry entries for this extension
+     * Constructor for NamedXContentRegistryAPI. Creates and populates a NamedXContentRegistry with the given entries for this extension
      *
      * @param extensionNamedXContent List of NamedXContentRegistry.Entry to be registered
      */

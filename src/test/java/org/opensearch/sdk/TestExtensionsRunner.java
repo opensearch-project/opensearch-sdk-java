@@ -32,6 +32,7 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
+import org.opensearch.common.xcontent.NamedXContentRegistryResponse;
 import org.opensearch.discovery.PluginRequest;
 import org.opensearch.discovery.PluginResponse;
 import org.opensearch.extensions.OpenSearchRequest;
@@ -117,8 +118,21 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testHandleOpenSearchRequest() throws Exception {
 
-        OpenSearchRequest request = new OpenSearchRequest(OpenSearchRequestType.REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY);
-        assertEquals(extensionsRunner.handleOpenSearchRequest(request).getClass(), NamedWriteableRegistryResponse.class);
+        OpenSearchRequest namedWriteableRegistryRequest = new OpenSearchRequest(
+            OpenSearchRequestType.REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY
+        );
+        assertEquals(
+            NamedWriteableRegistryResponse.class,
+            extensionsRunner.handleOpenSearchRequest(namedWriteableRegistryRequest).getClass()
+        );
+
+        OpenSearchRequest namedXContentRegistryRequest = new OpenSearchRequest(
+            OpenSearchRequestType.REQUEST_OPENSEARCH_NAMED_XCONTENT_REGISTRY
+        );
+        assertEquals(
+            NamedXContentRegistryResponse.class,
+            extensionsRunner.handleOpenSearchRequest(namedXContentRegistryRequest).getClass()
+        );
 
         // Add additional OpenSearch request handler tests here for each default extension point
     }
