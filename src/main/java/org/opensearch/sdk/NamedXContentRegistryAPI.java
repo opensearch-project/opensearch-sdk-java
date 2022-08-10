@@ -84,6 +84,13 @@ public class NamedXContentRegistryAPI {
         return namedXContentRegistryResponse;
     }
 
+    /**
+     * Handles a request from OpenSearch to parse a named xcontent
+     *
+     * @param request  The request to handle.
+     * @throws IOException if InputStream generated from the byte array is unsuccessfully closed
+     * @return A response acknowledging the request to parse has executed successfully
+     */
     public ExtensionBooleanResponse handleNamedXContentRegistryParseRequest(NamedXContentRegistryParseRequest request) throws IOException {
         logger.info("Registering Named Writeable Registry Parse request from OpenSearch");
         boolean status = false;
