@@ -165,6 +165,10 @@ Run tests :
 ./gradlew clean build test
 ```
 
+## Run Tar file
+```
+tar -xvf opensearch-sdk-1.0.0-SNAPSHOT.tar
+```
 ## Submitting Changes
 
 See [CONTRIBUTING](CONTRIBUTING.md).
