@@ -74,7 +74,8 @@ public class ExtensionsRunner {
     private final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
-    private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
+    private NamedWriteableRegistryAPI namedWriteableRegistryAPI = new NamedWriteableRegistryAPI();
+    private NamedXContentRegistryAPI namedXContentRegistryAPI = new NamedXContentRegistryAPI();
 
     /**
      * Instantiates a new Extensions Runner.
@@ -123,7 +124,9 @@ public class ExtensionsRunner {
         // Read enum
         switch (request.getRequestType()) {
             case REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY:
-                return namedWriteableRegistryApi.handleNamedWriteableRegistryRequest(request);
+                return namedWriteableRegistryAPI.handleNamedWriteableRegistryRequest(request);
+            case REQUEST_OPENSEARCH_NAMED_XCONTENT_REGISTRY:
+                return namedXContentRegistryAPI.handleNamedXContentRegistryRequest(request);
             // Add additional request handlers here
             default:
                 throw new Exception("Handler not present for the provided request");
@@ -261,12 +264,21 @@ public class ExtensionsRunner {
         );
 
         transportService.registerRequestHandler(
+            ExtensionsOrchestrator.REQUEST_OPENSEARCH_NAMED_XCONTENT_REGISTRY,
+            ThreadPool.Names.GENERIC,
+            false,
+            false,
+            OpenSearchRequest::new,
+            (request, channel, task) -> channel.sendResponse(handleOpenSearchRequest(request))
+        );
+
+        transportService.registerRequestHandler(
             ExtensionsOrchestrator.REQUEST_OPENSEARCH_PARSE_NAMED_WRITEABLE,
             ThreadPool.Names.GENERIC,
             false,
             false,
             NamedWriteableRegistryParseRequest::new,
-            (request, channel, task) -> channel.sendResponse(namedWriteableRegistryApi.handleNamedWriteableRegistryParseRequest(request))
+            (request, channel, task) -> channel.sendResponse(namedWriteableRegistryAPI.handleNamedWriteableRegistryParseRequest(request))
         );
 
         transportService.registerRequestHandler(
