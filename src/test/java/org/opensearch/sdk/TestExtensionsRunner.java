@@ -32,9 +32,14 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
+<<<<<<< HEAD
 import org.opensearch.common.xcontent.NamedXContentRegistryResponse;
 import org.opensearch.discovery.PluginRequest;
 import org.opensearch.discovery.PluginResponse;
+=======
+import org.opensearch.discovery.InitializeExtensionsRequest;
+import org.opensearch.discovery.InitializeExtensionsResponse;
+>>>>>>> main
 import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
@@ -99,7 +104,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     }
 
     @Test
-    public void testHandlePluginsRequest() throws UnknownHostException {
+    public void testHandleExtensionInitRequest() throws UnknownHostException {
         DiscoveryNode sourceNode = new DiscoveryNode(
             "test_node",
             new TransportAddress(InetAddress.getByName("localhost"), 9876),
@@ -107,11 +112,11 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
             emptySet(),
             Version.CURRENT
         );
-        PluginRequest pluginRequest = new PluginRequest(sourceNode, null);
-        PluginResponse response = extensionsRunner.handlePluginsRequest(pluginRequest);
+        InitializeExtensionsRequest extensionInitRequest = new InitializeExtensionsRequest(sourceNode, null);
+        InitializeExtensionsResponse response = extensionsRunner.handleExtensionInitRequest(extensionInitRequest);
         assertEquals(response.getName(), "extension");
 
-        // Test if the source node is set after handlePluginRequest() is called during OpenSearch bootstrap
+        // Test if the source node is set after handleExtensionInitRequest()) is called during OpenSearch bootstrap
         assertEquals(extensionsRunner.getOpensearchNode(), sourceNode);
     }
 

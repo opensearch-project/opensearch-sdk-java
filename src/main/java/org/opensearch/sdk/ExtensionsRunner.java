@@ -22,8 +22,8 @@ import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.PageCacheRecycler;
-import org.opensearch.discovery.PluginRequest;
-import org.opensearch.discovery.PluginResponse;
+import org.opensearch.discovery.InitializeExtensionsRequest;
+import org.opensearch.discovery.InitializeExtensionsResponse;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.extensions.ExtensionBooleanResponse;
@@ -100,17 +100,17 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Handles a plugin request from OpenSearch.  This is the first request for the transport communication and will initialize the extension and will be a part of OpenSearch bootstrap.
+     * Handles a extension request from OpenSearch.  This is the first request for the transport communication and will initialize the extension and will be a part of OpenSearch bootstrap.
      *
-     * @param pluginRequest  The request to handle.
+     * @param extensionInitRequest  The request to handle.
      * @return A response to OpenSearch validating that this is an extension.
      */
-    PluginResponse handlePluginsRequest(PluginRequest pluginRequest) {
-        logger.info("Registering Plugin Request received from OpenSearch");
-        PluginResponse pluginResponse = new PluginResponse(extensionSettings.getExtensionName());
-        opensearchNode = pluginRequest.getSourceNode();
+    InitializeExtensionsResponse handleExtensionInitRequest(InitializeExtensionsRequest extensionInitRequest) {
+        logger.info("Registering Extension Request received from OpenSearch");
+        InitializeExtensionsResponse initializeExtensionsResponse = new InitializeExtensionsResponse(extensionSettings.getExtensionName());
+        opensearchNode = extensionInitRequest.getSourceNode();
         setOpensearchNode(opensearchNode);
-        return pluginResponse;
+        return initializeExtensionsResponse;
     }
 
     /**
@@ -134,7 +134,7 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Handles a request for extension point indices from OpenSearch.  The {@link #handlePluginsRequest(PluginRequest)} method must have been called first to initialize the extension.
+     * Handles a request for extension point indices from OpenSearch.  The {@link #handleExtensionInitRequest(InitializeExtensionsRequest)} method must have been called first to initialize the extension.
      *
      * @param indicesModuleRequest  The request to handle.
      * @param transportService  The transport service communicating with OpenSearch.
@@ -144,14 +144,14 @@ public class ExtensionsRunner {
         logger.info("Registering Indices Module Request received from OpenSearch");
         IndicesModuleResponse indicesModuleResponse = new IndicesModuleResponse(true, true, true);
 
-        // handlePluginsRequest will set the opensearchNode while bootstraping of OpenSearch
+        // handleExtensionInitRequest will set the opensearchNode while bootstraping of OpenSearch
         DiscoveryNode opensearchNode = getOpensearchNode();
         transportService.connectToNode(opensearchNode);
         return indicesModuleResponse;
     }
 
     /**
-     * Handles a request for extension name from OpenSearch.  The {@link #handlePluginsRequest(PluginRequest)} method must have been called first to initialize the extension.
+     * Handles a request for extension name from OpenSearch.  The {@link #handleExtensionInitRequest(InitializeExtensionsRequest)} method must have been called first to initialize the extension.
      *
      * @param indicesModuleRequest  The request to handle.
      * @return A response acknowledging the request.
@@ -250,8 +250,8 @@ public class ExtensionsRunner {
             ThreadPool.Names.GENERIC,
             false,
             false,
-            PluginRequest::new,
-            (request, channel, task) -> channel.sendResponse(handlePluginsRequest(request))
+            InitializeExtensionsRequest::new,
+            (request, channel, task) -> channel.sendResponse(handleExtensionInitRequest(request))
         );
 
         transportService.registerRequestHandler(
