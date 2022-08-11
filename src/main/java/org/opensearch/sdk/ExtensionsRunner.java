@@ -34,6 +34,7 @@ import org.opensearch.indices.breaker.CircuitBreakerService;
 import org.opensearch.indices.breaker.NoneCircuitBreakerService;
 import org.opensearch.transport.netty4.Netty4Transport;
 import org.opensearch.transport.SharedGroupFactory;
+import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
@@ -346,6 +347,26 @@ public class ExtensionsRunner {
             );
         } catch (Exception e) {
             logger.info("Failed to send Cluster Settings request to OpenSearch", e);
+        }
+    }
+
+    /**
+     * Requests the ActionListener onFailure method to be run by OpenSearch.  The result will be handled by a {@link ActionListenerOnFailureResponseHandler}.
+     *
+     * @param transportService  The TransportService defining the connection to OpenSearch.
+     */
+    public void sendActionListenerOnFailureRequest(TransportService transportService) {
+        logger.info("Sending ActionListener onFailure request to OpenSearch");
+        ActionListenerOnFailureResponseHandler listenerHandler = new ActionListenerOnFailureResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_ACTION_LISTENER_ON_FAILURE,
+                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_ACTION_LISTENER_ON_FAILURE),
+                listenerHandler
+            );
+        } catch (Exception e) {
+            logger.info("Failed to send ActionListener onFailure request to OpenSearch", e);
         }
     }
 

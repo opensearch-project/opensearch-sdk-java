@@ -36,6 +36,7 @@ import org.opensearch.discovery.PluginRequest;
 import org.opensearch.discovery.PluginResponse;
 import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
+import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
@@ -145,6 +146,14 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         extensionsRunner.sendLocalNodeRequest(transportService);
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(LocalNodeResponseHandler.class));
+    }
+
+    @Test
+    public void testActionListenerOnFailureRequest() {
+
+        extensionsRunner.sendActionListenerOnFailureRequest(transportService);
+
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ActionListenerOnFailureResponseHandler.class));
     }
 
 }
