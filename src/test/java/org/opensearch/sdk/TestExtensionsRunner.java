@@ -32,14 +32,11 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
-<<<<<<< HEAD
 import org.opensearch.common.xcontent.NamedXContentRegistryResponse;
 import org.opensearch.discovery.PluginRequest;
 import org.opensearch.discovery.PluginResponse;
-=======
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
->>>>>>> main
 import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
