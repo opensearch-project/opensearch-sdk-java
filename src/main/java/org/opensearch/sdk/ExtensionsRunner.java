@@ -104,17 +104,10 @@ public class ExtensionsRunner {
      * @param extensionInitRequest  The request to handle.
      * @return A response to OpenSearch validating that this is an extension.
      */
-<<<<<<< HEAD
-    InitializeExtensionsResponse handlePluginsRequest(InitializeExtensionsRequest initializeExtensionsRequest) {
-        logger.info("Registering Plugin Request received from OpenSearch");
-        InitializeExtensionsResponse initializeExtensionsResponse = new InitializeExtensionsResponse("RealExtension");
-        opensearchNode = initializeExtensionsRequest.getSourceNode();
-=======
     InitializeExtensionsResponse handleExtensionInitRequest(InitializeExtensionsRequest extensionInitRequest) {
         logger.info("Registering Extension Request received from OpenSearch");
         InitializeExtensionsResponse initializeExtensionsResponse = new InitializeExtensionsResponse(extensionSettings.getExtensionName());
         opensearchNode = extensionInitRequest.getSourceNode();
->>>>>>> fd0f0708c14bf39c139b4cdea36b01839786a5ca
         setOpensearchNode(opensearchNode);
         return initializeExtensionsResponse;
     }
