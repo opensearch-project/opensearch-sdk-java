@@ -32,7 +32,7 @@ public class ActionListener {
      * @throws UnknownHostException if the local host name could not be resolved into an address.
      */
     @SuppressForbidden(reason = "need local ephemeral port")
-    protected static InetSocketAddress getLocalEphemeral() throws UnknownHostException {
+    protected static InetSocketAddress createLocalEphemeralAddress() throws UnknownHostException {
         return new InetSocketAddress(InetAddress.getLocalHost(), 0);
     }
 
@@ -50,7 +50,7 @@ public class ActionListener {
             // for testing considerations, otherwise zero which is interpreted as an infinite timeout
             socket.setSoTimeout(timeout);
 
-            socket.bind(getLocalEphemeral(), 1);
+            socket.bind(createLocalEphemeralAddress(), 1);
             socket.setReuseAddress(true);
 
             Thread t = new Thread() {
