@@ -99,15 +99,22 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Handles a plugin request from OpenSearch.  This is the first request for the transport communication and will initialize the extension and will be a part of OpenSearch bootstrap.
+     * Handles a extension request from OpenSearch.  This is the first request for the transport communication and will initialize the extension and will be a part of OpenSearch bootstrap.
      *
-     * @param pluginRequest  The request to handle.
+     * @param extensionInitRequest  The request to handle.
      * @return A response to OpenSearch validating that this is an extension.
      */
+<<<<<<< HEAD
     InitializeExtensionsResponse handlePluginsRequest(InitializeExtensionsRequest initializeExtensionsRequest) {
         logger.info("Registering Plugin Request received from OpenSearch");
         InitializeExtensionsResponse initializeExtensionsResponse = new InitializeExtensionsResponse("RealExtension");
         opensearchNode = initializeExtensionsRequest.getSourceNode();
+=======
+    InitializeExtensionsResponse handleExtensionInitRequest(InitializeExtensionsRequest extensionInitRequest) {
+        logger.info("Registering Extension Request received from OpenSearch");
+        InitializeExtensionsResponse initializeExtensionsResponse = new InitializeExtensionsResponse(extensionSettings.getExtensionName());
+        opensearchNode = extensionInitRequest.getSourceNode();
+>>>>>>> fd0f0708c14bf39c139b4cdea36b01839786a5ca
         setOpensearchNode(opensearchNode);
         return initializeExtensionsResponse;
     }
@@ -131,7 +138,7 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Handles a request for extension point indices from OpenSearch.  The {@link #handlePluginsRequest(PluginRequest)} method must have been called first to initialize the extension.
+     * Handles a request for extension point indices from OpenSearch.  The {@link #handleExtensionInitRequest(InitializeExtensionsRequest)} method must have been called first to initialize the extension.
      *
      * @param indicesModuleRequest  The request to handle.
      * @param transportService  The transport service communicating with OpenSearch.
@@ -141,14 +148,14 @@ public class ExtensionsRunner {
         logger.info("Registering Indices Module Request received from OpenSearch");
         IndicesModuleResponse indicesModuleResponse = new IndicesModuleResponse(true, true, true);
 
-        // handlePluginsRequest will set the opensearchNode while bootstraping of OpenSearch
+        // handleExtensionInitRequest will set the opensearchNode while bootstraping of OpenSearch
         DiscoveryNode opensearchNode = getOpensearchNode();
         transportService.connectToNode(opensearchNode);
         return indicesModuleResponse;
     }
 
     /**
-     * Handles a request for extension name from OpenSearch.  The {@link #handlePluginsRequest(PluginRequest)} method must have been called first to initialize the extension.
+     * Handles a request for extension name from OpenSearch.  The {@link #handleExtensionInitRequest(InitializeExtensionsRequest)} method must have been called first to initialize the extension.
      *
      * @param indicesModuleRequest  The request to handle.
      * @return A response acknowledging the request.
@@ -248,7 +255,11 @@ public class ExtensionsRunner {
             false,
             false,
             InitializeExtensionsRequest::new,
+<<<<<<< HEAD
             (request, channel, task) -> channel.sendResponse(handlePluginsRequest(request))
+=======
+            (request, channel, task) -> channel.sendResponse(handleExtensionInitRequest(request))
+>>>>>>> fd0f0708c14bf39c139b4cdea36b01839786a5ca
         );
 
         transportService.registerRequestHandler(
