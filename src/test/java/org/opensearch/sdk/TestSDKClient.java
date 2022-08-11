@@ -15,13 +15,14 @@ import org.opensearch.client.opensearch.indices.CreateIndexRequest;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.TransportException;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestSDKClient {
     private OpenSearchTransport transport = new FailingTransport();
 
     @Test
-    public void testCreateIndex() throws Exception {
+    public void testCreateIndexException() throws Exception {
         OpenSearchClient client = new OpenSearchClient(transport);
 
         //tag::builders
@@ -34,6 +35,20 @@ public class TestSDKClient {
                         .build()
         ));
         //end::builders
+    }
+
+    @Test
+    public void testCreateIndex() {
+        OpenSearchClient client = new OpenSearchClient(transport);
+
+        assertEquals(, () -> client.indices().create(
+                new CreateIndexRequest.Builder()
+                        .index("my-index")
+                        .aliases("foo",
+                                new Alias.Builder().isWriteIndex(true).build()
+                        )
+                        .build()
+        ));
     }
 
 }

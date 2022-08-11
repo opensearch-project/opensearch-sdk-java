@@ -22,8 +22,6 @@ import org.opensearch.client.RestClient;
 import org.opensearch.client.RestClientBuilder;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.opensearch.indices.CreateIndexRequest;
-import org.opensearch.client.opensearch.indices.CreateIndexResponse;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
 
@@ -38,21 +36,16 @@ public class SDKClient {
      * Creates client for SDK
      * @throws IOException if client failed
      */
-    public void createClient() throws IOException {
-        String endpoint = "localhost";
-        String username = "admin";
-        String password = "admin";
-        String protocol = "http";
-        int port = 9200;
+    public void createClient(String hostAddress, int port) throws IOException {
         RestClient restClient = null;
         try {
-            RestClientBuilder builder = RestClient.builder(new HttpHost(endpoint, port, protocol));
+            RestClientBuilder builder = RestClient.builder(new HttpHost(hostAddress, port));
             builder.setStrictDeprecationMode(true);
             builder.setHttpClientConfigCallback(httpClientBuilder -> {
                 final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-                credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+                //credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
                 try {
-                    return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
+                    return httpClientBuilder
                         .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
                         .setSSLContext(SSLContextBuilder.create().loadTrustMaterial(null, (chains, authType) -> true).build());
                 } catch (Exception e) {
@@ -70,18 +63,5 @@ public class SDKClient {
                 restClient.close();
             }
         }
-    }
-
-    /**
-     * Creates index on OpenSearch
-     * @throws IOException if request failed
-     */
-    public CreateIndexResponse createIndex(String index) throws IOException {
-        logger.info("Creating Index on OpenSearch");
-        // Create Index
-        CreateIndexRequest createIndexRequest = new CreateIndexRequest.Builder().index(index).build();
-        CreateIndexResponse createIndexResponse = client.indices().create(createIndexRequest);
-        logger.info("Created Index on OpenSearch", createIndexResponse);
-        return createIndexResponse;
     }
 }
