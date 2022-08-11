@@ -127,10 +127,14 @@ public class ExtensionsRunner {
      * @return A response to OpenSearch validating that this is an extension.
      */
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Update the lastest coomit
     InitializeExtensionsResponse handleExtensionInitRequest(InitializeExtensionsRequest extensionInitRequest) {
         logger.info("Registering Extension Request received from OpenSearch");
         InitializeExtensionsResponse initializeExtensionsResponse = new InitializeExtensionsResponse(extensionSettings.getExtensionName());
         opensearchNode = extensionInitRequest.getSourceNode();
+<<<<<<< HEAD
         // Fetch the unique ID
         for (DiscoveryExtension de : extensionInitRequest.getExtensions()) {
             if (de.getName().equals(extensionSettings.getExtensionName())) {
@@ -160,6 +164,8 @@ public class ExtensionsRunner {
         logger.info("Registering Plugin Request received from OpenSearch");
         InitializeExtensionsResponse initializeExtensionsResponse = new InitializeExtensionsResponse("RealExtension");
         opensearchNode = initializeExtensionsRequest.getSourceNode();
+=======
+>>>>>>> Update the lastest coomit
         setOpensearchNode(opensearchNode);
         return initializeExtensionsResponse;
 >>>>>>> issue #28
