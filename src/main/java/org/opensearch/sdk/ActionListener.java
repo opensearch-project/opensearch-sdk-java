@@ -32,7 +32,7 @@ public class ActionListener {
      * @throws UnknownHostException if the local host name could not be resolved into an address.
      */
     @SuppressForbidden(reason = "need local ephemeral port")
-    protected static InetSocketAddress createLocalEphemeralAddress() throws UnknownHostException {
+    private static InetSocketAddress createLocalEphemeralAddress() throws UnknownHostException {
         return new InetSocketAddress(InetAddress.getLocalHost(), 0);
     }
 
