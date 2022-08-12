@@ -11,6 +11,7 @@
 
 package org.opensearch.sdk;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +20,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.opensearch.common.ParseField;
 import org.opensearch.common.xcontent.NamedXContentRegistry;
+import org.opensearch.common.xcontent.NamedXContentRegistryParseRequest;
 import org.opensearch.common.xcontent.NamedXContentRegistryResponse;
+import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
 import org.opensearch.test.OpenSearchTestCase;
@@ -51,5 +54,17 @@ public class TestNamedXContentRegistryAPI extends OpenSearchTestCase {
 
         assertEquals(1, response.getRegistry().size());
         assertEquals(Object.class, response.getRegistry().get(testParseField));
+    }
+
+    @Test
+    public void testNamedXContentParseRequest() throws UnknownHostException, IOException {
+
+        Class categoryClass = Object.class;
+        String context = "test context";
+        NamedXContentRegistryParseRequest request = new NamedXContentRegistryParseRequest(categoryClass, context);
+        ExtensionBooleanResponse response = namedXContentRegistryAPI.handleNamedXContentRegistryParseRequest(request);
+
+        // verify that XcontentParser creation was successful
+        assertEquals(response.getStatus(), true);
     }
 }

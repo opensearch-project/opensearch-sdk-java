@@ -16,9 +16,12 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.ParseField;
+import org.opensearch.common.xcontent.LoggingDeprecationHandler;
 import org.opensearch.common.xcontent.NamedXContentRegistry;
 import org.opensearch.common.xcontent.NamedXContentRegistryParseRequest;
 import org.opensearch.common.xcontent.NamedXContentRegistryResponse;
+import org.opensearch.common.xcontent.XContentParser;
+import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.extensions.OpenSearchRequest;
 
@@ -85,22 +88,24 @@ public class NamedXContentRegistryAPI {
     }
 
     /**
-     * Handles a request from OpenSearch to parse a named xcontent
+     * Handles a request from OpenSearch to generate a XContentParser with the given context
      *
      * @param request  The request to handle.
-     * @throws IOException if InputStream generated from the byte array is unsuccessfully closed
      * @return A response acknowledging the request to parse has executed successfully
      */
     public ExtensionBooleanResponse handleNamedXContentRegistryParseRequest(NamedXContentRegistryParseRequest request) throws IOException {
-        logger.info("Registering Named Writeable Registry Parse request from OpenSearch");
-        boolean status = false;
+        logger.info("Registering Named XContent Registry Parse request from OpenSearch");
 
-        Class cateogoryClass = request.getCategoryClass();
+        // Category class is required to invoke parser.namedObject() to generate the corresponding object within the xcontent registry
+        Class categoryClass = request.getCategoryClass();
         String context = request.getContext();
 
-        // TODO : invoke parse on context
+        // TODO : Currently providing extensions with the capability to generate XContentParsers via a request from OpenSearch. Determine
+        // how extensions utilize this XContentParser for updating an Anomaly Detector
+        XContentParser parser = XContentType.JSON.xContent()
+            .createParser(namedXContentRegistry, LoggingDeprecationHandler.INSTANCE, context);
 
-        ExtensionBooleanResponse namedXContentRegistryParseResponse = new ExtensionBooleanResponse(status);
+        ExtensionBooleanResponse namedXContentRegistryParseResponse = new ExtensionBooleanResponse(true);
         return namedXContentRegistryParseResponse;
     }
 
