@@ -361,8 +361,8 @@ public class ExtensionsRunner {
         try {
             transportService.sendRequest(
                 opensearchNode,
-                ExtensionsOrchestrator.REQUEST_ACTION_LISTENER_ON_FAILURE,
-                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_ACTION_LISTENER_ON_FAILURE),
+                ExtensionsOrchestrator.REQUEST_EXTENSION_ACTION_LISTENER_ON_FAILURE,
+                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_ACTION_LISTENER_ON_FAILURE),
                 listenerHandler
             );
         } catch (Exception e) {
