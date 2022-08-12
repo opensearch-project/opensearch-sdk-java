@@ -178,7 +178,7 @@ Look for tar ball in /build/distributions. To run the artifact i.e. tar ball, ru
 ```
 tar -xvf opensearch-sdk-1.0.0-SNAPSHOT.tar
 ```
-For now, navigate to  opensearch-sdk/build/distributions/opensearch-sdk-1.0.0-SNAPSHOT/ 
+TODO navigate to  opensearch-sdk/build/distributions/opensearch-sdk-1.0.0-SNAPSHOT/ 
 - Check if src folder exists in using `ls`.
 - If the src folder does not exist, create it using `mkdir src && cd src && mkdir test && cd test && mkdir resources && cd resources`. 
   The above command will generate a path opensearch-sdk/build/distributions/opensearch-sdk-1.0.0-SNAPSHOT/src/test/resources
