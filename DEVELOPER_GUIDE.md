@@ -165,27 +165,23 @@ Run tests :
 ./gradlew clean build test
 ```
 ## Generate Artifact
-
 In opensearch-sdk navigate to build/distributions. Look for tar ball in the form `opensearch-sdk-1.0.0-SNAPSHOT.tar`. If not found follow the below steps to create one:
-
 ```
 ./gradlew clean && ./gradlew build
 ```
 Once the tar ball is generated navigate to /src/test/resources and look for extension.yml. Create one if not present
-
 Look for tar ball in /build/distributions. To run the artifact i.e. tar ball, run the below command
-
 ```
 tar -xvf opensearch-sdk-1.0.0-SNAPSHOT.tar
 ```
-TODO navigate to  opensearch-sdk/build/distributions/opensearch-sdk-1.0.0-SNAPSHOT/ 
+TODO https://github.com/opensearch-project/opensearch-sdk/issues/52 
+Navigate to opensearch-sdk/build/distributions/opensearch-sdk-1.0.0-SNAPSHOT/ 
 - Check if src folder exists in using `ls`.
 - If the src folder does not exist, create it using `mkdir src && cd src && mkdir test && cd test && mkdir resources && cd resources`. 
   The above command will generate a path opensearch-sdk/build/distributions/opensearch-sdk-1.0.0-SNAPSHOT/src/test/resources
 - Manually create a file titled `extension.yml` within the resources directory using an IDE or an in-line text editor. Below is the sample of extension.yml
 
 Sample extensions.yml file:
-
 ```
   extensionName: extension
   hostAddress: 127.0.0.1
