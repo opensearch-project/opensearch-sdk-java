@@ -178,7 +178,21 @@ Look for tar ball in /build/distributions. To run the artifact i.e. tar ball, ru
 ```
 tar -xvf opensearch-sdk-1.0.0-SNAPSHOT.tar
 ```
-For now, create the extension.yml file within  opensearch-sdk/build/distributions/opensearch-sdk-1.0.0-SNAPSHOT/src/test/resources/  and then run ./bin/opensearch-sdk to start opensearch
+For now, navigate to  opensearch-sdk/build/distributions/opensearch-sdk-1.0.0-SNAPSHOT/ 
+- Check if src folder exists in using `ls`.
+- If the src folder does not exist, create it using `mkdir src && cd src && mkdir test && cd test && mkdir resources && cd resources`. 
+  The above command will generate a path opensearch-sdk/build/distributions/opensearch-sdk-1.0.0-SNAPSHOT/src/test/resources
+- Manually create a file titled `extension.yml` within the resources directory using an IDE or an in-line text editor. Below is the sample of extension.yml
+
+Sample extensions.yml file:
+
+```
+  extensionName: extension
+  hostAddress: 127.0.0.1
+  hostPort: 4532
+```
+- After extension.yml is generated then start opensearch-sdk by ./bin/opensearch-sdk
+
 ## Submitting Changes
 
 See [CONTRIBUTING](CONTRIBUTING.md).
