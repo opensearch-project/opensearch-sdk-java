@@ -10,8 +10,6 @@ package org.opensearch.sdk;
 import java.io.IOException;
 
 import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -31,37 +29,44 @@ import org.opensearch.client.transport.rest_client.RestClientTransport;
 public class SDKClient {
     private final Logger logger = LogManager.getLogger(SDKClient.class);
     private OpenSearchClient client;
+    private RestClient restClient = null;
 
     /**
      * Creates client for SDK
+     * @param hostAddress The address client can connect to
+     * @param port The port of the address
      * @throws IOException if client failed
+     * @return SDKClient
      */
-    public void createClient(String hostAddress, int port) throws IOException {
-        RestClient restClient = null;
-        try {
-            RestClientBuilder builder = RestClient.builder(new HttpHost(hostAddress, port));
-            builder.setStrictDeprecationMode(true);
-            builder.setHttpClientConfigCallback(httpClientBuilder -> {
-                final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-                //credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
-                try {
-                    return httpClientBuilder
-                        .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                        .setSSLContext(SSLContextBuilder.create().loadTrustMaterial(null, (chains, authType) -> true).build());
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            });
-
-            restClient = builder.build();
-
-            // Create Client
-            OpenSearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
-            OpenSearchClient client = new OpenSearchClient(transport);
-        } finally {
-            if (restClient != null) {
-                restClient.close();
+    public OpenSearchClient createClient(String hostAddress, int port) throws IOException {
+        RestClientBuilder builder = RestClient.builder(new HttpHost(hostAddress, port));
+        builder.setStrictDeprecationMode(true);
+        builder.setHttpClientConfigCallback(httpClientBuilder -> {
+            final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            // credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+            try {
+                return httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                    .setSSLContext(SSLContextBuilder.create().loadTrustMaterial(null, (chains, authType) -> true).build());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
+        });
+
+        restClient = builder.build();
+
+        // Create Client
+        OpenSearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+        client = new OpenSearchClient(transport);
+        return client;
+    }
+
+    /**
+     *
+     * @throws IOException if closing the client fails
+     */
+    public void doClose() throws IOException {
+        if (restClient != null) {
+            restClient.close();
         }
     }
 }
