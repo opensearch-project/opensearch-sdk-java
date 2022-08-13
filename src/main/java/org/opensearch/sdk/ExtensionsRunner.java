@@ -26,6 +26,8 @@ import org.opensearch.discovery.PluginRequest;
 import org.opensearch.discovery.PluginResponse;
 import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.extensions.ExtensionBooleanResponse;
+import org.opensearch.discovery.InitializeExtensionsRequest;
+import org.opensearch.discovery.InitializeExtensionsResponse;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.extensions.RegisterApiRequest;
@@ -125,17 +127,17 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Handles a plugin request from OpenSearch.  This is the first request for the transport communication as a part of OpenSearch bootstrap.
-     * It will initialize the opensearchNode and trigger an initial call to sendApiRequest.
+     * Handles a extension request from OpenSearch.  This is the first request for the transport communication and will initialize the extension and will be a part of OpenSearch bootstrap.
      *
-     * @param pluginRequest  The request to handle.
+     * @param extensionInitRequest  The request to handle.
      * @return A response to OpenSearch validating that this is an extension.
      */
-    PluginResponse handlePluginsRequest(PluginRequest pluginRequest) {
-        logger.info("Registering Plugin Request received from OpenSearch");
-        opensearchNode = pluginRequest.getSourceNode();
+    InitializeExtensionsResponse handleExtensionInitRequest(InitializeExtensionsRequest extensionInitRequest) {
+        logger.info("Registering Extension Request received from OpenSearch");
+        InitializeExtensionsResponse initializeExtensionsResponse = new InitializeExtensionsResponse(extensionSettings.getExtensionName());
+        opensearchNode = extensionInitRequest.getSourceNode();
         // Fetch the unique ID
-        for (DiscoveryExtension de : pluginRequest.getExtensions()) {
+        for (DiscoveryExtension de : extensionInitRequest.getExtensions()) {
             if (de.getName().equals(extensionSettings.getExtensionName())) {
                 setUniqueId(de.getId());
                 break;
@@ -149,7 +151,7 @@ public class ExtensionsRunner {
         setOpensearchNode(opensearchNode);
         extensionTransportService.connectToNode(opensearchNode);
         sendRegisterApiRequest(extensionTransportService);
-        return new PluginResponse(extensionSettings.getExtensionName());
+        return initializeExtensionsResponse;
     }
 
     /**
@@ -171,7 +173,7 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Handles a request for extension point indices from OpenSearch.  The {@link #handlePluginsRequest(PluginRequest)} method must have been called first to initialize the extension.
+     * Handles a request for extension point indices from OpenSearch.  The {@link #handleExtensionInitRequest(InitializeExtensionsRequest)} method must have been called first to initialize the extension.
      *
      * @param indicesModuleRequest  The request to handle.
      * @param transportService  The transport service communicating with OpenSearch.
@@ -184,7 +186,7 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Handles a request for extension name from OpenSearch.  The {@link #handlePluginsRequest(PluginRequest)} method must have been called first to initialize the extension.
+     * Handles a request for extension name from OpenSearch.  The {@link #handleExtensionInitRequest(InitializeExtensionsRequest)} method must have been called first to initialize the extension.
      *
      * @param indicesModuleRequest  The request to handle.
      * @return A response acknowledging the request.
@@ -290,8 +292,8 @@ public class ExtensionsRunner {
             ThreadPool.Names.GENERIC,
             false,
             false,
-            PluginRequest::new,
-            (request, channel, task) -> channel.sendResponse(handlePluginsRequest(request))
+            InitializeExtensionsRequest::new,
+            (request, channel, task) -> channel.sendResponse(handleExtensionInitRequest(request))
         );
 
         transportService.registerRequestHandler(
