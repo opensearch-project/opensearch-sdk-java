@@ -312,6 +312,7 @@ public class ExtensionsRunner {
             InitializeExtensionsRequest::new,
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
             (request, channel, task) -> channel.sendResponse(handleExtensionInitRequest(request))
 =======
             (request, channel, task) -> channel.sendResponse(handlePluginsRequest(request))
@@ -319,6 +320,9 @@ public class ExtensionsRunner {
 =======
             (request, channel, task) -> channel.sendResponse(handleExtensionInitRequest(request))
 >>>>>>> Rename the method and fix the conflict
+=======
+            (request, channel, task) -> channel.sendResponse(handleExtensionInitRequest(request))
+>>>>>>> fix merge conflict
         );
 
         transportService.registerRequestHandler(
