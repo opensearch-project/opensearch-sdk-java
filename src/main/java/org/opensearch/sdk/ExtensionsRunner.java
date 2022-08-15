@@ -248,11 +248,7 @@ public class ExtensionsRunner {
             false,
             false,
             InitializeExtensionsRequest::new,
-<<<<<<< HEAD
-            (request, channel, task) -> channel.sendResponse(handlePluginsRequest(request))
-=======
             (request, channel, task) -> channel.sendResponse(handleExtensionInitRequest(request))
->>>>>>> fd0f0708c14bf39c139b4cdea36b01839786a5ca
         );
 
         transportService.registerRequestHandler(
