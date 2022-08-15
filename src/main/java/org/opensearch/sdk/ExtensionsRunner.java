@@ -134,15 +134,21 @@ public class ExtensionsRunner {
                 break;
             }
         }
+        // We could avoid this check if we only send one extension in the initialize request, rather than the entire list
         if (getUniqueId() == null) {
             throw new IllegalArgumentException(
                 "Extension " + extensionSettings.getExtensionName() + " does not match any requested extension."
             );
         }
-        setOpensearchNode(opensearchNode);
-        extensionTransportService.connectToNode(opensearchNode);
-        sendRegisterRestApiRequest(extensionTransportService);
-        return initializeExtensionsResponse;
+        // Successfully initialized. Send the response.
+        try {
+            return initializeExtensionsResponse;
+        } finally {
+            // After sending successful response to initialization, send the REST API
+            setOpensearchNode(opensearchNode);
+            extensionTransportService.connectToNode(opensearchNode);
+            sendRegisterRestApiRequest(extensionTransportService);
+        }
     }
 
     /**
