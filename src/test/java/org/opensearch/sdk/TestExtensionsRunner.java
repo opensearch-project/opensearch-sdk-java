@@ -104,21 +104,15 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         List<DiscoveryExtension> extensions = List.of(
             new DiscoveryExtension("sample-extension", "opensearch-sdk-1", null, null, null, null, null, null, null)
         );
-        PluginRequest pluginRequest = new PluginRequest(sourceNode, extensions);
-        PluginResponse response = extensionsRunner.handlePluginsRequest(pluginRequest);
+        InitializeExtensionsRequest extensionInitRequest = new InitializeExtensionsRequest(sourceNode, extensions);
+        InitializeExtensionsResponse response = extensionsRunner.handleExtensionInitRequest(extensionInitRequest);
         assertEquals("sample-extension", response.getName());
 
-        // Test if unique ID is set
+        // Test if name and unique ID are set
+        assertEquals("sample-extension", response.getName());
         assertEquals("opensearch-sdk-1", extensionsRunner.getUniqueId());
-        // Test if the source node is set after handlePluginRequest() is called during OpenSearch bootstrap
+        // Test if the source node is set after handleExtensionInitRequest() is called during OpenSearch bootstrap
         assertEquals(sourceNode, extensionsRunner.getOpensearchNode());
-
-        InitializeExtensionsRequest extensionInitRequest = new InitializeExtensionsRequest(sourceNode, null);
-        InitializeExtensionsResponse response = extensionsRunner.handleExtensionInitRequest(extensionInitRequest);
-        assertEquals(response.getName(), "extension");
-
-        // Test if the source node is set after handleExtensionInitRequest()) is called during OpenSearch bootstrap
-        assertEquals(extensionsRunner.getOpensearchNode(), sourceNode);
     }
 
     @Test

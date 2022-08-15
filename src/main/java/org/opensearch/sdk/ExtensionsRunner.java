@@ -22,8 +22,6 @@ import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.PageCacheRecycler;
-import org.opensearch.discovery.PluginRequest;
-import org.opensearch.discovery.PluginResponse;
 import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.discovery.InitializeExtensionsRequest;
@@ -48,7 +46,6 @@ import org.opensearch.transport.ConnectionManager;
 import org.opensearch.transport.TransportInterceptor;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
-import org.opensearch.transport.TransportInterceptor;
 import org.opensearch.transport.TransportResponse;
 
 import java.io.File;
@@ -83,13 +80,6 @@ public class ExtensionsRunner {
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
     private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
-
-    /**
-     * Instantiates a new Extensions Runner.
-     *
-     * @throws IOException if the runner failed to connect to the OpenSearch cluster.
-     */
-    public ExtensionsRunner() throws IOException {}
 
     /**
      * Instantiates a new Extensions Runner.
