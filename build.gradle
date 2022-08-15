@@ -24,11 +24,27 @@ ext {
 
 apply plugin: 'application'
 apply from: 'gradle/formatting.gradle'
+apply plugin: 'maven-publish'
 
 mainClassName = 'org.opensearch.sdk.ExtensionsRunner'
 
 group 'org.opensearch.sdk'
 version '1.0.0-SNAPSHOT'
+
+allprojects {
+    publishing {
+        publications {
+            group = "org.opensearch"
+            version = "1.0.0-SNAPSHOT"
+            mavenJava(MavenPublication) {
+                from components.java
+            }
+        }
+        repositories {
+            mavenLocal()
+        }
+    }
+}
 
 repositories {
     mavenLocal()
