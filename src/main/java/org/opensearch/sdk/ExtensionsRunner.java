@@ -28,7 +28,7 @@ import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
-import org.opensearch.extensions.RegisterApiRequest;
+import org.opensearch.extensions.RegisterRestApiRequest;
 import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.index.IndicesModuleResponse;
 import org.opensearch.indices.IndicesModule;
@@ -39,6 +39,7 @@ import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
+import org.opensearch.sdk.handlers.RegisterRestApiResponseHandler;
 import org.opensearch.search.SearchModule;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.ClusterConnectionManager;
@@ -66,7 +67,7 @@ import static org.opensearch.common.UUIDs.randomBase64UUID;
  */
 public class ExtensionsRunner {
     private ExtensionSettings extensionSettings = readExtensionSettings();
-    private ExtensionApi extensionApi = readExtensionApi();
+    private ExtensionRestApi extensionRestApi = readExtensionRestApi();
     private String uniqueId;
     private DiscoveryNode opensearchNode;
     private TransportService extensionTransportService = null;
@@ -94,10 +95,10 @@ public class ExtensionsRunner {
         return objectMapper.readValue(file, ExtensionSettings.class);
     }
 
-    private ExtensionApi readExtensionApi() throws IOException {
-        File file = new File(ExtensionApi.EXTENSION_API_DESCRIPTOR);
+    private ExtensionRestApi readExtensionRestApi() throws IOException {
+        File file = new File(ExtensionRestApi.EXTENSION_REST_API_DESCRIPTOR);
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        return objectMapper.readValue(file, ExtensionApi.class);
+        return objectMapper.readValue(file, ExtensionRestApi.class);
     }
 
     private void setUniqueId(String id) {
@@ -140,7 +141,7 @@ public class ExtensionsRunner {
         }
         setOpensearchNode(opensearchNode);
         extensionTransportService.connectToNode(opensearchNode);
-        sendRegisterApiRequest(extensionTransportService);
+        sendRegisterRestApiRequest(extensionTransportService);
         return initializeExtensionsResponse;
     }
 
@@ -329,14 +330,14 @@ public class ExtensionsRunner {
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
-    public void sendRegisterApiRequest(TransportService transportService) {
-        logger.info("Sending Register API request to OpenSearch for " + extensionApi.getApi());
-        RegisterApiResponseHandler registerApiResponseHandler = new RegisterApiResponseHandler();
+    public void sendRegisterRestApiRequest(TransportService transportService) {
+        logger.info("Sending Register API request to OpenSearch for " + extensionRestApi.getRestApi());
+        RegisterRestApiResponseHandler registerApiResponseHandler = new RegisterRestApiResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_API,
-                new RegisterApiRequest(getUniqueId(), extensionApi.getApi()),
+                ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_REST_API,
+                new RegisterRestApiRequest(getUniqueId(), extensionRestApi.getRestApi()),
                 registerApiResponseHandler
             );
         } catch (Exception e) {

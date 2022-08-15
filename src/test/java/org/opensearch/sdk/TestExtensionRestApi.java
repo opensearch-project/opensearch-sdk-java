@@ -10,22 +10,22 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-public class TestExtensionApi extends OpenSearchTestCase {
+public class TestExtensionRestApi extends OpenSearchTestCase {
 
-    private ExtensionApi extensionApi;
+    private ExtensionRestApi extensionRestApi;
 
     @Override
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        File file = new File(ExtensionApi.EXTENSION_API_DESCRIPTOR);
+        File file = new File(ExtensionRestApi.EXTENSION_REST_API_DESCRIPTOR);
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        extensionApi = objectMapper.readValue(file, ExtensionApi.class);
+        extensionRestApi = objectMapper.readValue(file, ExtensionRestApi.class);
     }
 
     @Test
     public void testExtensionApi() {
-        List<String> apiList = extensionApi.getApi();
+        List<String> apiList = extensionRestApi.getRestApi();
         List<String> expected = Arrays.asList("GET /api_1", "PUT /api_2", "POST /api_3");
         assertEquals(expected.size(), apiList.size());
         assertTrue(apiList.containsAll(expected));

@@ -5,12 +5,13 @@
  * this file be licensed under the Apache-2.0 license or a
  * compatible open source license.
  */
-package org.opensearch.sdk;
+package org.opensearch.sdk.handlers;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.io.stream.StreamInput;
-import org.opensearch.extensions.RegisterApiResponse;
+import org.opensearch.extensions.RegisterRestApiResponse;
+import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportException;
 import org.opensearch.transport.TransportResponseHandler;
@@ -19,13 +20,13 @@ import org.opensearch.transport.TransportService;
 import java.io.IOException;
 
 /**
- * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendRegisterApiRequest(TransportService)} call.
+ * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendRegisterRestApiRequest(TransportService)} call.
  */
-public class RegisterApiResponseHandler implements TransportResponseHandler<RegisterApiResponse> {
-    private static final Logger logger = LogManager.getLogger(RegisterApiResponseHandler.class);
+public class RegisterRestApiResponseHandler implements TransportResponseHandler<RegisterRestApiResponse> {
+    private static final Logger logger = LogManager.getLogger(RegisterRestApiResponseHandler.class);
 
     @Override
-    public void handleResponse(RegisterApiResponse response) {
+    public void handleResponse(RegisterRestApiResponse response) {
         logger.info("received {}", response);
     }
 
@@ -40,7 +41,7 @@ public class RegisterApiResponseHandler implements TransportResponseHandler<Regi
     }
 
     @Override
-    public RegisterApiResponse read(StreamInput in) throws IOException {
-        return new RegisterApiResponse(in);
+    public RegisterRestApiResponse read(StreamInput in) throws IOException {
+        return new RegisterRestApiResponse(in);
     }
 }

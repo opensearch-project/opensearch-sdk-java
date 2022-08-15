@@ -3,7 +3,7 @@
 # See https://github.com/opensearch-project/OpenSearch/issues/3090
 # The API will include at least two components, a method (e.g., GET, PUT) and
 # parts of a URI (e.g., /_extensions/sample-extension/api_1)
-api:
+restApi:
   - GET /api_1
   - PUT /api_2
   - POST /api_3

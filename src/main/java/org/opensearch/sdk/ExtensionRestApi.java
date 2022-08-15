@@ -13,28 +13,28 @@ import java.util.List;
 /**
  * This class encapsulates the API of an Extension.
  */
-public class ExtensionApi {
+public class ExtensionRestApi {
 
-    private List<String> api = new ArrayList<>();
+    private List<String> restApi = new ArrayList<>();
 
     /**
      * Placeholder field. Change the location to extension_api.yml file of the extension.
      */
-    public static final String EXTENSION_API_DESCRIPTOR = "src/test/resources/extension_api.yml";
+    public static final String EXTENSION_REST_API_DESCRIPTOR = "src/test/resources/extension_rest_api.yml";
 
     /**
      * Jackson requires a default constructor.
      */
-    private ExtensionApi() {
+    private ExtensionRestApi() {
         super();
     }
 
-    public List<String> getApi() {
-        return new ArrayList<>(api);
+    public List<String> getRestApi() {
+        return new ArrayList<>(restApi);
     }
 
     @Override
     public String toString() {
-        return "ExtensionApi{api=" + api + "}";
+        return "ExtensionRestApi{restApi=" + restApi + "}";
     }
 }

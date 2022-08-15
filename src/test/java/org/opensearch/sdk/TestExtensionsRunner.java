@@ -41,6 +41,7 @@ import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
+import org.opensearch.sdk.handlers.RegisterRestApiResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.Transport;
@@ -149,10 +150,10 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     }
 
     @Test
-    public void testRegisterApiRequest() {
+    public void testRegisterRestApiRequest() {
 
-        extensionsRunner.sendRegisterApiRequest(transportService);
+        extensionsRunner.sendRegisterRestApiRequest(transportService);
 
-        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(RegisterApiResponseHandler.class));
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(RegisterRestApiResponseHandler.class));
     }
 }
