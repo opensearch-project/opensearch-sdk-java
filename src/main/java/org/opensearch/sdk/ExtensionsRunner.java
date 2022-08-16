@@ -67,7 +67,7 @@ import static org.opensearch.common.UUIDs.randomBase64UUID;
  */
 public class ExtensionsRunner {
     private ExtensionSettings extensionSettings = readExtensionSettings();
-    private ExtensionRestApi extensionRestApi = readExtensionRestApi();
+    private ExtensionRestApi extensionRestApi = ExtensionRestApi.readFromYaml();
     private String uniqueId;
     private DiscoveryNode opensearchNode;
     private TransportService extensionTransportService = null;
@@ -93,12 +93,6 @@ public class ExtensionsRunner {
         File file = new File(ExtensionSettings.EXTENSION_DESCRIPTOR);
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
         return objectMapper.readValue(file, ExtensionSettings.class);
-    }
-
-    private ExtensionRestApi readExtensionRestApi() throws IOException {
-        File file = new File(ExtensionRestApi.EXTENSION_REST_API_DESCRIPTOR);
-        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        return objectMapper.readValue(file, ExtensionRestApi.class);
     }
 
     private void setUniqueId(String id) {

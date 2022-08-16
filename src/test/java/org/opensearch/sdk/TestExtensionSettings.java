@@ -7,14 +7,15 @@ import org.junit.jupiter.api.Test;
 import org.opensearch.test.OpenSearchTestCase;
 
 import java.io.File;
-import java.io.IOException;
 
 public class TestExtensionSettings extends OpenSearchTestCase {
 
     private ExtensionSettings extensionSettings;
 
+    @Override
     @BeforeEach
-    public void setUp() throws IOException {
+    public void setUp() throws Exception {
+        super.setUp();
         File file = new File(ExtensionSettings.EXTENSION_DESCRIPTOR);
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
         extensionSettings = objectMapper.readValue(file, ExtensionSettings.class);
@@ -22,12 +23,12 @@ public class TestExtensionSettings extends OpenSearchTestCase {
 
     @Test
     public void testExtensionName() {
-        assertEquals(extensionSettings.getExtensionName(), "extension");
+        assertEquals("sample-extension", extensionSettings.getExtensionName());
     }
 
     @Test
     public void testHostAddress() {
-        assertEquals(extensionSettings.getHostAddress(), "127.0.0.1");
+        assertEquals("127.0.0.1", extensionSettings.getHostAddress());
     }
 
     @Test
