@@ -18,34 +18,34 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 /**
  * This class encapsulates the API of an Extension.
  */
-public class ExtensionRestApi {
+public class ExtensionRestPaths {
 
-    private List<String> restApi = new ArrayList<>();
+    private List<String> restPaths = new ArrayList<>();
 
     /**
      * Placeholder field. Eventually will read this from spec file
      */
-    public static final String EXTENSION_REST_API_DESCRIPTOR = "/extension_rest_api.yml";
+    public static final String EXTENSION_REST_PATHS_DESCRIPTOR = "/extension_rest_paths.yml";
 
     /**
      * Jackson requires a default constructor.
      */
-    private ExtensionRestApi() {
+    private ExtensionRestPaths() {
         super();
     }
 
     /**
-     * Gets the REST API Strings.
+     * Gets the REST API Path and Method Strings.
      *
-     * @return a copy of the list containing the REST API Strings
+     * @return a copy of the list containing the REST API Path Strings
      */
-    public List<String> getRestApi() {
-        return new ArrayList<>(restApi);
+    public List<String> getRestPaths() {
+        return new ArrayList<>(restPaths);
     }
 
     @Override
     public String toString() {
-        return "ExtensionRestApi{restApi=" + restApi + "}";
+        return "ExtensionRestPaths{restPaths=" + restPaths + "}";
     }
 
     /**
@@ -54,9 +54,9 @@ public class ExtensionRestApi {
      * @return An instance of this class.
      * @throws IOException if there is an error reading the file.
      */
-    static ExtensionRestApi readFromYaml() throws IOException {
-        File file = new File(ExtensionRestApi.class.getResource(EXTENSION_REST_API_DESCRIPTOR).getPath());
+    static ExtensionRestPaths readFromYaml() throws IOException {
+        File file = new File(ExtensionRestPaths.class.getResource(EXTENSION_REST_PATHS_DESCRIPTOR).getPath());
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        return objectMapper.readValue(file, ExtensionRestApi.class);
+        return objectMapper.readValue(file, ExtensionRestPaths.class);
     }
 }

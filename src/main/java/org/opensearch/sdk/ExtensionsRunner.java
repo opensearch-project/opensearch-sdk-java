@@ -28,7 +28,7 @@ import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
-import org.opensearch.extensions.RegisterRestApiRequest;
+import org.opensearch.extensions.RegisterRestActionsRequest;
 import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.index.IndicesModuleResponse;
 import org.opensearch.indices.IndicesModule;
@@ -39,7 +39,7 @@ import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
-import org.opensearch.sdk.handlers.RegisterRestApiResponseHandler;
+import org.opensearch.sdk.handlers.RegisterRestActionsResponseHandler;
 import org.opensearch.search.SearchModule;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.ClusterConnectionManager;
@@ -67,7 +67,7 @@ import static org.opensearch.common.UUIDs.randomBase64UUID;
  */
 public class ExtensionsRunner {
     private ExtensionSettings extensionSettings = readExtensionSettings();
-    private ExtensionRestApi extensionRestApi = ExtensionRestApi.readFromYaml();
+    private ExtensionRestPaths extensionRestPaths = ExtensionRestPaths.readFromYaml();
     private String uniqueId;
     private DiscoveryNode opensearchNode;
     private TransportService extensionTransportService = null;
@@ -145,7 +145,7 @@ public class ExtensionsRunner {
             // After sending successful response to initialization, send the REST API
             setOpensearchNode(opensearchNode);
             extensionTransportService.connectToNode(opensearchNode);
-            sendRegisterRestApiRequest(extensionTransportService);
+            sendRegisterRestActionsRequest(extensionTransportService);
         }
     }
 
@@ -330,22 +330,22 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Requests that OpenSearch register the API for this extension.
+     * Requests that OpenSearch register the REST Actions for this extension.
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
-    public void sendRegisterRestApiRequest(TransportService transportService) {
-        logger.info("Sending Register API request to OpenSearch for " + extensionRestApi.getRestApi());
-        RegisterRestApiResponseHandler registerApiResponseHandler = new RegisterRestApiResponseHandler();
+    public void sendRegisterRestActionsRequest(TransportService transportService) {
+        logger.info("Sending Register REST Actions request to OpenSearch for " + extensionRestPaths.getRestPaths());
+        RegisterRestActionsResponseHandler registerActionsResponseHandler = new RegisterRestActionsResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_REST_API,
-                new RegisterRestApiRequest(getUniqueId(), extensionRestApi.getRestApi()),
-                registerApiResponseHandler
+                ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_REST_ACTIONS,
+                new RegisterRestActionsRequest(getUniqueId(), extensionRestPaths.getRestPaths()),
+                registerActionsResponseHandler
             );
         } catch (Exception e) {
-            logger.info("Failed to send Register API request to OpenSearch", e);
+            logger.info("Failed to send Register REST Actions request to OpenSearch", e);
         }
     }
 

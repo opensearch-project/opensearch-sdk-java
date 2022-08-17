@@ -13,20 +13,20 @@ import java.util.List;
 
 public class TestExtensionRestApi extends OpenSearchTestCase {
 
-    private ExtensionRestApi extensionRestApi;
+    private ExtensionRestPaths extensionRestApi;
 
     @Override
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        File file = new File(ExtensionRestApi.class.getResource(ExtensionRestApi.EXTENSION_REST_API_DESCRIPTOR).getPath());
+        File file = new File(ExtensionRestPaths.class.getResource(ExtensionRestPaths.EXTENSION_REST_PATHS_DESCRIPTOR).getPath());
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        extensionRestApi = objectMapper.readValue(file, ExtensionRestApi.class);
+        extensionRestApi = objectMapper.readValue(file, ExtensionRestPaths.class);
     }
 
     @Test
     public void testExtensionApi() {
-        List<String> apiList = extensionRestApi.getRestApi();
+        List<String> apiList = extensionRestApi.getRestPaths();
         List<String> expected = Arrays.asList("GET /api_1", "PUT /api_2", "POST /api_3");
         assertEquals(expected.size(), apiList.size());
         assertTrue(apiList.containsAll(expected));
@@ -35,7 +35,7 @@ public class TestExtensionRestApi extends OpenSearchTestCase {
 
     @Test
     public void testReadFromYaml() throws IOException {
-        List<String> apiList = ExtensionRestApi.readFromYaml().getRestApi();
+        List<String> apiList = ExtensionRestPaths.readFromYaml().getRestPaths();
         List<String> expected = Arrays.asList("GET /api_1", "PUT /api_2", "POST /api_3");
         assertEquals(expected.size(), apiList.size());
         assertTrue(apiList.containsAll(expected));
