@@ -95,6 +95,10 @@ public class ExtensionsRunner {
         return objectMapper.readValue(file, ExtensionSettings.class);
     }
 
+    void setExtensionTransportService(TransportService extensionTransportService) {
+        this.extensionTransportService = extensionTransportService;
+    }
+
     private void setUniqueId(String id) {
         this.uniqueId = id;
     }
