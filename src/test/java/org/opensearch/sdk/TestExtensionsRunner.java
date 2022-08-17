@@ -50,6 +50,8 @@ import org.opensearch.transport.Transport;
 
 public class TestExtensionsRunner extends OpenSearchTestCase {
 
+    private static final String EXTENSION_NAME = "sample-extension";
+
     private ExtensionsRunner extensionsRunner;
     private TransportService transportService;
 
@@ -107,7 +109,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         );
         List<DiscoveryExtension> extensions = List.of(
             new DiscoveryExtension(
-                "sample-extension",
+                EXTENSION_NAME,
                 "opensearch-sdk-1",
                 "",
                 "",
@@ -127,7 +129,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         InitializeExtensionsResponse response = extensionsRunner.handleExtensionInitRequest(extensionInitRequest);
         // Test if name and unique ID are set
-        assertEquals("sample-extension", response.getName());
+        assertEquals(EXTENSION_NAME, response.getName());
         assertEquals("opensearch-sdk-1", extensionsRunner.getUniqueId());
         // Test if the source node is set after handleExtensionInitRequest() is called during OpenSearch bootstrap
         assertEquals(sourceNode, extensionsRunner.getOpensearchNode());
@@ -137,7 +139,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     public void testHandleOpenSearchRequest() throws Exception {
 
         OpenSearchRequest request = new OpenSearchRequest(OpenSearchRequestType.REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY);
-        assertEquals(extensionsRunner.handleOpenSearchRequest(request).getClass(), NamedWriteableRegistryResponse.class);
+        assertEquals(NamedWriteableRegistryResponse.class, extensionsRunner.handleOpenSearchRequest(request).getClass());
 
         // Add additional OpenSearch request handler tests here for each default extension point
     }

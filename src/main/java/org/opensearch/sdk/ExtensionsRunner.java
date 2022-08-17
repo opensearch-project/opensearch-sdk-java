@@ -95,7 +95,7 @@ public class ExtensionsRunner {
         return objectMapper.readValue(file, ExtensionSettings.class);
     }
 
-    protected void setExtensionTransportService(TransportService extensionTransportService) {
+    void setExtensionTransportService(TransportService extensionTransportService) {
         this.extensionTransportService = extensionTransportService;
     }
 
