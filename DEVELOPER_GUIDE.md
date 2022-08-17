@@ -2,10 +2,10 @@
 # OpenSearch SDK JAVA Developer Guide
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
-	- [Git Clone OpenSearch-SDK Repo](#git-clone-OpenSearch-SDK-repo)
+	- [Git Clone OpenSearch-SDK-JAVA Repo](#git-clone-OpenSearch-SDK-JAVA-repo)
 	- [Git Clone OpenSearch Repo](#git-clone-opensearch-repo)
 	- [Publish OpenSearch Feature/Extensions branch to Maven local](#publish-opensearch-feature/extensions-branch-to-maven-local)
-	- [Run OpenSearch-SDK](#run-opensearch-sdk-java)
+	- [Run OpenSearch-SDK-JAVA](#run-opensearch-sdk-java)
 	    - [Create extensions.yml file](#create_extensions_file)
         - [Run OpenSearch](#run-opensearch)
 	- [Run Tests](#run-tests)
@@ -36,7 +36,7 @@ It is necessary to publish dependencies to a local maven repository until this b
 
 ## Run OpenSearch SDK JAVA
 
-Navigate to the directory that OpenSearch-SDK has been cloned to and run main script using `./gradlew run`.
+Navigate to the directory that OpenSearch-SDK-JAVA has been cloned to and run main script using `./gradlew run`.
 
 ```
 ./gradlew run
