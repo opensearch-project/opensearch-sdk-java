@@ -1,4 +1,4 @@
-- [Contributing to OpenSearch-SDK-JAVA](#contributing-to-opensearch-sdk-java)
+- [Contributing to OpenSearch-SDK-Java](#contributing-to-opensearch-sdk-java)
   - [First Things First](#first-things-first)
   - [Ways to Contribute](#ways-to-contribute)
     - [Bug Reports](#bug-reports)
@@ -7,9 +7,9 @@
   - [Developer Certificate of Origin](#developer-certificate-of-origin)
   - [Review Process](#review-process)
 
-# Contributing to OpenSearch-SDK-JAVA
+# Contributing to OpenSearch-SDK-Java
 
-OpenSearch-SDK-JAVA is a community project that is built and maintained by people just like **you**. We're glad you're interested in helping out. There are several different ways you can do it, but before we talk about that, let's talk about how to get started.
+OpenSearch-SDK-Java is a community project that is built and maintained by people just like **you**. We're glad you're interested in helping out. There are several different ways you can do it, but before we talk about that, let's talk about how to get started.
 
 ## First Things First
 
@@ -29,7 +29,7 @@ Once you've confirmed that the bug still exists in the latest version, you'll wa
 
 ### Feature Requests
 
-If you've thought of a way that OpenSearch-SDK-JAVA could be better, we want to hear about it. We track feature requests using GitHub, so please feel free to open an issue which describes the feature you would like to see, why you need it, and how it should work.
+If you've thought of a way that OpenSearch-SDK-Java could be better, we want to hear about it. We track feature requests using GitHub, so please feel free to open an issue which describes the feature you would like to see, why you need it, and how it should work.
 
 ### Contributing Code
 
@@ -68,7 +68,7 @@ By making a contribution to this project, I certify that:
     consistent with this project or the open source license(s)
     involved.
  ```
-We require that every contribution to OpenSearch-SDK-JAVA is signed with a Developer Certificate of Origin. Additionally, please use your real name. We do not accept anonymous contributors nor those utilizing pseudonyms.
+We require that every contribution to OpenSearch-SDK-Java is signed with a Developer Certificate of Origin. Additionally, please use your real name. We do not accept anonymous contributors nor those utilizing pseudonyms.
 
 Each commit must include a DCO which looks like this
 

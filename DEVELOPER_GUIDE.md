@@ -2,10 +2,10 @@
 # OpenSearch SDK JAVA Developer Guide
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
-	- [Git Clone OpenSearch-SDK-JAVA Repo](#git-clone-OpenSearch-SDK-JAVA-repo)
+	- [Git Clone OpenSearch-SDK-Java Repo](#git-clone-OpenSearch-SDK-Java-repo)
 	- [Git Clone OpenSearch Repo](#git-clone-opensearch-repo)
 	- [Publish OpenSearch Feature/Extensions branch to Maven local](#publish-opensearch-feature/extensions-branch-to-maven-local)
-	- [Run OpenSearch-SDK-JAVA](#run-opensearch-sdk-java)
+	- [Run OpenSearch-SDK-Java](#run-opensearch-sdk-java)
 	    - [Create extensions.yml file](#create_extensions_file)
         - [Run OpenSearch](#run-opensearch)
 	- [Run Tests](#run-tests)
@@ -36,7 +36,7 @@ It is necessary to publish dependencies to a local maven repository until this b
 
 ## Run OpenSearch SDK JAVA
 
-Navigate to the directory that OpenSearch-SDK-JAVA has been cloned to and run main script using `./gradlew run`.
+Navigate to the directory that OpenSearch-SDK-Java has been cloned to and run main script using `./gradlew run`.
 
 ```
 ./gradlew run
@@ -73,7 +73,7 @@ Sample extensions.yml file:
 
 ```
 extensions:
-  - name: opensearch-sdk-java
+  - name: sample-extension
     uniqueId: opensearch-sdk-java-1
     hostName: 'sdk_host'
     hostAddress: '127.0.0.1'
@@ -165,20 +165,20 @@ Run tests :
 ./gradlew clean build test
 ```
 ## Generate Artifact
-In opensearch-sdk-java navigate to build/distributions. Look for tar ball in the form `opensearch-sdk-1.0.0-SNAPSHOT.tar`. If not found follow the below steps to create one:
+In opensearch-sdk-java navigate to build/distributions. Look for tar ball in the form `opensearch-sdk-java-1.0.0-SNAPSHOT.tar`. If not found follow the below steps to create one:
 ```
 ./gradlew clean && ./gradlew build
 ```
 Once the tar ball is generated navigate to /src/test/resources and look for extension.yml. Create one if not present
 Look for tar ball in /build/distributions. To run the artifact i.e. tar ball, run the below command
 ```
-tar -xvf opensearch-sdk-1.0.0-SNAPSHOT.tar
+tar -xvf opensearch-sdk-java-1.0.0-SNAPSHOT.tar
 ```
 TODO https://github.com/opensearch-project/opensearch-sdk-java/issues/52 
-Navigate to opensearch-sdk-java/build/distributions/opensearch-sdk-1.0.0-SNAPSHOT/ 
+Navigate to opensearch-sdk-java/build/distributions/opensearch-sdk-java-1.0.0-SNAPSHOT/ 
 - Check if src folder exists in using `ls`.
 - If the src folder does not exist, create it using `mkdir src && cd src && mkdir test && cd test && mkdir resources && cd resources`. 
-  The above command will generate a path opensearch-sdk-java/build/distributions/opensearch-sdk-1.0.0-SNAPSHOT/src/test/resources
+  The above command will generate a path opensearch-sdk-java/build/distributions/opensearch-sdk-java-1.0.0-SNAPSHOT/src/test/resources
 - Manually create a file titled `extension.yml` within the resources directory using an IDE or an in-line text editor. Below is the sample of extension.yml
 
 Sample extensions.yml file:
