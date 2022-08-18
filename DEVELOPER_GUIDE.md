@@ -1,5 +1,5 @@
 
-# OpenSearch SDK JAVA Developer Guide
+# OpenSearch SDK Java Developer Guide
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
 	- [Git Clone OpenSearch-SDK-Java Repo](#git-clone-OpenSearch-SDK-Java-repo)
@@ -18,14 +18,14 @@ Read more about extensibility [here](https://github.com/opensearch-project/OpenS
 
 ## Getting Started
 
-### Git Clone OpenSearch SDK JAVA Repo
-Fork [OpenSearch SDK JAVA](https://github.com/opensearch-project/opensearch-sdk-java) and clone locally, e.g. `git clone https://github.com/[your username]/opensearch-sdk-java.git`.
+### Git Clone OpenSearch SDK Java Repo
+Fork [OpenSearch SDK Java](https://github.com/opensearch-project/opensearch-sdk-java) and clone locally, e.g. `git clone https://github.com/[your username]/opensearch-sdk-java.git`.
 
 ### Git Clone OpenSearch Repo
 Fork [OpenSearch](https://github.com/opensearch-project/OpenSearch/), checkout feature/extensions branch, and clone locally, e.g. `git clone https://github.com/[your username]/OpenSearch.git`.
 
 ## Publish OpenSearch feature/extensions Branch to Maven local
-The work done to support the extensions framework is located on the `feature/extensions` branch of the OpenSearch project. It is necessary to publish the dependencies of this branch to your local maven repository prior to running the OpenSearch SDK JAVA on a seperate process. 
+The work done to support the extensions framework is located on the `feature/extensions` branch of the OpenSearch project. It is necessary to publish the dependencies of this branch to your local maven repository prior to running the OpenSearch SDK Java on a seperate process. 
 
 - First navigate to the directory that OpenSearch has been cloned to
 - Checkout the correct branch, e.g. `git checkout feature/extensions`.
@@ -34,7 +34,7 @@ The work done to support the extensions framework is located on the `feature/ext
 
 It is necessary to publish dependencies to a local maven repository until this branch is merged to `main`, at which point all dependencies will be published to Maven central.
 
-## Run OpenSearch SDK JAVA
+## Run OpenSearch SDK Java
 
 Navigate to the directory that OpenSearch-SDK-Java has been cloned to and run main script using `./gradlew run`.
 
@@ -92,7 +92,7 @@ extensions:
 - Return to the OpenSearch directory by using `cd ..`.
 - Start OpenSearch feature/extensions branch using `./bin/opensearch`.
 
-During OpenSearch bootstrap, `ExtensionsOrchestrator` will then discover the extension listenening on a pre-defined port and execute the TCP handshake protocol to establish a data transfer connection. A request will be sent to the OpenSearch SDK JAVA and upon acknowledgment, the extension will respond with its name which will be logged onto terminal that OpenSearch is running on.
+During OpenSearch bootstrap, `ExtensionsOrchestrator` will then discover the extension listenening on a pre-defined port and execute the TCP handshake protocol to establish a data transfer connection. A request will be sent to the OpenSearch SDK Java and upon acknowledgment, the extension will respond with its name which will be logged onto terminal that OpenSearch is running on.
 
 ```
 [2022-06-16T21:30:18,857][INFO ][o.o.t.TransportService   ] [runTask-0] publish_address {127.0.0.1:9300}, bound_addresses {[::1]:9300}, {127.0.0.1:9300}
@@ -102,7 +102,7 @@ During OpenSearch bootstrap, `ExtensionsOrchestrator` will then discover the ext
 [2022-06-16T21:30:19,000][INFO ][o.o.e.ExtensionsOrchestrator] [runTask-0] received PluginResponse{examplepluginname}
 ```
 
-OpenSearch SDK JAVA terminal will also log all requests and responses it receives from OpenSearch :
+OpenSearch SDK Java terminal will also log all requests and responses it receives from OpenSearch :
 
 TCP HandShake Request :
 ```
@@ -156,7 +156,7 @@ MESSAGE RECEIVED:ES-ǣ!internal:discovery/extensionsnode_extensionQSt9oKXFTSWqgX
 21:30:18.999 [opensearch[extension][transport_worker][T#6]] TRACE org.opensearch.transport.TransportService.tracer - [3][internal:discovery/extensions] sent response
 ```
 
-It is important that the OpenSearch SDK JAVA is already up and running on a seperate process prior to starting OpenSearch, since extension discovery occurs only if the OpenSearch SDK JAVA is already listening on a pre-defined port. Once discovery is complete and the data transfer connection between both nodes has been established, OpenSearch and the OpenSearch SDK JAVA will now be able to comminicate. 
+It is important that the OpenSearch SDK Java is already up and running on a seperate process prior to starting OpenSearch, since extension discovery occurs only if the OpenSearch SDK Java is already listening on a pre-defined port. Once discovery is complete and the data transfer connection between both nodes has been established, OpenSearch and the OpenSearch SDK Java will now be able to comminicate. 
 
 ## Run Tests
 
@@ -183,7 +183,7 @@ Navigate to opensearch-sdk-java/build/distributions/opensearch-sdk-java-1.0.0-SN
 
 Sample extensions.yml file:
 ```
-  extensionName: extension
+  extensionName: sample-extension
   hostAddress: 127.0.0.1
   hostPort: 4532
 ```
