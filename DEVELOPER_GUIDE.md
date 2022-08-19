@@ -102,7 +102,7 @@ During OpenSearch bootstrap, `ExtensionsOrchestrator` will then discover the ext
 [2022-06-16T21:30:19,000][INFO ][o.o.e.ExtensionsOrchestrator] [runTask-0] received PluginResponse{examplepluginname}
 ```
 
-OpenSearch SDK Java terminal will also log all requests and responses it receives from OpenSearch :
+OpenSearch SDK terminal will also log all requests and responses it receives from OpenSearch :
 
 TCP HandShake Request :
 ```

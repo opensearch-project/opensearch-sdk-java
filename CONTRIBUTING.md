@@ -7,9 +7,9 @@
   - [Developer Certificate of Origin](#developer-certificate-of-origin)
   - [Review Process](#review-process)
 
-# Contributing to OpenSearch-SDK-Java
+# Contributing to OpenSearch-SDK
 
-OpenSearch-SDK-Java is a community project that is built and maintained by people just like **you**. We're glad you're interested in helping out. There are several different ways you can do it, but before we talk about that, let's talk about how to get started.
+OpenSearch-SDK is a community project that is built and maintained by people just like **you**. We're glad you're interested in helping out. There are several different ways you can do it, but before we talk about that, let's talk about how to get started.
 
 ## First Things First
 
@@ -68,7 +68,7 @@ By making a contribution to this project, I certify that:
     consistent with this project or the open source license(s)
     involved.
  ```
-We require that every contribution to OpenSearch-SDK-Java is signed with a Developer Certificate of Origin. Additionally, please use your real name. We do not accept anonymous contributors nor those utilizing pseudonyms.
+We require that every contribution to OpenSearch-SDK-Java is signed with a [Developer Certificate of Origin](https://github.com/opensearch-project/OpenSearch/blob/main/CONTRIBUTING.md#developer-certificate-of-origin). Additionally, please use your real name. We do not accept anonymous contributors nor those utilizing pseudonyms. 
 
 Each commit must include a DCO which looks like this
 

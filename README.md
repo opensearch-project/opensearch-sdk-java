@@ -1,4 +1,4 @@
-# OpenSearch SDK Java
+# OpenSearch SDK
 - [Introduction](#introduction)
 - [Contributing](#contributing)
 - [Code of Conduct](#code-of-conduct)
