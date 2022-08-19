@@ -43,11 +43,9 @@ public class SDKClient {
         RestClientBuilder builder = RestClient.builder(new HttpHost(hostAddress, port));
         builder.setStrictDeprecationMode(true);
         builder.setHttpClientConfigCallback(httpClientBuilder -> {
-            final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-            // credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
             try {
-                return httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                    .setSSLContext(SSLContextBuilder.create().loadTrustMaterial(null, (chains, authType) -> true).build());
+                return httpClientBuilder
+                        .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
