@@ -69,11 +69,11 @@ Every extension will require metadata stored in an extensions.yml file in order 
 - Navigate to the extensions folder using `cd extensions`.
 - Manually create a file titled `extensions.yml` within the extensions directory using an IDE or an in-line text editor.
 
-Sample extensions.yml file:
+Sample `extensions.yml` file (the name must match the `extensionName` field in the corresponding `extension.yml`:
 
 ```
 extensions:
-  - name: opensearch-sdk
+  - name: sample-extension
     uniqueId: opensearch-sdk-1
     hostName: 'sdk_host'
     hostAddress: '127.0.0.1'
