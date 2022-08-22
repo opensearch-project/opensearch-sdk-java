@@ -18,6 +18,9 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
 import org.opensearch.extensions.OpenSearchRequest;
+import org.opensearch.extensions.rest.RegisterRestActionsRequest;
+import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
+import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
 import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
 import org.opensearch.common.settings.Settings;
@@ -28,7 +31,6 @@ import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
-import org.opensearch.extensions.RegisterRestActionsRequest;
 import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.index.IndicesModuleResponse;
 import org.opensearch.indices.IndicesModule;
@@ -194,6 +196,24 @@ public class ExtensionsRunner {
     }
 
     /**
+     * Handles a request from OpenSearch to execute a REST request on the extension.
+     *
+     * @param request The REST request to execute
+     * @return A response acknowledging the request.
+     */
+    RestExecuteOnExtensionResponse handleRestExecuteOnExtensionRequest(RestExecuteOnExtensionRequest request) {
+        String message = "The extension would have just executed " + request.getMethod() + " " + request.getUri();
+        // TODO: logic matching the method/URI which came from the extension API to the appropriate
+        // action class, e.g., see AD plugin's actions in org.opensearch.ad.rest package.
+        // This should probably be stored locally in a map before we send the register API requests to OpenSearch.
+        // Tricky part is how to match up API names (in text) with actions (Class Names). Could use reflection
+        // or just register like the existing plugin code does. TBD future code!
+        // For now we just log (locally) and respond to OpenSearch that we received enough info to correlate such an action
+        logger.info(message);
+        return new RestExecuteOnExtensionResponse(message);
+    }
+
+    /**
      * Initializes a Netty4Transport object. This object will be wrapped in a {@link TransportService} object.
      *
      * @param settings  The transport settings to configure.
@@ -318,6 +338,7 @@ public class ExtensionsRunner {
             ((request, channel, task) -> channel.sendResponse(handleIndicesModuleRequest(request, transportService)))
 
         );
+
         transportService.registerRequestHandler(
             ExtensionsOrchestrator.INDICES_EXTENSION_NAME_ACTION_NAME,
             ThreadPool.Names.GENERIC,
@@ -325,6 +346,15 @@ public class ExtensionsRunner {
             false,
             IndicesModuleRequest::new,
             ((request, channel, task) -> channel.sendResponse(handleIndicesModuleNameRequest(request)))
+        );
+
+        transportService.registerRequestHandler(
+            ExtensionsOrchestrator.REQUEST_REST_EXECUTE_ON_EXTENSION_ACTION,
+            ThreadPool.Names.GENERIC,
+            false,
+            false,
+            RestExecuteOnExtensionRequest::new,
+            ((request, channel, task) -> channel.sendResponse(handleRestExecuteOnExtensionRequest(request)))
         );
 
     }
@@ -341,7 +371,11 @@ public class ExtensionsRunner {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_REST_ACTIONS,
-                new RegisterRestActionsRequest(getUniqueId(), extensionRestPaths.getRestPaths()),
+                new RegisterRestActionsRequest(
+                    extensionTransportService.getLocalNode().getId(),
+                    getUniqueId(),
+                    extensionRestPaths.getRestPaths()
+                ),
                 registerActionsResponseHandler
             );
         } catch (Exception e) {
