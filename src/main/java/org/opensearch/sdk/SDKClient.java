@@ -26,11 +26,11 @@ import org.opensearch.client.transport.rest_client.RestClientTransport;
  */
 public class SDKClient {
     private final Logger logger = LogManager.getLogger(SDKClient.class);
-    private OpenSearchClient client;
+    private OpenSearchClient javaClient;
     private RestClient restClient = null;
 
     /**
-     * Creates OpenSearchClient for SDK. It also creates a restClient as a wrapper around OpenSearchClient
+     * Creates OpenSearchClient for SDK. It also creates a restClient as a wrapper around Java OpenSearchClient
      * @param hostAddress The address of OpenSearch cluster, client can connect to
      * @param port The port of OpenSearch cluster
      * @throws IOException if client failed
@@ -51,8 +51,8 @@ public class SDKClient {
 
         // Create Client
         OpenSearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
-        client = new OpenSearchClient(transport);
-        return client;
+        javaClient = new OpenSearchClient(transport);
+        return javaClient;
     }
 
     /**
