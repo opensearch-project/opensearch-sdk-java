@@ -24,7 +24,7 @@ public class TestSDKClient extends OpenSearchTestCase {
     @Test
     public void testCreateClient() throws Exception {
 
-        OpenSearchClient testClient = sdkClient.createClient("localhost", 9200);
+        OpenSearchClient testClient = sdkClient.initializeClient("localhost", 9200);
         assertInstanceOf(OpenSearchClient.class, testClient);
 
         assertThrows(
