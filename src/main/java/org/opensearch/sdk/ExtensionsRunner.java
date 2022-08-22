@@ -361,7 +361,11 @@ public class ExtensionsRunner {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_REST_ACTIONS,
-                new RegisterRestActionsRequest(getUniqueId(), extensionRestPaths.getRestPaths()),
+                new RegisterRestActionsRequest(
+                    extensionTransportService.getLocalNode().getId(),
+                    getUniqueId(),
+                    extensionRestPaths.getRestPaths()
+                ),
                 registerActionsResponseHandler
             );
         } catch (Exception e) {
