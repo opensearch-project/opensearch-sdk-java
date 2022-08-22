@@ -22,7 +22,7 @@ import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
 
 /**
- * This class creates a Client for SDK to make requests to OpenSearch
+ * This class creates SDKClient for an extension to make requests to OpenSearch
  */
 public class SDKClient {
     private final Logger logger = LogManager.getLogger(SDKClient.class);
@@ -30,11 +30,11 @@ public class SDKClient {
     private RestClient restClient = null;
 
     /**
-     * Creates client for SDK
-     * @param hostAddress The address client can connect to
-     * @param port The port of the address
+     * Creates OpenSearchClient for SDK
+     * @param hostAddress The address of OpenSearch cluster, client can connect to
+     * @param port The port of OpenSearch cluster
      * @throws IOException if client failed
-     * @return SDKClient
+     * @return SDKClient which is internally an OpenSearchClient. The user is responsible for calling {@link #doCloseRestClient()} when finished with the client
      */
     public OpenSearchClient createClient(String hostAddress, int port) throws IOException {
         RestClientBuilder builder = RestClient.builder(new HttpHost(hostAddress, port));
@@ -57,9 +57,9 @@ public class SDKClient {
 
     /**
      *
-     * @throws IOException if closing the client fails
+     * @throws IOException if closing the restClient fails
      */
-    public void doClose() throws IOException {
+    public void doCloseRestClient() throws IOException {
         if (restClient != null) {
             restClient.close();
         }

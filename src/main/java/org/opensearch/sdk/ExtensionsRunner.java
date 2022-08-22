@@ -145,8 +145,8 @@ public class ExtensionsRunner {
             return initializeExtensionsResponse;
         } finally {
             // After sending successful response to initialization, send the REST API
-            port = extensionInitRequest.getPort();
-            hostAddress = opensearchNode.getHostAddress();
+            port = opensearchNode.getAddress().getPort();
+            hostAddress = opensearchNode.getAddress().getAddress();
             setOpensearchNode(opensearchNode);
             extensionTransportService.connectToNode(opensearchNode);
             sendRegisterRestActionsRequest(extensionTransportService);

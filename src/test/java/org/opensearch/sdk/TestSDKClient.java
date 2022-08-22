@@ -12,28 +12,32 @@ import org.junit.jupiter.api.Test;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch.indices.Alias;
 import org.opensearch.client.opensearch.indices.CreateIndexRequest;
-import org.opensearch.client.transport.OpenSearchTransport;
-import org.opensearch.client.transport.TransportException;
+import org.opensearch.test.OpenSearchTestCase;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.net.ConnectException;
 
-public class TestSDKClient {
-    private OpenSearchTransport transport = new FailingTransport();
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+
+public class TestSDKClient extends OpenSearchTestCase {
+    SDKClient sdkClient = new SDKClient();
 
     @Test
-    public void testCreateIndexException() throws Exception {
-        OpenSearchClient client = new OpenSearchClient(transport);
+    public void testCreateClient() throws Exception {
 
-        //tag::builders
-        assertThrows(TransportException.class, () -> client.indices().create(
-                new CreateIndexRequest.Builder()
-                        .index("my-index")
-                        .aliases("foo",
-                                new Alias.Builder().isWriteIndex(true).build()
-                        )
+        OpenSearchClient testClient = sdkClient.createClient("localhost", 9200);
+        assertInstanceOf(OpenSearchClient.class, testClient);
+
+        assertThrows(
+            ConnectException.class,
+            () -> testClient.indices()
+                .create(
+                    new CreateIndexRequest.Builder().index("my-index")
+                        .aliases("foo", new Alias.Builder().isWriteIndex(true).build())
                         .build()
-        ));
-        //end::builders
+                )
+        );
+
+        sdkClient.doCloseRestClient();
     }
 
 }
