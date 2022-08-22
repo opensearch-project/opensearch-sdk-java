@@ -2,13 +2,14 @@
 # OpenSearch SDK Developer Guide
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
-	- [Git Clone OpenSearch-SDK Repo](#git-clone-OpenSearch-SDK-repo)
-	- [Git Clone OpenSearch Repo](#git-clone-opensearch-repo)
-	- [Publish OpenSearch Feature/Extensions branch to Maven local](#publish-opensearch-feature/extensions-branch-to-maven-local)
-	- [Run OpenSearch-SDK](#run-opensearch-sdk)
-	    - [Create extensions.yml file](#create_extensions_file)
+    - [Git Clone OpenSearch-SDK Repo](#git-clone-OpenSearch-SDK-repo)
+    - [Git Clone OpenSearch Repo](#git-clone-opensearch-repo)
+    - [Publish OpenSearch Feature/Extensions branch to Maven local](#publish-opensearch-featureextensions-branch-to-maven-local)
+    - [Run OpenSearch-SDK](#run-opensearch-sdk)
+        - [Create extensions.yml file](#create-extensionsyml-file)
         - [Run OpenSearch](#run-opensearch)
-	- [Run Tests](#run-tests)
+    - [Publish OpenSearch-SDK to Maven Local](#publish-openSearch-sdk-to-maven-local)
+    - [Run Tests](#run-tests)
     - [Submitting Changes](#submitting-changes)
 
 ## Introduction
@@ -54,7 +55,11 @@ Bound addresses will then be logged to the terminal :
 [main] INFO  transportservice.TransportService - profile [test]: publish_address {127.0.0.1:5555}, bound_addresses {[::1]:5555}, {127.0.0.1:5555}
 ```
 
-
+## Publish OpenSearch-SDK to Maven local
+Until we publish this repo to maven central. Publishing to maven local is the way to import the artifacts
+```
+./gradlew publishToMavenLocal
+```
 
 ## Create extensions.yml file
 
