@@ -11,10 +11,7 @@ import java.io.IOException;
 
 import org.apache.http.HttpHost;
 
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.client.RestClient;
@@ -44,8 +41,7 @@ public class SDKClient {
         builder.setStrictDeprecationMode(true);
         builder.setHttpClientConfigCallback(httpClientBuilder -> {
             try {
-                return httpClientBuilder
-                        .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
+                return httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
