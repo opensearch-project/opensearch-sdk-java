@@ -2,13 +2,14 @@
 # OpenSearch SDK for Java Developer Guide
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
-	- [Git Clone OpenSearch-SDK-Java Repo](#git-clone-OpenSearch-SDK-Java-repo)
-	- [Git Clone OpenSearch Repo](#git-clone-opensearch-repo)
-	- [Publish OpenSearch Feature/Extensions branch to Maven local](#publish-opensearch-feature/extensions-branch-to-maven-local)
-	- [Run OpenSearch-SDK-Java](#run-opensearch-sdk-java)
-	    - [Create extensions.yml file](#create_extensions_file)
+    - [Git Clone OpenSearch-SDK-Java Repo](#git-clone-OpenSearch-SDK-Java-repo)
+    - [Git Clone OpenSearch Repo](#git-clone-opensearch-repo)
+    - [Publish OpenSearch Feature/Extensions branch to Maven local](#publish-opensearch-featureextensions-branch-to-maven-local)
+    - [Run OpenSearch-SDK-Java](#run-opensearch-sdk-java)
+        - [Create extensions.yml file](#create-extensionsyml-file)
         - [Run OpenSearch](#run-opensearch)
-	- [Run Tests](#run-tests)
+    - [Publish OpenSearch-SDK to Maven Local](#publish-openSearch-sdk-to-maven-local)
+    - [Run Tests](#run-tests)
     - [Submitting Changes](#submitting-changes)
 
 ## Introduction
@@ -54,7 +55,11 @@ Bound addresses will then be logged to the terminal :
 [main] INFO  transportservice.TransportService - profile [test]: publish_address {127.0.0.1:5555}, bound_addresses {[::1]:5555}, {127.0.0.1:5555}
 ```
 
-
+## Publish OpenSearch-SDK to Maven local
+Until we publish this repo to maven central. Publishing to maven local is the way to import the artifacts
+```
+./gradlew publishToMavenLocal
+```
 
 ## Create extensions.yml file
 
@@ -69,7 +74,7 @@ Every extension will require metadata stored in an extensions.yml file in order 
 - Navigate to the extensions folder using `cd extensions`.
 - Manually create a file titled `extensions.yml` within the extensions directory using an IDE or an in-line text editor.
 
-Sample extensions.yml file:
+Sample `extensions.yml` file (the name must match the `extensionName` field in the corresponding `extension.yml`:
 
 ```
 extensions:

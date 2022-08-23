@@ -42,7 +42,6 @@ public class ExtensionSettings {
 
     @Override
     public String toString() {
-        return "\nnodename: " + extensionName + "\nhostaddress: " + hostAddress + "\nhostPort: " + hostPort + "\n";
+        return "ExtensionSettings{extensionName=" + extensionName + ", hostAddress=" + hostAddress + ", hostPort=" + hostPort + "}";
     }
-
 }

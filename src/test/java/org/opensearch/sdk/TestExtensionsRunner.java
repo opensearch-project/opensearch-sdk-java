@@ -19,11 +19,14 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +35,7 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
+import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
 import org.opensearch.extensions.OpenSearchRequest;
@@ -39,20 +43,23 @@ import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
+import org.opensearch.sdk.handlers.RegisterRestActionsResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.Transport;
 
 public class TestExtensionsRunner extends OpenSearchTestCase {
 
+    private static final String EXTENSION_NAME = "sample-extension";
+
     private ExtensionsRunner extensionsRunner;
-    private Settings settings;
     private TransportService transportService;
 
+    @Override
     @BeforeEach
     public void setUp() throws Exception {
+        super.setUp();
         this.extensionsRunner = new ExtensionsRunner();
-        this.settings = Settings.builder().put("node.name", "sdk").build();
         this.transportService = spy(
             new TransportService(
                 Settings.EMPTY,
@@ -64,12 +71,6 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
                 Collections.emptySet()
             )
         );
-    }
-
-    // test ExtensionsRunner getTransportService return type is transport service
-    @Test
-    public void testGetTransportService() {
-        assert (extensionsRunner.createTransportService(settings) instanceof TransportService);
     }
 
     // test manager method invokes start on transport service
@@ -106,19 +107,39 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
             emptySet(),
             Version.CURRENT
         );
-        InitializeExtensionsRequest extensionInitRequest = new InitializeExtensionsRequest(sourceNode, null);
-        InitializeExtensionsResponse response = extensionsRunner.handleExtensionInitRequest(extensionInitRequest);
-        assertEquals(response.getName(), "extension");
+        List<DiscoveryExtension> extensions = List.of(
+            new DiscoveryExtension(
+                EXTENSION_NAME,
+                "opensearch-sdk-1",
+                "",
+                "",
+                "",
+                sourceNode.getAddress(),
+                new HashMap<String, String>(),
+                null,
+                null
+            )
+        );
 
-        // Test if the source node is set after handleExtensionInitRequest()) is called during OpenSearch bootstrap
-        assertEquals(extensionsRunner.getOpensearchNode(), sourceNode);
+        // Set mocked transport service
+        extensionsRunner.setExtensionTransportService(this.transportService);
+        doNothing().when(this.transportService).connectToNode(sourceNode);
+
+        InitializeExtensionsRequest extensionInitRequest = new InitializeExtensionsRequest(sourceNode, extensions);
+
+        InitializeExtensionsResponse response = extensionsRunner.handleExtensionInitRequest(extensionInitRequest);
+        // Test if name and unique ID are set
+        assertEquals(EXTENSION_NAME, response.getName());
+        assertEquals("opensearch-sdk-1", extensionsRunner.getUniqueId());
+        // Test if the source node is set after handleExtensionInitRequest() is called during OpenSearch bootstrap
+        assertEquals(sourceNode, extensionsRunner.getOpensearchNode());
     }
 
     @Test
     public void testHandleOpenSearchRequest() throws Exception {
 
         OpenSearchRequest request = new OpenSearchRequest(OpenSearchRequestType.REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY);
-        assertEquals(extensionsRunner.handleOpenSearchRequest(request).getClass(), NamedWriteableRegistryResponse.class);
+        assertEquals(NamedWriteableRegistryResponse.class, extensionsRunner.handleOpenSearchRequest(request).getClass());
 
         // Add additional OpenSearch request handler tests here for each default extension point
     }
@@ -147,4 +168,11 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(LocalNodeResponseHandler.class));
     }
 
+    @Test
+    public void testRegisterRestActionsRequest() {
+
+        extensionsRunner.sendRegisterRestActionsRequest(transportService);
+
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(RegisterRestActionsResponseHandler.class));
+    }
 }
