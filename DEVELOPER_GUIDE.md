@@ -1,11 +1,11 @@
 
-# OpenSearch SDK Developer Guide
+# OpenSearch SDK for Java Developer Guide
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
-    - [Git Clone OpenSearch-SDK Repo](#git-clone-OpenSearch-SDK-repo)
+    - [Git Clone OpenSearch-SDK-Java Repo](#git-clone-OpenSearch-SDK-Java-repo)
     - [Git Clone OpenSearch Repo](#git-clone-opensearch-repo)
     - [Publish OpenSearch Feature/Extensions branch to Maven local](#publish-opensearch-featureextensions-branch-to-maven-local)
-    - [Run OpenSearch-SDK](#run-opensearch-sdk)
+    - [Run OpenSearch-SDK-Java](#run-opensearch-sdk-java)
         - [Create extensions.yml file](#create-extensionsyml-file)
         - [Run OpenSearch](#run-opensearch)
     - [Publish OpenSearch-SDK to Maven Local](#publish-openSearch-sdk-to-maven-local)
@@ -19,14 +19,14 @@ Read more about extensibility [here](https://github.com/opensearch-project/OpenS
 
 ## Getting Started
 
-### Git Clone OpenSearch SDK Repo
-Fork [OpenSearch SDK](https://github.com/opensearch-project/opensearch-sdk) and clone locally, e.g. `git clone https://github.com/[your username]/opensearch-sdk.git`.
+### Git Clone OpenSearch SDK for Java Repo
+Fork [OpenSearch SDK for Java](https://github.com/opensearch-project/opensearch-sdk-java) and clone locally, e.g. `git clone https://github.com/[your username]/opensearch-sdk-java.git`.
 
 ### Git Clone OpenSearch Repo
 Fork [OpenSearch](https://github.com/opensearch-project/OpenSearch/), checkout feature/extensions branch, and clone locally, e.g. `git clone https://github.com/[your username]/OpenSearch.git`.
 
 ## Publish OpenSearch feature/extensions Branch to Maven local
-The work done to support the extensions framework is located on the `feature/extensions` branch of the OpenSearch project. It is necessary to publish the dependencies of this branch to your local maven repository prior to running the OpenSearch SDK on a seperate process. 
+The work done to support the extensions framework is located on the `feature/extensions` branch of the OpenSearch project. It is necessary to publish the dependencies of this branch to your local maven repository prior to running OpenSearch SDK for Java on a seperate process. 
 
 - First navigate to the directory that OpenSearch has been cloned to
 - Checkout the correct branch, e.g. `git checkout feature/extensions`.
@@ -35,9 +35,9 @@ The work done to support the extensions framework is located on the `feature/ext
 
 It is necessary to publish dependencies to a local maven repository until this branch is merged to `main`, at which point all dependencies will be published to Maven central.
 
-## Run OpenSearch SDK
+## Run OpenSearch SDK for Java
 
-Navigate to the directory that OpenSearch-SDK has been cloned to and run main script using `./gradlew run`.
+Navigate to the directory that OpenSearch-SDK-Java has been cloned to and run main script using `./gradlew run`.
 
 ```
 ./gradlew run
@@ -79,7 +79,7 @@ Sample `extensions.yml` file (the name must match the `extensionName` field in t
 ```
 extensions:
   - name: sample-extension
-    uniqueId: opensearch-sdk-1
+    uniqueId: opensearch-sdk-java-1
     hostName: 'sdk_host'
     hostAddress: '127.0.0.1'
     port: '4532'
@@ -88,7 +88,7 @@ extensions:
     opensearchVersion: '3.0.0'
     javaVersion: '14'
     className: ExtensionsRunner
-    customFolderName: opensearch-sdk
+    customFolderName: opensearch-sdk-java
     hasNativeController: false	
 ```
 
@@ -97,7 +97,7 @@ extensions:
 - Return to the OpenSearch directory by using `cd ..`.
 - Start OpenSearch feature/extensions branch using `./bin/opensearch`.
 
-During OpenSearch bootstrap, `ExtensionsOrchestrator` will then discover the extension listenening on a pre-defined port and execute the TCP handshake protocol to establish a data transfer connection. A request will be sent to the OpenSearch SDK and upon acknowledgment, the extension will respond with its name which will be logged onto terminal that OpenSearch is running on.
+During OpenSearch bootstrap, `ExtensionsOrchestrator` will then discover the extension listenening on a pre-defined port and execute the TCP handshake protocol to establish a data transfer connection. A request will be sent to OpenSearch SDK for Java and upon acknowledgment, the extension will respond with its name which will be logged onto terminal that OpenSearch is running on.
 
 ```
 [2022-06-16T21:30:18,857][INFO ][o.o.t.TransportService   ] [runTask-0] publish_address {127.0.0.1:9300}, bound_addresses {[::1]:9300}, {127.0.0.1:9300}
@@ -161,7 +161,7 @@ MESSAGE RECEIVED:ES-ǣ!internal:discovery/extensionsnode_extensionQSt9oKXFTSWqgX
 21:30:18.999 [opensearch[extension][transport_worker][T#6]] TRACE org.opensearch.transport.TransportService.tracer - [3][internal:discovery/extensions] sent response
 ```
 
-It is important that the OpenSearch SDK is already up and running on a seperate process prior to starting OpenSearch, since extension discovery occurs only if the OpenSearch SDK is already listening on a pre-defined port. Once discovery is complete and the data transfer connection between both nodes has been established, OpenSearch and the OpenSearch SDK will now be able to comminicate. 
+It is important that the OpenSearch SDK for Java is already up and running on a seperate process prior to starting OpenSearch, since extension discovery occurs only if the OpenSearch SDK for Java is already listening on a pre-defined port. Once discovery is complete and the data transfer connection between both nodes has been established, OpenSearch and the OpenSearch SDK for Java will now be able to comminicate. 
 
 ## Run Tests
 
@@ -170,29 +170,29 @@ Run tests :
 ./gradlew clean build test
 ```
 ## Generate Artifact
-In opensearch-sdk navigate to build/distributions. Look for tar ball in the form `opensearch-sdk-1.0.0-SNAPSHOT.tar`. If not found follow the below steps to create one:
+In opensearch-sdk-java navigate to build/distributions. Look for tar ball in the form `opensearch-sdk-java-1.0.0-SNAPSHOT.tar`. If not found follow the below steps to create one:
 ```
 ./gradlew clean && ./gradlew build
 ```
 Once the tar ball is generated navigate to /src/test/resources and look for extension.yml. Create one if not present
 Look for tar ball in /build/distributions. To run the artifact i.e. tar ball, run the below command
 ```
-tar -xvf opensearch-sdk-1.0.0-SNAPSHOT.tar
+tar -xvf opensearch-sdk-java-1.0.0-SNAPSHOT.tar
 ```
-TODO https://github.com/opensearch-project/opensearch-sdk/issues/52 
-Navigate to opensearch-sdk/build/distributions/opensearch-sdk-1.0.0-SNAPSHOT/ 
+TODO https://github.com/opensearch-project/opensearch-sdk-java/issues/52 
+Navigate to opensearch-sdk-java/build/distributions/opensearch-sdk-java-1.0.0-SNAPSHOT/ 
 - Check if src folder exists in using `ls`.
 - If the src folder does not exist, create it using `mkdir src && cd src && mkdir test && cd test && mkdir resources && cd resources`. 
-  The above command will generate a path opensearch-sdk/build/distributions/opensearch-sdk-1.0.0-SNAPSHOT/src/test/resources
+  The above command will generate a path opensearch-sdk-java/build/distributions/opensearch-sdk-java-1.0.0-SNAPSHOT/src/test/resources
 - Manually create a file titled `extension.yml` within the resources directory using an IDE or an in-line text editor. Below is the sample of extension.yml
 
 Sample extensions.yml file:
 ```
-  extensionName: extension
+  extensionName: sample-extension
   hostAddress: 127.0.0.1
   hostPort: 4532
 ```
-- After extension.yml is generated then start opensearch-sdk by ./bin/opensearch-sdk
+- After extension.yml is generated then start opensearch-sdk-java by ./bin/opensearch-sdk-java
 
 ## Submitting Changes
 

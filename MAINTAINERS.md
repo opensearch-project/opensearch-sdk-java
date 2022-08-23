@@ -1,4 +1,4 @@
-# OpenSearch-SDK Maintainers
+# OpenSearch-SDK-Java Maintainers
 
 ## Maintainers
 | Maintainer              | GitHub ID                                               | Affiliation |

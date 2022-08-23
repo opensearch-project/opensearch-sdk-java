@@ -9,7 +9,7 @@ i.e critical workloads like ingestion/search traffic would be impacted because o
 This problem is exponentially grows when we would like to run a 3rd Party plugin from the community.  
 As OpenSearch and plugins run in the same process, it brings in security risk, dependency conflicts and reduces the velocity of releases.
 
-Introducing extensions, a simple and easy way to extend features of OpenSearch. It would support all plugin features and enable them to run in a seperate process or on another node via OpenSearch SDK.
+Introducing extensions, a simple and easy way to extend features of OpenSearch. It would support all plugin features and enable them to run in a seperate process or on another node via OpenSearch SDK Java.
 
 Meta Issue: [Steps to make OpenSearch extensible](https://github.com/opensearch-project/OpenSearch/issues/2447)  
 Sandboxing: [Step towards modular architecture in OpenSearch](https://github.com/opensearch-project/OpenSearch/issues/1422)  
@@ -32,7 +32,7 @@ During the bootstrap of OpenSearch node, it class loads all the code under `~/pl
 
 ![](Docs/Extensions.png)
 
-Extensions are independent processes which are built using `opensearch-sdk`. They communicate with OpenSearch via [transport](https://github.com/opensearch-project/OpenSearch/tree/main/modules/transport-netty4) protocol which today is used to communicate between OpenSearch nodes.  
+Extensions are independent processes which are built using `opensearch-sdk-java`. They communicate with OpenSearch via [transport](https://github.com/opensearch-project/OpenSearch/tree/main/modules/transport-netty4) protocol which today is used to communicate between OpenSearch nodes.  
 Extensions are designed to extend features via transport APIs which are exposed using extension points of OpenSearch.
 
 ### Discovery
@@ -41,7 +41,7 @@ Here is an example extension configuration `extensions.yml`:
 
 ```
 extensions:
-  - name: opensearch-sdk // extension name
+  - name: sample-extension // extension name
     uniqueId: opensearch-sdk-1 // identifier for the extension
     hostName: 'sdk_host' // name of the host where extension is running
     hostAddress: '127.0.0.1' // host to reach
@@ -55,7 +55,7 @@ extensions:
 ### Communication
 As we are running extensions on the port defined in the `extensions.yml`, the communication between OpenSearch and Extensions happens using a ServerSocket which binds the port and the host address. OpenSearch will initialize the extensions during the bootstrap by making a request to all the extensions running on different ports and thus creating a medium for the future requests.
 
-### OpenSearch SDK
+### OpenSearch SDK Java
 Currently, plugins relies on extension points to communicate with OpenSearch. To turn plugins into extensions, all the extension points should be converted into Transport APIs which will be present in the SDK. Plugins need to integrate SDK, call those APIs, and later SDK will take care of the communication and the required attributes from OpenSearch.
 
 ### Settings
