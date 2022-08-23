@@ -66,29 +66,53 @@ When OpenSearch receives a registered method and URI, it will send the request t
 
 ### OpenSearch SDK for Java
 
-Currently, plugins rely on extension points to communicate with OpenSearch. These are represented as Actions. To turn plugins into extensions, the Extension must assemble a list of all methods and URIs to communicate to OpenSearch, where they will be registered; upon receiving a matching request from a user these will be forwarded back to the Extension and the Extension will further need to handle these registered methods and URIs with an appropriate Action.
+Currently, plugins rely on extension points to communicate with OpenSearch, loaded into the class loader as Actions which extend `RestHandler`. The key part of this loading is each action's `routes()` method, which registers REST methods and URIs; upon receiving a matching request from a user the registered action handles the request.
 
-### Extension Walk Through
+Extensions will use a similar registration feature, but as a separate process will not need nor use many of the features of the `RestHandler` interface.  Instead, Extension Actions will implement the `ExtensionAction` interface which requires the extension developer to implement a `routes()` method (similar to plugins) and a `getExtensionResponse()` method to take action on the corresponding REST calls.
 
-1. Extensions are started up and must be running before OpenSearch is started.  (In the future, there will be a facility to refresh the extension list during operation and handle network communication interruptions.)
+The sequence diagram below shows the process of initializing an Extension, registering its REST actions (API) with OpenSearch, and responding to a user's REST request.  A detailed description of the steps follows the diagram.
 
-2. OpenSearch is started. During its bootstrap, the `ExtensionsOrchestrator` is initialized, reading a list of extensions present in `extensions.yml`.
+The `org.opensearch.sdk.sample` package contains a sample `HelloWorldExtension` implementing the below steps. It is executed following the steps in the [`DEVELOPER_GUIDE`](DEVELOPER_GUIDE.md).
 
-3. The Node bootstrapping OpenSearch sends its `RestController`, `TransportService`, and `ClusterService` objects to the `ExtensionsOrchestrator` which initializes a `RestActionsRequestHandler` object. This completes the `ExtensionsOrchestrator` initialization.
+![](Docs/ExtensionRestActions.svg)
 
-4. The `ExtensionsOrchestrator` iterates over its configured list of extensions, sending an initialization request to each one, tracking those that respond, and initializing the `ExtensionNamedWriteableRegistry`.
+#### Extension REST Actions Walk Through
 
-5. After each Extension responds to the initialization request, it sends its REST API, a list of methods and URIs.
+##### Extension Startup
 
-6. The `RestActionsRequestHandler` registers these method/URI combinations in the `RestController` as the `routes()` that extension will handle.  This step relies on a globally unique identifier for the extension which users will use in REST requests, presently the Extension's `uniqueId`.
+(1) Extensions must implement the `Extension` interface which requires them to define their settings (name, host address and port) and a list of `ExtensionRestHandler` implementations they will handle.  They are started up using a `main()` method which passes an instance of the extension to the `ExtensionsRunner` using `ExtensionsRunner.run(this)`.
 
-At a later time:
+(2, 3, 4) Using the `ExtensionSettings` from the extension, the `ExtensionsRunner` binds to the configured host and port.
 
-7. Users send REST requests to OpenSearch.
+(5, 6, 7) Using the `List<ExtensionRestHandler>` from the extension, the `ExtensionsRunner` stores each handler (Rest Action)'s restPath (method+URI) in a map, identifying the action to execute when that combination is received by the extension.
 
-8. If the requests match the registered path/URI and `routes()` of an extension, the `RestRequest` is forwarded to the Extension, and the user receives an ACCEPTED (202) response.
+##### OpenSearch Startup, Extension Initialization, and REST Action Registration
 
-9. Upon receipt of the `RestRequest`, the extension matches it to the appropriate Action and executes it.
+(8, 9, 10) During bootstrap of the OpenSearch `Node`, it instantiates a `RestController`, passing this to the `ExtensionsOrchestrator` which subsequently passes it to a `RestActionsRequestHandler`.
+
+The `ExtensionsOrchestrator` reads a list of extensions present in `extensions.yml`. For each configured extension:
+
+(11, 12) The `ExtensionsOrchestrator` Initializes the extension using an `InitializeExtensionRequest`/`Response`, establishing the two-way transport mechanism.
+
+(13) Each `Extension` retrieves all REST paths from its pathMap (the key set).
+
+(14, 15, 16) Each `Extension` sends a `RegisterRestActionsRequest` to the `RestActionsRequestHandler`, which registers a `RestSendToExtensionAction` with the `RestController` to handle each REST path (`Route`). These routes rely on a globally unique identifier for the extension which users will use in REST requests, presently the Extension's `uniqueId`.
+
+##### Responding to User REST Requests
+
+(17) Users send REST requests to OpenSearch which are handled by the `RestController`.
+
+(18) If the requests match the registered path/URI and `routes()` of an extension, it invokes the registered `RestSendToExtensionAction`.
+
+(19) The `RestSendToExtensionAction` forwards the Method and URI to the Extension in a `RestExecuteOnExtensionRequest`.  (This class will be expanded iteratively as we add more features to include parameters, identity IDs or access tokens, and other information.)
+
+(20) The `Extension` matches the Method and URI to its pathMap to retrieve the `ExtensionRestHandler` registered to handle that combination.
+
+(21, 22) The appropriate `ExtensionRestHandler` handles the request, possibly executing complex logic, and eventually providing a response string.
+
+(23, 24) The response string is relayed by the `Extension` to the `RestActionsRequestHandler` which uses it to complete the `RestSendToExtensionAction` by returning a `BytesRestResponse`.
+
+(25) The User receives the response.
 
 ## FAQ
 
