@@ -11,16 +11,16 @@
 
 package org.opensearch.sdk;
 
-import static java.util.Collections.emptySet;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -35,18 +35,21 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
-import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
-import org.opensearch.extensions.OpenSearchRequest;
+import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
+import org.opensearch.extensions.OpenSearchRequest;
+import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
+import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
+import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
 import org.opensearch.sdk.handlers.RegisterRestActionsResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
-import org.opensearch.transport.TransportService;
 import org.opensearch.transport.Transport;
+import org.opensearch.transport.TransportService;
 
 public class TestExtensionsRunner extends OpenSearchTestCase {
 
@@ -95,7 +98,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     public void testRegisterRequestHandler() {
 
         extensionsRunner.startTransportService(transportService);
-        verify(transportService, times(5)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
+        verify(transportService, times(6)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
     }
 
     @Test
@@ -142,6 +145,15 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         assertEquals(NamedWriteableRegistryResponse.class, extensionsRunner.handleOpenSearchRequest(request).getClass());
 
         // Add additional OpenSearch request handler tests here for each default extension point
+    }
+
+    @Test
+    public void testHandleRestExecuteOnExtensionRequest() throws Exception {
+
+        RestExecuteOnExtensionRequest request = new RestExecuteOnExtensionRequest(Method.GET, "/foo");
+        RestExecuteOnExtensionResponse response = extensionsRunner.handleRestExecuteOnExtensionRequest(request);
+        assertTrue(response.getResponse().contains("GET"));
+        assertTrue(response.getResponse().contains("/foo"));
     }
 
     @Test
