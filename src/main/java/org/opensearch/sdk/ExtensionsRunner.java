@@ -73,6 +73,8 @@ public class ExtensionsRunner {
     private String uniqueId;
     private DiscoveryNode opensearchNode;
     private TransportService extensionTransportService = null;
+    private int port;
+    private String hostAddress;
 
     private final Settings settings = Settings.builder()
         .put("node.name", extensionSettings.getExtensionName())
@@ -145,6 +147,8 @@ public class ExtensionsRunner {
             return initializeExtensionsResponse;
         } finally {
             // After sending successful response to initialization, send the REST API
+            port = opensearchNode.getAddress().getPort();
+            hostAddress = opensearchNode.getAddress().getAddress();
             setOpensearchNode(opensearchNode);
             extensionTransportService.connectToNode(opensearchNode);
             sendRegisterRestActionsRequest(extensionTransportService);

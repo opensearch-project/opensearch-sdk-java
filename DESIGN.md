@@ -9,7 +9,7 @@ i.e critical workloads like ingestion/search traffic would be impacted because o
 This problem is exponentially grows when we would like to run a 3rd Party plugin from the community.  
 As OpenSearch and plugins run in the same process, it brings in security risk, dependency conflicts and reduces the velocity of releases.
 
-Introducing extensions, a simple and easy way to extend features of OpenSearch. It would support all plugin features and enable them to run in a seperate process or on another node via OpenSearch SDK.
+Introducing extensions, a simple and easy way to extend features of OpenSearch. It would support all plugin features and enable them to run in a seperate process or on another node via OpenSearch SDK Java.
 
 Meta Issue: [Steps to make OpenSearch extensible](https://github.com/opensearch-project/OpenSearch/issues/2447)  
 Sandboxing: [Step towards modular architecture in OpenSearch](https://github.com/opensearch-project/OpenSearch/issues/1422)  
@@ -32,7 +32,7 @@ During the bootstrap of OpenSearch node, it class loads all the code under `~/pl
 
 ![](Docs/Extensions.png)
 
-Extensions are independent processes which are built using `opensearch-sdk`. They communicate with OpenSearch via [transport](https://github.com/opensearch-project/OpenSearch/tree/main/modules/transport-netty4) protocol which today is used to communicate between OpenSearch nodes. This follows a Request-Response pattern.
+Extensions are independent processes which are built using `opensearch-sdk-java`. They communicate with OpenSearch via [transport](https://github.com/opensearch-project/OpenSearch/tree/main/modules/transport-netty4) protocol which today is used to communicate between OpenSearch nodes.  
 
 Extensions are designed to extend features via transport APIs which are exposed using extension points of OpenSearch.
 
@@ -64,7 +64,7 @@ Immediately following initialization, each extension will establish a connection
 
 When OpenSearch receives a registered method and URI, it will send the request to the Extension. The extension will appropriately handle the request, using the API to determine which Action to execute.
 
-### OpenSearch SDK
+### OpenSearch SDK for Java
 
 Currently, plugins rely on extension points to communicate with OpenSearch. These are represented as Actions. To turn plugins into extensions, the Extension must assemble a list of all methods and URIs to communicate to OpenSearch, where they will be registered; upon receiving a matching request from a user these will be forwarded back to the Extension and the Extension will further need to handle these registered methods and URIs with an appropriate Action.
 
