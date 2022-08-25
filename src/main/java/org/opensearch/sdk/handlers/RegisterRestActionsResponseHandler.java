@@ -27,7 +27,7 @@ public class RegisterRestActionsResponseHandler implements TransportResponseHand
 
     @Override
     public void handleResponse(RegisterRestActionsResponse response) {
-        logger.info("received {}", response);
+        logger.info("received {}", response.getResponse());
     }
 
     @Override
