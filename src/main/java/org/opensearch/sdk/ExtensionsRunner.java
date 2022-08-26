@@ -22,11 +22,8 @@ import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.PageCacheRecycler;
-<<<<<<< HEAD
 import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.extensions.ExtensionBooleanResponse;
-=======
->>>>>>> issue #28
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
 import org.opensearch.extensions.ExtensionRequest;
@@ -126,15 +123,10 @@ public class ExtensionsRunner {
      * @param extensionInitRequest  The request to handle.
      * @return A response to OpenSearch validating that this is an extension.
      */
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Update the lastest coomit
     InitializeExtensionsResponse handleExtensionInitRequest(InitializeExtensionsRequest extensionInitRequest) {
         logger.info("Registering Extension Request received from OpenSearch");
         InitializeExtensionsResponse initializeExtensionsResponse = new InitializeExtensionsResponse(extensionSettings.getExtensionName());
         opensearchNode = extensionInitRequest.getSourceNode();
-<<<<<<< HEAD
         // Fetch the unique ID
         for (DiscoveryExtension de : extensionInitRequest.getExtensions()) {
             if (de.getName().equals(extensionSettings.getExtensionName())) {
@@ -159,16 +151,6 @@ public class ExtensionsRunner {
             extensionTransportService.connectToNode(opensearchNode);
             sendRegisterRestActionsRequest(extensionTransportService);
         }
-=======
-    InitializeExtensionsResponse handlePluginsRequest(InitializeExtensionsRequest initializeExtensionsRequest) {
-        logger.info("Registering Plugin Request received from OpenSearch");
-        InitializeExtensionsResponse initializeExtensionsResponse = new InitializeExtensionsResponse("RealExtension");
-        opensearchNode = initializeExtensionsRequest.getSourceNode();
-=======
->>>>>>> Update the lastest coomit
-        setOpensearchNode(opensearchNode);
-        return initializeExtensionsResponse;
->>>>>>> issue #28
     }
 
     /**
@@ -310,19 +292,7 @@ public class ExtensionsRunner {
             false,
             false,
             InitializeExtensionsRequest::new,
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
             (request, channel, task) -> channel.sendResponse(handleExtensionInitRequest(request))
-=======
-            (request, channel, task) -> channel.sendResponse(handlePluginsRequest(request))
->>>>>>> issue #28
-=======
-            (request, channel, task) -> channel.sendResponse(handleExtensionInitRequest(request))
->>>>>>> Rename the method and fix the conflict
-=======
-            (request, channel, task) -> channel.sendResponse(handleExtensionInitRequest(request))
->>>>>>> fix merge conflict
         );
 
         transportService.registerRequestHandler(
