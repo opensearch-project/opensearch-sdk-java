@@ -12,6 +12,7 @@
 plugins {
     id 'java'
     id "com.diffplug.spotless" version "6.3.0" apply false
+    id 'jacoco'
 }
 
 
@@ -53,6 +54,16 @@ repositories {
 configurations {
   requireJavadoc
 }
+
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+    }
+}  
 
 dependencies {
     implementation "org.opensearch:opensearch:3.0.0-SNAPSHOT"
