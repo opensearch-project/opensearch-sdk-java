@@ -72,21 +72,21 @@ Currently, plugins rely on extension points to communicate with OpenSearch. Thes
 
 1. Extensions are started up and must be running before OpenSearch is started.  (In the future, there will be a facility to refresh the extension list during operation and handle network communication interruptions.)
 
-2. OpenSearch is started. During its bootstrap, the `ExtensionsOrchestrator` is initialized, reading extension definitions from `extensions.yml`.
+2. OpenSearch is started. During its bootstrap, the `ExtensionsOrchestrator` is initialized, reading a list of extensions present in `extensions.yml`.
 
-3. The Node bootstrapping OpenSearch sends its transport service and REST controller objects to the `ExtensionsOrchestrator` which initializes a `RestActionsRequestHandler` object.  This completes the `ExtensionsOrchestrator` initialization.
+3. The Node bootstrapping OpenSearch sends its `RestController`, `TransportService`, and `ClusterService` objects to the `ExtensionsOrchestrator` which initializes a `RestActionsRequestHandler` object. This completes the `ExtensionsOrchestrator` initialization.
 
-4. The `ExtensionsOrchestrator` iterates over its configured list of extensions, sending an initialization request to each one.
+4. The `ExtensionsOrchestrator` iterates over its configured list of extensions, sending an initialization request to each one, tracking those that respond, and initializing the `ExtensionNamedWriteableRegistry`.
 
-5. Each Extension responds to the initialization request and then sends its REST API, a list of methods and URIs.
+5. After each Extension responds to the initialization request, it sends its REST API, a list of methods and URIs.
 
-6. The `RestActionsRequestHandler` registers these method/URI combinations in the `RestController` as the `routes()` that extension will handle.  This step relies on a globally unique combination of the Extension's `uniqueId` and the REST method and URI.  In theory multiple extensions may share the same `uniqueId` as long as their APIs do not overlap. Using reverse-DNS style names for the `uniqueId` is recommended for published extensions.
+6. The `RestActionsRequestHandler` registers these method/URI combinations in the `RestController` as the `routes()` that extension will handle.  This step relies on a globally unique identifier for the extension which users will use in REST requests, presently the Extension's `uniqueId`.
 
 At a later time:
 
 7. Users send REST requests to OpenSearch.
 
-8. If the requests match the registered `routes()` of an extension, the `RestRequest` is forwarded to the Extension, and the user receives an ACCEPTED (202) response. 
+8. If the requests match the registered path/URI and `routes()` of an extension, the `RestRequest` is forwarded to the Extension, and the user receives an ACCEPTED (202) response.
 
 9. Upon receipt of the `RestRequest`, the extension matches it to the appropriate Action and executes it.
 
