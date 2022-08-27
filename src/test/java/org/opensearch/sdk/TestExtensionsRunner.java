@@ -26,7 +26,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -110,25 +109,23 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
             emptySet(),
             Version.CURRENT
         );
-        List<DiscoveryExtension> extensions = List.of(
-            new DiscoveryExtension(
-                EXTENSION_NAME,
-                "opensearch-sdk-1",
-                "",
-                "",
-                "",
-                sourceNode.getAddress(),
-                new HashMap<String, String>(),
-                null,
-                null
-            )
+        DiscoveryExtension extension = new DiscoveryExtension(
+            EXTENSION_NAME,
+            "opensearch-sdk-1",
+            "",
+            "",
+            "",
+            sourceNode.getAddress(),
+            new HashMap<String, String>(),
+            null,
+            null
         );
 
         // Set mocked transport service
         extensionsRunner.setExtensionTransportService(this.transportService);
         doNothing().when(this.transportService).connectToNode(sourceNode);
 
-        InitializeExtensionsRequest extensionInitRequest = new InitializeExtensionsRequest(sourceNode, extensions);
+        InitializeExtensionsRequest extensionInitRequest = new InitializeExtensionsRequest(sourceNode, extension);
 
         InitializeExtensionsResponse response = extensionsRunner.handleExtensionInitRequest(extensionInitRequest);
         // Test if name and unique ID are set
