@@ -7,6 +7,7 @@ ignore:
   - SECURITY.md
   - formatter/license-header.txt
   - src/main/resources/log4j2.xml
+  - Docs/ExtensionActions.svg
 
 rules:
   # checks if file ends in a newline character

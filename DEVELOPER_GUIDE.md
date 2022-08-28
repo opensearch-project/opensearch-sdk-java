@@ -2,13 +2,14 @@
 # OpenSearch SDK for Java Developer Guide
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
-    - [Git Clone OpenSearch-SDK-Java Repo](#git-clone-OpenSearch-SDK-Java-repo)
+    - [Git Clone OpenSearch-SDK-Java Repo](#git-clone-opensearch-sdk-for-java-repo)
     - [Git Clone OpenSearch Repo](#git-clone-opensearch-repo)
-    - [Publish OpenSearch Feature/Extensions branch to Maven local](#publish-opensearch-featureextensions-branch-to-maven-local)
-    - [Run OpenSearch-SDK-Java](#run-opensearch-sdk-java)
-        - [Create extensions.yml file](#create-extensionsyml-file)
+    - [Publish OpenSearch Feature/Extensions branch to Maven local](#publish-opensearch-feature-extensions-branch-to-maven-local)
+    - [Run the Sample Extension](#run-the-sample-extension)
+        - [Create extensions.yml file](#create-extensions-yml-file)
         - [Run OpenSearch](#run-opensearch)
-    - [Publish OpenSearch-SDK to Maven Local](#publish-openSearch-sdk-to-maven-local)
+    - [Publish OpenSearch-SDK to Maven Local](#publish-opensearch-sdk-to-maven-local)
+    - [Perform a REST Request on the Extension](#perform-a-rest-request-on-the-extension)
     - [Run Tests](#run-tests)
     - [Submitting Changes](#submitting-changes)
 
@@ -35,9 +36,9 @@ The work done to support the extensions framework is located on the `feature/ext
 
 It is necessary to publish dependencies to a local maven repository until this branch is merged to `main`, at which point all dependencies will be published to Maven central.
 
-## Run OpenSearch SDK for Java
+## Run the Sample Extension
 
-Navigate to the directory that OpenSearch-SDK-Java has been cloned to and run main script using `./gradlew run`.
+Navigate to the directory that OpenSearch-SDK-Java has been cloned to and run the Sample Extension's main method using `./gradlew run`.
 
 ```
 ./gradlew run
@@ -78,7 +79,7 @@ Sample `extensions.yml` file (the name must match the `extensionName` field in t
 
 ```
 extensions:
-  - name: sample-extension
+  - name: hello-world
     uniqueId: opensearch-sdk-java-1
     hostName: 'sdk_host'
     hostAddress: '127.0.0.1'
@@ -163,6 +164,13 @@ MESSAGE RECEIVED:ES-ǣ!internal:discovery/extensionsnode_extensionQSt9oKXFTSWqgX
 
 It is important that the OpenSearch SDK for Java is already up and running on a seperate process prior to starting OpenSearch, since extension discovery occurs only if the OpenSearch SDK for Java is already listening on a pre-defined port. Once discovery is complete and the data transfer connection between both nodes has been established, OpenSearch and the OpenSearch SDK for Java will now be able to comminicate. 
 
+## Perform a REST Request on the Extension
+
+The following request is configured to be handled by the sample `HelloWorldExtension` (note the matching uniqueId):
+```
+curl -X GET localhost:9200/_extensions/_opensearch-sdk-1/hello
+```
+
 ## Run Tests
 
 Run tests :
@@ -174,25 +182,20 @@ In opensearch-sdk-java navigate to build/distributions. Look for tar ball in the
 ```
 ./gradlew clean && ./gradlew build
 ```
-Once the tar ball is generated navigate to /src/test/resources and look for extension.yml. Create one if not present
-Look for tar ball in /build/distributions. To run the artifact i.e. tar ball, run the below command
+Once the tar ball is generated navigate to `/src/test/resources/sample` and look for `extension-settings.yml`. Create one if not present
+Look for tar ball in `/build/distributions`. To run the artifact i.e., tar ball, run the below command
 ```
 tar -xvf opensearch-sdk-java-1.0.0-SNAPSHOT.tar
 ```
-TODO https://github.com/opensearch-project/opensearch-sdk-java/issues/52 
-Navigate to opensearch-sdk-java/build/distributions/opensearch-sdk-java-1.0.0-SNAPSHOT/ 
-- Check if src folder exists in using `ls`.
-- If the src folder does not exist, create it using `mkdir src && cd src && mkdir test && cd test && mkdir resources && cd resources`. 
-  The above command will generate a path opensearch-sdk-java/build/distributions/opensearch-sdk-java-1.0.0-SNAPSHOT/src/test/resources
-- Manually create a file titled `extension.yml` within the resources directory using an IDE or an in-line text editor. Below is the sample of extension.yml
 
-Sample extensions.yml file:
+The artifact will include extension settings for the sample extension on the class path under the path `/sample/extension-settings.yml`. This path is used by the sample `HelloWorldExtension`. 
+
 ```
-  extensionName: sample-extension
+  extensionName: hello-world
   hostAddress: 127.0.0.1
   hostPort: 4532
 ```
-- After extension.yml is generated then start opensearch-sdk-java by ./bin/opensearch-sdk-java
+- Start the sample extension with `./bin/opensearch-sdk-java`
 
 ## Submitting Changes
 
