@@ -36,7 +36,7 @@ public class TestRestHelloAction extends OpenSearchTestCase {
     }
 
     @Test
-    public void testExtensioResponse() {
+    public void testExtensionResponse() {
         assertEquals("Hello, World!", helloAction.getExtensionResponse(Method.GET, "/hello"));
         assertNull(helloAction.getExtensionResponse(Method.PUT, "/hello"));
         assertNull(helloAction.getExtensionResponse(Method.GET, "/goodbye"));
