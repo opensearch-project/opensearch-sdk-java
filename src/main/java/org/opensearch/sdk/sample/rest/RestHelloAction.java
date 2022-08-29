@@ -9,7 +9,7 @@ package org.opensearch.sdk.sample.rest;
 
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest.Method;
-import org.opensearch.sdk.ExtensionAction;
+import org.opensearch.sdk.ExtensionRestHandler;
 
 import java.util.List;
 
@@ -17,9 +17,9 @@ import static java.util.Collections.singletonList;
 import static org.opensearch.rest.RestRequest.Method.GET;
 
 /**
- * Sample Action. Extension Actions must implement {@link ExtensionAction}.
+ * Sample REST Handler (REST Action). Extension REST handlers must implement {@link ExtensionRestHandler}.
  */
-public class RestHelloAction implements ExtensionAction {
+public class RestHelloAction implements ExtensionRestHandler {
 
     private static final String GREETING = "Hello, World!";
 
@@ -29,7 +29,7 @@ public class RestHelloAction implements ExtensionAction {
     }
 
     @Override
-    public String getExtensionResponse(Method method, String uri) {
+    public String handleRequest(Method method, String uri) {
         if (Method.GET.equals(method) && "/hello".equals(uri)) {
             return GREETING;
         }

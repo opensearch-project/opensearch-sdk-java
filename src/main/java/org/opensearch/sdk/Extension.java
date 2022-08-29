@@ -30,11 +30,11 @@ public interface Extension {
     ExtensionSettings getExtensionSettings();
 
     /**
-     * Gets a list of {@link ExtensionAction} implementations this extension handles.
+     * Gets a list of {@link ExtensionRestHandler} implementations this extension handles.
      *
-     * @return a list of Actions this extension handles.
+     * @return a list of REST handlers (REST actions) this extension handles.
      */
-    List<ExtensionAction> getExtensionActions();
+    List<ExtensionRestHandler> getExtensionRestHandlers();
 
     /**
      * Helper method to read extension settings from a YAML file.

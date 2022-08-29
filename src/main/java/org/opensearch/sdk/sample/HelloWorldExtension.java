@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.opensearch.sdk.Extension;
-import org.opensearch.sdk.ExtensionAction;
+import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionSettings;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.sample.rest.RestHelloAction;
@@ -20,9 +20,8 @@ import org.opensearch.sdk.sample.rest.RestHelloAction;
  * Sample class to demonstrate how to use the OpenSearch SDK for Java to create
  * an extension.
  * <p>
- * To create your own extension, implement the getSettings and getExtensionActions methods.
- * You may either create an {@link ExtensionSettings} object directly with the constructor,
- * or read it from a yml file on your class path.
+ * To create your own extension, implement the {@link #getExtensionSettings()} and {@link #getExtensionRestHandlers()} methods.
+ * You may either create an {@link ExtensionSettings} object directly with the constructor, or read it from a YAML file on your class path.
  * <p>
  * To execute, pass an instatiated object of this class to {@link ExtensionsRunner#run(Extension)}.
  */
@@ -39,17 +38,11 @@ public class HelloWorldExtension implements Extension {
     private ExtensionSettings settings;
 
     /**
-     * The REST actions are action classes which handle REST requests.
-     */
-    private List<ExtensionAction> extensionActions;
-
-    /**
      * Instantiate this extension, initializing the connection settings and REST actions.
      */
     public HelloWorldExtension() {
         try {
             this.settings = initializeSettings();
-            this.extensionActions = listRestActions();
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -61,8 +54,8 @@ public class HelloWorldExtension implements Extension {
     }
 
     @Override
-    public List<ExtensionAction> getExtensionActions() {
-        return this.extensionActions;
+    public List<ExtensionRestHandler> getExtensionRestHandlers() {
+        return List.of(new RestHelloAction());
     }
 
     /**
@@ -79,15 +72,6 @@ public class HelloWorldExtension implements Extension {
             throw new IOException("Failed to initialize Extension settings. No port bound.");
         }
         return settings;
-    }
-
-    /**
-     * The extension must provide handlers for all the REST actions it handles.
-     *
-     * @return A list of this extension's REST actions.
-     */
-    private static List<ExtensionAction> listRestActions() {
-        return List.of(new RestHelloAction());
     }
 
     /**

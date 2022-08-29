@@ -13,33 +13,33 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest.Method;
-import org.opensearch.sdk.ExtensionAction;
+import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestRestHelloAction extends OpenSearchTestCase {
 
-    private ExtensionAction helloAction;
+    private ExtensionRestHandler restHelloAction;
 
     @Override
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        helloAction = new RestHelloAction();
+        restHelloAction = new RestHelloAction();
     }
 
     @Test
     public void testRoutes() {
-        List<Route> routes = helloAction.routes();
+        List<Route> routes = restHelloAction.routes();
         assertEquals(1, routes.size());
         assertEquals(Method.GET, routes.get(0).getMethod());
         assertEquals("/hello", routes.get(0).getPath());
     }
 
     @Test
-    public void testExtensionResponse() {
-        assertEquals("Hello, World!", helloAction.getExtensionResponse(Method.GET, "/hello"));
-        assertNull(helloAction.getExtensionResponse(Method.PUT, "/hello"));
-        assertNull(helloAction.getExtensionResponse(Method.GET, "/goodbye"));
+    public void testHandleRequest() {
+        assertEquals("Hello, World!", restHelloAction.handleRequest(Method.GET, "/hello"));
+        assertNull(restHelloAction.handleRequest(Method.PUT, "/hello"));
+        assertNull(restHelloAction.handleRequest(Method.GET, "/goodbye"));
     }
 
 }

@@ -75,7 +75,7 @@ public class ExtensionsRunner {
     private static final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
     private static final String NODE_NAME_SETTING = "node.name";
 
-    private Map<String, ExtensionAction> extensionRestPathMap = new HashMap<>();
+    private Map<String, ExtensionRestHandler> extensionRestPathMap = new HashMap<>();
     private String uniqueId;
     private DiscoveryNode opensearchNode;
     private TransportService extensionTransportService = null;
@@ -112,11 +112,11 @@ public class ExtensionsRunner {
             .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
             .build();
-        // store rest actions in the map
-        for (ExtensionAction extensionAction : extension.getExtensionActions()) {
-            for (Route route : extensionAction.routes()) {
+        // store rest handlers in the map
+        for (ExtensionRestHandler extensionRestHandler : extension.getExtensionRestHandlers()) {
+            for (Route route : extensionRestHandler.routes()) {
                 String restPath = route.getMethod().name() + " " + route.getPath();
-                extensionRestPathMap.put(restPath, extensionAction);
+                extensionRestPathMap.put(restPath, extensionRestHandler);
             }
         }
         // initialize the transport service
@@ -225,12 +225,12 @@ public class ExtensionsRunner {
     RestExecuteOnExtensionResponse handleRestExecuteOnExtensionRequest(RestExecuteOnExtensionRequest request) {
 
         String restPath = request.getMethod().name() + " " + request.getUri();
-        ExtensionAction restAction = extensionRestPathMap.get(restPath);
-        if (restAction == null) {
+        ExtensionRestHandler restHandler = extensionRestPathMap.get(restPath);
+        if (restHandler == null) {
             return new RestExecuteOnExtensionResponse("FAILED: No handler for " + restPath);
         }
         // Get response from extension
-        String response = restAction.getExtensionResponse(request.getMethod(), request.getUri());
+        String response = restHandler.handleRequest(request.getMethod(), request.getUri());
         logger.info("Sending extension response to OpenSearch: " + response);
         return new RestExecuteOnExtensionResponse(response);
     }
