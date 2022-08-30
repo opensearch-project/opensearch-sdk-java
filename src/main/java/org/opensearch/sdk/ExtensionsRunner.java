@@ -22,7 +22,6 @@ import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.PageCacheRecycler;
-import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
@@ -125,24 +124,11 @@ public class ExtensionsRunner {
      */
     InitializeExtensionsResponse handleExtensionInitRequest(InitializeExtensionsRequest extensionInitRequest) {
         logger.info("Registering Extension Request received from OpenSearch");
-        InitializeExtensionsResponse initializeExtensionsResponse = new InitializeExtensionsResponse(extensionSettings.getExtensionName());
         opensearchNode = extensionInitRequest.getSourceNode();
-        // Fetch the unique ID
-        for (DiscoveryExtension de : extensionInitRequest.getExtensions()) {
-            if (de.getName().equals(extensionSettings.getExtensionName())) {
-                setUniqueId(de.getId());
-                break;
-            }
-        }
-        // We could avoid this check if we only send one extension in the initialize request, rather than the entire list
-        if (getUniqueId() == null) {
-            throw new IllegalArgumentException(
-                "Extension " + extensionSettings.getExtensionName() + " does not match any requested extension."
-            );
-        }
+        setUniqueId(extensionInitRequest.getExtension().getId());
         // Successfully initialized. Send the response.
         try {
-            return initializeExtensionsResponse;
+            return new InitializeExtensionsResponse(extensionSettings.getExtensionName());
         } finally {
             // After sending successful response to initialization, send the REST API
             port = opensearchNode.getAddress().getPort();

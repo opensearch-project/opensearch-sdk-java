@@ -11,22 +11,21 @@
 
 package org.opensearch.sdk;
 
-import static java.util.Collections.emptySet;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,18 +34,18 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
-import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
-import org.opensearch.extensions.OpenSearchRequest;
+import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
+import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
 import org.opensearch.sdk.handlers.RegisterRestActionsResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
-import org.opensearch.transport.TransportService;
 import org.opensearch.transport.Transport;
+import org.opensearch.transport.TransportService;
 
 public class TestExtensionsRunner extends OpenSearchTestCase {
 
@@ -107,25 +106,23 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
             emptySet(),
             Version.CURRENT
         );
-        List<DiscoveryExtension> extensions = List.of(
-            new DiscoveryExtension(
-                EXTENSION_NAME,
-                "opensearch-sdk-1",
-                "",
-                "",
-                "",
-                sourceNode.getAddress(),
-                new HashMap<String, String>(),
-                null,
-                null
-            )
+        DiscoveryExtension extension = new DiscoveryExtension(
+            EXTENSION_NAME,
+            "opensearch-sdk-1",
+            "",
+            "",
+            "",
+            sourceNode.getAddress(),
+            new HashMap<String, String>(),
+            null,
+            null
         );
 
         // Set mocked transport service
         extensionsRunner.setExtensionTransportService(this.transportService);
         doNothing().when(this.transportService).connectToNode(sourceNode);
 
-        InitializeExtensionsRequest extensionInitRequest = new InitializeExtensionsRequest(sourceNode, extensions);
+        InitializeExtensionsRequest extensionInitRequest = new InitializeExtensionsRequest(sourceNode, extension);
 
         InitializeExtensionsResponse response = extensionsRunner.handleExtensionInitRequest(extensionInitRequest);
         // Test if name and unique ID are set
