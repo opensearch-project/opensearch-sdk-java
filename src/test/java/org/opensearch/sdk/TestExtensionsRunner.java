@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verify;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -41,7 +42,9 @@ import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
 import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
+import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest.Method;
+import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
@@ -149,8 +152,12 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         RestExecuteOnExtensionRequest request = new RestExecuteOnExtensionRequest(Method.GET, "/foo");
         RestExecuteOnExtensionResponse response = extensionsRunner.handleRestExecuteOnExtensionRequest(request);
-        assertTrue(response.getResponse().contains("GET"));
-        assertTrue(response.getResponse().contains("/foo"));
+        // this will fail in test environment with no registered actions
+        assertEquals(RestStatus.INTERNAL_SERVER_ERROR, response.getStatus());
+        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.getContentType());
+        String responseStr = new String(response.getContent(), StandardCharsets.UTF_8);
+        assertTrue(responseStr.contains("GET"));
+        assertTrue(responseStr.contains("/foo"));
     }
 
     @Test

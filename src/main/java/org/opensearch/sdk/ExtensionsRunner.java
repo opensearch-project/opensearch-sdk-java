@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.opensearch.Version;
 import org.opensearch.cluster.ClusterModule;
 import org.opensearch.cluster.node.DiscoveryNode;
+import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
 import org.opensearch.extensions.OpenSearchRequest;
@@ -35,7 +36,9 @@ import org.opensearch.index.IndicesModuleResponse;
 import org.opensearch.indices.IndicesModule;
 import org.opensearch.indices.breaker.CircuitBreakerService;
 import org.opensearch.indices.breaker.NoneCircuitBreakerService;
+import org.opensearch.rest.RestStatus;
 import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.rest.RestResponse;
 import org.opensearch.transport.netty4.Netty4Transport;
 import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
@@ -227,12 +230,17 @@ public class ExtensionsRunner {
         String restPath = request.getMethod().name() + " " + request.getUri();
         ExtensionRestHandler restHandler = extensionRestPathMap.get(restPath);
         if (restHandler == null) {
-            return new RestExecuteOnExtensionResponse("FAILED: No handler for " + restPath);
+            return new RestExecuteOnExtensionResponse(RestStatus.INTERNAL_SERVER_ERROR, "No handler for " + restPath);
         }
         // Get response from extension
-        String response = restHandler.handleRequest(request.getMethod(), request.getUri());
-        logger.info("Sending extension response to OpenSearch: " + response);
-        return new RestExecuteOnExtensionResponse(response);
+        RestResponse response = restHandler.handleRequest(request.getMethod(), request.getUri());
+        logger.info("Sending extension response to OpenSearch: " + response.status());
+        return new RestExecuteOnExtensionResponse(
+            response.status(),
+            response.contentType(),
+            BytesReference.toBytes(response.content()),
+            response.getHeaders()
+        );
     }
 
     /**
