@@ -36,6 +36,7 @@ import org.opensearch.indices.IndicesModule;
 import org.opensearch.indices.breaker.CircuitBreakerService;
 import org.opensearch.indices.breaker.NoneCircuitBreakerService;
 import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.sdk.api.TransportActionsAPI;
 import org.opensearch.transport.netty4.Netty4Transport;
 import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
@@ -84,6 +85,10 @@ public class ExtensionsRunner {
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
     private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
+    /*
+     * TODO: expose an interface for extension to register actions for HelloWorld Extension
+     */
+    private TransportActionsAPI transportActionsAPI = new TransportActionsAPI(new HashMap<>());
 
     /**
      * Instantiates a new Extensions Runner using test settings.
@@ -169,6 +174,7 @@ public class ExtensionsRunner {
             setOpensearchNode(opensearchNode);
             extensionTransportService.connectToNode(opensearchNode);
             sendRegisterRestActionsRequest(extensionTransportService);
+            transportActionsAPI.sendRegisterTransportActionsRequest(extensionTransportService, opensearchNode);
         }
     }
 
