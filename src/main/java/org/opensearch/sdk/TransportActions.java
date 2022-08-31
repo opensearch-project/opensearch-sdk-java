@@ -5,7 +5,7 @@
  * this file be licensed under the Apache-2.0 license or a
  * compatible open source license.
  */
-package org.opensearch.sdk.api;
+package org.opensearch.sdk;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

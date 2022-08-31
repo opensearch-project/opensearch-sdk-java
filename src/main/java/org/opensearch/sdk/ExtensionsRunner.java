@@ -36,7 +36,6 @@ import org.opensearch.indices.IndicesModule;
 import org.opensearch.indices.breaker.CircuitBreakerService;
 import org.opensearch.indices.breaker.NoneCircuitBreakerService;
 import org.opensearch.rest.RestHandler.Route;
-import org.opensearch.sdk.api.TransportActions;
 import org.opensearch.transport.netty4.Netty4Transport;
 import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;

@@ -13,7 +13,6 @@ import org.opensearch.common.io.stream.Writeable;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.extensions.ExtensionsOrchestrator;
-import org.opensearch.sdk.api.TransportActions;
 import org.opensearch.sdk.handlers.ExtensionResponseHandler;
 import org.opensearch.tasks.Task;
 import org.opensearch.test.OpenSearchTestCase;
