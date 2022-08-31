@@ -29,7 +29,7 @@ public class TransportActions {
     private Map<String, Class> transportActions;
 
     /**
-     * Constructor for TransportActionsAPI. Creates a map of transportActions for this extension.
+     * Constructor for TransportActions. Creates a map of transportActions for this extension.
      * @param transportActions is the list of actions the extension would like to register with OpenSearch.
      */
     public <Request extends ActionRequest, Response extends ActionResponse> TransportActions(
