@@ -21,7 +21,7 @@ import java.io.IOException;
  * This class handles the response {{@link org.opensearch.extensions.ExtensionBooleanResponse }} from OpenSearch to Extension.
  */
 public class GenericResponseHandler implements TransportResponseHandler<ExtensionBooleanResponse> {
-    private static final Logger logger = LogManager.getLogger(RegisterRestActionsResponseHandler.class);
+    private static final Logger logger = LogManager.getLogger(GenericResponseHandler.class);
 
     @Override
     public void handleResponse(ExtensionBooleanResponse response) {

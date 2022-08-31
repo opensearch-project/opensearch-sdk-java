@@ -50,7 +50,7 @@ public class TransportActionsAPI {
                 registerTransportActionsResponseHandler
             );
         } catch (Exception e) {
-            logger.info("Failed to send Register REST Actions request to OpenSearch", e);
+            logger.info("Failed to send Register Transport Actions request to OpenSearch", e);
         }
     }
 }
