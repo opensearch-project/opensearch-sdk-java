@@ -39,6 +39,9 @@ import org.opensearch.discovery.InitializeExtensionsResponse;
 import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
 import org.opensearch.extensions.OpenSearchRequest;
+import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
+import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
+import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
@@ -94,7 +97,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     public void testRegisterRequestHandler() {
 
         extensionsRunner.startTransportService(transportService);
-        verify(transportService, times(5)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
+        verify(transportService, times(6)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
     }
 
     @Test
@@ -139,6 +142,15 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         assertEquals(NamedWriteableRegistryResponse.class, extensionsRunner.handleOpenSearchRequest(request).getClass());
 
         // Add additional OpenSearch request handler tests here for each default extension point
+    }
+
+    @Test
+    public void testHandleRestExecuteOnExtensionRequest() throws Exception {
+
+        RestExecuteOnExtensionRequest request = new RestExecuteOnExtensionRequest(Method.GET, "/foo");
+        RestExecuteOnExtensionResponse response = extensionsRunner.handleRestExecuteOnExtensionRequest(request);
+        assertTrue(response.getResponse().contains("GET"));
+        assertTrue(response.getResponse().contains("/foo"));
     }
 
     @Test

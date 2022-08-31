@@ -10,7 +10,7 @@ package org.opensearch.sdk.handlers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.io.stream.StreamInput;
-import org.opensearch.extensions.RegisterRestActionsResponse;
+import org.opensearch.extensions.rest.RegisterRestActionsResponse;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportException;
@@ -27,7 +27,7 @@ public class RegisterRestActionsResponseHandler implements TransportResponseHand
 
     @Override
     public void handleResponse(RegisterRestActionsResponse response) {
-        logger.info("received {}", response);
+        logger.info("received {}", response.getResponse());
     }
 
     @Override

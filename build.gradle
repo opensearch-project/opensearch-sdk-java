@@ -26,7 +26,7 @@ apply plugin: 'application'
 apply from: 'gradle/formatting.gradle'
 apply plugin: 'maven-publish'
 
-mainClassName = 'org.opensearch.sdk.ExtensionsRunner'
+mainClassName = 'org.opensearch.sdk.sample.HelloWorldExtension'
 
 group 'org.opensearch.sdk'
 version '1.0.0-SNAPSHOT'
