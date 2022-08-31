@@ -36,7 +36,7 @@ import org.opensearch.indices.IndicesModule;
 import org.opensearch.indices.breaker.CircuitBreakerService;
 import org.opensearch.indices.breaker.NoneCircuitBreakerService;
 import org.opensearch.rest.RestHandler.Route;
-import org.opensearch.sdk.api.TransportActionsAPI;
+import org.opensearch.sdk.api.TransportActions;
 import org.opensearch.transport.netty4.Netty4Transport;
 import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
@@ -87,8 +87,9 @@ public class ExtensionsRunner {
     private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
     /*
      * TODO: expose an interface for extension to register actions
+     * https://github.com/opensearch-project/opensearch-sdk-java/issues/119
      */
-    private TransportActionsAPI transportActionsAPI = new TransportActionsAPI(new HashMap<>());
+    private TransportActions transportActions = new TransportActions(new HashMap<>());
 
     /**
      * Instantiates a new Extensions Runner using test settings.
@@ -174,7 +175,7 @@ public class ExtensionsRunner {
             setOpensearchNode(opensearchNode);
             extensionTransportService.connectToNode(opensearchNode);
             sendRegisterRestActionsRequest(extensionTransportService);
-            transportActionsAPI.sendRegisterTransportActionsRequest(extensionTransportService, opensearchNode);
+            transportActions.sendRegisterTransportActionsRequest(extensionTransportService, opensearchNode);
         }
     }
 

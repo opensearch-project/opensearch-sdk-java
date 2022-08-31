@@ -3,12 +3,19 @@ package org.opensearch.sdk;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.Version;
+import org.opensearch.action.ActionListener;
+import org.opensearch.action.main.MainRequest;
+import org.opensearch.action.main.MainResponse;
+import org.opensearch.action.support.ActionFilters;
+import org.opensearch.action.support.HandledTransportAction;
 import org.opensearch.cluster.node.DiscoveryNode;
+import org.opensearch.common.io.stream.Writeable;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.extensions.ExtensionsOrchestrator;
-import org.opensearch.sdk.api.TransportActionsAPI;
-import org.opensearch.sdk.handlers.GenericResponseHandler;
+import org.opensearch.sdk.api.TransportActions;
+import org.opensearch.sdk.handlers.ExtensionResponseHandler;
+import org.opensearch.tasks.Task;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.Transport;
 import org.opensearch.transport.TransportService;
@@ -29,14 +36,31 @@ import static org.mockito.Mockito.verify;
 public class TestExtensionTransportActionsAPI extends OpenSearchTestCase {
 
     private TransportService transportService;
-    private TransportActionsAPI transportActionsAPI;
+    private TransportActions transportActions;
     private DiscoveryNode opensearchNode;
+
+    private class TestTransportAction extends HandledTransportAction<MainRequest, MainResponse> {
+
+        protected TestTransportAction(
+            String actionName,
+            TransportService transportService,
+            ActionFilters actionFilters,
+            Writeable.Reader<MainRequest> mainRequestReader
+        ) {
+            super(actionName, transportService, actionFilters, mainRequestReader);
+        }
+
+        @Override
+        protected void doExecute(Task task, MainRequest request, ActionListener<MainResponse> actionListener) {
+
+        }
+    }
 
     @Override
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        this.transportActionsAPI = new TransportActionsAPI(Map.of("testAction", Map.class));
+        this.transportActions = new TransportActions(Map.of("testAction", TestTransportAction.class));
         this.transportService = spy(
             new TransportService(
                 Settings.EMPTY,
@@ -59,12 +83,12 @@ public class TestExtensionTransportActionsAPI extends OpenSearchTestCase {
 
     @Test
     public void testRegisterTransportAction() {
-        transportActionsAPI.sendRegisterTransportActionsRequest(transportService, opensearchNode);
+        transportActions.sendRegisterTransportActionsRequest(transportService, opensearchNode);
         verify(transportService, times(1)).sendRequest(
             any(),
             eq(ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_TRANSPORT_ACTIONS),
             any(),
-            any(GenericResponseHandler.class)
+            any(ExtensionResponseHandler.class)
         );
     }
 }

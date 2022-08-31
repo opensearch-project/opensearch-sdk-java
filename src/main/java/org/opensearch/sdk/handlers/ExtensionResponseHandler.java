@@ -20,8 +20,8 @@ import java.io.IOException;
 /**
  * This class handles the response {{@link org.opensearch.extensions.ExtensionBooleanResponse }} from OpenSearch to Extension.
  */
-public class GenericResponseHandler implements TransportResponseHandler<ExtensionBooleanResponse> {
-    private static final Logger logger = LogManager.getLogger(GenericResponseHandler.class);
+public class ExtensionResponseHandler implements TransportResponseHandler<ExtensionBooleanResponse> {
+    private static final Logger logger = LogManager.getLogger(ExtensionResponseHandler.class);
 
     @Override
     public void handleResponse(ExtensionBooleanResponse response) {
@@ -30,7 +30,7 @@ public class GenericResponseHandler implements TransportResponseHandler<Extensio
 
     @Override
     public void handleException(TransportException exp) {
-        logger.info("SDK Request failed", exp);
+        logger.info("Extension Request failed", exp);
     }
 
     @Override

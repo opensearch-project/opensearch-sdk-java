@@ -9,10 +9,13 @@ package org.opensearch.sdk.api;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.opensearch.action.ActionRequest;
+import org.opensearch.action.ActionResponse;
+import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.extensions.RegisterTransportActionsRequest;
-import org.opensearch.sdk.handlers.GenericResponseHandler;
+import org.opensearch.sdk.handlers.ExtensionResponseHandler;
 import org.opensearch.transport.TransportService;
 
 import java.util.HashMap;
@@ -21,15 +24,17 @@ import java.util.Map;
 /**
  * This class helps manage transport actions for SDK
  */
-public class TransportActionsAPI {
-    private final Logger logger = LogManager.getLogger(TransportActionsAPI.class);
+public class TransportActions {
+    private final Logger logger = LogManager.getLogger(TransportActions.class);
     private Map<String, Class> transportActions;
 
     /**
      * Constructor for TransportActionsAPI. Creates a map of transportActions for this extension.
      * @param transportActions is the list of actions the extension would like to register with OpenSearch.
      */
-    public TransportActionsAPI(Map<String, Class> transportActions) {
+    public <Request extends ActionRequest, Response extends ActionResponse> TransportActions(
+        Map<String, Class<? extends TransportAction<Request, Response>>> transportActions
+    ) {
         this.transportActions = new HashMap(transportActions);
     }
 
@@ -40,8 +45,8 @@ public class TransportActionsAPI {
      * @param opensearchNode The OpenSearch node where transport actions being registered.
      */
     public void sendRegisterTransportActionsRequest(TransportService transportService, DiscoveryNode opensearchNode) {
-        logger.info("Sending Register Transport Actions request to OpenSearch for ");
-        GenericResponseHandler registerTransportActionsResponseHandler = new GenericResponseHandler();
+        logger.info("Sending Register Transport Actions request to OpenSearch");
+        ExtensionResponseHandler registerTransportActionsResponseHandler = new ExtensionResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
