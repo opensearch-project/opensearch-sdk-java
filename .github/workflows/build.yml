@@ -20,7 +20,7 @@ jobs:
           distribution: adopt
       - name: Run Gradle Check
         run: |
-          ./gradlew check --coverage
+          ./gradlew check
       - name: Upload Coverage Report
         uses: codecov/codecov-action@v3.1.0
         with:
