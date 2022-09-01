@@ -84,6 +84,11 @@ public class ExtensionsRunner {
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
     private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
+    /*
+     * TODO: expose an interface for extension to register actions
+     * https://github.com/opensearch-project/opensearch-sdk-java/issues/119
+     */
+    private TransportActions transportActions = new TransportActions(new HashMap<>());
 
     /**
      * Instantiates a new Extensions Runner using test settings.
@@ -169,6 +174,7 @@ public class ExtensionsRunner {
             setOpensearchNode(opensearchNode);
             extensionTransportService.connectToNode(opensearchNode);
             sendRegisterRestActionsRequest(extensionTransportService);
+            transportActions.sendRegisterTransportActionsRequest(extensionTransportService, opensearchNode);
         }
     }
 
