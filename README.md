@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/opensearch-project/opensearch-sdk-java/branch/main/graph/badge.svg)](https://codecov.io/gh/opensearch-project/opensearch-sdk-java)
+
 # OpenSearch SDK
 - [Introduction](#introduction)
 - [Contributing](#contributing)

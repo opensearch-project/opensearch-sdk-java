@@ -12,6 +12,7 @@
 plugins {
     id 'java'
     id "com.diffplug.spotless" version "6.3.0" apply false
+    id 'jacoco'
 }
 
 
@@ -112,4 +113,15 @@ test {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
     }
+    jacoco {
+        classDumpDir = file("$buildDir/jacoco/classpathdumps")
+    }
+    finalizedBy jacocoTestReport
 }
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+    }
+}  
