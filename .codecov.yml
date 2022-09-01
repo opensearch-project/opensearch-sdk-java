@@ -1,13 +1,9 @@
-codecov:
-  require_ci_to_pass: yes
-
 coverage:
   precision: 2
   round: down
-  range: "70...100"
+  range: "70...90"
   status:
     project:
       default:
-        target: 70%    # the required coverage value
-        threshold: 1%  # the leniency in hitting the target
-        
+        target: auto    # the required coverage value
+        threshold: 0.2%  # the leniency in hitting the target
