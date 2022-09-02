@@ -7,12 +7,17 @@
  */
 package org.opensearch.sdk.sample.rest;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest.Method;
+import org.opensearch.common.bytes.BytesReference;
+import org.opensearch.rest.BytesRestResponse;
+import org.opensearch.rest.RestResponse;
+import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.test.OpenSearchTestCase;
 
@@ -37,9 +42,23 @@ public class TestRestHelloAction extends OpenSearchTestCase {
 
     @Test
     public void testHandleRequest() {
-        assertEquals("Hello, World!", restHelloAction.handleRequest(Method.GET, "/hello"));
-        assertNull(restHelloAction.handleRequest(Method.PUT, "/hello"));
-        assertNull(restHelloAction.handleRequest(Method.GET, "/goodbye"));
+        RestResponse response = restHelloAction.handleRequest(Method.GET, "/hello");
+        assertEquals(RestStatus.OK, response.status());
+        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
+        String responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
+        assertEquals("Hello, World!", responseStr);
+
+        response = restHelloAction.handleRequest(Method.PUT, "/hello");
+        assertEquals(RestStatus.INTERNAL_SERVER_ERROR, response.status());
+        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
+        responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
+        assertTrue(responseStr.contains("PUT"));
+
+        response = restHelloAction.handleRequest(Method.GET, "/goodbye");
+        assertEquals(RestStatus.INTERNAL_SERVER_ERROR, response.status());
+        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
+        responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
+        assertTrue(responseStr.contains("/goodbye"));
     }
 
 }
