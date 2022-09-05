@@ -5,7 +5,7 @@
  * this file be licensed under the Apache-2.0 license or a
  * compatible open source license.
  */
-package org.opensearch.sdk.sample.rest;
+package org.opensearch.sdk.sample.helloworld.rest;
 
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestHandler.Route;

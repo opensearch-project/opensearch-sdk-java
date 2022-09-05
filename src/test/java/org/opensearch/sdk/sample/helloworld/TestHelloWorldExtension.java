@@ -5,7 +5,7 @@
  * this file be licensed under the Apache-2.0 license or a
  * compatible open source license.
  */
-package org.opensearch.sdk.sample;
+package org.opensearch.sdk.sample.helloworld;
 
 import java.util.List;
 

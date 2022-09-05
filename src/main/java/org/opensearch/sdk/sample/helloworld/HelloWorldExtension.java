@@ -5,7 +5,7 @@
  * this file be licensed under the Apache-2.0 license or a
  * compatible open source license.
  */
-package org.opensearch.sdk.sample;
+package org.opensearch.sdk.sample.helloworld;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,7 +14,7 @@ import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionSettings;
 import org.opensearch.sdk.ExtensionsRunner;
-import org.opensearch.sdk.sample.rest.RestHelloAction;
+import org.opensearch.sdk.sample.helloworld.rest.RestHelloAction;
 
 /**
  * Sample class to demonstrate how to use the OpenSearch SDK for Java to create
@@ -30,7 +30,7 @@ public class HelloWorldExtension implements Extension {
     /**
      * Optional classpath-relative path to a yml file containing extension settings.
      */
-    private static final String EXTENSION_SETTINGS_PATH = "/sample/extension-settings.yml";
+    private static final String EXTENSION_SETTINGS_PATH = "/sample/helloworld-settings.yml";
 
     /**
      * The extension settings include a name, host address, and port.

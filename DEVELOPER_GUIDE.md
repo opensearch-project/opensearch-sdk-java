@@ -8,13 +8,13 @@
     - [Run the Sample Extension](#run-the-sample-extension)
         - [Create extensions.yml file](#create-extensions-yml-file)
         - [Run OpenSearch](#run-opensearch)
-    - [Publish OpenSearch-SDK to Maven Local](#publish-opensearch-sdk-to-maven-local)
+    - [Publish OpenSearch SDK for Java to Maven Local](#publish-opensearch-sdk-for-java-to-maven-local)
     - [Perform a REST Request on the Extension](#perform-a-rest-request-on-the-extension)
     - [Run Tests](#run-tests)
     - [Submitting Changes](#submitting-changes)
 
 ## Introduction
-Opensearch plugins have allowed the extension and ehancements of various core features however, current plugin architecture carries the risk of fatally impacting clusters should they fail. In order to ensure that plugins may run safely without impacting the system, our goal is to effectively isolate plugin interactions with OpenSearch by modularizing the [extension points](https://opensearch.org/blog/technical-post/2021/12/plugins-intro/) to which they hook onto. 
+OpenSearch plugins have allowed the extension and enhancements of various core features. However, the current plugin architecture carries the risk of fatally impacting clusters should they fail. In order to ensure that plugins may run safely without impacting the system, our goal is to effectively isolate plugin interactions with OpenSearch by modularizing the [extension points](https://opensearch.org/blog/technical-post/2021/12/plugins-intro/) to which they hook onto. 
 
 Read more about extensibility [here](https://github.com/opensearch-project/OpenSearch/issues/1422)
 
@@ -24,31 +24,32 @@ Read more about extensibility [here](https://github.com/opensearch-project/OpenS
 Fork [OpenSearch SDK for Java](https://github.com/opensearch-project/opensearch-sdk-java) and clone locally, e.g. `git clone https://github.com/[your username]/opensearch-sdk-java.git`.
 
 ### Git Clone OpenSearch Repo
-Fork [OpenSearch](https://github.com/opensearch-project/OpenSearch/), checkout feature/extensions branch, and clone locally, e.g. `git clone https://github.com/[your username]/OpenSearch.git`.
+Fork [OpenSearch](https://github.com/opensearch-project/OpenSearch/), clone locally, e.g., `git clone https://github.com/[your username]/OpenSearch.git`, and checkout the `feature/extensions` branch.
 
 ## Publish OpenSearch feature/extensions Branch to Maven local
-The work done to support the extensions framework is located on the `feature/extensions` branch of the OpenSearch project. It is necessary to publish the dependencies of this branch to your local maven repository prior to running OpenSearch SDK for Java on a seperate process. 
+The work done to support the extensions framework is located on the `feature/extensions` branch of the OpenSearch project. Until this branch is merged to `main`, it is necessary to publish the dependencies of this branch to your local maven repository prior to running an Extension on a separate process. 
 
 - First navigate to the directory that OpenSearch has been cloned to
 - Checkout the correct branch, e.g. `git checkout feature/extensions`.
-- Run `./gradlew publishToMavenLocal`. 
 - Run `./gradlew check` to make sure the build is successful.
-
-It is necessary to publish dependencies to a local maven repository until this branch is merged to `main`, at which point all dependencies will be published to Maven central.
+- Run `./gradlew publishToMavenLocal`. 
 
 ## Run the Sample Extension
 
-Navigate to the directory that OpenSearch-SDK-Java has been cloned to and run the Sample Extension's main method using `./gradlew run`.
+Navigate to the directory that OpenSearch-SDK-Java has been cloned to.
+
+You can execute just the SDK's `ExtensionsRunner` main method with test settings using `./gradlew run`.
 
 ```
 ./gradlew run
 ```
 
-This will execute the main script set within the root `build.gradle` file :
+You can execute the sample Hello World extension using the `helloWorld` task:
 
 ```
-mainClassName = 'transportservice.ExtensionsRunner'
+./gradlew helloWorld
 ```
+
 Bound addresses will then be logged to the terminal :
 
 ```bash
@@ -56,8 +57,9 @@ Bound addresses will then be logged to the terminal :
 [main] INFO  transportservice.TransportService - profile [test]: publish_address {127.0.0.1:5555}, bound_addresses {[::1]:5555}, {127.0.0.1:5555}
 ```
 
-## Publish OpenSearch-SDK to Maven local
-Until we publish this repo to maven central. Publishing to maven local is the way to import the artifacts
+## Publish OpenSearch SDK for Java to Maven local
+
+Until we publish this repo to maven central, publishing to maven local is the way for plugins (outside the sample packages) to import the artifacts:
 ```
 ./gradlew publishToMavenLocal
 ```
@@ -111,6 +113,7 @@ During OpenSearch bootstrap, `ExtensionsOrchestrator` will then discover the ext
 OpenSearch SDK terminal will also log all requests and responses it receives from OpenSearch :
 
 TCP HandShake Request :
+
 ```
 21:30:18.943 [opensearch[extension][transport_worker][T#7]] TRACE org.opensearch.latencytester.transportservice.netty4.OpenSearchLoggingHandler - [id: 0x37b22600, L:/127.0.0.1:4532 - R:/127.0.0.1:47766] READ: 55B
          +-------------------------------------------------+
@@ -125,6 +128,7 @@ MESSAGE RECEIVED:E«󀀀internal:tcp/handshake£·A
 ```
 
 Extension Name Request / Response : 
+
 ```
 21:30:18.992 [opensearch[extension][transport_worker][T#6]] TRACE org.opensearch.latencytester.transportservice.netty4.OpenSearchLoggingHandler - [id: 0xb2be651b, L:/127.0.0.1:4532 - R:/127.0.0.1:47782] READ: 204B
          +-------------------------------------------------+
