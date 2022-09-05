@@ -153,7 +153,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         RestExecuteOnExtensionRequest request = new RestExecuteOnExtensionRequest(Method.GET, "/foo");
         RestExecuteOnExtensionResponse response = extensionsRunner.handleRestExecuteOnExtensionRequest(request);
         // this will fail in test environment with no registered actions
-        assertEquals(RestStatus.INTERNAL_SERVER_ERROR, response.getStatus());
+        assertEquals(RestStatus.NOT_FOUND, response.getStatus());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.getContentType());
         String responseStr = new String(response.getContent(), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("GET"));
