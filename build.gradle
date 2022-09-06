@@ -55,16 +55,6 @@ configurations {
   requireJavadoc
 }
 
-jacoco {
-    toolVersion = "0.8.8"
-}
-
-jacocoTestReport {
-    reports {
-        xml.required = true
-    }
-}  
-
 dependencies {
     implementation "org.opensearch:opensearch:3.0.0-SNAPSHOT"
     implementation "org.opensearch.plugin:transport-netty4-client:3.0.0-SNAPSHOT"
