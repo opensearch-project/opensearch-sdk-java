@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest.Method;
-import org.opensearch.rest.RestResponse;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
@@ -20,7 +19,7 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
         }
 
         @Override
-        public RestResponse handleRequest(Method method, String uri) {
+        public ExtensionRestResponse handleRequest(Method method, String uri) {
             return null;
         }
     };
@@ -31,7 +30,7 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
         }
 
         @Override
-        public RestResponse handleRequest(Method method, String uri) {
+        public ExtensionRestResponse handleRequest(Method method, String uri) {
             return null;
         }
     };
@@ -42,7 +41,7 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
         }
 
         @Override
-        public RestResponse handleRequest(Method method, String uri) {
+        public ExtensionRestResponse handleRequest(Method method, String uri) {
             return null;
         }
     };

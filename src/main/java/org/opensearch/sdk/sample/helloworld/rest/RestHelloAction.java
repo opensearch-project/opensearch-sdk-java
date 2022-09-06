@@ -7,14 +7,14 @@
  */
 package org.opensearch.sdk.sample.helloworld.rest;
 
-import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest.Method;
-import org.opensearch.rest.RestResponse;
 import org.opensearch.sdk.ExtensionRestHandler;
+import org.opensearch.sdk.ExtensionRestResponse;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.opensearch.rest.RestRequest.Method.GET;
@@ -37,19 +37,29 @@ public class RestHelloAction implements ExtensionRestHandler {
     }
 
     @Override
-    public RestResponse handleRequest(Method method, String uri) {
+    public ExtensionRestResponse handleRequest(Method method, String uri) {
+        // We need to track which parameters are consumed to pass back to OpenSearch
+        List<String> consumedParams = new ArrayList<>();
         if (Method.GET.equals(method) && "/hello".equals(uri)) {
-            return new BytesRestResponse(OK, String.format(GREETING, worldName));
+            return new ExtensionRestResponse(OK, String.format(GREETING, worldName), consumedParams);
         } else if (Method.PUT.equals(method) && uri.startsWith("/hello/")) {
+            // Placeholder code here for parameters in named wildcard paths
+            // Full implementation based on params() will be implemented as part of
+            // https://github.com/opensearch-project/opensearch-sdk-java/issues/111
             String name = uri.substring("/hello/".length());
+            consumedParams.add("name");
             try {
                 worldName = URLDecoder.decode(name, StandardCharsets.UTF_8);
             } catch (IllegalArgumentException e) {
-                return new BytesRestResponse(BAD_REQUEST, e.getMessage());
+                return new ExtensionRestResponse(BAD_REQUEST, e.getMessage(), consumedParams);
             }
-            return new BytesRestResponse(OK, "Updated the world's name to " + worldName);
+            return new ExtensionRestResponse(OK, "Updated the world's name to " + worldName, consumedParams);
         }
-        return new BytesRestResponse(NOT_FOUND, "Extension REST action improperly configured to handle " + method.name() + " " + uri);
+        return new ExtensionRestResponse(
+            NOT_FOUND,
+            "Extension REST action improperly configured to handle " + method.name() + " " + uri,
+            consumedParams
+        );
     }
 
 }
