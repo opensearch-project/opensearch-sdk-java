@@ -33,6 +33,14 @@ public class TestExtensionSettings extends OpenSearchTestCase {
 
     @Test
     public void testHostPort() {
-        assertEquals(extensionSettings.getHostPort(), "4532");
+        assertEquals("4532", extensionSettings.getHostPort());
+    }
+
+    @Test
+    public void testConstructorWithArgs() {
+        ExtensionSettings settings = new ExtensionSettings("foo", "bar", "baz");
+        assertEquals("foo", settings.getExtensionName());
+        assertEquals("bar", settings.getHostAddress());
+        assertEquals("baz", settings.getHostPort());
     }
 }

@@ -33,10 +33,13 @@ During the bootstrap of OpenSearch node, it class loads all the code under `~/pl
 ![](Docs/Extensions.png)
 
 Extensions are independent processes which are built using `opensearch-sdk-java`. They communicate with OpenSearch via [transport](https://github.com/opensearch-project/OpenSearch/tree/main/modules/transport-netty4) protocol which today is used to communicate between OpenSearch nodes.  
+
 Extensions are designed to extend features via transport APIs which are exposed using extension points of OpenSearch.
 
 ### Discovery
-Extensions are discovered and configured via `extensions.yml`, same way we currently have `plugin-descriptor.properties` which is read by OpenSearch during the node bootstrap. `ExtensionsOrchestrator` reads through the config file at `~/extensions` and registers extensions within OpenSearch.
+
+Extensions are discovered and configured via `extensions.yml`, the same way we currently have `plugin-descriptor.properties` which is read by OpenSearch during the node bootstrap. `ExtensionsOrchestrator` reads through the config file at `~/extensions` and registers extensions within OpenSearch.
+
 Here is an example extension configuration `extensions.yml`:
 
 ```
@@ -51,16 +54,65 @@ extensions:
     opensearchVersion: '3.0.0' // OpenSearch compatibility
 ```
 
-
 ### Communication
-As we are running extensions on the port defined in the `extensions.yml`, the communication between OpenSearch and Extensions happens using a ServerSocket which binds the port and the host address. OpenSearch will initialize the extensions during the bootstrap by making a request to all the extensions running on different ports and thus creating a medium for the future requests.
 
-### OpenSearch SDK Java
-Currently, plugins relies on extension points to communicate with OpenSearch. To turn plugins into extensions, all the extension points should be converted into Transport APIs which will be present in the SDK. Plugins need to integrate SDK, call those APIs, and later SDK will take care of the communication and the required attributes from OpenSearch.
+Extensions will use a ServerSocket which binds them listen on a host address and port defined in their configuration file. Each type of incoming request will invoke code from an associated handler. 
 
-### Settings
-Walking through a similar example as plugin above, after extension registration is done, extension makes an API call to register custom settings to OpenSearch.
-`ExtensionsOrchestrator` receives the requests, forwards it to `SettingsModule` to register a new setting and wala, the user is now able to toggle the setting via `_settings` Rest API.
+OpenSearch will have its own configuration file, presently `extensions.yml`, matching these addresses and ports. On startup, the ExtensionsOrchestrator will use the node's TransportService to communicate its requests to each extension, with the first request initializing the extension and validating the host and port.
+
+Immediately following initialization, each extension will establish a connection to OpenSearch on its own transport service, and send its REST API (a list of methods and URIs to which it will respond).  These will be registered with the RestController.
+
+When OpenSearch receives a registered method and URI, it will send the request to the Extension. The extension will appropriately handle the request, using the API to determine which Action to execute.
+
+### OpenSearch SDK for Java
+
+Currently, plugins rely on extension points to communicate with OpenSearch, loaded into the class loader as Actions which extend `RestHandler`. The key part of this loading is each action's `routes()` method, which registers REST methods and URIs; upon receiving a matching request from a user the registered action handles the request.
+
+Extensions will use a similar registration feature, but as a separate process will not need nor use many of the features of the `RestHandler` interface.  Instead, Extension Actions will implement the `ExtensionAction` interface which requires the extension developer to implement a `routes()` method (similar to plugins) and a `getExtensionResponse()` method to take action on the corresponding REST calls.
+
+The sequence diagram below shows the process of initializing an Extension, registering its REST actions (API) with OpenSearch, and responding to a user's REST request.  A detailed description of the steps follows the diagram.
+
+The `org.opensearch.sdk.sample` package contains a sample `HelloWorldExtension` implementing the below steps. It is executed following the steps in the [`DEVELOPER_GUIDE`](DEVELOPER_GUIDE.md).
+
+![](Docs/ExtensionRestActions.svg)
+
+#### Extension REST Actions Walk Through
+
+##### Extension Startup
+
+(1) Extensions must implement the `Extension` interface which requires them to define their settings (name, host address and port) and a list of `ExtensionRestHandler` implementations they will handle.  They are started up using a `main()` method which passes an instance of the extension to the `ExtensionsRunner` using `ExtensionsRunner.run(this)`.
+
+(2, 3, 4) Using the `ExtensionSettings` from the extension, the `ExtensionsRunner` binds to the configured host and port.
+
+(5, 6, 7) Using the `List<ExtensionRestHandler>` from the extension, the `ExtensionsRunner` stores each handler (Rest Action)'s restPath (method+URI) in a map, identifying the action to execute when that combination is received by the extension.
+
+##### OpenSearch Startup, Extension Initialization, and REST Action Registration
+
+(8, 9, 10) During bootstrap of the OpenSearch `Node`, it instantiates a `RestController`, passing this to the `ExtensionsOrchestrator` which subsequently passes it to a `RestActionsRequestHandler`.
+
+The `ExtensionsOrchestrator` reads a list of extensions present in `extensions.yml`. For each configured extension:
+
+(11, 12) The `ExtensionsOrchestrator` Initializes the extension using an `InitializeExtensionRequest`/`Response`, establishing the two-way transport mechanism.
+
+(13) Each `Extension` retrieves all REST paths from its pathMap (the key set).
+
+(14, 15, 16) Each `Extension` sends a `RegisterRestActionsRequest` to the `RestActionsRequestHandler`, which registers a `RestSendToExtensionAction` with the `RestController` to handle each REST path (`Route`). These routes rely on a globally unique identifier for the extension which users will use in REST requests, presently the Extension's `uniqueId`.
+
+##### Responding to User REST Requests
+
+(17) Users send REST requests to OpenSearch which are handled by the `RestController`.
+
+(18) If the requests match the registered path/URI and `routes()` of an extension, it invokes the registered `RestSendToExtensionAction`.
+
+(19) The `RestSendToExtensionAction` forwards the Method and URI to the Extension in a `RestExecuteOnExtensionRequest`.  (This class will be expanded iteratively as we add more features to include parameters, identity IDs or access tokens, and other information.)
+
+(20) The `Extension` matches the Method and URI to its pathMap to retrieve the `ExtensionRestHandler` registered to handle that combination.
+
+(21, 22) The appropriate `ExtensionRestHandler` handles the request, possibly executing complex logic, and eventually providing a response string.
+
+(23, 24) The response string is relayed by the `Extension` to the `RestActionsRequestHandler` which uses it to complete the `RestSendToExtensionAction` by returning a `BytesRestResponse`.
+
+(25) The User receives the response.
 
 ## FAQ
 

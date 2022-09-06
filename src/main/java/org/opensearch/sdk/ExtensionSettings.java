@@ -17,15 +17,30 @@ public class ExtensionSettings {
     private String hostPort;
 
     /**
-     * Placeholder field. Change the location to extension.yml file of the extension.
+     * Path to extension.yml file for testing. Internal use only.
      */
-    public static final String EXTENSION_DESCRIPTOR = "src/test/resources/extension.yml";
+    static final String EXTENSION_DESCRIPTOR = "src/test/resources/extension.yml";
 
     /**
      * Jackson requires a default constructor.
      */
+    @SuppressWarnings("unused")
     private ExtensionSettings() {
         super();
+    }
+
+    /**
+     * Instantiate this class using the specified parameters.
+     *
+     * @param extensionName  The extension name. Provided to OpenSearch as a response to initialization query. Must match the defined extension name in OpenSearch.
+     * @param hostAddress  The IP Address to bind this extension to.
+     * @param hostPort  The port to bind this extension to.
+     */
+    public ExtensionSettings(String extensionName, String hostAddress, String hostPort) {
+        super();
+        this.extensionName = extensionName;
+        this.hostAddress = hostAddress;
+        this.hostPort = hostPort;
     }
 
     public String getExtensionName() {
