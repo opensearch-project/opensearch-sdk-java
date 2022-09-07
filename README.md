@@ -1,4 +1,7 @@
 [![codecov](https://codecov.io/gh/opensearch-project/opensearch-sdk-java/branch/main/graph/badge.svg)](https://codecov.io/gh/opensearch-project/opensearch-sdk-java)
+[![GHA gradle check](https://github.com/opensearch-project/opensearch-sdk-java/actions/workflows/build.yml/badge.svg)](https://github.com/opensearch-project/opensearch-sdk-java/actions/workflows/build.yml)
+[![GHA validate pull request](https://github.com/opensearch-project/opensearch-sdk-java/actions/workflows/wrapper.yml/badge.svg)](https://github.com/opensearch-project/opensearch-sdk-java/actions/workflows/wrapper.yml)
+[![Code Hygiene](https://github.com/opensearch-project/opensearch-sdk-java/actions/workflows/code-hygiene.yml/badge.svg)](https://github.com/opensearch-project/opensearch-sdk-java/actions/workflows/code-hygiene.yml)
 
 # OpenSearch SDK
 - [Introduction](#introduction)
