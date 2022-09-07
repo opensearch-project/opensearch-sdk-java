@@ -56,7 +56,7 @@ Plugins are loaded into the same java virtual machine instance allowing communic
 
 Extensions of OpenSearch communicate via https requests between the nodes on the cluster and the extensions endpoint(s).  This is a bi-directional communication and also allows extensions to contact the OpenSearch cluster through its available APIs.
 
-* :warning: The communication protocol has not been locked-in. Further discussion in [Extensions to OpenSearch communication #34](https://github.com/opensearch-project/opensearch-sdk/issues/34).
+* :warning: The communication protocol has not been locked-in. Further discussion in [Extensions to OpenSearch communication #34](https://github.com/opensearch-project/opensearch-sdk-java/issues/34).
 
 ## Data Security
 
@@ -70,12 +70,12 @@ With the security plugin installed, role based access control (RBAC) is availabl
 
 For resource that are managed by plugins, access control is governed within individual plugin. By examining [user](https://github.com/opensearch-project/common-utils/blob/main/src/main/java/org/opensearch/commons/authuser/User.java) object from OpenSearch's thread context permissions are available for approval/denial. An example from anomaly detection is [checkUserPermissions](https://github.com/opensearch-project/anomaly-detection/blob/875b03c1c7596cb34d74fea285c28d949cfb0d19/src/main/java/org/opensearch/ad/util/ParseUtils.java#L568).  Uniform resource controls and models are needed to protect from misconfiguration and code defects.
 
-* :building_construction: Adding a uniform resource permission check is being worked on in [sdk#40](https://github.com/opensearch-project/opensearch-sdk/issues/40). 
+* :building_construction: Adding a uniform resource permission check is being worked on in [sdk#40](https://github.com/opensearch-project/opensearch-sdk-java/issues/40). 
 
 
 As Extensions do not have access OpenSearch's thread context, identity and its associated privileges must be communicated through APIs.
 
-* :building_construction: User identity is being worked on in [sdk#37](https://github.com/opensearch-project/opensearch-sdk/issues/37).
+* :building_construction: User identity is being worked on in [sdk#37](https://github.com/opensearch-project/opensearch-sdk-java/issues/37).
 
 ## Auditing
 
@@ -119,17 +119,17 @@ Additional background avaliable from [Security#1895](https://github.com/opensear
 ### User identity [OpenSearch#3846](https://github.com/opensearch-project/OpenSearch/issues/3846) :negative_squared_cross_mark:
 Replace [commons.authuser.User](https://github.com/opensearch-project/common-utils/blob/main/src/main/java/org/opensearch/commons/authuser/User.java) which is presently the common identity object used by plugins.  The new object should conform to open identity standards and be obtainable by the extension through other means than [InjectSecurity](https://github.com/opensearch-project/common-utils/blob/main/src/main/java/org/opensearch/commons/InjectSecurity.java#L69) which depends on the thread context.
 
-#### Aquiring User objects [sdk#37](https://github.com/opensearch-project/opensearch-sdk/issues/37)
-When OpenSearch sends a request to an extension, the identity of the requestor should be included with the request. More discussion in [Handling identity in extensions](https://github.com/opensearch-project/opensearch-sdk/issues/14).
+#### Aquiring User objects [sdk#37](https://github.com/opensearch-project/opensearch-sdk-java/issues/37)
+When OpenSearch sends a request to an extension, the identity of the requestor should be included with the request. More discussion in [Handling identity in extensions](https://github.com/opensearch-project/opensearch-sdk-java/issues/14).
 
-#### Resource user/role checks [sdk#40](https://github.com/opensearch-project/opensearch-sdk/issues/40)
+#### Resource user/role checks [sdk#40](https://github.com/opensearch-project/opensearch-sdk-java/issues/40)
 anomaly Detection has detectors that analyzer data and store its results so it can be inspected or alerted on, [more details](https://opensearch.org/docs/latest/monitoring-plugins/ad/index/). OpenSearch should be responsible for inspecting the user, roles, resources to ensure standard practices are used.  An access check API should be designed and implemented to offload this work from extensions creators.
 
 ### Delegate Authority  [OpenSearch#3850](https://github.com/opensearch-project/OpenSearch/issues/3850) :negative_squared_cross_mark:
 anomaly Detection runs background jobs to scan for anamolies and alerts that trigger if conditions are detected.  Background tasks should be tied to an idenity and a delegated identity so permissions can be verified.  The underlying systems depends on the [Job Scheduler](https://github.com/opensearch-project/job-scheduler/blob/main/src/main/java/org/opensearch/jobscheduler/scheduler/JobScheduler.java) plugin to execute these requests. 
 
-#### Extension identity [sdk#41](https://github.com/opensearch-project/opensearch-sdk/issues/41)
+#### Extension identity [sdk#41](https://github.com/opensearch-project/opensearch-sdk-java/issues/41)
 There should be different levels of permissions granularity interactive allowing for disgushing a user actions or user action through an extension.  Extensions should have an identity and there should be a way that the identity of action is layered with all the parties that have triggered it. 
 
-#### Delayed action API [sdk#42](https://github.com/opensearch-project/opensearch-sdk/issues/42)
+#### Delayed action API [sdk#42](https://github.com/opensearch-project/opensearch-sdk-java/issues/42)
 When actions are triggered without an interactive user session OpenSearch will need to permit the action to occur or not.  Create an API for these background tasks to get an identity associated with the session.

@@ -1,14 +1,16 @@
 
-# OpenSearch SDK Developer Guide
+# OpenSearch SDK for Java Developer Guide
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
-	- [Git Clone OpenSearch-SDK Repo](#git-clone-OpenSearch-SDK-repo)
-	- [Git Clone OpenSearch Repo](#git-clone-opensearch-repo)
-	- [Publish OpenSearch Feature/Extensions branch to Maven local](#publish-opensearch-feature/extensions-branch-to-maven-local)
-	- [Run OpenSearch-SDK](#run-opensearch-sdk)
-	    - [Create extensions.yml file](#create_extensions_file)
+    - [Git Clone OpenSearch-SDK-Java Repo](#git-clone-opensearch-sdk-for-java-repo)
+    - [Git Clone OpenSearch Repo](#git-clone-opensearch-repo)
+    - [Publish OpenSearch Feature/Extensions branch to Maven local](#publish-opensearch-feature-extensions-branch-to-maven-local)
+    - [Run the Sample Extension](#run-the-sample-extension)
+        - [Create extensions.yml file](#create-extensions-yml-file)
         - [Run OpenSearch](#run-opensearch)
-	- [Run Tests](#run-tests)
+    - [Publish OpenSearch-SDK to Maven Local](#publish-opensearch-sdk-to-maven-local)
+    - [Perform a REST Request on the Extension](#perform-a-rest-request-on-the-extension)
+    - [Run Tests](#run-tests)
     - [Submitting Changes](#submitting-changes)
 
 ## Introduction
@@ -18,14 +20,14 @@ Read more about extensibility [here](https://github.com/opensearch-project/OpenS
 
 ## Getting Started
 
-### Git Clone OpenSearch SDK Repo
-Fork [OpenSearch SDK](https://github.com/opensearch-project/opensearch-sdk) and clone locally, e.g. `git clone https://github.com/[your username]/opensearch-sdk.git`.
+### Git Clone OpenSearch SDK for Java Repo
+Fork [OpenSearch SDK for Java](https://github.com/opensearch-project/opensearch-sdk-java) and clone locally, e.g. `git clone https://github.com/[your username]/opensearch-sdk-java.git`.
 
 ### Git Clone OpenSearch Repo
 Fork [OpenSearch](https://github.com/opensearch-project/OpenSearch/), checkout feature/extensions branch, and clone locally, e.g. `git clone https://github.com/[your username]/OpenSearch.git`.
 
 ## Publish OpenSearch feature/extensions Branch to Maven local
-The work done to support the extensions framework is located on the `feature/extensions` branch of the OpenSearch project. It is necessary to publish the dependencies of this branch to your local maven repository prior to running the OpenSearch SDK on a seperate process. 
+The work done to support the extensions framework is located on the `feature/extensions` branch of the OpenSearch project. It is necessary to publish the dependencies of this branch to your local maven repository prior to running OpenSearch SDK for Java on a seperate process. 
 
 - First navigate to the directory that OpenSearch has been cloned to
 - Checkout the correct branch, e.g. `git checkout feature/extensions`.
@@ -34,9 +36,9 @@ The work done to support the extensions framework is located on the `feature/ext
 
 It is necessary to publish dependencies to a local maven repository until this branch is merged to `main`, at which point all dependencies will be published to Maven central.
 
-## Run OpenSearch SDK
+## Run the Sample Extension
 
-Navigate to the directory that OpenSearch-SDK has been cloned to and run main script using `./gradlew run`.
+Navigate to the directory that OpenSearch-SDK-Java has been cloned to and run the Sample Extension's main method using `./gradlew run`.
 
 ```
 ./gradlew run
@@ -54,7 +56,11 @@ Bound addresses will then be logged to the terminal :
 [main] INFO  transportservice.TransportService - profile [test]: publish_address {127.0.0.1:5555}, bound_addresses {[::1]:5555}, {127.0.0.1:5555}
 ```
 
-
+## Publish OpenSearch-SDK to Maven local
+Until we publish this repo to maven central. Publishing to maven local is the way to import the artifacts
+```
+./gradlew publishToMavenLocal
+```
 
 ## Create extensions.yml file
 
@@ -69,12 +75,12 @@ Every extension will require metadata stored in an extensions.yml file in order 
 - Navigate to the extensions folder using `cd extensions`.
 - Manually create a file titled `extensions.yml` within the extensions directory using an IDE or an in-line text editor.
 
-Sample extensions.yml file:
+Sample `extensions.yml` file (the name must match the `extensionName` field in the corresponding `extension.yml`:
 
 ```
 extensions:
-  - name: opensearch-sdk
-    uniqueId: opensearch-sdk-1
+  - name: hello-world
+    uniqueId: opensearch-sdk-java-1
     hostName: 'sdk_host'
     hostAddress: '127.0.0.1'
     port: '4532'
@@ -83,7 +89,7 @@ extensions:
     opensearchVersion: '3.0.0'
     javaVersion: '14'
     className: ExtensionsRunner
-    customFolderName: opensearch-sdk
+    customFolderName: opensearch-sdk-java
     hasNativeController: false	
 ```
 
@@ -92,7 +98,7 @@ extensions:
 - Return to the OpenSearch directory by using `cd ..`.
 - Start OpenSearch feature/extensions branch using `./bin/opensearch`.
 
-During OpenSearch bootstrap, `ExtensionsOrchestrator` will then discover the extension listenening on a pre-defined port and execute the TCP handshake protocol to establish a data transfer connection. A request will be sent to the OpenSearch SDK and upon acknowledgment, the extension will respond with its name which will be logged onto terminal that OpenSearch is running on.
+During OpenSearch bootstrap, `ExtensionsOrchestrator` will then discover the extension listenening on a pre-defined port and execute the TCP handshake protocol to establish a data transfer connection. A request will be sent to OpenSearch SDK for Java and upon acknowledgment, the extension will respond with its name which will be logged onto terminal that OpenSearch is running on.
 
 ```
 [2022-06-16T21:30:18,857][INFO ][o.o.t.TransportService   ] [runTask-0] publish_address {127.0.0.1:9300}, bound_addresses {[::1]:9300}, {127.0.0.1:9300}
@@ -156,7 +162,14 @@ MESSAGE RECEIVED:ES-ǣ!internal:discovery/extensionsnode_extensionQSt9oKXFTSWqgX
 21:30:18.999 [opensearch[extension][transport_worker][T#6]] TRACE org.opensearch.transport.TransportService.tracer - [3][internal:discovery/extensions] sent response
 ```
 
-It is important that the OpenSearch SDK is already up and running on a seperate process prior to starting OpenSearch, since extension discovery occurs only if the OpenSearch SDK is already listening on a pre-defined port. Once discovery is complete and the data transfer connection between both nodes has been established, OpenSearch and the OpenSearch SDK will now be able to comminicate. 
+It is important that the OpenSearch SDK for Java is already up and running on a seperate process prior to starting OpenSearch, since extension discovery occurs only if the OpenSearch SDK for Java is already listening on a pre-defined port. Once discovery is complete and the data transfer connection between both nodes has been established, OpenSearch and the OpenSearch SDK for Java will now be able to comminicate. 
+
+## Perform a REST Request on the Extension
+
+The following request is configured to be handled by the sample `HelloWorldExtension` (note the matching uniqueId):
+```
+curl -X GET localhost:9200/_extensions/_opensearch-sdk-1/hello
+```
 
 ## Run Tests
 
@@ -164,6 +177,25 @@ Run tests :
 ```
 ./gradlew clean build test
 ```
+## Generate Artifact
+In opensearch-sdk-java navigate to build/distributions. Look for tar ball in the form `opensearch-sdk-java-1.0.0-SNAPSHOT.tar`. If not found follow the below steps to create one:
+```
+./gradlew clean && ./gradlew build
+```
+Once the tar ball is generated navigate to `/src/test/resources/sample` and look for `extension-settings.yml`. Create one if not present
+Look for tar ball in `/build/distributions`. To run the artifact i.e., tar ball, run the below command
+```
+tar -xvf opensearch-sdk-java-1.0.0-SNAPSHOT.tar
+```
+
+The artifact will include extension settings for the sample extension on the class path under the path `/sample/extension-settings.yml`. This path is used by the sample `HelloWorldExtension`. 
+
+```
+  extensionName: hello-world
+  hostAddress: 127.0.0.1
+  hostPort: 4532
+```
+- Start the sample extension with `./bin/opensearch-sdk-java`
 
 ## Submitting Changes
 
