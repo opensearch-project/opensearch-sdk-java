@@ -354,15 +354,19 @@ public class ExtensionsRunner {
      * Requests the ActionListener onFailure method to be run by OpenSearch.  The result will be handled by a {@link ActionListenerOnFailureResponseHandler}.
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
+     * @param failureException The exception to be sent to OpenSearch
      */
-    public void sendActionListenerOnFailureRequest(TransportService transportService) {
+    public void sendActionListenerOnFailureRequest(TransportService transportService, Exception failureException) {
         logger.info("Sending ActionListener onFailure request to OpenSearch");
         ActionListenerOnFailureResponseHandler listenerHandler = new ActionListenerOnFailureResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsOrchestrator.REQUEST_EXTENSION_ACTION_LISTENER_ON_FAILURE,
-                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_ACTION_LISTENER_ON_FAILURE),
+                new ExtensionRequest(
+                    ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_ACTION_LISTENER_ON_FAILURE,
+                    failureException.toString()
+                ),
                 listenerHandler
             );
         } catch (Exception e) {
@@ -379,7 +383,7 @@ public class ExtensionsRunner {
      *
      * @param timeout  The timeout for the listener in milliseconds. A timeout of 0 means no timeout.
      */
-    public void startActionListener(int timeout) {
+    public static void startActionListener(int timeout) {
         final ActionListener actionListener = new ActionListener();
         actionListener.runActionListener(true, timeout);
     }

@@ -151,7 +151,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testActionListenerOnFailureRequest() {
 
-        extensionsRunner.sendActionListenerOnFailureRequest(transportService);
+        extensionsRunner.sendActionListenerOnFailureRequest(transportService, new Exception("Test failure"));
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ActionListenerOnFailureResponseHandler.class));
     }

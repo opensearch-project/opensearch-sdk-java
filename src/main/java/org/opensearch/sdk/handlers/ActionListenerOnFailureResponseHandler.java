@@ -20,7 +20,7 @@ import org.opensearch.transport.TransportService;
 import java.io.IOException;
 
 /**
- * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendActionListenerOnFailureRequest(TransportService)} call.
+ * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendActionListenerOnFailureRequest(TransportService, Exception)} call.
  */
 public class ActionListenerOnFailureResponseHandler implements TransportResponseHandler<ExtensionBooleanResponse> {
     private static final Logger logger = LogManager.getLogger(ActionListenerOnFailureResponseHandler.class);
