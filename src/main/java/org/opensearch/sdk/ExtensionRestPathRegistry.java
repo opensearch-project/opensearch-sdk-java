@@ -25,13 +25,13 @@ public class ExtensionRestPathRegistry {
     private List<String> registeredPaths = new ArrayList<>();
 
     /**
-     * Register a REST method and route in this extension's path registry.
+     * Register a REST handler to handle a method and route in this extension's path registry.
      *
      * @param method  The method to register.
      * @param uri  The URI to register. May include named wildcards.
      * @param extensionRestHandler  The RestHandler to handle this route
      */
-    public void register(Method method, String uri, ExtensionRestHandler extensionRestHandler) {
+    public void registerHandler(Method method, String uri, ExtensionRestHandler extensionRestHandler) {
         String restPath = restPathToString(method, uri);
         pathTrie.insert(restPath, extensionRestHandler);
         registeredPaths.add(restPath);

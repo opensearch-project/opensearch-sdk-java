@@ -121,7 +121,7 @@ public class ExtensionsRunner {
         // store rest handlers in the map
         for (ExtensionRestHandler extensionRestHandler : extension.getExtensionRestHandlers()) {
             for (Route route : extensionRestHandler.routes()) {
-                extensionRestPathRegistry.register(route.getMethod(), route.getPath(), extensionRestHandler);
+                extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
             }
         }
         // initialize the transport service

@@ -49,10 +49,11 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
     @Override
     @BeforeEach
     public void setUp() throws Exception {
+        List<ExtensionRestHandler> handlerList = List.of(fooHandler, barHandler, bazHandler);
         super.setUp();
-        for (ExtensionRestHandler handler : List.of(fooHandler, barHandler, bazHandler)) {
+        for (ExtensionRestHandler handler : handlerList) {
             for (Route route : handler.routes()) {
-                extensionRestPathRegistry.register(route.getMethod(), route.getPath(), handler);
+                extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), handler);
             }
         }
     }
@@ -60,9 +61,12 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
     @Test
     public void testRegisterConflicts() {
         // Can't register same exact name
-        assertThrows(IllegalArgumentException.class, () -> extensionRestPathRegistry.register(Method.GET, "/foo", fooHandler));
+        assertThrows(IllegalArgumentException.class, () -> extensionRestPathRegistry.registerHandler(Method.GET, "/foo", fooHandler));
         // Can't register conflicting named wildcards
-        assertThrows(IllegalArgumentException.class, () -> extensionRestPathRegistry.register(Method.PUT, "/bar/{none}", barHandler));
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> extensionRestPathRegistry.registerHandler(Method.PUT, "/bar/{none}", barHandler)
+        );
     }
 
     @Test
