@@ -6,6 +6,8 @@
 # OpenSearch SDK
 - [Introduction](#introduction)
 - [Contributing](#contributing)
+- [Design](#design)
+- [Maintainers](#maintainers)
 - [Code of Conduct](#code-of-conduct)
 
 ## Introduction
@@ -15,6 +17,12 @@ Read more about extensibility [here](https://github.com/opensearch-project/OpenS
 
 ## Contributing
 See [DEVELOPER_GUIDE](DEVELOPER_GUIDE.md)
+
+## Design
+See [DESIGN](DESIGN.md)
+
+## Maintainers
+See [MAINTAINERS](MAINTAINERS.md)
 
 ## Code of Conduct
 
