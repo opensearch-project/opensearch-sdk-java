@@ -1,11 +1,11 @@
 [![codecov](https://codecov.io/gh/opensearch-project/opensearch-sdk-java/branch/main/graph/badge.svg)](https://codecov.io/gh/opensearch-project/opensearch-sdk-java)
 [![GHA gradle check](https://github.com/opensearch-project/opensearch-sdk-java/actions/workflows/build.yml/badge.svg)](https://github.com/opensearch-project/opensearch-sdk-java/actions/workflows/build.yml)
 [![GHA validate pull request](https://github.com/opensearch-project/opensearch-sdk-java/actions/workflows/wrapper.yml/badge.svg)](https://github.com/opensearch-project/opensearch-sdk-java/actions/workflows/wrapper.yml)
-[![Code Hygiene](https://github.com/opensearch-project/opensearch-sdk-java/actions/workflows/code-hygiene.yml/badge.svg)](https://github.com/opensearch-project/opensearch-sdk-java/actions/workflows/code-hygiene.yml)
 
-# OpenSearch SDK
+# OpenSearch SDK for Java
 - [Introduction](#introduction)
 - [Contributing](#contributing)
+- [Developer Guide](#developer-guide)
 - [Design](#design)
 - [Maintainers](#maintainers)
 - [Code of Conduct](#code-of-conduct)
@@ -16,8 +16,10 @@ Opensearch plugins have allowed the extension and ehancements of various core fe
 Read more about extensibility [here](https://github.com/opensearch-project/OpenSearch/issues/1422)
 
 ## Contributing
-See [DEVELOPER_GUIDE](DEVELOPER_GUIDE.md)
+See [CONTRIBUTING](CONTRIBUTING.md)
 
+## Developer Guide
+See [DEVELOPER_GUIDE](DEVELOPER_GUIDE.md)
 ## Design
 See [DESIGN](DESIGN.md)
 
