@@ -9,7 +9,7 @@ i.e., critical workloads like ingestion/search traffic would be impacted because
 This problem exponentially grows when we would like to run a third Party plugin from the community.  
 As OpenSearch and plugins run in the same process, it brings in security risk, dependency conflicts and reduces the velocity of releases.
 
-Introducing extensions, a simple and easy way to extend features of OpenSearch. It would support all plugin features and enable them to run in a seperate process or on another node via OpenSearch SDK for Java (other clients will be developed).
+Introducing extensions, a simple and easy way to extend features of OpenSearch. It would support all plugin features and enable them to run in a seperate process or on another node via OpenSearch SDK for Java (other SDKs will be developed).
 
 Meta Issue: [Steps to make OpenSearch extensible](https://github.com/opensearch-project/OpenSearch/issues/2447)  
 Sandboxing: [Step towards modular architecture in OpenSearch](https://github.com/opensearch-project/OpenSearch/issues/1422)  
