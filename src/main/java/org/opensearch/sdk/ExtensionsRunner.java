@@ -57,11 +57,9 @@ import org.opensearch.transport.TransportResponse;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -79,10 +77,10 @@ public class ExtensionsRunner {
     private static final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
     private static final String NODE_NAME_SETTING = "node.name";
 
-    private Map<String, ExtensionRestHandler> extensionRestPathMap = new HashMap<>();
     private String uniqueId;
     private DiscoveryNode opensearchNode;
     private TransportService extensionTransportService = null;
+    private ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
 
     private final Settings settings;
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
@@ -124,8 +122,7 @@ public class ExtensionsRunner {
         // store rest handlers in the map
         for (ExtensionRestHandler extensionRestHandler : extension.getExtensionRestHandlers()) {
             for (Route route : extensionRestHandler.routes()) {
-                String restPath = route.getMethod().name() + " " + route.getPath();
-                extensionRestPathMap.put(restPath, extensionRestHandler);
+                extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
             }
         }
         // initialize the transport service
@@ -234,10 +231,12 @@ public class ExtensionsRunner {
      */
     RestExecuteOnExtensionResponse handleRestExecuteOnExtensionRequest(RestExecuteOnExtensionRequest request) {
 
-        String restPath = request.getMethod().name() + " " + request.getUri();
-        ExtensionRestHandler restHandler = extensionRestPathMap.get(restPath);
+        ExtensionRestHandler restHandler = extensionRestPathRegistry.getHandler(request.getMethod(), request.getUri());
         if (restHandler == null) {
-            return new RestExecuteOnExtensionResponse(RestStatus.INTERNAL_SERVER_ERROR, "No handler for " + restPath);
+            return new RestExecuteOnExtensionResponse(
+                RestStatus.NOT_FOUND,
+                "No handler for " + ExtensionRestPathRegistry.restPathToString(request.getMethod(), request.getUri())
+            );
         }
         // Get response from extension
         RestResponse response = restHandler.handleRequest(request.getMethod(), request.getUri());
@@ -402,7 +401,7 @@ public class ExtensionsRunner {
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
     public void sendRegisterRestActionsRequest(TransportService transportService) {
-        List<String> extensionRestPaths = new ArrayList<>(extensionRestPathMap.keySet());
+        List<String> extensionRestPaths = extensionRestPathRegistry.getRegisteredPaths();
         logger.info("Sending Register REST Actions request to OpenSearch for " + extensionRestPaths);
         RegisterRestActionsResponseHandler registerActionsResponseHandler = new RegisterRestActionsResponseHandler();
         try {
