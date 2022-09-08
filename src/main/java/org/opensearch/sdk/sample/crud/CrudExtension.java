@@ -31,7 +31,7 @@ public class CrudExtension implements Extension {
     /**
      * Optional classpath-relative path to a yml file containing extension settings.
      */
-    private static final String EXTENSION_SETTINGS_PATH = "/sample/extension-crud-settings.yml";
+    private static final String EXTENSION_SETTINGS_PATH = "/sample/crud-settings.yml";
 
     /**
      * The extension settings include a name, host address, and port.

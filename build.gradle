@@ -27,7 +27,7 @@ apply plugin: 'application'
 apply from: 'gradle/formatting.gradle'
 apply plugin: 'maven-publish'
 
-mainClassName = 'org.opensearch.sdk.sample.crud.CrudExtension'
+mainClassName = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
 
 group 'org.opensearch.sdk'
 version '1.0.0-SNAPSHOT'
@@ -109,6 +109,14 @@ task helloWorld(type: JavaExec) {
   description = 'Run HelloWorld Extension.'
   mainClass = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
   classpath = sourceSets.main.runtimeClasspath
+}
+
+// this task runs the helloworld sample extension
+task sampleCrud(type: JavaExec) {
+    group = 'Execution'
+    description = 'Run Sample CRUD Extension.'
+    mainClass = 'org.opensearch.sdk.sample.crud.CrudExtension'
+    classpath = sourceSets.main.runtimeClasspath
 }
 
 test {
