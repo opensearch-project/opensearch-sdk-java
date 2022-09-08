@@ -27,10 +27,14 @@ import static org.opensearch.rest.RestStatus.OK;
 /**
  * Sample REST Handler (REST Action). Extension REST handlers must implement {@link ExtensionRestHandler}.
  */
-public class RestHelloAction implements ExtensionRestHandler {
+public class RestHelloAction extends ExtensionRestHandler {
 
     private static final String GREETING = "Hello, %s!";
     private String worldName = "World";
+
+    public RestHelloAction(String extensionId) {
+        super(extensionId);
+    }
 
     @Override
     public List<Route> routes() {

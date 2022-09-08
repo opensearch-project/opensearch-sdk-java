@@ -14,8 +14,7 @@ import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionSettings;
 import org.opensearch.sdk.ExtensionsRunner;
-import org.opensearch.sdk.sample.crud.rest.RestCreateAction;
-import org.opensearch.sdk.sample.crud.rest.RestUpdateAction;
+import org.opensearch.sdk.sample.crud.rest.CrudRestHandler;
 
 /**
  * Sample class to demonstrate how to use the OpenSearch SDK for Java to create
@@ -56,7 +55,8 @@ public class CrudExtension implements Extension {
 
     @Override
     public List<ExtensionRestHandler> getExtensionRestHandlers() {
-        return List.of(new RestCreateAction(), new RestUpdateAction());
+        List <ExtensionRestHandler> restHandlers = List.of(new CrudRestHandler(settings.getExtensionName()));
+        return restHandlers;
     }
 
     /**
