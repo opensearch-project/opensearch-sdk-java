@@ -43,6 +43,7 @@ import org.opensearch.transport.netty4.Netty4Transport;
 import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
+import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
 import org.opensearch.sdk.handlers.RegisterRestActionsResponseHandler;
 import org.opensearch.search.SearchModule;
@@ -473,6 +474,26 @@ public class ExtensionsRunner {
             );
         } catch (Exception e) {
             logger.info("Failed to send Cluster Settings request to OpenSearch", e);
+        }
+    }
+
+    /**
+     * Requests the environment settings from OpenSearch.  The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
+     *
+     * @param transportService  The TransportService defining the connection to OpenSearch.
+     */
+    public void sendEnvironmentSettingsRequest(TransportService transportService) {
+        logger.info("Sending Environment Settings request to OpenSearch");
+        EnvironmentSettingsResponseHandler environmentSettingsResponseHandler = new EnvironmentSettingsResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS,
+                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS),
+                environmentSettingsResponseHandler
+            );
+        } catch (Exception e) {
+            logger.info("Failed to send Environment Settings request to OpenSearch", e);
         }
     }
 

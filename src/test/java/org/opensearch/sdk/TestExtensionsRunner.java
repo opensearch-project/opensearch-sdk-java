@@ -47,6 +47,7 @@ import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
+import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
 import org.opensearch.sdk.handlers.RegisterRestActionsResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
@@ -182,6 +183,14 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         extensionsRunner.sendLocalNodeRequest(transportService);
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(LocalNodeResponseHandler.class));
+    }
+
+    @Test
+    public void testEnvironmentSettingsRequest() {
+
+        extensionsRunner.sendEnvironmentSettingsRequest(transportService);
+
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(EnvironmentSettingsResponseHandler.class));
     }
 
     @Test
