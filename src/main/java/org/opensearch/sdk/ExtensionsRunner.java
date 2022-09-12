@@ -29,6 +29,7 @@ import org.opensearch.common.util.PageCacheRecycler;
 import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
+import org.opensearch.extensions.EnvironmentSettingsRequest;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.index.IndicesModuleRequest;
@@ -481,14 +482,14 @@ public class ExtensionsRunner {
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
-    public void sendEnvironmentSettingsRequest(TransportService transportService) {
+    public void sendEnvironmentSettingsRequest(TransportService transportService, List<String> componentSettingKeys) {
         logger.info("Sending Environment Settings request to OpenSearch");
         EnvironmentSettingsResponseHandler environmentSettingsResponseHandler = new EnvironmentSettingsResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsOrchestrator.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS,
-                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS),
+                new EnvironmentSettingsRequest(componentSettingKeys),
                 environmentSettingsResponseHandler
             );
         } catch (Exception e) {

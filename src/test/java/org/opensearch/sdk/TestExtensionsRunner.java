@@ -25,8 +25,10 @@ import static org.mockito.Mockito.verify;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -188,7 +190,8 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testEnvironmentSettingsRequest() {
 
-        extensionsRunner.sendEnvironmentSettingsRequest(transportService);
+        List<String> componentSettingKeys = new ArrayList<>();
+        extensionsRunner.sendEnvironmentSettingsRequest(transportService, componentSettingKeys);
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(EnvironmentSettingsResponseHandler.class));
     }
