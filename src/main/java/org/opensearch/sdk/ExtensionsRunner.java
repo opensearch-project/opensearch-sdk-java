@@ -478,8 +478,9 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Requests the environment settings from OpenSearch.  The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
+     * Requests the environment setting values from OpenSearch for the corresponding component setting keys .  The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
      *
+     * @param componentSettingKeys The component ssetting keys that correspond to the values provided by the environment settings
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
     public void sendEnvironmentSettingsRequest(TransportService transportService, List<String> componentSettingKeys) {

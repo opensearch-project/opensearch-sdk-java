@@ -20,7 +20,7 @@ import org.opensearch.transport.TransportService;
 import java.io.IOException;
 
 /**
- * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendEnvironmentSettingsRequest(TransportService)} call.
+ * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendEnvironmentSettingsRequest} call.
  */
 public class EnvironmentSettingsResponseHandler implements TransportResponseHandler<EnvironmentSettingsResponse> {
     private static final Logger logger = LogManager.getLogger(EnvironmentSettingsResponseHandler.class);
