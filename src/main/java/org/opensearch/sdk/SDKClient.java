@@ -10,10 +10,7 @@ package org.opensearch.sdk;
 import java.io.IOException;
 
 import org.apache.http.HttpHost;
-
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.RestClientBuilder;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
@@ -25,7 +22,6 @@ import org.opensearch.client.transport.rest_client.RestClientTransport;
  * This class creates SDKClient for an extension to make requests to OpenSearch
  */
 public class SDKClient {
-    private final Logger logger = LogManager.getLogger(SDKClient.class);
     private OpenSearchClient javaClient;
     private RestClient restClient = null;
 
