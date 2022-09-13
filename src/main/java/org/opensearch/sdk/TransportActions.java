@@ -35,7 +35,7 @@ public class TransportActions {
     public <Request extends ActionRequest, Response extends ActionResponse> TransportActions(
         Map<String, Class<? extends TransportAction<Request, Response>>> transportActions
     ) {
-        this.transportActions = new HashMap(transportActions);
+        this.transportActions = new HashMap<>(transportActions);
     }
 
     /**

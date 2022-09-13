@@ -15,17 +15,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.opensearch.extensions.OpenSearchRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.io.stream.InputStreamStreamInput;
-import org.opensearch.common.io.stream.NamedWriteable;
 import org.opensearch.common.io.stream.NamedWriteableAwareStreamInput;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
-import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.io.stream.StreamInput;
+import org.opensearch.extensions.ExtensionBooleanResponse;
+import org.opensearch.extensions.OpenSearchRequest;
 
 /**
  * API used to handle named writeable registry requests from OpenSearch
@@ -122,7 +121,7 @@ public class NamedWriteableRegistryAPI {
                 try {
 
                     // TODO : Determine how extensions utilize parsed object (https://github.com/opensearch-project/OpenSearch/issues/4067)
-                    NamedWriteable namedWriteable = streamInput.readNamedWriteable(categoryClass);
+                    streamInput.readNamedWriteable(categoryClass);
                     status = true;
                 } catch (UnsupportedOperationException e) {
                     logger.info("Failed to parse named writeable", e);

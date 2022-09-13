@@ -45,10 +45,6 @@ public class TestNamedWriteableRegistryAPI extends OpenSearchTestCase {
         public static final String NAME = "example";
         private final String message;
 
-        Example(String message) {
-            this.message = message;
-        }
-
         Example(StreamInput in) throws IOException {
             this.message = in.readString();
         }
