@@ -7,19 +7,22 @@
  */
 package org.opensearch.sdk.sample.crud.rest;
 
-import org.opensearch.action.ActionType;
-import org.opensearch.action.support.master.AcknowledgedResponse;
+import org.opensearch.common.path.PathTrie;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest.Method;
+import org.opensearch.rest.RestUtils;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionRestResponse;
+import org.opensearch.sdk.authz.ProtectedRoute;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
-import static java.util.Collections.singletonList;
-import static org.opensearch.rest.RestRequest.Method.POST;
-import static org.opensearch.rest.RestRequest.Method.PUT;
+import static org.opensearch.rest.RestRequest.Method.*;
 import static org.opensearch.rest.RestStatus.*;
 
 
@@ -33,32 +36,62 @@ public class CrudRestHandler extends ExtensionRestHandler {
     private static final String CREATE_SUCCESS = "PUT /create successful";
     private static final String UPDATE_SUCCESS = "POST /update successful";
 
+    private PathTrie<List<Route>> pathTrie;
+
     public CrudRestHandler(String extensionId) {
         super(extensionId);
+        // initializes pathTrie
+        routes();
     }
 
     @Override
     public List<Route> routes() {
-        return List.of(new Route(PUT, "/crud/create"), new Route(POST, "/crud/update"));
+        List<Route> routes = List.of(
+                new ProtectedRoute(GET, "/detector", (Method method, String uri) -> new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of())),
+                new ProtectedRoute(PUT, "/detector", (Method method, String uri) -> new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of())),
+                new ProtectedRoute(POST, "/detector/{detector_id}", new CrudUpdateRestHandler()),
+                new ProtectedRoute(GET, "/detector/{detector_id}/results", (Method method, String uri) -> new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of())),
+                new ProtectedRoute(GET, "/detector/{detector_id}/results/{results_id}", (Method method, String uri) -> new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of())),
+                new ProtectedRoute(DELETE, "/detector/{detector_id}/results/{results_id}", (Method method, String uri) -> new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of()))
+        );
+        // Only initialize this on first call
+        if (pathTrie == null) {
+            pathTrie = new PathTrie<>(RestUtils.REST_DECODER);
+            for (Route r : routes) {
+                List<Route> routesForPath = pathTrie.retrieve(r.getPath());
+                if (routesForPath == null) {
+                    routesForPath = new ArrayList<>();
+                    routesForPath.add(r);
+                    pathTrie.insert(r.getPath(), routesForPath);
+                } else {
+                    routesForPath.add(r);
+                }
+            }
+        }
+        return routes;
     }
 
     // How should the extension list what permissions it wants to create?
     // Will the permissions be part of the API spec of the extension?
     @Override
     public ExtensionRestResponse handleRequest(Method method, String uri) {
-        System.out.println("method: " + method);
-        System.out.println("URI: " + uri);
-        // TODO modify RestExecuteOnExtensionRequest to get request body. (Should it get params and headers too?)
-        List<String> consumedParams = new ArrayList<>();
-        if (Method.PUT.equals(method) && "/crud/create".equals(uri)) {
-            return new ExtensionRestResponse(OK, CREATE_SUCCESS, consumedParams);
-        } else if (Method.POST.equals(method) && "/crud/update".equals(uri)) {
-            return new ExtensionRestResponse(OK, UPDATE_SUCCESS, consumedParams);
+        if (pathTrie.retrieve(uri) == null || pathTrie.retrieve(uri).isEmpty()) {
+            return new ExtensionRestResponse(
+                NOT_FOUND,
+                "Extension REST action improperly configured to handle " + method.name() + " " + uri,
+                List.of()
+            );
+        }
+        for (Route r : routes()) {
+            ProtectedRoute protectedRoute = (ProtectedRoute) r;
+            if (uri.matches(protectedRoute.getRouteRegex().pattern())) {
+                return protectedRoute.handleRequest(method, uri);
+            }
         }
         return new ExtensionRestResponse(
                 NOT_FOUND,
                 "Extension REST action improperly configured to handle " + method.name() + " " + uri,
-                consumedParams
+                List.of()
         );
     }
 

@@ -14,7 +14,6 @@ import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionSettings;
-import org.opensearch.sdk.sample.helloworld.HelloWorldExtension;
 import org.opensearch.test.OpenSearchTestCase;
 
 import java.util.List;
@@ -34,7 +33,7 @@ public class TestCrudExtension extends OpenSearchTestCase {
     public void testExtensionSettings() {
         // This effectively tests the Extension interface helper method
         ExtensionSettings extensionSettings = extension.getExtensionSettings();
-        ExtensionSettings expected = new ExtensionSettings("crud-sample", "127.0.0.1", "7331");
+        ExtensionSettings expected = new ExtensionSettings("sample-crud", "127.0.0.1", "7331");
         assertEquals(expected.getExtensionName(), extensionSettings.getExtensionName());
         assertEquals(expected.getHostAddress(), extensionSettings.getHostAddress());
         assertEquals(expected.getHostPort(), extensionSettings.getHostPort());
@@ -47,7 +46,7 @@ public class TestCrudExtension extends OpenSearchTestCase {
         List<Route> routes = extensionRestHandlers.get(0).routes();
         assertEquals(1, routes.size());
         assertEquals(Method.PUT, routes.get(0).getMethod());
-        assertEquals("/crud/create", routes.get(0).getPath());
+        assertEquals("/detector", routes.get(0).getPath());
     }
 
 }

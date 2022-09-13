@@ -43,8 +43,6 @@ import org.opensearch.indices.breaker.NoneCircuitBreakerService;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestResponse;
-import org.opensearch.rest.RestRequest;
-import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.sdk.handlers.AuthorizationResponseHandler;
 import org.opensearch.transport.netty4.Netty4Transport;
 import org.opensearch.transport.SharedGroupFactory;
@@ -64,15 +62,10 @@ import org.opensearch.transport.TransportResponse;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -266,6 +259,34 @@ public class ExtensionsRunner {
             request.getRequestIssuerIdentity()
         );
 
+        // TODO validate that caller has the permissions required here
+        String principalIdentifier = request.getPrincipalIdentifier();
+
+
+        // TODO get this list of resource IDs and addition params from the RestExecuteOnExtentionRequest
+        Map<String, Object> params = new HashMap<>();
+
+        AuthorizationResponseHandler authorizationResponseHandler = new AuthorizationResponseHandler();
+        try {
+            AuthorizationResponse authResponse = this.extensionTransportService.submitRequest(
+                    opensearchNode,
+                    ExtensionsOrchestrator.REQUEST_EXTENSION_AUTHORIZE_ACTION,
+                    new AuthorizationRequest(principalIdentifier, actionName, params),
+                    authorizationResponseHandler
+            ).get();
+        } catch (InterruptedException e) {
+            // Request should not be authorized if a definitive response cannot be received
+            return new RestExecuteOnExtensionResponse(
+                RestStatus.SERVICE_UNAVAILABLE,
+                "Received error from OpenSearch: " + e.getMessage()
+            );
+        } catch (ExecutionException e) {
+            // Request should not be authorized if a definitive response cannot be received
+            return new RestExecuteOnExtensionResponse(
+                RestStatus.SERVICE_UNAVAILABLE,
+                "Received error from OpenSearch: " + e.getMessage()
+            );
+        }
         // Get response from extension
         RestResponse response = restHandler.handleRequest(restRequest);
         logger.info("Sending extension response to OpenSearch: " + response.status());

@@ -32,14 +32,14 @@ public class TestRestCreateAction extends OpenSearchTestCase {
         List<Route> routes = restCreateAction.routes();
         assertEquals(1, routes.size());
         assertEquals(Method.PUT, routes.get(0).getMethod());
-        assertEquals("/crud/create", routes.get(0).getPath());
+        assertEquals("/detector", routes.get(0).getPath());
     }
 
     @Test
     public void testHandleRequest() {
-        assertEquals("PUT /create successful", restCreateAction.handleRequest(Method.PUT, "/crud/create"));
-        assertNull(restCreateAction.handleRequest(Method.GET, "/crud/create"));
-        assertNull(restCreateAction.handleRequest(Method.GET, "/crud/validate"));
+        assertEquals("PUT /create successful", restCreateAction.handleRequest(Method.PUT, "/detector"));
+        assertNull(restCreateAction.handleRequest(Method.PATCH, "/detector"));
+        assertNull(restCreateAction.handleRequest(Method.GET, "/detector/validate"));
     }
 
 }
