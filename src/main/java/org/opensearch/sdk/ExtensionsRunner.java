@@ -35,6 +35,7 @@ import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
+import org.opensearch.identity.PrincipalIdentifierToken;
 import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.index.IndicesModuleResponse;
 import org.opensearch.indices.IndicesModule;
@@ -260,8 +261,7 @@ public class ExtensionsRunner {
         );
 
         // TODO validate that caller has the permissions required here
-        String principalIdentifier = request.getPrincipalIdentifier();
-
+        PrincipalIdentifierToken requestIssuerIdentifier = request.getRequestIssuerIdentity();
 
         // TODO get this list of resource IDs and addition params from the RestExecuteOnExtentionRequest
         Map<String, Object> params = new HashMap<>();
@@ -271,7 +271,7 @@ public class ExtensionsRunner {
             AuthorizationResponse authResponse = this.extensionTransportService.submitRequest(
                     opensearchNode,
                     ExtensionsOrchestrator.REQUEST_EXTENSION_AUTHORIZE_ACTION,
-                    new AuthorizationRequest(principalIdentifier, actionName, params),
+                    new AuthorizationRequest(requestIssuerIdentifier, actionName, params),
                     authorizationResponseHandler
             ).get();
         } catch (InterruptedException e) {
