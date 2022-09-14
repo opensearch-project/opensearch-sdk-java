@@ -210,6 +210,7 @@ public class ExtensionsRunner {
     IndicesModuleResponse handleIndicesModuleRequest(IndicesModuleRequest indicesModuleRequest, TransportService transportService) {
         logger.info("Registering Indices Module Request received from OpenSearch");
         IndicesModuleResponse indicesModuleResponse = new IndicesModuleResponse(true, true, true);
+        sendActionListenerOnFailureRequest(transportService, new Exception("Test failure"));
         return indicesModuleResponse;
     }
 
