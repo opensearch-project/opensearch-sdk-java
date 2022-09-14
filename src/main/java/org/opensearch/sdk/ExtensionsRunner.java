@@ -24,12 +24,16 @@ import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
 import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
+import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.PageCacheRecycler;
 import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
+import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.extensions.EnvironmentSettingsRequest;
+import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
+import org.opensearch.extensions.UpdateSettingsRequest;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.index.IndicesModuleRequest;
@@ -42,6 +46,7 @@ import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestResponse;
 import org.opensearch.transport.netty4.Netty4Transport;
 import org.opensearch.transport.SharedGroupFactory;
+import org.opensearch.sdk.handlers.AddSettingsUpdateConsumerResponseHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
@@ -61,9 +66,11 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 import static java.util.Collections.emptySet;
 import static org.opensearch.common.UUIDs.randomBase64UUID;
@@ -80,6 +87,7 @@ public class ExtensionsRunner {
 
     private String uniqueId;
     private DiscoveryNode opensearchNode;
+    private DiscoveryExtension extensionNode;
     private TransportService extensionTransportService = null;
     private ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
 
@@ -92,6 +100,7 @@ public class ExtensionsRunner {
      * https://github.com/opensearch-project/opensearch-sdk-java/issues/119
      */
     private TransportActions transportActions = new TransportActions(new HashMap<>());
+    private Map<String, Consumer> settingUpdateConsumers = new HashMap<>();
 
     /**
      * Instantiates a new Extensions Runner using test settings.
@@ -154,6 +163,10 @@ public class ExtensionsRunner {
         this.opensearchNode = opensearchNode;
     }
 
+    private void setExtensionNode(DiscoveryExtension extensionNode) {
+        this.extensionNode = extensionNode;
+    }
+
     DiscoveryNode getOpensearchNode() {
         return opensearchNode;
     }
@@ -174,6 +187,7 @@ public class ExtensionsRunner {
         } finally {
             // After sending successful response to initialization, send the REST API
             setOpensearchNode(opensearchNode);
+            setExtensionNode(extensionInitRequest.getExtension());
             extensionTransportService.connectToNode(opensearchNode);
             sendRegisterRestActionsRequest(extensionTransportService);
             transportActions.sendRegisterTransportActionsRequest(extensionTransportService, opensearchNode);
@@ -222,6 +236,31 @@ public class ExtensionsRunner {
         logger.info("Registering Indices Module Name Request received from OpenSearch");
         ExtensionBooleanResponse indicesModuleNameResponse = new ExtensionBooleanResponse(true);
         return indicesModuleNameResponse;
+    }
+
+    /**
+     * Handles a request to update a setting from OpenSearch.  Extensions must register their setting keys and consumers within the settingUpdateConsumer map
+     *
+     * @param updateSettingsRequest  The request to handle.
+     * @return A response acknowledging the request.
+     */
+    ExtensionBooleanResponse handleUpdateSettingsRequest(UpdateSettingsRequest updateSettingsRequest) {
+        logger.info("Registering UpdateSettingsRequest received from OpenSearch");
+
+        boolean settingUpdateStatus = false;
+        String settingKey = updateSettingsRequest.getSettingKey();
+        Object data = updateSettingsRequest.getData();
+
+        // Cross reference setting key with settings registered in settingUpdateConsumer map
+        if (settingUpdateConsumers.isEmpty() == false) {
+
+            // Retrieve consumer and accept transported data to execute the consumer
+            Consumer consumer = this.settingUpdateConsumers.get(settingKey);
+            consumer.accept(data);
+            settingUpdateStatus = true;
+        }
+
+        return new ExtensionBooleanResponse(settingUpdateStatus);
     }
 
     /**
@@ -394,6 +433,15 @@ public class ExtensionsRunner {
             ((request, channel, task) -> channel.sendResponse(handleRestExecuteOnExtensionRequest(request)))
         );
 
+        transportService.registerRequestHandler(
+            ExtensionsOrchestrator.REQUEST_EXTENSION_UPDATE_SETTINGS,
+            ThreadPool.Names.GENERIC,
+            false,
+            false,
+            UpdateSettingsRequest::new,
+            ((request, channel, task) -> channel.sendResponse(handleUpdateSettingsRequest(request)))
+        );
+
     }
 
     /**
@@ -478,7 +526,7 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Requests the environment setting values from OpenSearch for the corresponding component setting keys .  The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
+     * Requests the environment setting values from OpenSearch for the corresponding component setting keys. The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
      *
      * @param componentSettingKeys The component ssetting keys that correspond to the values provided by the environment settings
      * @param transportService  The TransportService defining the connection to OpenSearch.
@@ -495,6 +543,40 @@ public class ExtensionsRunner {
             );
         } catch (Exception e) {
             logger.info("Failed to send Environment Settings request to OpenSearch", e);
+        }
+    }
+
+    /**
+     * Registers the setting key from {@link Setting} and the corresponding consumer to the settingsUpdateConsumer map.
+     * Extensions will use this method instead of invoking ClusterSettings#addSettingsUpdateConsumer
+     *
+     * @param settingKey
+     * @param consumer  The TransportService defining the connection to OpenSearch.
+     */
+    public void registerSettingUpdateConsumer(String settingKey, Consumer consumer) {
+        this.settingUpdateConsumers.put(settingKey, consumer);
+    }
+
+    /**
+     * Requests the environment setting values from OpenSearch for the corresponding component setting keys.
+     * This should be called after extension components have registered all their setting update consumers with the settingUpdateConsumers map.
+     * The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
+     *
+     * @param transportService  The TransportService defining the connection to OpenSearch.
+     * @param componentSettingKeys The component setting keys that correspond to the values provided by the environment settings
+     */
+    public void sendAddSettingsUpdateConsumerRequest(TransportService transportService, List<Setting> componentSettings) {
+        logger.info("Sending Add Settings Update Consumer request to OpenSearch");
+        AddSettingsUpdateConsumerResponseHandler addSettingsUpdateConsumerResponseHandler = new AddSettingsUpdateConsumerResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_EXTENSION_ADD_SETTINGS_UPDATE_CONSUMER,
+                new AddSettingsUpdateConsumerRequest(this.extensionNode, componentSettings),
+                addSettingsUpdateConsumerResponseHandler
+            );
+        } catch (Exception e) {
+            logger.info("Failed to send Add Settings Update Consumer request to OpenSearch", e);
         }
     }
 

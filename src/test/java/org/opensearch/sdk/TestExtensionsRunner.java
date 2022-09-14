@@ -40,6 +40,7 @@ import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
 import org.opensearch.extensions.DiscoveryExtension;
+import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
 import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
@@ -47,6 +48,9 @@ import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestStatus;
+import org.opensearch.common.settings.Setting;
+import org.opensearch.extensions.UpdateSettingsRequest;
+import org.opensearch.sdk.handlers.AddSettingsUpdateConsumerResponseHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
@@ -103,7 +107,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     public void testRegisterRequestHandler() {
 
         extensionsRunner.startTransportService(transportService);
-        verify(transportService, times(6)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
+        verify(transportService, times(7)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
     }
 
     @Test
@@ -161,6 +165,13 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         String responseStr = new String(response.getContent(), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("GET"));
         assertTrue(responseStr.contains("/foo"));
+    }
+
+    @Test
+    public void testHandleUpdateSettingsRequest() throws Exception {
+        
+        UpdateSettingsRequest request = new UpdateSettingsRequest("", null);
+        assertEquals(ExtensionBooleanResponse.class, extensionsRunner.handleUpdateSettingsRequest(request).getClass());
     }
 
     @Test

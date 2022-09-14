@@ -9,7 +9,7 @@ package org.opensearch.sdk.handlers;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opensearch.env.EnvironmentSettingsResponse;
+import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.threadpool.ThreadPool;
@@ -19,19 +19,19 @@ import org.opensearch.transport.TransportResponseHandler;
 import java.io.IOException;
 
 /**
- * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendEnvironmentSettingsRequest} call.
+ * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendAddSettingsUpdateConsumerRequest} call.
  */
-public class EnvironmentSettingsResponseHandler implements TransportResponseHandler<EnvironmentSettingsResponse> {
-    private static final Logger logger = LogManager.getLogger(EnvironmentSettingsResponseHandler.class);
+public class AddSettingsUpdateConsumerResponseHandler implements TransportResponseHandler<ExtensionBooleanResponse> {
+    private static final Logger logger = LogManager.getLogger(AddSettingsUpdateConsumerResponseHandler.class);
 
     @Override
-    public void handleResponse(EnvironmentSettingsResponse response) {
+    public void handleResponse(ExtensionBooleanResponse response) {
         logger.info("received {}", response);
     }
 
     @Override
     public void handleException(TransportException exp) {
-        logger.info("EnvironmentSettingsRequest failed", exp);
+        logger.info("AddSettingsUpdateConsumerResponse failed", exp);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class EnvironmentSettingsResponseHandler implements TransportResponseHand
     }
 
     @Override
-    public EnvironmentSettingsResponse read(StreamInput in) throws IOException {
-        return new EnvironmentSettingsResponse(in);
+    public ExtensionBooleanResponse read(StreamInput in) throws IOException {
+        return new ExtensionBooleanResponse(in);
     }
 }
