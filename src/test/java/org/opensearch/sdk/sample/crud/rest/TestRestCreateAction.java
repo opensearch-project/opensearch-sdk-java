@@ -24,7 +24,7 @@ public class TestRestCreateAction extends OpenSearchTestCase {
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        restCreateAction = new CrudRestHandler("test");
+        restCreateAction = new CrudRestHandler();
     }
 
     @Test

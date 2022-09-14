@@ -21,6 +21,7 @@ import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
 import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.rest.AuthorizationRequest;
 import org.opensearch.extensions.rest.AuthorizationResponse;
+import org.opensearch.extensions.rest.AuthorizationStatus;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
@@ -44,7 +45,9 @@ import org.opensearch.indices.breaker.NoneCircuitBreakerService;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestResponse;
+import org.opensearch.sdk.authz.ProtectedRoute;
 import org.opensearch.sdk.handlers.AuthorizationResponseHandler;
+import org.opensearch.sdk.sample.crud.rest.CrudRestHandler;
 import org.opensearch.transport.netty4.Netty4Transport;
 import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
@@ -259,6 +262,14 @@ public class ExtensionsRunner {
             request.getUri(),
             request.getRequestIssuerIdentity()
         );
+        // TODO Create a general mechanism for getting the name of the permission for an action
+        String requiredPermission = "deny_by_default";
+        if (restHandler instanceof CrudRestHandler) {
+            ProtectedRoute matchingRoute = ((CrudRestHandler) restHandler).getMatchingRoute(request.getMethod(), request.getUri());
+            if (matchingRoute != null) {
+                requiredPermission = matchingRoute.getRequiredPermission();
+            }
+        }
 
         // TODO validate that caller has the permissions required here
         PrincipalIdentifierToken requestIssuerIdentifier = request.getRequestIssuerIdentity();
@@ -271,9 +282,15 @@ public class ExtensionsRunner {
             AuthorizationResponse authResponse = this.extensionTransportService.submitRequest(
                     opensearchNode,
                     ExtensionsOrchestrator.REQUEST_EXTENSION_AUTHORIZE_ACTION,
-                    new AuthorizationRequest(requestIssuerIdentifier, actionName, params),
+                    new AuthorizationRequest(getUniqueId(), requestIssuerIdentifier, requiredPermission, params),
                     authorizationResponseHandler
             ).get();
+            if (authResponse.getAuthStatus().equals(AuthorizationStatus.DENIED)) {
+                return new RestExecuteOnExtensionResponse(
+                        RestStatus.FORBIDDEN,
+                        "User is not authorized to perform the action"
+                );
+            }
         } catch (InterruptedException e) {
             // Request should not be authorized if a definitive response cannot be received
             return new RestExecuteOnExtensionResponse(

@@ -10,9 +10,16 @@ import java.util.regex.Pattern;
 public class ProtectedRoute extends RestHandler.Route {
 
     public ExtensionRouteRequestHandler requestHandler;
-    public ProtectedRoute(RestRequest.Method method, String path, ExtensionRouteRequestHandler requestHandler) {
+
+    private String requiredPermission;
+    public ProtectedRoute(RestRequest.Method method, String path, String requiredPermission, ExtensionRouteRequestHandler requestHandler) {
         super(method, path);
         this.requestHandler = requestHandler;
+        this.requiredPermission = requiredPermission;
+    }
+
+    public String getRequiredPermission() {
+        return this.requiredPermission;
     }
 
     public Pattern getRouteRegex() {

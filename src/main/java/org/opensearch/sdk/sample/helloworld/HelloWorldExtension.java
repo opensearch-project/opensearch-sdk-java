@@ -55,7 +55,7 @@ public class HelloWorldExtension implements Extension {
 
     @Override
     public List<ExtensionRestHandler> getExtensionRestHandlers() {
-        return List.of(new RestHelloAction(this.settings.getExtensionName()));
+        return List.of(new RestHelloAction());
     }
 
     /**

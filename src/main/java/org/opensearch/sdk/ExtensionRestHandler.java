@@ -18,24 +18,14 @@ import org.opensearch.rest.RestRequest;
  * This interface defines methods which an extension REST handler (action) must provide.
  * It is the Extension counterpart to core OpenSearch {@link RestHandler}.
  */
-public abstract class ExtensionRestHandler {
-
-    private String actionPrefix;
-
-    public ExtensionRestHandler(String extensionId) {
-        this.actionPrefix = "extensions:" + extensionId;
-    }
-
-    public String getActionPrefix() {
-        return this.actionPrefix;
-    }
+public interface ExtensionRestHandler {
 
     /**
      * The list of {@link Route}s that this ExtensionRestHandler is responsible for handling.
      *
      * @return The routes this handler will handle.
      */
-    public abstract List<Route> routes();
+    List<Route> routes();
 
     /**
      * Handles REST Requests forwarded from OpenSearch for a configured route on an extension.

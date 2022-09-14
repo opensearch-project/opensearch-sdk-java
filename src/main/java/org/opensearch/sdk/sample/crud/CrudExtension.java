@@ -55,7 +55,7 @@ public class CrudExtension implements Extension {
 
     @Override
     public List<ExtensionRestHandler> getExtensionRestHandlers() {
-        List <ExtensionRestHandler> restHandlers = List.of(new CrudRestHandler(settings.getExtensionName()));
+        List <ExtensionRestHandler> restHandlers = List.of(new CrudRestHandler());
         return restHandlers;
     }
 

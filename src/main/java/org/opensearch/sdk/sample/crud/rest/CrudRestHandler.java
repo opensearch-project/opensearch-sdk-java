@@ -31,15 +31,15 @@ import static org.opensearch.rest.RestStatus.*;
 /**
  * Sample REST Handler (REST Action). Extension REST handlers must implement {@link ExtensionRestHandler}.
  */
-public class CrudRestHandler extends ExtensionRestHandler {
+public class CrudRestHandler implements ExtensionRestHandler {
 
     private static final String CREATE_SUCCESS = "PUT /create successful";
     private static final String UPDATE_SUCCESS = "POST /update successful";
 
     private PathTrie<List<Route>> pathTrie;
 
-    public CrudRestHandler(String extensionId) {
-        super(extensionId);
+    public CrudRestHandler() {
+        super();
         // initializes pathTrie
         routes();
     }
@@ -47,12 +47,12 @@ public class CrudRestHandler extends ExtensionRestHandler {
     @Override
     public List<Route> routes() {
         List<Route> routes = List.of(
-                new ProtectedRoute(GET, "/detector", (Method method, String uri) -> new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of())),
-                new ProtectedRoute(PUT, "/detector", new CrudCreateRestHandler()),
-                new ProtectedRoute(POST, "/detector/{detector_id}", new CrudUpdateRestHandler()),
-                new ProtectedRoute(GET, "/detector/{detector_id}/results", (Method method, String uri) -> new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of())),
-                new ProtectedRoute(GET, "/detector/{detector_id}/results/{results_id}", (Method method, String uri) -> new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of())),
-                new ProtectedRoute(DELETE, "/detector/{detector_id}/results/{results_id}", (Method method, String uri) -> new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of()))
+                new ProtectedRoute(GET, "/detector", "ListDetector", (Method method, String uri) -> new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of())),
+                new ProtectedRoute(PUT, "/detector", "CreateDetector", new CrudCreateRestHandler()),
+                new ProtectedRoute(POST, "/detector/{detector_id}", "UpdateDetector", new CrudUpdateRestHandler()),
+                new ProtectedRoute(GET, "/detector/{detector_id}/results", "ListResults", (Method method, String uri) -> new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of())),
+                new ProtectedRoute(GET, "/detector/{detector_id}/results/{results_id}", "GetResults",(Method method, String uri) -> new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of())),
+                new ProtectedRoute(DELETE, "/detector/{detector_id}/results/{results_id}", "DeleteResults", (Method method, String uri) -> new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of()))
         );
         // Only initialize this on first call
         if (pathTrie == null) {
@@ -82,11 +82,9 @@ public class CrudRestHandler extends ExtensionRestHandler {
                 List.of()
             );
         }
-        for (Route r : routes()) {
-            ProtectedRoute protectedRoute = (ProtectedRoute) r;
-            if (protectedRoute.getMethod() == method && uri.matches(protectedRoute.getRouteRegex().pattern())) {
-                return protectedRoute.handleRequest(method, uri);
-            }
+        ProtectedRoute matchingRoute = getMatchingRoute(method, uri);
+        if (matchingRoute != null) {
+            return matchingRoute.handleRequest(method, uri);
         }
         return new ExtensionRestResponse(
                 NOT_FOUND,
@@ -95,4 +93,13 @@ public class CrudRestHandler extends ExtensionRestHandler {
         );
     }
 
+    public ProtectedRoute getMatchingRoute(Method method, String uri) {
+        for (Route r : routes()) {
+            ProtectedRoute protectedRoute = (ProtectedRoute) r;
+            if (protectedRoute.getMethod() == method && uri.matches(protectedRoute.getRouteRegex().pattern())) {
+                return protectedRoute;
+            }
+        }
+        return null;
+    }
 }

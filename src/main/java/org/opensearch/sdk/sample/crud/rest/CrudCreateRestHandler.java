@@ -24,7 +24,9 @@ import org.opensearch.client.opensearch.indices.ExistsResponse;
 import org.opensearch.client.transport.endpoints.BooleanResponse;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.xcontent.XContentFactory;
+import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
 import org.opensearch.rest.RestRequest;
+import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.ExtensionRestResponse;
 import org.opensearch.sdk.NamedWriteableRegistryAPI;
 import org.opensearch.sdk.SDKClient;
@@ -69,7 +71,11 @@ public class CrudCreateRestHandler implements ExtensionRouteRequestHandler {
             IndexResponse ir = client.index(new IndexRequest.Builder().index("detectors").document(doc).build());
             logger.info("IndexResponse: " + ir.toString());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return new ExtensionRestResponse(
+                RestStatus.SERVICE_UNAVAILABLE,
+        "Received error from OpenSearch: " + e.getMessage(),
+                List.of()
+            );
         }
         return new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of());
     }
