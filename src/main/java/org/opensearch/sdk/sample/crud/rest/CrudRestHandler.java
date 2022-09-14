@@ -48,7 +48,7 @@ public class CrudRestHandler extends ExtensionRestHandler {
     public List<Route> routes() {
         List<Route> routes = List.of(
                 new ProtectedRoute(GET, "/detector", (Method method, String uri) -> new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of())),
-                new ProtectedRoute(PUT, "/detector", (Method method, String uri) -> new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of())),
+                new ProtectedRoute(PUT, "/detector", new CrudCreateRestHandler()),
                 new ProtectedRoute(POST, "/detector/{detector_id}", new CrudUpdateRestHandler()),
                 new ProtectedRoute(GET, "/detector/{detector_id}/results", (Method method, String uri) -> new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of())),
                 new ProtectedRoute(GET, "/detector/{detector_id}/results/{results_id}", (Method method, String uri) -> new ExtensionRestResponse(OK, CREATE_SUCCESS, List.of())),
@@ -84,7 +84,7 @@ public class CrudRestHandler extends ExtensionRestHandler {
         }
         for (Route r : routes()) {
             ProtectedRoute protectedRoute = (ProtectedRoute) r;
-            if (uri.matches(protectedRoute.getRouteRegex().pattern())) {
+            if (protectedRoute.getMethod() == method && uri.matches(protectedRoute.getRouteRegex().pattern())) {
                 return protectedRoute.handleRequest(method, uri);
             }
         }
