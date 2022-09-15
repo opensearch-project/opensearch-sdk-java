@@ -103,12 +103,14 @@ user has the required permissions. AuthorizationRequest handling is performed in
 
 ```java
 public class AuthorizationRequest extends TransportRequest {
-    private String principalIdentifier;
+    private String extensionUniqueId;
+    private PrincipalIdentifierToken requestIssuerIdentity;
     private String permissionId;
     private Map<String, Object> params;
 
-    public AuthorizationRequest(String principalIdentifier, String permissionId, Map<String, Object> params) {
-        this.principalIdentifier = principalIdentifier;
+    public AuthorizationRequest(String extensionUniqueId, PrincipalIdentifierToken requestIssuerIdentity, String permissionId, Map<String, Object> params) {
+        this.extensionUniqueId = extensionUniqueId;
+        this.requestIssuerIdentity = requestIssuerIdentity;
         this.permissionId = permissionId;
         this.params = params;
     }

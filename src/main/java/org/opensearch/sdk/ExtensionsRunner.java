@@ -262,20 +262,22 @@ public class ExtensionsRunner {
             request.getUri(),
             request.getRequestIssuerIdentity()
         );
+
+        // TODO get this list of resource IDs and addition params from the RestExecuteOnExtentionRequest
+        Map<String, Object> params = new HashMap<>();
+
         // TODO Create a general mechanism for getting the name of the permission for an action
         String requiredPermission = "deny_by_default";
         if (restHandler instanceof CrudRestHandler) {
             ProtectedRoute matchingRoute = ((CrudRestHandler) restHandler).getMatchingRoute(request.getMethod(), request.getUri());
             if (matchingRoute != null) {
+                params = matchingRoute.getConsumedParams(request.getUri());
                 requiredPermission = matchingRoute.getRequiredPermission();
             }
         }
 
         // TODO validate that caller has the permissions required here
         PrincipalIdentifierToken requestIssuerIdentifier = request.getRequestIssuerIdentity();
-
-        // TODO get this list of resource IDs and addition params from the RestExecuteOnExtentionRequest
-        Map<String, Object> params = new HashMap<>();
 
         AuthorizationResponseHandler authorizationResponseHandler = new AuthorizationResponseHandler();
         try {
