@@ -36,6 +36,7 @@ import org.opensearch.Version;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.common.settings.Setting.Property;
 import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
@@ -50,7 +51,6 @@ import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.extensions.UpdateSettingsRequest;
-import org.opensearch.sdk.handlers.AddSettingsUpdateConsumerResponseHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
@@ -169,8 +169,10 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
     @Test
     public void testHandleUpdateSettingsRequest() throws Exception {
-        
-        UpdateSettingsRequest request = new UpdateSettingsRequest("", null);
+
+        Setting<Integer> fallbackSetting = Setting.intSetting("component.fallback.setting.key", 0, 0, Property.Dynamic);
+        Setting<Integer> componentSetting = Setting.intSetting("component.setting.key", fallbackSetting, Property.Dynamic);
+        UpdateSettingsRequest request = new UpdateSettingsRequest(componentSetting, null);
         assertEquals(ExtensionBooleanResponse.class, extensionsRunner.handleUpdateSettingsRequest(request).getClass());
     }
 
@@ -201,8 +203,8 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testEnvironmentSettingsRequest() {
 
-        List<String> componentSettingKeys = new ArrayList<>();
-        extensionsRunner.sendEnvironmentSettingsRequest(transportService, componentSettingKeys);
+        List<Setting<?>> componentSettings = new ArrayList<>();
+        extensionsRunner.sendEnvironmentSettingsRequest(transportService, componentSettings);
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(EnvironmentSettingsResponseHandler.class));
     }

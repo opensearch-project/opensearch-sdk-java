@@ -100,7 +100,7 @@ public class ExtensionsRunner {
      * https://github.com/opensearch-project/opensearch-sdk-java/issues/119
      */
     private TransportActions transportActions = new TransportActions(new HashMap<>());
-    private Map<String, Consumer> settingUpdateConsumers = new HashMap<>();
+    private Map<Setting<?>, Consumer<?>> settingUpdateConsumers = new HashMap<>();
 
     /**
      * Instantiates a new Extensions Runner using test settings.
@@ -248,14 +248,15 @@ public class ExtensionsRunner {
         logger.info("Registering UpdateSettingsRequest received from OpenSearch");
 
         boolean settingUpdateStatus = false;
-        String settingKey = updateSettingsRequest.getSettingKey();
+        Setting<?> componentSetting = updateSettingsRequest.getComponentSetting();
         Object data = updateSettingsRequest.getData();
 
         // Cross reference setting key with settings registered in settingUpdateConsumer map
         if (settingUpdateConsumers.isEmpty() == false) {
 
+            // TODO : After getSettings support is added, handle consumer parameterization
             // Retrieve consumer and accept transported data to execute the consumer
-            Consumer consumer = this.settingUpdateConsumers.get(settingKey);
+            Consumer consumer = this.settingUpdateConsumers.get(componentSetting);
             consumer.accept(data);
             settingUpdateStatus = true;
         }
@@ -526,19 +527,19 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Requests the environment setting values from OpenSearch for the corresponding component setting keys. The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
+     * Requests the environment setting values from OpenSearch for the corresponding component settings. The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
      *
-     * @param componentSettingKeys The component ssetting keys that correspond to the values provided by the environment settings
+     * @param componentSettings The component setting that correspond to the values provided by the environment settings
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
-    public void sendEnvironmentSettingsRequest(TransportService transportService, List<String> componentSettingKeys) {
+    public void sendEnvironmentSettingsRequest(TransportService transportService, List<Setting<?>> componentSettings) {
         logger.info("Sending Environment Settings request to OpenSearch");
         EnvironmentSettingsResponseHandler environmentSettingsResponseHandler = new EnvironmentSettingsResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsOrchestrator.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS,
-                new EnvironmentSettingsRequest(componentSettingKeys),
+                new EnvironmentSettingsRequest(componentSettings),
                 environmentSettingsResponseHandler
             );
         } catch (Exception e) {
@@ -547,25 +548,25 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Registers the setting key from {@link Setting} and the corresponding consumer to the settingsUpdateConsumer map.
+     * Registers the component {@link Setting} and the corresponding consumer to the settingsUpdateConsumer map.
      * Extensions will use this method instead of invoking ClusterSettings#addSettingsUpdateConsumer
      *
-     * @param settingKey
-     * @param consumer  The TransportService defining the connection to OpenSearch.
+     * @param componentSetting The component setting associated with the consumer
+     * @param consumer  The setting update consumer associated with the component setting
      */
-    public void registerSettingUpdateConsumer(String settingKey, Consumer consumer) {
-        this.settingUpdateConsumers.put(settingKey, consumer);
+    public <T> void registerSettingUpdateConsumer(Setting<T> componentSetting, Consumer<T> consumer) {
+        this.settingUpdateConsumers.put(componentSetting, consumer);
     }
 
     /**
-     * Requests the environment setting values from OpenSearch for the corresponding component setting keys.
+     * Requests the environment setting values from OpenSearch for the corresponding component settings.
      * This should be called after extension components have registered all their setting update consumers with the settingUpdateConsumers map.
      * The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
-     * @param componentSettingKeys The component setting keys that correspond to the values provided by the environment settings
+     * @param componentSettings The component settings that correspond to the values provided by the environment settings
      */
-    public void sendAddSettingsUpdateConsumerRequest(TransportService transportService, List<Setting> componentSettings) {
+    public void sendAddSettingsUpdateConsumerRequest(TransportService transportService, List<Setting<?>> componentSettings) {
         logger.info("Sending Add Settings Update Consumer request to OpenSearch");
         AddSettingsUpdateConsumerResponseHandler addSettingsUpdateConsumerResponseHandler = new AddSettingsUpdateConsumerResponseHandler();
         try {
