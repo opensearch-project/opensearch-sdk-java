@@ -63,6 +63,7 @@ import org.opensearch.transport.TransportResponse;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -564,21 +565,34 @@ public class ExtensionsRunner {
      * The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
-     * @param componentSettings The component settings that correspond to the values provided by the environment settings
+     * @throws Exception if there are no setting update consumers registered within the settingUpdateConsumers map
      */
-    public void sendAddSettingsUpdateConsumerRequest(TransportService transportService, List<Setting<?>> componentSettings) {
+    public void sendAddSettingsUpdateConsumerRequest(TransportService transportService) throws Exception {
         logger.info("Sending Add Settings Update Consumer request to OpenSearch");
-        AddSettingsUpdateConsumerResponseHandler addSettingsUpdateConsumerResponseHandler = new AddSettingsUpdateConsumerResponseHandler();
-        try {
-            transportService.sendRequest(
-                opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_ADD_SETTINGS_UPDATE_CONSUMER,
-                new AddSettingsUpdateConsumerRequest(this.extensionNode, componentSettings),
-                addSettingsUpdateConsumerResponseHandler
-            );
-        } catch (Exception e) {
-            logger.info("Failed to send Add Settings Update Consumer request to OpenSearch", e);
+
+        // Determine if setting update consumers have been registered
+        if (this.settingUpdateConsumers.isEmpty()) {
+            throw new Exception("There are no setting update consumers registered");
+        } else {
+
+            // Extract registered settings from setting update consumer map
+            List<Setting<?>> componentSettings = new ArrayList<>(this.settingUpdateConsumers.size());
+            componentSettings.addAll(this.settingUpdateConsumers.keySet());
+
+            AddSettingsUpdateConsumerResponseHandler addSettingsUpdateConsumerResponseHandler =
+                new AddSettingsUpdateConsumerResponseHandler();
+            try {
+                transportService.sendRequest(
+                    opensearchNode,
+                    ExtensionsOrchestrator.REQUEST_EXTENSION_ADD_SETTINGS_UPDATE_CONSUMER,
+                    new AddSettingsUpdateConsumerRequest(this.extensionNode, componentSettings),
+                    addSettingsUpdateConsumerResponseHandler
+                );
+            } catch (Exception e) {
+                logger.info("Failed to send Add Settings Update Consumer request to OpenSearch", e);
+            }
         }
+
     }
 
     private Settings getSettings() {
