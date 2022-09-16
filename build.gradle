@@ -40,6 +40,8 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
         }
+        sourceCompatibility = 11
+        targetCompatibility = 11
     }
 }
 
@@ -60,16 +62,16 @@ dependencies {
     implementation "org.opensearch.plugin:transport-netty4-client:3.0.0-SNAPSHOT"
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.1'
-    implementation 'org.opensearch.client:opensearch-rest-client:2.0.0'
-    implementation 'org.opensearch.client:opensearch-java:2.0.0'
-    implementation "io.netty:netty-all:4.1.73.Final"
+    implementation 'org.opensearch.client:opensearch-rest-client:3.0.0-SNAPSHOT'
+    implementation 'org.opensearch.client:opensearch-java:3.0.0-SNAPSHOT'
+    implementation "io.netty:netty-all:4.1.79.Final"
     testCompileOnly ("junit:junit:4.13.2") {
         exclude module : 'hamcrest'
         exclude module : 'hamcrest-core'
     }
     implementation 'javax.xml.bind:jaxb-api:2.2.2'
-    implementation 'com.fasterxml.jackson.core:jackson-databind: 2.12.6.1'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml: 2.12.6.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.4'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
     testImplementation "org.opensearch.test:framework:3.0.0-SNAPSHOT"
