@@ -11,7 +11,6 @@ import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.common.io.stream.StreamOutput;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
 import org.opensearch.identity.PrincipalIdentifierToken;
-import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.transport.TransportRequest;
 
@@ -39,11 +38,7 @@ public class ExtensionRestRequest extends TransportRequest {
 
     public ExtensionRestRequest(StreamInput in) throws IOException {
         super(in);
-        try {
-            method = RestRequest.Method.valueOf(in.readString());
-        } catch (IllegalArgumentException e) {
-            throw new IOException(e);
-        }
+        method = in.readEnum(Method.class);
         uri = in.readString();
         principalIdentifierToken = in.readNamedWriteable(PrincipalIdentifierToken.class);
     }
@@ -51,16 +46,16 @@ public class ExtensionRestRequest extends TransportRequest {
     @Override
     public void writeTo(StreamOutput out) throws IOException {
         super.writeTo(out);
-        out.writeString(method.name());
+        out.writeEnum(method);
         out.writeString(uri);
         out.writeNamedWriteable(principalIdentifierToken);
     }
 
-    public Method getMethod() {
+    public Method method() {
         return method;
     }
 
-    public String getUri() {
+    public String uri() {
         return uri;
     }
 

@@ -31,7 +31,7 @@ public interface ExtensionRestHandler {
      * This method corresponds to the {@link BaseRestHandler#prepareRequest} method.
      * As in that method, consumed parameters must be tracked and returned in the response.
      *
-     * @param restRequest a rest request object for a request to be forwarded to extensions
+     * @param restRequest a REST request object for a request to be forwarded to extensions
      * @return An {@link ExtensionRestResponse} to the request.
      */
     ExtensionRestResponse handleRequest(ExtensionRestRequest restRequest);

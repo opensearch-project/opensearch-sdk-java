@@ -35,8 +35,8 @@ public class TestExtensionRestRequest extends OpenSearchTestCase {
 
         ExtensionRestRequest request = new ExtensionRestRequest(expectedMethod, expectedUri, expectedRequestIssuerIdentity);
 
-        assertEquals(expectedMethod, request.getMethod());
-        assertEquals(expectedUri, request.getUri());
+        assertEquals(expectedMethod, request.method());
+        assertEquals(expectedUri, request.uri());
         assertEquals(expectedRequestIssuerIdentity, request.getRequestIssuerIdentity());
 
         try (BytesStreamOutput out = new BytesStreamOutput()) {
@@ -47,8 +47,8 @@ public class TestExtensionRestRequest extends OpenSearchTestCase {
                     request = new ExtensionRestRequest(nameWritableAwareIn);
                 }
 
-                assertEquals(expectedMethod, request.getMethod());
-                assertEquals(expectedUri, request.getUri());
+                assertEquals(expectedMethod, request.method());
+                assertEquals(expectedUri, request.uri());
                 assertEquals(expectedRequestIssuerIdentity, request.getRequestIssuerIdentity());
             }
         }

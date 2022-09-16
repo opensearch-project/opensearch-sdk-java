@@ -41,9 +41,10 @@ public class RestHelloAction implements ExtensionRestHandler {
     public ExtensionRestResponse handleRequest(ExtensionRestRequest request) {
         // We need to track which parameters are consumed to pass back to OpenSearch
         List<String> consumedParams = new ArrayList<>();
-        Method method = request.getMethod();
-        String uri = request.getUri();
-        // consumedParams.add(requesterIdentity.getToken());
+        Method method = request.method();
+        String uri = request.uri();
+        // TODO: should we extract token and then add it to the list of consumed parameters?
+        consumedParams.add(request.getRequestIssuerIdentity().getToken());
         if (Method.GET.equals(method) && "/hello".equals(uri)) {
             return new ExtensionRestResponse(OK, String.format(GREETING, worldName), consumedParams);
         } else if (Method.PUT.equals(method) && uri.startsWith("/hello/")) {
