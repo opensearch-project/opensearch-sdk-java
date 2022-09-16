@@ -46,7 +46,7 @@ publishing {
 repositories {
     mavenLocal()
     // Remove the commented code below once TransportService is published to maven
-    //maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
+    maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
     maven { url "https://d1nvenhzbhpy0q.cloudfront.net/snapshots/lucene/"}
     mavenCentral()
 }
@@ -63,6 +63,7 @@ dependencies {
     implementation 'org.opensearch.client:opensearch-rest-client:2.0.0'
     implementation 'org.opensearch.client:opensearch-java:2.0.0'
     implementation "io.netty:netty-all:4.1.73.Final"
+    implementation "org.apache.lucene:lucene-core:9.4.0-snapshot-ddf0d0a"
     testCompileOnly ("junit:junit:4.13.2") {
         exclude module : 'hamcrest'
         exclude module : 'hamcrest-core'

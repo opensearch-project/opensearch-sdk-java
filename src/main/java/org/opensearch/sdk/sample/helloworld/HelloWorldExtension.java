@@ -10,6 +10,7 @@ package org.opensearch.sdk.sample.helloworld;
 import java.io.IOException;
 import java.util.List;
 
+import org.opensearch.sdk.BaseExtension;
 import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionSettings;
@@ -25,7 +26,7 @@ import org.opensearch.sdk.sample.helloworld.rest.RestHelloAction;
  * <p>
  * To execute, pass an instatiated object of this class to {@link ExtensionsRunner#run(Extension)}.
  */
-public class HelloWorldExtension implements Extension {
+public class HelloWorldExtension extends BaseExtension {
 
     /**
      * Optional classpath-relative path to a yml file containing extension settings.
@@ -40,7 +41,8 @@ public class HelloWorldExtension implements Extension {
     /**
      * Instantiate this extension, initializing the connection settings and REST actions.
      */
-    public HelloWorldExtension() {
+    public HelloWorldExtension() throws IOException {
+        super();
         try {
             this.settings = initializeSettings();
         } catch (IOException e) {
