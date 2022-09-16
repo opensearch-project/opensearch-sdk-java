@@ -60,6 +60,9 @@ import org.opensearch.transport.TransportInterceptor;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
 import org.opensearch.transport.TransportResponse;
+import org.opensearch.common.settings.WriteableSetting;
+import org.opensearch.common.unit.ByteSizeValue;
+import org.opensearch.common.unit.TimeValue;
 
 import java.io.File;
 import java.io.IOException;
@@ -245,21 +248,55 @@ public class ExtensionsRunner {
      * @param updateSettingsRequest  The request to handle.
      * @return A response acknowledging the request.
      */
+    @SuppressWarnings("unchecked")
     ExtensionBooleanResponse handleUpdateSettingsRequest(UpdateSettingsRequest updateSettingsRequest) {
         logger.info("Registering UpdateSettingsRequest received from OpenSearch");
 
-        boolean settingUpdateStatus = false;
+        boolean settingUpdateStatus = true;
+
+        WriteableSetting.WriteableSettingGenericType settingType = updateSettingsRequest.getSettingType();
         Setting<?> componentSetting = updateSettingsRequest.getComponentSetting();
         Object data = updateSettingsRequest.getData();
 
-        // Cross reference setting key with settings registered in settingUpdateConsumer map
-        if (settingUpdateConsumers.isEmpty() == false) {
-
-            // TODO : After getSettings support is added, handle consumer parameterization
-            // Retrieve consumer and accept transported data to execute the consumer
-            Consumer consumer = this.settingUpdateConsumers.get(componentSetting);
-            consumer.accept(data);
-            settingUpdateStatus = true;
+        // Setting updater in OpenSearch performs setting change validation, only need to cast the consumer to the corresponding type and
+        // invoke the consumer
+        try {
+            switch (settingType) {
+                case Boolean:
+                    Consumer<Boolean> boolConsumer = (Consumer<Boolean>) this.settingUpdateConsumers.get(componentSetting);
+                    boolConsumer.accept(Boolean.parseBoolean(data.toString()));
+                case Integer:
+                    Consumer<Integer> intConsumer = (Consumer<Integer>) this.settingUpdateConsumers.get(componentSetting);
+                    intConsumer.accept(Integer.parseInt(data.toString()));
+                case Long:
+                    Consumer<Long> longConsumer = (Consumer<Long>) this.settingUpdateConsumers.get(componentSetting);
+                    longConsumer.accept(Long.parseLong(data.toString()));
+                case Float:
+                    Consumer<Float> floatConsumer = (Consumer<Float>) this.settingUpdateConsumers.get(componentSetting);
+                    floatConsumer.accept(Float.parseFloat(data.toString()));
+                case Double:
+                    Consumer<Double> doubleConsumer = (Consumer<Double>) this.settingUpdateConsumers.get(componentSetting);
+                    doubleConsumer.accept(Double.parseDouble(data.toString()));
+                case String:
+                    Consumer<String> stringConsumer = (Consumer<String>) this.settingUpdateConsumers.get(componentSetting);
+                    stringConsumer.accept(data.toString());
+                case TimeValue:
+                    Consumer<TimeValue> timeValueConsumer = (Consumer<TimeValue>) this.settingUpdateConsumers.get(componentSetting);
+                    timeValueConsumer.accept(TimeValue.parseTimeValue(data.toString(), componentSetting.getKey()));
+                case ByteSizeValue:
+                    Consumer<ByteSizeValue> byteSizeValueConsumer = (Consumer<ByteSizeValue>) this.settingUpdateConsumers.get(
+                        componentSetting
+                    );
+                    byteSizeValueConsumer.accept(ByteSizeValue.parseBytesSizeValue(data.toString(), componentSetting.getKey()));
+                case Version:
+                    Consumer<Version> versionConsumer = (Consumer<Version>) this.settingUpdateConsumers.get(componentSetting);
+                    versionConsumer.accept((Version) data);
+                default:
+                    throw new UnsupportedOperationException("Setting Update Consumer type does not exist and is not handled here");
+            }
+        } catch (Exception e) {
+            logger.info(e.getMessage());
+            settingUpdateStatus = false;
         }
 
         return new ExtensionBooleanResponse(settingUpdateStatus);

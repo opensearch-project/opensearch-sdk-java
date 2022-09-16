@@ -59,6 +59,7 @@ import org.opensearch.sdk.handlers.RegisterRestActionsResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.Transport;
 import org.opensearch.transport.TransportService;
+import org.opensearch.common.settings.WriteableSetting;
 
 public class TestExtensionsRunner extends OpenSearchTestCase {
 
@@ -172,7 +173,11 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         Setting<Integer> fallbackSetting = Setting.intSetting("component.fallback.setting.key", 0, 0, Property.Dynamic);
         Setting<Integer> componentSetting = Setting.intSetting("component.setting.key", fallbackSetting, Property.Dynamic);
-        UpdateSettingsRequest request = new UpdateSettingsRequest(componentSetting, null);
+        UpdateSettingsRequest request = new UpdateSettingsRequest(
+            WriteableSetting.WriteableSettingGenericType.Integer,
+            componentSetting,
+            null
+        );
         assertEquals(ExtensionBooleanResponse.class, extensionsRunner.handleUpdateSettingsRequest(request).getClass());
     }
 
