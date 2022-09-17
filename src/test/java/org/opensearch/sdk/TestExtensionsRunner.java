@@ -45,6 +45,7 @@ import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestStatus;
+import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
@@ -182,6 +183,14 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         extensionsRunner.sendLocalNodeRequest(transportService);
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(LocalNodeResponseHandler.class));
+    }
+
+    @Test
+    public void testActionListenerOnFailureRequest() {
+
+        extensionsRunner.sendActionListenerOnFailureRequest(transportService, new Exception("Test failure"));
+
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ActionListenerOnFailureResponseHandler.class));
     }
 
     @Test
