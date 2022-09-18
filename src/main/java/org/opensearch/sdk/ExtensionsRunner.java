@@ -509,7 +509,7 @@ public class ExtensionsRunner {
      *
      * @param timeout  The timeout for the listener in milliseconds. A timeout of 0 means no timeout.
      */
-    public static void startActionListener(int timeout) {
+    public void startActionListener(int timeout) {
         final ActionListener actionListener = new ActionListener();
         actionListener.runActionListener(true, timeout);
     }
