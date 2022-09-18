@@ -20,8 +20,8 @@ import java.io.IOException;
 /**
  * This class handles the response {{@link org.opensearch.extensions.ExtensionBooleanResponse }} from OpenSearch to Extension.
  */
-public class ExtensionResponseHandler implements TransportResponseHandler<ExtensionBooleanResponse> {
-    private static final Logger logger = LogManager.getLogger(ExtensionResponseHandler.class);
+public class ExtensionBooleanResponseHandler implements TransportResponseHandler<ExtensionBooleanResponse> {
+    private static final Logger logger = LogManager.getLogger(ExtensionBooleanResponseHandler.class);
 
     @Override
     public void handleResponse(ExtensionBooleanResponse response) {
