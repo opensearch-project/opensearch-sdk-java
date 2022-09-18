@@ -45,7 +45,7 @@ import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
-import org.opensearch.sdk.handlers.RegisterRestActionsResponseHandler;
+import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
 import org.opensearch.search.SearchModule;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.ClusterConnectionManager;
@@ -403,7 +403,7 @@ public class ExtensionsRunner {
     public void sendRegisterRestActionsRequest(TransportService transportService) {
         List<String> extensionRestPaths = extensionRestPathRegistry.getRegisteredPaths();
         logger.info("Sending Register REST Actions request to OpenSearch for " + extensionRestPaths);
-        RegisterRestActionsResponseHandler registerActionsResponseHandler = new RegisterRestActionsResponseHandler();
+        ExtensionStringResponseHandler registerActionsResponseHandler = new ExtensionStringResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
