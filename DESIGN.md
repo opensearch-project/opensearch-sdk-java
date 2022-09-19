@@ -4,12 +4,12 @@
 
 Plugin architecture enables extending core features of OpenSearch. There are various kinds of plugins which are supported.
 But, the architecture has significant problems for OpenSearch customers. Importantly, plugins can fatally impact the cluster
-i.e critical workloads like ingestion/search traffic would be impacted because of a non-critical plugin like s3-repository failed with an exception.
+i.e., critical workloads like ingestion/search traffic would be impacted because of a non-critical plugin like s3-repository failed with an exception.
 
-This problem is exponentially grows when we would like to run a 3rd Party plugin from the community.  
+This problem exponentially grows when we would like to run a third Party plugin from the community.  
 As OpenSearch and plugins run in the same process, it brings in security risk, dependency conflicts and reduces the velocity of releases.
 
-Introducing extensions, a simple and easy way to extend features of OpenSearch. It would support all plugin features and enable them to run in a seperate process or on another node via OpenSearch SDK Java.
+Introducing extensions, a simple and easy way to extend features of OpenSearch. It would support all plugin features and enable them to run in a seperate process or on another node via OpenSearch SDK for Java (other SDKs will be developed).
 
 Meta Issue: [Steps to make OpenSearch extensible](https://github.com/opensearch-project/OpenSearch/issues/2447)  
 Sandboxing: [Step towards modular architecture in OpenSearch](https://github.com/opensearch-project/OpenSearch/issues/1422)  
@@ -84,7 +84,7 @@ The `org.opensearch.sdk.sample` package contains a sample `HelloWorldExtension` 
 
 (2, 3, 4) Using the `ExtensionSettings` from the extension, the `ExtensionsRunner` binds to the configured host and port.
 
-(5, 6, 7) Using the `List<ExtensionRestHandler>` from the extension, the `ExtensionsRunner` stores each handler (Rest Action)'s restPath (method+URI) in a map, identifying the action to execute when that combination is received by the extension.
+(5, 6, 7) Using the `List<ExtensionRestHandler>` from the extension, the `ExtensionsRunner` stores each handler (Rest Action)'s restPath (method+URI) in the `ExtensionRestPathRegistry`, identifying the action to execute when that combination is received by the extension. This registry internally uses the same `PathTrie` implementation as OpenSearch's `RestController`.
 
 ##### OpenSearch Startup, Extension Initialization, and REST Action Registration
 
@@ -94,7 +94,7 @@ The `ExtensionsOrchestrator` reads a list of extensions present in `extensions.y
 
 (11, 12) The `ExtensionsOrchestrator` Initializes the extension using an `InitializeExtensionRequest`/`Response`, establishing the two-way transport mechanism.
 
-(13) Each `Extension` retrieves all REST paths from its pathMap (the key set).
+(13) Each `Extension` retrieves all of its REST paths from its `ExtensionRestPathRegistry`.
 
 (14, 15, 16) Each `Extension` sends a `RegisterRestActionsRequest` to the `RestActionsRequestHandler`, which registers a `RestSendToExtensionAction` with the `RestController` to handle each REST path (`Route`). These routes rely on a globally unique identifier for the extension which users will use in REST requests, presently the Extension's `uniqueId`.
 
@@ -110,9 +110,11 @@ The `ExtensionsOrchestrator` reads a list of extensions present in `extensions.y
 
 (21, 22) The appropriate `ExtensionRestHandler` handles the request, possibly executing complex logic, and eventually providing a response string.
 
-(23, 24) The response string is relayed by the `Extension` to the `RestActionsRequestHandler` which uses it to complete the `RestSendToExtensionAction` by returning a `BytesRestResponse`.
+(23, 24) As part of handling some requests, additional actions, such as creating an index, may require further interactions with OpenSearch's `RestController` which are accomplished via the `SDKClient` as required.
 
-(25) The User receives the response.
+(25, 26) The response string is relayed by the `Extension` to the `RestActionsRequestHandler` which uses it to complete the `RestSendToExtensionAction` by returning a `BytesRestResponse`.
+
+(27) The User receives the response.
 
 ## FAQ
 

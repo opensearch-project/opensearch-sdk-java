@@ -5,14 +5,13 @@
  * this file be licensed under the Apache-2.0 license or a
  * compatible open source license.
  */
-package org.opensearch.sdk.sample;
+package org.opensearch.sdk.sample.helloworld;
 
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.rest.RestHandler.Route;
-import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionSettings;
@@ -44,9 +43,7 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         List<ExtensionRestHandler> extensionRestHandlers = extension.getExtensionRestHandlers();
         assertEquals(1, extensionRestHandlers.size());
         List<Route> routes = extensionRestHandlers.get(0).routes();
-        assertEquals(1, routes.size());
-        assertEquals(Method.GET, routes.get(0).getMethod());
-        assertEquals("/hello", routes.get(0).getPath());
+        assertEquals(2, routes.size());
     }
 
 }
