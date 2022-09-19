@@ -22,7 +22,7 @@ import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
-import org.opensearch.extensions.settings.RegisterSettingsRequest;
+import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
 import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
 import org.opensearch.common.settings.Setting;
@@ -183,7 +183,7 @@ public class ExtensionsRunner {
             setOpensearchNode(opensearchNode);
             extensionTransportService.connectToNode(opensearchNode);
             sendRegisterRestActionsRequest(extensionTransportService);
-            sendRegisterSettingsRequest(extensionTransportService);
+            sendRegisterCustomSettingsRequest(extensionTransportService);
             transportActions.sendRegisterTransportActionsRequest(extensionTransportService, opensearchNode);
         }
     }
@@ -430,15 +430,15 @@ public class ExtensionsRunner {
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
-    public void sendRegisterSettingsRequest(TransportService transportService) {
+    public void sendRegisterCustomSettingsRequest(TransportService transportService) {
         logger.info("Sending Settings request to OpenSearch");
-        ExtensionStringResponseHandler registerSettingsResponseHandler = new ExtensionStringResponseHandler();
+        ExtensionStringResponseHandler registerCustomSettingsResponseHandler = new ExtensionStringResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_SETTINGS,
-                new RegisterSettingsRequest(getUniqueId(), customSettings),
-                registerSettingsResponseHandler
+                ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_CUSTOM_SETTINGS,
+                new RegisterCustomSettingsRequest(getUniqueId(), customSettings),
+                registerCustomSettingsResponseHandler
             );
         } catch (Exception e) {
             logger.info("Failed to send Register Settings request to OpenSearch", e);
