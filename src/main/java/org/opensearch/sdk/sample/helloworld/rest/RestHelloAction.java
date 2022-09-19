@@ -43,8 +43,7 @@ public class RestHelloAction implements ExtensionRestHandler {
         List<String> consumedParams = new ArrayList<>();
         Method method = request.method();
         String uri = request.uri();
-        // TODO: should we extract token and then add it to the list of consumed parameters?
-        consumedParams.add(request.getRequestIssuerIdentity().getToken());
+
         if (Method.GET.equals(method) && "/hello".equals(uri)) {
             return new ExtensionRestResponse(OK, String.format(GREETING, worldName), consumedParams);
         } else if (Method.PUT.equals(method) && uri.startsWith("/hello/")) {
