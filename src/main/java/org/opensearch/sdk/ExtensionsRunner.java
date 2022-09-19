@@ -46,6 +46,7 @@ import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestResponse;
 import org.opensearch.transport.netty4.Netty4Transport;
 import org.opensearch.transport.SharedGroupFactory;
+import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
 import org.opensearch.sdk.handlers.AddSettingsUpdateConsumerResponseHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
@@ -565,6 +566,30 @@ public class ExtensionsRunner {
     }
 
     /**
+     * Requests the ActionListener onFailure method to be run by OpenSearch.  The result will be handled by a {@link ActionListenerOnFailureResponseHandler}.
+     *
+     * @param transportService  The TransportService defining the connection to OpenSearch.
+     * @param failureException The exception to be sent to OpenSearch
+     */
+    public void sendActionListenerOnFailureRequest(TransportService transportService, Exception failureException) {
+        logger.info("Sending ActionListener onFailure request to OpenSearch");
+        ActionListenerOnFailureResponseHandler listenerHandler = new ActionListenerOnFailureResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_EXTENSION_ACTION_LISTENER_ON_FAILURE,
+                new ExtensionRequest(
+                    ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_ACTION_LISTENER_ON_FAILURE,
+                    failureException.toString()
+                ),
+                listenerHandler
+            );
+        } catch (Exception e) {
+            logger.info("Failed to send ActionListener onFailure request to OpenSearch", e);
+        }
+    }
+
+    /**
      * Requests the environment setting values from OpenSearch for the corresponding component settings. The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
      *
      * @param componentSettings The component setting that correspond to the values provided by the environment settings
@@ -641,7 +666,7 @@ public class ExtensionsRunner {
      *
      * @param timeout  The timeout for the listener in milliseconds. A timeout of 0 means no timeout.
      */
-    public void startActionListener(int timeout) {
+    public static void startActionListener(int timeout) {
         final ActionListener actionListener = new ActionListener();
         actionListener.runActionListener(true, timeout);
     }
