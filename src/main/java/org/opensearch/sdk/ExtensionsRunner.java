@@ -254,7 +254,7 @@ public class ExtensionsRunner {
 
         boolean settingUpdateStatus = true;
 
-        WriteableSetting.WriteableSettingGenericType settingType = updateSettingsRequest.getSettingType();
+        WriteableSetting.SettingType settingType = updateSettingsRequest.getSettingType();
         Setting<?> componentSetting = updateSettingsRequest.getComponentSetting();
         Object data = updateSettingsRequest.getData();
 
