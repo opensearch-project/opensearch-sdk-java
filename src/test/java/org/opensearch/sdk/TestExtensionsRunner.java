@@ -200,4 +200,12 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ExtensionStringResponseHandler.class));
     }
+
+    @Test
+    public void testRegisterSettingsRequest() {
+
+        extensionsRunner.sendRegisterSettingsRequest(transportService);
+
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ExtensionStringResponseHandler.class));
+    }
 }

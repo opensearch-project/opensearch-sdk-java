@@ -22,8 +22,10 @@ import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
+import org.opensearch.extensions.settings.RegisterSettingsRequest;
 import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
+import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.PageCacheRecycler;
 import org.opensearch.extensions.ExtensionBooleanResponse;
@@ -80,8 +82,11 @@ public class ExtensionsRunner {
     private String uniqueId;
     private DiscoveryNode opensearchNode;
     private TransportService extensionTransportService = null;
-    private ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
-
+    // The routes and classes which handle the REST requests
+    private final ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
+    // Custom settings from the extension's getSettings
+    private final List<Setting<?>> customSettings;
+    // Node name, host, and port
     private final Settings settings;
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
@@ -104,6 +109,7 @@ public class ExtensionsRunner {
             .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
             .build();
+        this.customSettings = Collections.emptyList();
     }
 
     /**
@@ -119,12 +125,14 @@ public class ExtensionsRunner {
             .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
             .build();
-        // store rest handlers in the map
+        // store REST handlers in the registry
         for (ExtensionRestHandler extensionRestHandler : extension.getExtensionRestHandlers()) {
             for (Route route : extensionRestHandler.routes()) {
                 extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
             }
         }
+        // save custom settings
+        this.customSettings = extension.getSettings();
         // initialize the transport service
         this.initializeExtensionTransportService(this.getSettings());
         // start listening on configured port and wait for connection from OpenSearch
@@ -171,10 +179,11 @@ public class ExtensionsRunner {
         try {
             return new InitializeExtensionsResponse(settings.get(NODE_NAME_SETTING));
         } finally {
-            // After sending successful response to initialization, send the REST API
+            // After sending successful response to initialization, send the REST API and Settings
             setOpensearchNode(opensearchNode);
             extensionTransportService.connectToNode(opensearchNode);
             sendRegisterRestActionsRequest(extensionTransportService);
+            sendRegisterSettingsRequest(extensionTransportService);
             transportActions.sendRegisterTransportActionsRequest(extensionTransportService, opensearchNode);
         }
     }
@@ -413,6 +422,26 @@ public class ExtensionsRunner {
             );
         } catch (Exception e) {
             logger.info("Failed to send Register REST Actions request to OpenSearch", e);
+        }
+    }
+
+    /**
+     * Requests that OpenSearch register the custom settings for this extension.
+     *
+     * @param transportService  The TransportService defining the connection to OpenSearch.
+     */
+    public void sendRegisterSettingsRequest(TransportService transportService) {
+        logger.info("Sending Settings request to OpenSearch");
+        ExtensionStringResponseHandler registerSettingsResponseHandler = new ExtensionStringResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_SETTINGS,
+                new RegisterSettingsRequest(getUniqueId(), customSettings),
+                registerSettingsResponseHandler
+            );
+        } catch (Exception e) {
+            logger.info("Failed to send Register Settings request to OpenSearch", e);
         }
     }
 
