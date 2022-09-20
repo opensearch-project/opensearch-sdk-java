@@ -10,29 +10,26 @@ package org.opensearch.sdk.handlers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.io.stream.StreamInput;
-import org.opensearch.extensions.rest.RegisterRestActionsResponse;
-import org.opensearch.sdk.ExtensionsRunner;
+import org.opensearch.extensions.ExtensionStringResponse;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportException;
 import org.opensearch.transport.TransportResponseHandler;
-import org.opensearch.transport.TransportService;
-
 import java.io.IOException;
 
 /**
- * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendRegisterRestActionsRequest(TransportService)} call.
+ * This class handles the response from OpenSearch to call returning an {@link ExtensionStringResponse}.
  */
-public class RegisterRestActionsResponseHandler implements TransportResponseHandler<RegisterRestActionsResponse> {
-    private static final Logger logger = LogManager.getLogger(RegisterRestActionsResponseHandler.class);
+public class ExtensionStringResponseHandler implements TransportResponseHandler<ExtensionStringResponse> {
+    private static final Logger logger = LogManager.getLogger(ExtensionStringResponseHandler.class);
 
     @Override
-    public void handleResponse(RegisterRestActionsResponse response) {
+    public void handleResponse(ExtensionStringResponse response) {
         logger.info("received {}", response.getResponse());
     }
 
     @Override
     public void handleException(TransportException exp) {
-        logger.info("RegisterActionsRequest failed", exp);
+        logger.info("Request failed", exp);
     }
 
     @Override
@@ -41,7 +38,7 @@ public class RegisterRestActionsResponseHandler implements TransportResponseHand
     }
 
     @Override
-    public RegisterRestActionsResponse read(StreamInput in) throws IOException {
-        return new RegisterRestActionsResponse(in);
+    public ExtensionStringResponse read(StreamInput in) throws IOException {
+        return new ExtensionStringResponse(in);
     }
 }

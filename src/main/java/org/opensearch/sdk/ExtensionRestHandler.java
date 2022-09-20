@@ -23,6 +23,8 @@ public interface ExtensionRestHandler {
 
     /**
      * The list of {@link Route}s that this ExtensionRestHandler is responsible for handling.
+     *
+     * @return The routes this handler will handle.
      */
     List<Route> routes();
 
