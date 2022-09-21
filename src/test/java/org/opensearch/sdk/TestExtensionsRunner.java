@@ -57,8 +57,11 @@ import org.opensearch.extensions.UpdateSettingsRequest;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
+import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
+import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
+import org.opensearch.sdk.handlers.OpensearchRequestHandler;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.Transport;
 import org.opensearch.transport.TransportService;
@@ -141,10 +144,10 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         InitializeExtensionsRequest extensionInitRequest = new InitializeExtensionsRequest(sourceNode, extension);
 
-        InitializeExtensionsResponse response = extensionsRunner.handleExtensionInitRequest(extensionInitRequest);
+        InitializeExtensionsResponse response = ExtensionsInitRequestHandler.handleExtensionInitRequest(extensionInitRequest);
         // Test if name and unique ID are set
         assertEquals(EXTENSION_NAME, response.getName());
-        assertEquals("opensearch-sdk-1", extensionsRunner.getUniqueId());
+        assertEquals("opensearch-sdk-1", ExtensionsRunner.getUniqueId());
         // Test if the source node is set after handleExtensionInitRequest() is called during OpenSearch bootstrap
         assertEquals(sourceNode, extensionsRunner.getOpensearchNode());
     }
@@ -153,7 +156,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     public void testHandleOpenSearchRequest() throws Exception {
 
         OpenSearchRequest request = new OpenSearchRequest(OpenSearchRequestType.REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY);
-        assertEquals(NamedWriteableRegistryResponse.class, extensionsRunner.handleOpenSearchRequest(request).getClass());
+        assertEquals(NamedWriteableRegistryResponse.class, OpensearchRequestHandler.handleOpenSearchRequest(request).getClass());
 
         // Add additional OpenSearch request handler tests here for each default extension point
     }
@@ -164,7 +167,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         ExtensionTokenProcessor ext = new ExtensionTokenProcessor(EXTENSION_NAME);
         Principal userPrincipal = () -> "user1";
         RestExecuteOnExtensionRequest request = new RestExecuteOnExtensionRequest(Method.GET, "/foo", ext.generateToken(userPrincipal));
-        RestExecuteOnExtensionResponse response = extensionsRunner.handleRestExecuteOnExtensionRequest(request);
+        RestExecuteOnExtensionResponse response = ExtensionsRestRequestHandler.handleRestExecuteOnExtensionRequest(request);
         // this will fail in test environment with no registered actions
         assertEquals(RestStatus.NOT_FOUND, response.getStatus());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.getContentType());
@@ -229,7 +232,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testRegisterRestActionsRequest() {
 
-        extensionsRunner.sendRegisterRestActionsRequest(transportService);
+        ExtensionsRunner.sendRegisterRestActionsRequest(transportService);
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ExtensionStringResponseHandler.class));
     }
