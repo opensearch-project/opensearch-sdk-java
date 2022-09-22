@@ -17,25 +17,47 @@ import org.opensearch.transport.TransportRequest;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * A subclass of {@link TransportRequest} which contains request relevant information
+ * to be utilised in ExtensionRestHandler implementation
+ */
 public class ExtensionRestRequest extends TransportRequest {
-
     private Method method;
     private String uri;
+    /**
+     * The owner of this request object
+     */
     private PrincipalIdentifierToken principalIdentifierToken;
 
-    public ExtensionRestRequest(Method method, String uri, PrincipalIdentifierToken requesterIdentifier) {
+    /**
+     * This object can be instantiated given method, uri and identifier
+     * @param method of type {@link Method}
+     * @param uri url string
+     * @param principalIdentifier the owner of this request
+     */
+    public ExtensionRestRequest(Method method, String uri, PrincipalIdentifierToken principalIdentifier) {
         this.method = method;
         this.uri = uri;
-        this.principalIdentifierToken = requesterIdentifier;
+        this.principalIdentifierToken = principalIdentifier;
     }
 
-    // TODO Check if this constructor is more useful, If so what happens when request object is null
-    protected ExtensionRestRequest(RestExecuteOnExtensionRequest request) {
+    /**
+     * The object to be created from rest request object incoming from OpenSearch
+     * @param request incoming object from OpenSearch
+     * @throws IllegalArgumentException when request is null
+     */
+    protected ExtensionRestRequest(RestExecuteOnExtensionRequest request) throws IllegalArgumentException {
+        if (request == null) throw new IllegalArgumentException("Request object can't be null");
         this.method = request.getMethod();
         this.uri = request.getUri();
         this.principalIdentifierToken = request.getRequestIssuerIdentity();
     }
 
+    /**
+     * Object generated from input stream
+     * @param in Input stream
+     * @throws IOException
+     */
     public ExtensionRestRequest(StreamInput in) throws IOException {
         super(in);
         method = in.readEnum(Method.class);
@@ -43,6 +65,11 @@ public class ExtensionRestRequest extends TransportRequest {
         principalIdentifierToken = in.readNamedWriteable(PrincipalIdentifierToken.class);
     }
 
+    /**
+     * Write this object to output stream
+     * @param out the writeable output stream
+     * @throws IOException
+     */
     @Override
     public void writeTo(StreamOutput out) throws IOException {
         super.writeTo(out);
