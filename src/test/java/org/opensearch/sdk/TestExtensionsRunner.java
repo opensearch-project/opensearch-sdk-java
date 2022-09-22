@@ -49,7 +49,7 @@ import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
-import org.opensearch.sdk.handlers.RegisterRestActionsResponseHandler;
+import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.Transport;
 import org.opensearch.transport.TransportService;
@@ -198,6 +198,14 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         extensionsRunner.sendRegisterRestActionsRequest(transportService);
 
-        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(RegisterRestActionsResponseHandler.class));
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ExtensionStringResponseHandler.class));
+    }
+
+    @Test
+    public void testRegisterCustomSettingsRequest() {
+
+        extensionsRunner.sendRegisterCustomSettingsRequest(transportService);
+
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ExtensionStringResponseHandler.class));
     }
 }

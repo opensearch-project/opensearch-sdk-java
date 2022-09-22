@@ -40,6 +40,8 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
         }
+        sourceCompatibility = 11
+        targetCompatibility = 11
     }
 }
 

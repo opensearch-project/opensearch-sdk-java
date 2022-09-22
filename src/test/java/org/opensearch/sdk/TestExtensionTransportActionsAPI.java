@@ -13,7 +13,7 @@ import org.opensearch.common.io.stream.Writeable;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.extensions.ExtensionsOrchestrator;
-import org.opensearch.sdk.handlers.ExtensionResponseHandler;
+import org.opensearch.sdk.handlers.ExtensionBooleanResponseHandler;
 import org.opensearch.tasks.Task;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.Transport;
@@ -87,7 +87,7 @@ public class TestExtensionTransportActionsAPI extends OpenSearchTestCase {
             any(),
             eq(ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_TRANSPORT_ACTIONS),
             any(),
-            any(ExtensionResponseHandler.class)
+            any(ExtensionBooleanResponseHandler.class)
         );
     }
 }
