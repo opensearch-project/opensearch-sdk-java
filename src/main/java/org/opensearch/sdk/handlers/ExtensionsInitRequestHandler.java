@@ -15,6 +15,7 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
+import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.TransportActions;
 import org.opensearch.transport.TransportService;
@@ -26,35 +27,49 @@ import org.opensearch.transport.TransportService;
 public class ExtensionsInitRequestHandler {
     private static final Logger logger = LogManager.getLogger(ExtensionsInitRequestHandler.class);
     private static final String NODE_NAME_SETTING = "node.name";
-    private static DiscoveryNode opensearchNode;
-    private static Settings settings;
-    private static String uniqueId;
-    private static TransportService extensionTransportService = null;
-    private static TransportActions transportActions = new TransportActions(new HashMap<>());
+    private DiscoveryNode opensearchNode;
+    private DiscoveryExtension extensionNode;
+    private Settings settings;
+    private String uniqueId;
+    private TransportService extensionTransportService = null;
 
-    private static void setUniqueId(String id) {
-        ExtensionsInitRequestHandler.uniqueId = id;
+    private void setUniqueId(String id) {
+        this.uniqueId = id;
     }
 
     String getUniqueId() {
         return uniqueId;
     }
 
-    private static void setOpensearchNode(DiscoveryNode opensearchNode) {
-        ExtensionsInitRequestHandler.opensearchNode = opensearchNode;
+    private void setOpensearchNode(DiscoveryNode opensearchNode) {
+        this.opensearchNode = opensearchNode;
+    }
+
+    private void setExtensionNode(DiscoveryExtension extensionNode) {
+        this.extensionNode = extensionNode;
     }
 
     DiscoveryNode getOpensearchNode() {
         return opensearchNode;
     }
 
+    /*
+     * TODO: expose an interface for extension to register actions
+     * https://github.com/opensearch-project/opensearch-sdk-java/issues/119
+     */
+    private TransportActions transportActions = new TransportActions(new HashMap<>());
+
     /**
      * Handles a extension request from OpenSearch.  This is the first request for the transport communication and will initialize the extension and will be a part of OpenSearch bootstrap.
      *
      * @param extensionInitRequest  The request to handle.
+     * @param extensionsRunner The method call from handler.
      * @return A response to OpenSearch validating that this is an extension.
      */
-    public static InitializeExtensionsResponse handleExtensionInitRequest(InitializeExtensionsRequest extensionInitRequest) {
+    public InitializeExtensionsResponse handleExtensionInitRequest(
+        InitializeExtensionsRequest extensionInitRequest,
+        ExtensionsRunner extensionsRunner
+    ) {
         logger.info("Registering Extension Request received from OpenSearch");
         opensearchNode = extensionInitRequest.getSourceNode();
         setUniqueId(extensionInitRequest.getExtension().getId());
@@ -62,10 +77,12 @@ public class ExtensionsInitRequestHandler {
         try {
             return new InitializeExtensionsResponse(settings.get(NODE_NAME_SETTING));
         } finally {
-            // After sending successful response to initialization, send the REST API
+            // After sending successful response to initialization, send the REST API and Settings
             setOpensearchNode(opensearchNode);
+            setExtensionNode(extensionInitRequest.getExtension());
             extensionTransportService.connectToNode(opensearchNode);
-            ExtensionsRunner.sendRegisterRestActionsRequest(extensionTransportService);
+            extensionsRunner.sendRegisterRestActionsRequest(extensionTransportService);
+            extensionsRunner.sendRegisterCustomSettingsRequest(extensionTransportService);
             transportActions.sendRegisterTransportActionsRequest(extensionTransportService, opensearchNode);
         }
     }

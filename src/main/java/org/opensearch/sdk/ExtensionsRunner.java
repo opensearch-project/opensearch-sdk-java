@@ -27,15 +27,11 @@ import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.PageCacheRecycler;
 import org.opensearch.discovery.InitializeExtensionsRequest;
-<<<<<<< HEAD
-import org.opensearch.discovery.InitializeExtensionsResponse;
 import org.opensearch.extensions.ExtensionActionListenerOnFailureRequest;
 import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.extensions.EnvironmentSettingsRequest;
 import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
 import org.opensearch.extensions.UpdateSettingsRequest;
-=======
->>>>>>> refactor class for handler method in ExtensionsRunner
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.index.IndicesModuleRequest;
@@ -48,15 +44,12 @@ import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
-<<<<<<< HEAD
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionBooleanResponseHandler;
-=======
 import org.opensearch.sdk.handlers.ExtensionsIndicesModuleNameRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
->>>>>>> refactor class for handler method in ExtensionsRunner
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
@@ -93,14 +86,9 @@ public class ExtensionsRunner {
     private static final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
     private static final String NODE_NAME_SETTING = "node.name";
 
-<<<<<<< HEAD
     private String uniqueId;
     private DiscoveryNode opensearchNode;
     private DiscoveryExtension extensionNode;
-=======
-    private static String uniqueId;
-    private static DiscoveryNode opensearchNode;
->>>>>>> refactor class for handler method in ExtensionsRunner
     private TransportService extensionTransportService = null;
     // The routes and classes which handle the REST requests
     private static ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
@@ -111,18 +99,17 @@ public class ExtensionsRunner {
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
     private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
-<<<<<<< HEAD
-    /*
-     * TODO: expose an interface for extension to register actions
-     * https://github.com/opensearch-project/opensearch-sdk-java/issues/119
-     */
-    private TransportActions transportActions = new TransportActions(new HashMap<>());
+    private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler();
+    private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler();
+    private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
+    private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
+        new ExtensionsIndicesModuleNameRequestHandler();
+    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler();
+
     /**
      * Instantiates a new update settings request handler
      */
     UpdateSettingsRequestHandler updateSettingsRequestHandler = new UpdateSettingsRequestHandler();
-=======
->>>>>>> refactor class for handler method in ExtensionsRunner
 
     /**
      * Instantiates a new Extensions Runner using test settings.
@@ -176,11 +163,14 @@ public class ExtensionsRunner {
         this.extensionTransportService = extensionTransportService;
     }
 
-    static String getUniqueId() {
+    private void setUniqueId(String id) {
+        this.uniqueId = id;
+    }
+
+    String getUniqueId() {
         return uniqueId;
     }
 
-<<<<<<< HEAD
     private void setOpensearchNode(DiscoveryNode opensearchNode) {
         this.opensearchNode = opensearchNode;
     }
@@ -189,117 +179,11 @@ public class ExtensionsRunner {
         this.extensionNode = extensionNode;
     }
 
-=======
->>>>>>> refactor class for handler method in ExtensionsRunner
     DiscoveryNode getOpensearchNode() {
         return opensearchNode;
     }
 
     /**
-<<<<<<< HEAD
-     * Handles a extension request from OpenSearch.  This is the first request for the transport communication and will initialize the extension and will be a part of OpenSearch bootstrap.
-     *
-     * @param extensionInitRequest  The request to handle.
-     * @return A response to OpenSearch validating that this is an extension.
-     */
-    InitializeExtensionsResponse handleExtensionInitRequest(InitializeExtensionsRequest extensionInitRequest) {
-        logger.info("Registering Extension Request received from OpenSearch");
-        opensearchNode = extensionInitRequest.getSourceNode();
-        setUniqueId(extensionInitRequest.getExtension().getId());
-        // Successfully initialized. Send the response.
-        try {
-            return new InitializeExtensionsResponse(settings.get(NODE_NAME_SETTING));
-        } finally {
-            // After sending successful response to initialization, send the REST API and Settings
-            setOpensearchNode(opensearchNode);
-            setExtensionNode(extensionInitRequest.getExtension());
-            extensionTransportService.connectToNode(opensearchNode);
-            sendRegisterRestActionsRequest(extensionTransportService);
-            sendRegisterCustomSettingsRequest(extensionTransportService);
-            transportActions.sendRegisterTransportActionsRequest(extensionTransportService, opensearchNode);
-        }
-    }
-
-    /**
-     * Handles a request from OpenSearch and invokes the extension point API corresponding with the request type
-     *
-     * @param request  The request to handle.
-     * @return A response to OpenSearch for the corresponding API
-     * @throws Exception if the corresponding handler for the request is not present
-     */
-    TransportResponse handleOpenSearchRequest(OpenSearchRequest request) throws Exception {
-        // Read enum
-        switch (request.getRequestType()) {
-            case REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY:
-                return namedWriteableRegistryApi.handleNamedWriteableRegistryRequest(request);
-            // Add additional request handlers here
-            default:
-                throw new Exception("Handler not present for the provided request");
-        }
-    }
-
-    /**
-     * Handles a request for extension point indices from OpenSearch.  The {@link #handleExtensionInitRequest(InitializeExtensionsRequest)} method must have been called first to initialize the extension.
-     *
-     * @param indicesModuleRequest  The request to handle.
-     * @param transportService  The transport service communicating with OpenSearch.
-     * @return A response to OpenSearch with this extension's index and search listeners.
-     */
-    IndicesModuleResponse handleIndicesModuleRequest(IndicesModuleRequest indicesModuleRequest, TransportService transportService) {
-        logger.info("Registering Indices Module Request received from OpenSearch");
-        IndicesModuleResponse indicesModuleResponse = new IndicesModuleResponse(true, true, true);
-        return indicesModuleResponse;
-    }
-
-    /**
-     * Handles a request for extension name from OpenSearch.  The {@link #handleExtensionInitRequest(InitializeExtensionsRequest)} method must have been called first to initialize the extension.
-     *
-     * @param indicesModuleRequest  The request to handle.
-     * @return A response acknowledging the request.
-     */
-    ExtensionBooleanResponse handleIndicesModuleNameRequest(IndicesModuleRequest indicesModuleRequest) {
-        // Works as beforeIndexRemoved
-        logger.info("Registering Indices Module Name Request received from OpenSearch");
-        ExtensionBooleanResponse indicesModuleNameResponse = new ExtensionBooleanResponse(true);
-        return indicesModuleNameResponse;
-    }
-
-    /**
-     * Handles a request from OpenSearch to execute a REST request on the extension.
-     *
-     * @param request  The REST request to execute.
-     * @return A response acknowledging the request.
-     */
-    RestExecuteOnExtensionResponse handleRestExecuteOnExtensionRequest(RestExecuteOnExtensionRequest request) {
-
-        ExtensionRestHandler restHandler = extensionRestPathRegistry.getHandler(request.getMethod(), request.getUri());
-        if (restHandler == null) {
-            return new RestExecuteOnExtensionResponse(
-                RestStatus.NOT_FOUND,
-                "No handler for " + ExtensionRestPathRegistry.restPathToString(request.getMethod(), request.getUri())
-            );
-        }
-        // ExtensionRestRequest restRequest = new ExtensionRestRequest(request);
-        ExtensionRestRequest restRequest = new ExtensionRestRequest(
-            request.getMethod(),
-            request.getUri(),
-            request.getRequestIssuerIdentity()
-        );
-
-        // Get response from extension
-        RestResponse response = restHandler.handleRequest(restRequest);
-        logger.info("Sending extension response to OpenSearch: " + response.status());
-        return new RestExecuteOnExtensionResponse(
-            response.status(),
-            response.contentType(),
-            BytesReference.toBytes(response.content()),
-            response.getHeaders()
-        );
-    }
-
-    /**
-=======
->>>>>>> refactor class for handler method in ExtensionsRunner
      * Initializes a Netty4Transport object. This object will be wrapped in a {@link TransportService} object.
      *
      * @param settings  The transport settings to configure.
@@ -394,7 +278,7 @@ public class ExtensionsRunner {
             false,
             false,
             InitializeExtensionsRequest::new,
-            (request, channel, task) -> channel.sendResponse(ExtensionsInitRequestHandler.handleExtensionInitRequest(request))
+            (request, channel, task) -> channel.sendResponse(extensionsInitRequestHandler.handleExtensionInitRequest(request, null))
         );
 
         transportService.registerRequestHandler(
@@ -403,7 +287,7 @@ public class ExtensionsRunner {
             false,
             false,
             OpenSearchRequest::new,
-            (request, channel, task) -> channel.sendResponse(OpensearchRequestHandler.handleOpenSearchRequest(request))
+            (request, channel, task) -> channel.sendResponse(opensearchRequestHandler.handleOpenSearchRequest(request))
         );
 
         transportService.registerRequestHandler(
@@ -422,7 +306,7 @@ public class ExtensionsRunner {
             false,
             IndicesModuleRequest::new,
             ((request, channel, task) -> channel.sendResponse(
-                ExtensionsIndicesModuleRequestHandler.handleIndicesModuleRequest(request, transportService)
+                extensionsIndicesModuleRequestHandler.handleIndicesModuleRequest(request, transportService)
             ))
 
         );
@@ -434,7 +318,7 @@ public class ExtensionsRunner {
             false,
             IndicesModuleRequest::new,
             ((request, channel, task) -> channel.sendResponse(
-                ExtensionsIndicesModuleNameRequestHandler.handleIndicesModuleNameRequest(request)
+                extensionsIndicesModuleNameRequestHandler.handleIndicesModuleNameRequest(request)
             ))
         );
 
@@ -444,7 +328,7 @@ public class ExtensionsRunner {
             false,
             false,
             RestExecuteOnExtensionRequest::new,
-            ((request, channel, task) -> channel.sendResponse(ExtensionsRestRequestHandler.handleRestExecuteOnExtensionRequest(request)))
+            ((request, channel, task) -> channel.sendResponse(extensionsRestRequestHandler.handleRestExecuteOnExtensionRequest(request)))
         );
 
         transportService.registerRequestHandler(
@@ -463,7 +347,7 @@ public class ExtensionsRunner {
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
-    public static void sendRegisterRestActionsRequest(TransportService transportService) {
+    public void sendRegisterRestActionsRequest(TransportService transportService) {
         List<String> extensionRestPaths = extensionRestPathRegistry.getRegisteredPaths();
         logger.info("Sending Register REST Actions request to OpenSearch for " + extensionRestPaths);
         ExtensionStringResponseHandler registerActionsResponseHandler = new ExtensionStringResponseHandler();

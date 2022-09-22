@@ -25,7 +25,7 @@ import org.opensearch.sdk.ExtensionRestRequest;
 
 public class ExtensionsRestRequestHandler {
     private static final Logger logger = LogManager.getLogger(ExtensionsRestRequestHandler.class);
-    private static ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
+    private ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
 
     /**
      * Handles a request from OpenSearch to execute a REST request on the extension.
@@ -33,7 +33,7 @@ public class ExtensionsRestRequestHandler {
      * @param request  The REST request to execute.
      * @return A response acknowledging the request.
      */
-    RestExecuteOnExtensionResponse handleRestExecuteOnExtensionRequest(RestExecuteOnExtensionRequest request) {
+    public RestExecuteOnExtensionResponse handleRestExecuteOnExtensionRequest(RestExecuteOnExtensionRequest request) {
 
         ExtensionRestHandler restHandler = extensionRestPathRegistry.getHandler(request.getMethod(), request.getUri());
         if (restHandler == null) {

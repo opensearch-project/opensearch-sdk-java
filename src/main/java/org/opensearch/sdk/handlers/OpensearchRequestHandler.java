@@ -17,7 +17,7 @@ import org.opensearch.transport.TransportResponse;
  */
 
 public class OpensearchRequestHandler {
-    private static NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
+    private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
 
     /**
      * Handles a request from OpenSearch and invokes the extension point API corresponding with the request type
@@ -26,14 +26,14 @@ public class OpensearchRequestHandler {
      * @return A response to OpenSearch for the corresponding API
      * @throws Exception if the corresponding handler for the request is not present
      */
-    TransportResponse handleOpenSearchRequest(OpenSearchRequest request) throws Exception {
+    public TransportResponse handleOpenSearchRequest(OpenSearchRequest request) throws Exception {
         // Read enum
         switch (request.getRequestType()) {
             case REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY:
                 return namedWriteableRegistryApi.handleNamedWriteableRegistryRequest(request);
             // Add additional request handlers here
             default:
-                throw new Exception("Handler not present for the provided request");
+                throw new IllegalArgumentException("Handler not present for the provided request");
         }
     }
 
