@@ -36,7 +36,7 @@ public class UpdateSettingsRequestHandler {
 
     /**
      * Registers the component {@link Setting} and the corresponding consumer to the settingsUpdateConsumer map.
-     * This map is used only when handling {@link UpdateSettingRequest}
+     * This map is used only when handling {@link UpdateSettingsRequest}
      *
      * @param settingUpdateConsumers The settings and their corresponding update consumers to register
      */

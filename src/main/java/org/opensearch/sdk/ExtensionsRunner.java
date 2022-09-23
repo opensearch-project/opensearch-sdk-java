@@ -584,7 +584,7 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Registers settings and setting consumers with the {@link UpdateSettingsRequestHandler} and then sends a request to OpenSearch to register these Setting<?> objects with a callback to this extension.
+     * Registers settings and setting consumers with the {@link UpdateSettingsRequestHandler} and then sends a request to OpenSearch to register these Setting objects with a callback to this extension.
      * The result will be handled by a {@link ExtensionBooleanResponseHandler}.
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
