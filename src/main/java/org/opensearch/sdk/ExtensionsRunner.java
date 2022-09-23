@@ -584,18 +584,18 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Registers settings and setting consumers with the {@link UpdateSettingsRequestHandler} Requests the environment setting values from OpenSearch for the corresponding component settings
-     * The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
+     * Registers settings and setting consumers with the {@link UpdateSettingsRequestHandler} and then sends a request to OpenSearch to register these Setting<?> objects with a callback to this extension.
+     * The result will be handled by a {@link ExtensionBooleanResponseHandler}.
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      * @param settingUpdateConsumers A map of setting objects and their corresponding consumers
-     * @throws Exception if there are no setting update consumers registered within the settingUpdateConsumers map
+     * @throws Exception if there are no setting update consumers within the settingUpdateConsumers map
      */
     public void sendAddSettingsUpdateConsumerRequest(TransportService transportService, Map<Setting<?>, Consumer<?>> settingUpdateConsumers)
         throws Exception {
         logger.info("Sending Add Settings Update Consumer request to OpenSearch");
 
-        // Determine if setting update consumers have been registered
+        // Determine if there are setting update consumers to be registered
         if (settingUpdateConsumers.isEmpty()) {
             throw new Exception("There are no setting update consumers to be registered");
         } else {
