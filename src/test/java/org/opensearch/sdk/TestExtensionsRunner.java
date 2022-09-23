@@ -179,7 +179,10 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         Setting<Integer> fallbackSetting = Setting.intSetting("component.fallback.setting.key", 0, 0, Property.Dynamic);
         Setting<Integer> componentSetting = Setting.intSetting("component.setting.key", fallbackSetting, Property.Dynamic);
         UpdateSettingsRequest request = new UpdateSettingsRequest(WriteableSetting.SettingType.Integer, componentSetting, null);
-        assertEquals(ExtensionBooleanResponse.class, extensionsRunner.handleUpdateSettingsRequest(request).getClass());
+        assertEquals(
+            ExtensionBooleanResponse.class,
+            extensionsRunner.updateSettingsRequestHandler.handleUpdateSettingsRequest(request).getClass()
+        );
     }
 
     @Test

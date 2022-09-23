@@ -48,11 +48,12 @@ import org.opensearch.rest.RestResponse;
 import org.opensearch.transport.netty4.Netty4Transport;
 import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
-import org.opensearch.sdk.handlers.AddSettingsUpdateConsumerResponseHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
+import org.opensearch.sdk.handlers.ExtensionBooleanResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
+import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
 import org.opensearch.search.SearchModule;
 import org.opensearch.threadpool.ThreadPool;
@@ -62,9 +63,6 @@ import org.opensearch.transport.TransportInterceptor;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
 import org.opensearch.transport.TransportResponse;
-import org.opensearch.common.settings.WriteableSetting;
-import org.opensearch.common.unit.ByteSizeValue;
-import org.opensearch.common.unit.TimeValue;
 
 import java.io.File;
 import java.io.IOException;
@@ -110,6 +108,7 @@ public class ExtensionsRunner {
      */
     private TransportActions transportActions = new TransportActions(new HashMap<>());
     private Map<Setting<?>, Consumer<?>> settingUpdateConsumers = new HashMap<>();
+    UpdateSettingsRequestHandler updateSettingsRequestHandler = new UpdateSettingsRequestHandler();
 
     /**
      * Instantiates a new Extensions Runner using test settings.
@@ -249,66 +248,6 @@ public class ExtensionsRunner {
         logger.info("Registering Indices Module Name Request received from OpenSearch");
         ExtensionBooleanResponse indicesModuleNameResponse = new ExtensionBooleanResponse(true);
         return indicesModuleNameResponse;
-    }
-
-    /**
-     * Handles a request to update a setting from OpenSearch.  Extensions must register their setting keys and consumers within the settingUpdateConsumer map
-     *
-     * @param updateSettingsRequest  The request to handle.
-     * @return A response acknowledging the request.
-     */
-    @SuppressWarnings("unchecked")
-    ExtensionBooleanResponse handleUpdateSettingsRequest(UpdateSettingsRequest updateSettingsRequest) {
-        logger.info("Registering UpdateSettingsRequest received from OpenSearch");
-
-        boolean settingUpdateStatus = true;
-
-        WriteableSetting.SettingType settingType = updateSettingsRequest.getSettingType();
-        Setting<?> componentSetting = updateSettingsRequest.getComponentSetting();
-        Object data = updateSettingsRequest.getData();
-
-        // Setting updater in OpenSearch performs setting change validation, only need to cast the consumer to the corresponding type and
-        // invoke the consumer
-        try {
-            switch (settingType) {
-                case Boolean:
-                    Consumer<Boolean> boolConsumer = (Consumer<Boolean>) this.settingUpdateConsumers.get(componentSetting);
-                    boolConsumer.accept(Boolean.parseBoolean(data.toString()));
-                case Integer:
-                    Consumer<Integer> intConsumer = (Consumer<Integer>) this.settingUpdateConsumers.get(componentSetting);
-                    intConsumer.accept(Integer.parseInt(data.toString()));
-                case Long:
-                    Consumer<Long> longConsumer = (Consumer<Long>) this.settingUpdateConsumers.get(componentSetting);
-                    longConsumer.accept(Long.parseLong(data.toString()));
-                case Float:
-                    Consumer<Float> floatConsumer = (Consumer<Float>) this.settingUpdateConsumers.get(componentSetting);
-                    floatConsumer.accept(Float.parseFloat(data.toString()));
-                case Double:
-                    Consumer<Double> doubleConsumer = (Consumer<Double>) this.settingUpdateConsumers.get(componentSetting);
-                    doubleConsumer.accept(Double.parseDouble(data.toString()));
-                case String:
-                    Consumer<String> stringConsumer = (Consumer<String>) this.settingUpdateConsumers.get(componentSetting);
-                    stringConsumer.accept(data.toString());
-                case TimeValue:
-                    Consumer<TimeValue> timeValueConsumer = (Consumer<TimeValue>) this.settingUpdateConsumers.get(componentSetting);
-                    timeValueConsumer.accept(TimeValue.parseTimeValue(data.toString(), componentSetting.getKey()));
-                case ByteSizeValue:
-                    Consumer<ByteSizeValue> byteSizeValueConsumer = (Consumer<ByteSizeValue>) this.settingUpdateConsumers.get(
-                        componentSetting
-                    );
-                    byteSizeValueConsumer.accept(ByteSizeValue.parseBytesSizeValue(data.toString(), componentSetting.getKey()));
-                case Version:
-                    Consumer<Version> versionConsumer = (Consumer<Version>) this.settingUpdateConsumers.get(componentSetting);
-                    versionConsumer.accept((Version) data);
-                default:
-                    throw new UnsupportedOperationException("Setting Update Consumer type does not exist and is not handled here");
-            }
-        } catch (Exception e) {
-            logger.info(e.getMessage());
-            settingUpdateStatus = false;
-        }
-
-        return new ExtensionBooleanResponse(settingUpdateStatus);
     }
 
     /**
@@ -494,7 +433,7 @@ public class ExtensionsRunner {
             false,
             false,
             UpdateSettingsRequest::new,
-            ((request, channel, task) -> channel.sendResponse(handleUpdateSettingsRequest(request)))
+            ((request, channel, task) -> channel.sendResponse(updateSettingsRequestHandler.handleUpdateSettingsRequest(request)))
         );
 
     }
@@ -646,14 +585,17 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Registers the component {@link Setting} and the corresponding consumer to the settingsUpdateConsumer map.
+     * Registers the component {@link Setting} and the corresponding consumer.
      * Extensions will use this method instead of invoking ClusterSettings#addSettingsUpdateConsumer
      *
      * @param componentSetting The component setting associated with the consumer
      * @param consumer  The setting update consumer associated with the component setting
      */
     public <T> void registerSettingUpdateConsumer(Setting<T> componentSetting, Consumer<T> consumer) {
+        // register for setting consumer map for AddSettingUpdateConsumerRequests
         this.settingUpdateConsumers.put(componentSetting, consumer);
+        // register for setting consumer map for UpdateSettingsRequests
+        this.updateSettingsRequestHandler.registerSettingUpdateConsumer(componentSetting, consumer);
     }
 
     /**
@@ -676,14 +618,13 @@ public class ExtensionsRunner {
             List<Setting<?>> componentSettings = new ArrayList<>(this.settingUpdateConsumers.size());
             componentSettings.addAll(this.settingUpdateConsumers.keySet());
 
-            AddSettingsUpdateConsumerResponseHandler addSettingsUpdateConsumerResponseHandler =
-                new AddSettingsUpdateConsumerResponseHandler();
+            ExtensionBooleanResponseHandler extensionBooleanResponseHandler = new ExtensionBooleanResponseHandler();
             try {
                 transportService.sendRequest(
                     opensearchNode,
                     ExtensionsOrchestrator.REQUEST_EXTENSION_ADD_SETTINGS_UPDATE_CONSUMER,
                     new AddSettingsUpdateConsumerRequest(this.extensionNode, componentSettings),
-                    addSettingsUpdateConsumerResponseHandler
+                    extensionBooleanResponseHandler
                 );
             } catch (Exception e) {
                 logger.info("Failed to send Add Settings Update Consumer request to OpenSearch", e);
