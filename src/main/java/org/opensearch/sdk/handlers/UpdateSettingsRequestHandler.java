@@ -41,7 +41,7 @@ public class UpdateSettingsRequestHandler {
      * @param componentSetting The component setting associated with the consumer
      * @param consumer  The setting update consumer associated with the component setting
      */
-    public <T> void registerSettingUpdateConsumer(Setting<T> componentSetting, Consumer<T> consumer) {
+    public void registerSettingUpdateConsumer(Setting<?> componentSetting, Consumer<?> consumer) {
         this.settingUpdateConsumers.put(componentSetting, consumer);
     }
 

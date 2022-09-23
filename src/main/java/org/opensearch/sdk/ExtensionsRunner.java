@@ -107,7 +107,6 @@ public class ExtensionsRunner {
      * https://github.com/opensearch-project/opensearch-sdk-java/issues/119
      */
     private TransportActions transportActions = new TransportActions(new HashMap<>());
-    private Map<Setting<?>, Consumer<?>> settingUpdateConsumers = new HashMap<>();
     UpdateSettingsRequestHandler updateSettingsRequestHandler = new UpdateSettingsRequestHandler();
 
     /**
@@ -585,38 +584,30 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Registers the component {@link Setting} and the corresponding consumer.
-     * Extensions will use this method instead of invoking ClusterSettings#addSettingsUpdateConsumer
-     *
-     * @param componentSetting The component setting associated with the consumer
-     * @param consumer  The setting update consumer associated with the component setting
-     */
-    public <T> void registerSettingUpdateConsumer(Setting<T> componentSetting, Consumer<T> consumer) {
-        // register for setting consumer map for AddSettingUpdateConsumerRequests
-        this.settingUpdateConsumers.put(componentSetting, consumer);
-        // register for setting consumer map for UpdateSettingsRequests
-        this.updateSettingsRequestHandler.registerSettingUpdateConsumer(componentSetting, consumer);
-    }
-
-    /**
-     * Requests the environment setting values from OpenSearch for the corresponding component settings.
-     * This should be called after extension components have registered all their setting update consumers with the settingUpdateConsumers map.
+     * Registers settings and setting consumers with the {@link UpdateSettingsRequestHandler} Requests the environment setting values from OpenSearch for the corresponding component settings
      * The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
+     * @param settingUpdateConsumers A map of setting objects and their corresponding consumers
      * @throws Exception if there are no setting update consumers registered within the settingUpdateConsumers map
      */
-    public void sendAddSettingsUpdateConsumerRequest(TransportService transportService) throws Exception {
+    public void sendAddSettingsUpdateConsumerRequest(TransportService transportService, Map<Setting<?>, Consumer<?>> settingUpdateConsumers)
+        throws Exception {
         logger.info("Sending Add Settings Update Consumer request to OpenSearch");
 
         // Determine if setting update consumers have been registered
-        if (this.settingUpdateConsumers.isEmpty()) {
-            throw new Exception("There are no setting update consumers registered");
+        if (settingUpdateConsumers.isEmpty()) {
+            throw new Exception("There are no setting update consumers to be registered");
         } else {
 
+            // Register setting update consumers to UpdateSettingsRequestHandler
+            for (Map.Entry<Setting<?>, Consumer<?>> entry : settingUpdateConsumers.entrySet()) {
+                this.updateSettingsRequestHandler.registerSettingUpdateConsumer(entry.getKey(), entry.getValue());
+            }
+
             // Extract registered settings from setting update consumer map
-            List<Setting<?>> componentSettings = new ArrayList<>(this.settingUpdateConsumers.size());
-            componentSettings.addAll(this.settingUpdateConsumers.keySet());
+            List<Setting<?>> componentSettings = new ArrayList<>(settingUpdateConsumers.size());
+            componentSettings.addAll(settingUpdateConsumers.keySet());
 
             ExtensionBooleanResponseHandler extensionBooleanResponseHandler = new ExtensionBooleanResponseHandler();
             try {
