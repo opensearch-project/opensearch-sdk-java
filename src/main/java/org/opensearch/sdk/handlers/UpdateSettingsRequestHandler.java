@@ -23,8 +23,6 @@ import org.opensearch.extensions.UpdateSettingsRequest;
 
 /**
  * Handles requests to update settings
- *
- * @opensearch.internal
  */
 public class UpdateSettingsRequestHandler {
 
