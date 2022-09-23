@@ -78,14 +78,23 @@ public class ExtensionRestRequest extends TransportRequest {
         out.writeNamedWriteable(principalIdentifierToken);
     }
 
+    /**
+     * @return This REST request {@link Method} type
+     */
     public Method method() {
         return method;
     }
 
+    /**
+     * @return This REST request's uri
+     */
     public String uri() {
         return uri;
     }
 
+    /**
+     * @return This REST request issuer's identity token
+     */
     public PrincipalIdentifierToken getRequestIssuerIdentity() {
         return principalIdentifierToken;
     }
