@@ -107,6 +107,9 @@ public class ExtensionsRunner {
      * https://github.com/opensearch-project/opensearch-sdk-java/issues/119
      */
     private TransportActions transportActions = new TransportActions(new HashMap<>());
+    /**
+     * Instantiates a new update settings request handler
+     */
     UpdateSettingsRequestHandler updateSettingsRequestHandler = new UpdateSettingsRequestHandler();
 
     /**

@@ -21,6 +21,11 @@ import org.opensearch.common.unit.TimeValue;
 import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.extensions.UpdateSettingsRequest;
 
+/**
+ * Handles requests to update settings
+ *
+ * @opensearch.internal
+ */
 public class UpdateSettingsRequestHandler {
 
     private static final Logger logger = LogManager.getLogger(UpdateSettingsRequestHandler.class);
