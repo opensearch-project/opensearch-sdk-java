@@ -326,8 +326,15 @@ public class ExtensionsRunner {
                 "No handler for " + ExtensionRestPathRegistry.restPathToString(request.getMethod(), request.getUri())
             );
         }
+        // ExtensionRestRequest restRequest = new ExtensionRestRequest(request);
+        ExtensionRestRequest restRequest = new ExtensionRestRequest(
+            request.getMethod(),
+            request.getUri(),
+            request.getRequestIssuerIdentity()
+        );
+
         // Get response from extension
-        RestResponse response = restHandler.handleRequest(request.getMethod(), request.getUri());
+        RestResponse response = restHandler.handleRequest(restRequest);
         logger.info("Sending extension response to OpenSearch: " + response.status());
         return new RestExecuteOnExtensionResponse(
             response.status(),

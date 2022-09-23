@@ -19,7 +19,7 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
         }
 
         @Override
-        public ExtensionRestResponse handleRequest(Method method, String uri) {
+        public ExtensionRestResponse handleRequest(ExtensionRestRequest request) {
             return null;
         }
     };
@@ -30,7 +30,7 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
         }
 
         @Override
-        public ExtensionRestResponse handleRequest(Method method, String uri) {
+        public ExtensionRestResponse handleRequest(ExtensionRestRequest request) {
             return null;
         }
     };
@@ -41,7 +41,7 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
         }
 
         @Override
-        public ExtensionRestResponse handleRequest(Method method, String uri) {
+        public ExtensionRestResponse handleRequest(ExtensionRestRequest request) {
             return null;
         }
     };

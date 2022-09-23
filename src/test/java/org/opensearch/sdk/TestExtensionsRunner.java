@@ -26,6 +26,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +47,7 @@ import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
 import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
+import org.opensearch.identity.ExtensionTokenProcessor;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestStatus;
@@ -159,7 +161,9 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testHandleRestExecuteOnExtensionRequest() throws Exception {
 
-        RestExecuteOnExtensionRequest request = new RestExecuteOnExtensionRequest(Method.GET, "/foo");
+        ExtensionTokenProcessor ext = new ExtensionTokenProcessor(EXTENSION_NAME);
+        Principal userPrincipal = () -> "user1";
+        RestExecuteOnExtensionRequest request = new RestExecuteOnExtensionRequest(Method.GET, "/foo", ext.generateToken(userPrincipal));
         RestExecuteOnExtensionResponse response = extensionsRunner.handleRestExecuteOnExtensionRequest(request);
         // this will fail in test environment with no registered actions
         assertEquals(RestStatus.NOT_FOUND, response.getStatus());
