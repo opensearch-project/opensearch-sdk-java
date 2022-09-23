@@ -601,9 +601,7 @@ public class ExtensionsRunner {
         } else {
 
             // Register setting update consumers to UpdateSettingsRequestHandler
-            for (Map.Entry<Setting<?>, Consumer<?>> entry : settingUpdateConsumers.entrySet()) {
-                this.updateSettingsRequestHandler.registerSettingUpdateConsumer(entry.getKey(), entry.getValue());
-            }
+            this.updateSettingsRequestHandler.registerSettingUpdateConsumer(settingUpdateConsumers);
 
             // Extract registered settings from setting update consumer map
             List<Setting<?>> componentSettings = new ArrayList<>(settingUpdateConsumers.size());

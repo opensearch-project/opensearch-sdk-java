@@ -38,11 +38,10 @@ public class UpdateSettingsRequestHandler {
      * Registers the component {@link Setting} and the corresponding consumer to the settingsUpdateConsumer map.
      * This map is used only when handling {@link UpdateSettingRequest}
      *
-     * @param componentSetting The component setting associated with the consumer
-     * @param consumer  The setting update consumer associated with the component setting
+     * @param settingUpdateConsumers The settings and their corresponding update consumers to register
      */
-    public void registerSettingUpdateConsumer(Setting<?> componentSetting, Consumer<?> consumer) {
-        this.settingUpdateConsumers.put(componentSetting, consumer);
+    public void registerSettingUpdateConsumer(Map<Setting<?>, Consumer<?>> settingUpdateConsumers) {
+        this.settingUpdateConsumers.putAll(settingUpdateConsumers);
     }
 
     /**
