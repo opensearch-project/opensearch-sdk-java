@@ -31,6 +31,7 @@ import org.opensearch.common.util.PageCacheRecycler;
 import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
+import org.opensearch.extensions.ExtensionActionListenerOnFailureRequest;
 import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.extensions.EnvironmentSettingsRequest;
 import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
@@ -554,10 +555,7 @@ public class ExtensionsRunner {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsOrchestrator.REQUEST_EXTENSION_ACTION_LISTENER_ON_FAILURE,
-                new ExtensionRequest(
-                    ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_ACTION_LISTENER_ON_FAILURE,
-                    failureException.toString()
-                ),
+                new ExtensionActionListenerOnFailureRequest(failureException.toString()),
                 listenerHandler
             );
         } catch (Exception e) {
