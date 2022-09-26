@@ -93,12 +93,13 @@ public class ExtensionsRunner {
     // The routes and classes which handle the REST requests
     private static ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
     // Custom settings from the extension's getSettings
-    private final List<Setting<?>> customSettings;
+    private static List<Setting<?>> customSettings;
     // Node name, host, and port
     private final Settings settings;
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
     private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
+<<<<<<< HEAD
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler();
     private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler();
     private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
@@ -110,6 +111,8 @@ public class ExtensionsRunner {
      * Instantiates a new update settings request handler
      */
     UpdateSettingsRequestHandler updateSettingsRequestHandler = new UpdateSettingsRequestHandler();
+=======
+>>>>>>> fix merge conflict
 
     /**
      * Instantiates a new Extensions Runner using test settings.
@@ -123,7 +126,7 @@ public class ExtensionsRunner {
             .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
             .build();
-        this.customSettings = Collections.emptyList();
+        ExtensionsRunner.customSettings = Collections.emptyList();
     }
 
     /**
@@ -146,7 +149,7 @@ public class ExtensionsRunner {
             }
         }
         // save custom settings
-        this.customSettings = extension.getSettings();
+        ExtensionsRunner.customSettings = extension.getSettings();
         // initialize the transport service
         this.initializeExtensionTransportService(this.getSettings());
         // start listening on configured port and wait for connection from OpenSearch
@@ -159,6 +162,9 @@ public class ExtensionsRunner {
         return objectMapper.readValue(file, ExtensionSettings.class);
     }
 
+    /**
+    * @param extensionTransportService 
+    */
     void setExtensionTransportService(TransportService extensionTransportService) {
         this.extensionTransportService = extensionTransportService;
     }
@@ -368,7 +374,7 @@ public class ExtensionsRunner {
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
-    public void sendRegisterCustomSettingsRequest(TransportService transportService) {
+    public static void sendRegisterCustomSettingsRequest(TransportService transportService) {
         logger.info("Sending Settings request to OpenSearch");
         ExtensionStringResponseHandler registerCustomSettingsResponseHandler = new ExtensionStringResponseHandler();
         try {
