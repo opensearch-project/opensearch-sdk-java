@@ -555,10 +555,7 @@ public class ExtensionsRunner {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsOrchestrator.REQUEST_EXTENSION_ACTION_LISTENER_ON_FAILURE,
-                new ExtensionActionListenerOnFailureRequest(
-                    ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_ACTION_LISTENER_ON_FAILURE,
-                    failureException.toString()
-                ),
+                new ExtensionActionListenerOnFailureRequest(failureException.toString()),
                 listenerHandler
             );
         } catch (Exception e) {
