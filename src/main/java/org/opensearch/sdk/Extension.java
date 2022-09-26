@@ -10,7 +10,10 @@ package org.opensearch.sdk;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
+
+import org.opensearch.common.settings.Setting;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -35,6 +38,15 @@ public interface Extension {
      * @return a list of REST handlers (REST actions) this extension handles.
      */
     List<ExtensionRestHandler> getExtensionRestHandlers();
+
+    /**
+     * Gets an optional list of custom {@link Setting} for the extension to register with OpenSearch.
+     *
+     * @return a list of custom settings this extension uses.
+     */
+    default List<Setting<?>> getSettings() {
+        return Collections.emptyList();
+    }
 
     /**
      * Helper method to read extension settings from a YAML file.

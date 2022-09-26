@@ -10,27 +10,26 @@ package org.opensearch.sdk.handlers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.io.stream.StreamInput;
-import org.opensearch.extensions.ExtensionBooleanResponse;
+import org.opensearch.extensions.ExtensionStringResponse;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportException;
 import org.opensearch.transport.TransportResponseHandler;
-
 import java.io.IOException;
 
 /**
- * This class handles the response {{@link org.opensearch.extensions.ExtensionBooleanResponse }} from OpenSearch to Extension.
+ * This class handles the response from OpenSearch to call returning an {@link ExtensionStringResponse}.
  */
-public class ExtensionResponseHandler implements TransportResponseHandler<ExtensionBooleanResponse> {
-    private static final Logger logger = LogManager.getLogger(ExtensionResponseHandler.class);
+public class ExtensionStringResponseHandler implements TransportResponseHandler<ExtensionStringResponse> {
+    private static final Logger logger = LogManager.getLogger(ExtensionStringResponseHandler.class);
 
     @Override
-    public void handleResponse(ExtensionBooleanResponse response) {
-        logger.info("received {}", response);
+    public void handleResponse(ExtensionStringResponse response) {
+        logger.info("received {}", response.getResponse());
     }
 
     @Override
     public void handleException(TransportException exp) {
-        logger.info("Extension Request failed", exp);
+        logger.info("Request failed", exp);
     }
 
     @Override
@@ -39,7 +38,7 @@ public class ExtensionResponseHandler implements TransportResponseHandler<Extens
     }
 
     @Override
-    public ExtensionBooleanResponse read(StreamInput in) throws IOException {
-        return new ExtensionBooleanResponse(in);
+    public ExtensionStringResponse read(StreamInput in) throws IOException {
+        return new ExtensionStringResponse(in);
     }
 }

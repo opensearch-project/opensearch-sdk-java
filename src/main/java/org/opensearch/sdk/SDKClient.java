@@ -52,6 +52,7 @@ public class SDKClient {
     }
 
     /**
+     * Close this client.
      *
      * @throws IOException if closing the restClient fails
      */
