@@ -12,12 +12,12 @@ import org.apache.logging.log4j.Logger;
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
-import org.opensearch.rest.RestResponse;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.ExtensionRestPathRegistry;
 import org.opensearch.sdk.ExtensionRestRequest;
+import org.opensearch.sdk.ExtensionRestResponse;
 
 /**
  * This class handles the request from OpenSearch to a {@link ExtensionsRunner#startTransportService(TransportService transportService)} call.
@@ -50,7 +50,7 @@ public class ExtensionsRestRequestHandler {
         );
 
         // Get response from extension
-        RestResponse response = restHandler.handleRequest(restRequest);
+        ExtensionRestResponse response = restHandler.handleRequest(restRequest);
         logger.info("Sending extension response to OpenSearch: " + response.status());
         return new RestExecuteOnExtensionResponse(
             response.status(),
