@@ -66,6 +66,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -87,15 +88,27 @@ public class ExtensionsRunner {
     private static final String NODE_NAME_SETTING = "node.name";
 
     private String uniqueId;
-    private DiscoveryNode opensearchNode;
+    /**
+     * This method is call from {@link ExtensionsInitRequestHandler}.
+     */
+    public DiscoveryNode opensearchNode;
     private DiscoveryExtension extensionNode;
-    private TransportService extensionTransportService = null;
+    /**
+     * This method is call from {@link ExtensionsInitRequestHandler}.
+     */
+    public TransportService extensionTransportService = null;
     // The routes and classes which handle the REST requests
     private final ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
     // Custom settings from the extension's getSettings
+    /**
+     * This method is call from {@link ExtensionsInitRequestHandler}.
+     */
     private final List<Setting<?>> customSettings;
     // Node name, host, and port
-    private final Settings settings;
+    /**
+     * This method is call from {@link ExtensionsInitRequestHandler}.
+     */
+    public final Settings settings;
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
     private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
@@ -105,6 +118,15 @@ public class ExtensionsRunner {
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler();
+
+    /*
+     * TODO: expose an interface for extension to register actions
+     * https://github.com/opensearch-project/opensearch-sdk-java/issues/119
+     */
+    /**
+     * This method is call from {@link ExtensionsInitRequestHandler}.
+     */
+    public TransportActions transportActions = new TransportActions(new HashMap<>());
 
     /**
      * Instantiates a new update settings request handler
@@ -159,11 +181,19 @@ public class ExtensionsRunner {
         return objectMapper.readValue(file, ExtensionSettings.class);
     }
 
+    /**
+     * This method is call from {@link ExtensionsInitRequestHandler}.
+     * @param extensionTransportService assign value for extensionTransportService
+     */
     void setExtensionTransportService(TransportService extensionTransportService) {
         this.extensionTransportService = extensionTransportService;
     }
 
-    private void setUniqueId(String id) {
+    /**
+     * This method is call from {@link ExtensionsInitRequestHandler}.
+     * @param id assign value for id
+     */
+    public void setUniqueId(String id) {
         this.uniqueId = id;
     }
 
@@ -171,11 +201,11 @@ public class ExtensionsRunner {
         return uniqueId;
     }
 
-    private void setOpensearchNode(DiscoveryNode opensearchNode) {
+    public void setOpensearchNode(DiscoveryNode opensearchNode) {
         this.opensearchNode = opensearchNode;
     }
 
-    private void setExtensionNode(DiscoveryExtension extensionNode) {
+    public void setExtensionNode(DiscoveryExtension extensionNode) {
         this.extensionNode = extensionNode;
     }
 
@@ -278,7 +308,7 @@ public class ExtensionsRunner {
             false,
             false,
             InitializeExtensionsRequest::new,
-            (request, channel, task) -> channel.sendResponse(extensionsInitRequestHandler.handleExtensionInitRequest(request, null))
+            (request, channel, task) -> channel.sendResponse(extensionsInitRequestHandler.handleExtensionInitRequest(request, this))
         );
 
         transportService.registerRequestHandler(
