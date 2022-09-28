@@ -12,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.index.IndicesModuleRequest;
-import org.opensearch.discovery.InitializeExtensionsRequest;
 
 /**
  * This class handles the request from OpenSearch to a {@link ExtensionsRunner#startTransportService(TransportService transportService)} call.
@@ -22,7 +21,7 @@ public class ExtensionsIndicesModuleNameRequestHandler {
     private static final Logger logger = LogManager.getLogger(ExtensionsIndicesModuleNameRequestHandler.class);
 
     /**
-     * Handles a request for extension name from OpenSearch.  The {@link #handleExtensionInitRequest(InitializeExtensionsRequest)} method must have been called first to initialize the extension.
+     * Handles a request for extension name from OpenSearch.  The {@link ExtensionsInitRequestHandler} method must have been called first to initialize the extension.
      *
      * @param indicesModuleRequest  The request to handle.
      * @return A response acknowledging the request.

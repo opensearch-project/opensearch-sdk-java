@@ -13,7 +13,6 @@ import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.index.IndicesModuleResponse;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.transport.TransportService;
-import org.opensearch.discovery.InitializeExtensionsRequest;
 
 /**
  * This class handles the request from OpenSearch to a {@link ExtensionsRunner#startTransportService(TransportService transportService)} call.
@@ -23,7 +22,7 @@ public class ExtensionsIndicesModuleRequestHandler {
     private static final Logger logger = LogManager.getLogger(ExtensionsIndicesModuleRequestHandler.class);
 
     /**
-     * Handles a request for extension point indices from OpenSearch.  The {@link #handleExtensionInitRequest(InitializeExtensionsRequest)} method must have been called first to initialize the extension.
+     * Handles a request for extension point indices from OpenSearch.  The {@link ExtensionsInitRequestHandler} class must have been called first to initialize the extension.
      *
      * @param indicesModuleRequest  The request to handle.
      * @param transportService  The transport service communicating with OpenSearch.
