@@ -15,6 +15,8 @@ import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.extensions.RegisterTransportActionsRequest;
+import org.opensearch.extensions.action.TransportActionRequestFromExtension;
+import org.opensearch.extensions.action.TransportActionResponseToExtension;
 import org.opensearch.sdk.handlers.ExtensionBooleanResponseHandler;
 import org.opensearch.transport.TransportService;
 
@@ -47,14 +49,14 @@ public class TransportActions {
      * @param transportService  The TransportService defining the connection to OpenSearch.
      * @param opensearchNode The OpenSearch node where transport actions being registered.
      */
-    public void sendRegisterTransportActionsRequest(TransportService transportService, DiscoveryNode opensearchNode) {
+    public void sendRegisterTransportActionsRequest(TransportService transportService, DiscoveryNode opensearchNode, String uniqueId) {
         logger.info("Sending Register Transport Actions request to OpenSearch");
         ExtensionBooleanResponseHandler registerTransportActionsResponseHandler = new ExtensionBooleanResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_TRANSPORT_ACTIONS,
-                new RegisterTransportActionsRequest(transportActions),
+                new RegisterTransportActionsRequest(uniqueId, transportActions),
                 registerTransportActionsResponseHandler
             );
         } catch (Exception e) {

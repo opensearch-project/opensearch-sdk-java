@@ -13,11 +13,16 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.Version;
+import org.opensearch.action.main.MainRequest;
+import org.opensearch.action.main.MainResponse;
+import org.opensearch.action.support.ActionFilters;
+import org.opensearch.action.support.HandledTransportAction;
 import org.opensearch.cluster.ClusterModule;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
+import org.opensearch.common.io.stream.Writeable;
 import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
@@ -46,6 +51,7 @@ import org.opensearch.indices.breaker.NoneCircuitBreakerService;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestResponse;
+import org.opensearch.tasks.Task;
 import org.opensearch.transport.netty4.Netty4Transport;
 import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
@@ -126,6 +132,7 @@ public class ExtensionsRunner {
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
             .build();
         this.customSettings = Collections.emptyList();
+        this.transportActions = new TransportActions(Collections.EMPTY_MAP);
     }
 
     /**
@@ -149,6 +156,8 @@ public class ExtensionsRunner {
         }
         // save custom settings
         this.customSettings = extension.getSettings();
+        // save custom transport actions
+        this.transportActions = new TransportActions(extension.getActions());
         // initialize the transport service
         this.initializeExtensionTransportService(this.getSettings());
         // start listening on configured port and wait for connection from OpenSearch
@@ -205,7 +214,7 @@ public class ExtensionsRunner {
             extensionTransportService.connectToNode(opensearchNode);
             sendRegisterRestActionsRequest(extensionTransportService);
             sendRegisterCustomSettingsRequest(extensionTransportService);
-            transportActions.sendRegisterTransportActionsRequest(extensionTransportService, opensearchNode);
+            transportActions.sendRegisterTransportActionsRequest(extensionTransportService, opensearchNode, getUniqueId());
         }
     }
 
