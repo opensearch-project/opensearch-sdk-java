@@ -89,29 +89,29 @@ public class ExtensionsRunner {
 
     private String uniqueId;
     /**
-     * This method is call from {@link ExtensionsInitRequestHandler}.
+     * This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
      */
     public DiscoveryNode opensearchNode;
     private DiscoveryExtension extensionNode;
     /**
-     * This method is call from {@link ExtensionsInitRequestHandler}.
+     * This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
      */
     public TransportService extensionTransportService = null;
     // The routes and classes which handle the REST requests
     private final ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
     // Custom settings from the extension's getSettings
     /**
-     * This method is call from {@link ExtensionsInitRequestHandler}.
+     * This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
      */
     private final List<Setting<?>> customSettings;
     // Node name, host, and port
     /**
-     * This method is call from {@link ExtensionsInitRequestHandler}.
+     * This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
      */
     public final Settings settings;
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
-    private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
+    private ExtensionNamedWriteableRegistry namedWriteableRegistryApi = new ExtensionNamedWriteableRegistry();
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler();
     private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler();
     private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
@@ -124,7 +124,7 @@ public class ExtensionsRunner {
      * https://github.com/opensearch-project/opensearch-sdk-java/issues/119
      */
     /**
-     * This method is call from {@link ExtensionsInitRequestHandler}.
+     * Instantiates a new transportActions
      */
     public TransportActions transportActions = new TransportActions(new HashMap<>());
 
@@ -190,7 +190,7 @@ public class ExtensionsRunner {
     }
 
     /**
-     * This method is call from {@link ExtensionsInitRequestHandler}.
+     * Sets the Unique ID, used in REST requests to uniquely identify this extension
      * @param id assign value for id
      */
     public void setUniqueId(String id) {

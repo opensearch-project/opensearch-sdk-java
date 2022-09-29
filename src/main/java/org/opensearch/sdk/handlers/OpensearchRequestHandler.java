@@ -8,7 +8,7 @@
 package org.opensearch.sdk.handlers;
 
 import org.opensearch.extensions.OpenSearchRequest;
-import org.opensearch.sdk.NamedWriteableRegistryAPI;
+import org.opensearch.sdk.ExtensionNamedWriteableRegistry;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.transport.TransportResponse;
 
@@ -17,7 +17,7 @@ import org.opensearch.transport.TransportResponse;
  */
 
 public class OpensearchRequestHandler {
-    private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
+    private ExtensionNamedWriteableRegistry namedWriteableRegistryApi = new ExtensionNamedWriteableRegistry();
 
     /**
      * Handles a request from OpenSearch and invokes the extension point API corresponding with the request type
