@@ -46,6 +46,7 @@ public class TransportActions {
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      * @param opensearchNode The OpenSearch node where transport actions being registered.
+     * @param uniqueId The identity used to
      */
     public void sendRegisterTransportActionsRequest(TransportService transportService, DiscoveryNode opensearchNode, String uniqueId) {
         logger.info("Sending Register Transport Actions request to OpenSearch");
