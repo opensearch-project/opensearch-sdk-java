@@ -60,7 +60,6 @@ import org.opensearch.transport.TransportResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -91,11 +90,7 @@ public class ExtensionsRunner {
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
     private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
-    /*
-     * TODO: expose an interface for extension to register actions
-     * https://github.com/opensearch-project/opensearch-sdk-java/issues/119
-     */
-    private TransportActions transportActions = new TransportActions(new HashMap<>());
+    private TransportActions transportActions;
 
     /**
      * Instantiates a new Extensions Runner using test settings.
@@ -110,6 +105,7 @@ public class ExtensionsRunner {
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
             .build();
         this.customSettings = Collections.emptyList();
+        this.transportActions = new TransportActions(Collections.EMPTY_MAP);
     }
 
     /**
@@ -133,6 +129,8 @@ public class ExtensionsRunner {
         }
         // save custom settings
         this.customSettings = extension.getSettings();
+        // save custom transport actions
+        this.transportActions = new TransportActions(extension.getActions());
         // initialize the transport service
         this.initializeExtensionTransportService(this.getSettings());
         // start listening on configured port and wait for connection from OpenSearch
@@ -184,7 +182,7 @@ public class ExtensionsRunner {
             extensionTransportService.connectToNode(opensearchNode);
             sendRegisterRestActionsRequest(extensionTransportService);
             sendRegisterCustomSettingsRequest(extensionTransportService);
-            transportActions.sendRegisterTransportActionsRequest(extensionTransportService, opensearchNode);
+            transportActions.sendRegisterTransportActionsRequest(extensionTransportService, opensearchNode, getUniqueId());
         }
     }
 
