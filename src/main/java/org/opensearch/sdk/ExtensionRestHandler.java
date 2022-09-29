@@ -13,7 +13,6 @@ import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.RestHandler;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
-import org.opensearch.rest.RestRequest.Method;
 
 /**
  * This interface defines methods which an extension REST handler (action) must provide.
@@ -34,9 +33,8 @@ public interface ExtensionRestHandler {
      * This method corresponds to the {@link BaseRestHandler#prepareRequest} method.
      * As in that method, consumed parameters must be tracked and returned in the response.
      *
-     * @param method A REST method.
-     * @param uri The URI to handle.
+     * @param restRequest a REST request object for a request to be forwarded to extensions
      * @return An {@link ExtensionRestResponse} to the request.
      */
-    ExtensionRestResponse handleRequest(Method method, String uri);
+    ExtensionRestResponse handleRequest(ExtensionRestRequest restRequest);
 }

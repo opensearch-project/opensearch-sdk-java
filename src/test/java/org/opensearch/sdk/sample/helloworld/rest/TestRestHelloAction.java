@@ -8,10 +8,13 @@
 package org.opensearch.sdk.sample.helloworld.rest;
 
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opensearch.identity.ExtensionTokenProcessor;
+import org.opensearch.identity.PrincipalIdentifierToken;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.common.bytes.BytesReference;
@@ -19,11 +22,13 @@ import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestResponse;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.ExtensionRestHandler;
+import org.opensearch.sdk.ExtensionRestRequest;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestRestHelloAction extends OpenSearchTestCase {
 
     private ExtensionRestHandler restHelloAction;
+    private static final String EXTENSION_NAME = "hello-world";
 
     @Override
     @BeforeEach
@@ -44,37 +49,47 @@ public class TestRestHelloAction extends OpenSearchTestCase {
 
     @Test
     public void testHandleRequest() {
-        RestResponse response = restHelloAction.handleRequest(Method.GET, "/hello");
+        Principal userPrincipal = () -> "user1";
+        ExtensionTokenProcessor extensionTokenProcessor = new ExtensionTokenProcessor(EXTENSION_NAME);
+        PrincipalIdentifierToken token = extensionTokenProcessor.generateToken(userPrincipal);
+
+        ExtensionRestRequest getRequest = new ExtensionRestRequest(Method.GET, "/hello", token);
+        ExtensionRestRequest putRequest = new ExtensionRestRequest(Method.PUT, "/hello", token);
+        ExtensionRestRequest updateRequest = new ExtensionRestRequest(Method.PUT, "/hello/Passing+Test", token);
+        ExtensionRestRequest badRequest = new ExtensionRestRequest(Method.PUT, "/hello/Bad%Request", token);
+        ExtensionRestRequest unsuccessfulRequest = new ExtensionRestRequest(Method.GET, "/goodbye", token);
+
+        RestResponse response = restHelloAction.handleRequest(getRequest);
         assertEquals(RestStatus.OK, response.status());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
         String responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertEquals("Hello, World!", responseStr);
 
-        response = restHelloAction.handleRequest(Method.PUT, "/hello");
+        response = restHelloAction.handleRequest(putRequest);
         assertEquals(RestStatus.NOT_FOUND, response.status());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("PUT"));
 
-        response = restHelloAction.handleRequest(Method.PUT, "/hello/Passing+Test");
+        response = restHelloAction.handleRequest(updateRequest);
         assertEquals(RestStatus.OK, response.status());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertEquals("Updated the world's name to Passing Test", responseStr);
 
-        response = restHelloAction.handleRequest(Method.GET, "/hello");
+        response = restHelloAction.handleRequest(getRequest);
         assertEquals(RestStatus.OK, response.status());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertEquals("Hello, Passing Test!", responseStr);
 
-        response = restHelloAction.handleRequest(Method.PUT, "/hello/Bad%Request");
+        response = restHelloAction.handleRequest(badRequest);
         assertEquals(RestStatus.BAD_REQUEST, response.status());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("Illegal hex characters in escape (%) pattern"));
 
-        response = restHelloAction.handleRequest(Method.GET, "/goodbye");
+        response = restHelloAction.handleRequest(unsuccessfulRequest);
         assertEquals(RestStatus.NOT_FOUND, response.status());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
