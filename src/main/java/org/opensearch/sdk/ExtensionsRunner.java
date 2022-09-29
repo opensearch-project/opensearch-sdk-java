@@ -103,7 +103,6 @@ public class ExtensionsRunner {
     };
     private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
     private TransportActions transportActions;
-    private TransportActions transportActions = new TransportActions(new HashMap<>());
     UpdateSettingsRequestHandler updateSettingsRequestHandler = new UpdateSettingsRequestHandler();
 
     /**
