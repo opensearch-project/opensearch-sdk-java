@@ -15,6 +15,8 @@ import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.extensions.RegisterTransportActionsRequest;
+import org.opensearch.extensions.action.TransportActionRequestFromExtension;
+import org.opensearch.extensions.action.TransportActionResponseToExtension;
 import org.opensearch.sdk.handlers.ExtensionBooleanResponseHandler;
 import org.opensearch.transport.TransportService;
 
