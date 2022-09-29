@@ -10,7 +10,6 @@ package org.opensearch.sdk.handlers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.bytes.BytesReference;
-import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.ExtensionRestHandler;
@@ -33,24 +32,18 @@ public class ExtensionsRestRequestHandler {
      * @param request  The REST request to execute.
      * @return A response acknowledging the request.
      */
-    public RestExecuteOnExtensionResponse handleRestExecuteOnExtensionRequest(RestExecuteOnExtensionRequest request) {
+    public RestExecuteOnExtensionResponse handleRestExecuteOnExtensionRequest(ExtensionRestRequest request) {
 
-        ExtensionRestHandler restHandler = extensionRestPathRegistry.getHandler(request.getMethod(), request.getUri());
+        ExtensionRestHandler restHandler = extensionRestPathRegistry.getHandler(request.method(), request.uri());
         if (restHandler == null) {
             return new RestExecuteOnExtensionResponse(
                 RestStatus.NOT_FOUND,
-                "No handler for " + ExtensionRestPathRegistry.restPathToString(request.getMethod(), request.getUri())
+                "No handler for " + ExtensionRestPathRegistry.restPathToString(request.method(), request.uri())
             );
         }
-        // ExtensionRestRequest restRequest = new ExtensionRestRequest(request);
-        ExtensionRestRequest restRequest = new ExtensionRestRequest(
-            request.getMethod(),
-            request.getUri(),
-            request.getRequestIssuerIdentity()
-        );
 
         // Get response from extension
-        ExtensionRestResponse response = restHandler.handleRequest(restRequest);
+        ExtensionRestResponse response = restHandler.handleRequest(request);
         logger.info("Sending extension response to OpenSearch: " + response.status());
         return new RestExecuteOnExtensionResponse(
             response.status(),

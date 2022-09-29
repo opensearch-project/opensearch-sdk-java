@@ -9,7 +9,9 @@ package org.opensearch.sdk.sample.helloworld.rest;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,11 +20,11 @@ import org.opensearch.identity.PrincipalIdentifierToken;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.common.bytes.BytesReference;
+import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestResponse;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.ExtensionRestHandler;
-import org.opensearch.sdk.ExtensionRestRequest;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestRestHelloAction extends OpenSearchTestCase {
@@ -52,12 +54,13 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         Principal userPrincipal = () -> "user1";
         ExtensionTokenProcessor extensionTokenProcessor = new ExtensionTokenProcessor(EXTENSION_NAME);
         PrincipalIdentifierToken token = extensionTokenProcessor.generateToken(userPrincipal);
+        Map<String, String> params = Collections.emptyMap();
 
-        ExtensionRestRequest getRequest = new ExtensionRestRequest(Method.GET, "/hello", token);
-        ExtensionRestRequest putRequest = new ExtensionRestRequest(Method.PUT, "/hello", token);
-        ExtensionRestRequest updateRequest = new ExtensionRestRequest(Method.PUT, "/hello/Passing+Test", token);
-        ExtensionRestRequest badRequest = new ExtensionRestRequest(Method.PUT, "/hello/Bad%Request", token);
-        ExtensionRestRequest unsuccessfulRequest = new ExtensionRestRequest(Method.GET, "/goodbye", token);
+        ExtensionRestRequest getRequest = new ExtensionRestRequest(Method.GET, "/hello", params, token);
+        ExtensionRestRequest putRequest = new ExtensionRestRequest(Method.PUT, "/hello", params, token);
+        ExtensionRestRequest updateRequest = new ExtensionRestRequest(Method.PUT, "/hello/Passing+Test", params, token);
+        ExtensionRestRequest badRequest = new ExtensionRestRequest(Method.PUT, "/hello/Bad%Request", params, token);
+        ExtensionRestRequest unsuccessfulRequest = new ExtensionRestRequest(Method.GET, "/goodbye", params, token);
 
         RestResponse response = restHelloAction.handleRequest(getRequest);
         assertEquals(RestStatus.OK, response.status());

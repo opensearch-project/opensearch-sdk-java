@@ -9,6 +9,7 @@ package org.opensearch.sdk;
 
 import java.util.List;
 
+import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.RestHandler;
 import org.opensearch.rest.RestHandler.Route;
@@ -29,12 +30,12 @@ public interface ExtensionRestHandler {
 
     /**
      * Handles REST Requests forwarded from OpenSearch for a configured route on an extension.
-     * Parameters are components of the {@link RestRequest} received from a user.
+     * Parameter contains components of the {@link RestRequest} received from a user.
      * This method corresponds to the {@link BaseRestHandler#prepareRequest} method.
      * As in that method, consumed parameters must be tracked and returned in the response.
      *
-     * @param restRequest a REST request object for a request to be forwarded to extensions
+     * @param request a REST request object for a request to be forwarded to extensions
      * @return An {@link ExtensionRestResponse} to the request.
      */
-    ExtensionRestResponse handleRequest(ExtensionRestRequest restRequest);
+    ExtensionRestResponse handleRequest(ExtensionRestRequest request);
 }

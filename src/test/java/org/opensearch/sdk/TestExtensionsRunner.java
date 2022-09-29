@@ -35,6 +35,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.Version;
 import org.opensearch.cluster.node.DiscoveryNode;
+import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.settings.Setting.Property;
@@ -45,7 +46,7 @@ import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
 import org.opensearch.extensions.OpenSearchRequest;
-import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
+import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
 import org.opensearch.identity.ExtensionTokenProcessor;
 import org.opensearch.rest.BytesRestResponse;
@@ -72,8 +73,6 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     private static final String EXTENSION_NAME = "sample-extension";
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler();
     private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler();
-    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler();
-
     private ExtensionsRunner extensionsRunner;
     private TransportService transportService;
 
@@ -168,12 +167,19 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     }
 
     @Test
-    public void testHandleRestExecuteOnExtensionRequest() throws Exception {
+    public void testHandleExtensionRestRequest() throws Exception {
 
         ExtensionTokenProcessor ext = new ExtensionTokenProcessor(EXTENSION_NAME);
         Principal userPrincipal = () -> "user1";
-        RestExecuteOnExtensionRequest request = new RestExecuteOnExtensionRequest(Method.GET, "/foo", ext.generateToken(userPrincipal));
-        RestExecuteOnExtensionResponse response = extensionsRestRequestHandler.handleRestExecuteOnExtensionRequest(request);
+        ExtensionRestRequest request = new ExtensionRestRequest(
+            Method.GET,
+            "/foo",
+            Collections.emptyMap(),
+            null,
+            new BytesArray(""),
+            ext.generateToken(userPrincipal)
+        );
+        RestExecuteOnExtensionResponse response = extensionsRunner.handleRestExecuteOnExtensionRequest(request);
         // this will fail in test environment with no registered actions
         assertEquals(RestStatus.NOT_FOUND, response.getStatus());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.getContentType());
