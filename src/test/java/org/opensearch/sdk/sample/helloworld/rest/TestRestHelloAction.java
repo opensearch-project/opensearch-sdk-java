@@ -57,10 +57,13 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         Map<String, String> params = Collections.emptyMap();
 
         ExtensionRestRequest getRequest = new ExtensionRestRequest(Method.GET, "/hello", params, token);
-        ExtensionRestRequest putRequest = new ExtensionRestRequest(Method.PUT, "/hello", params, token);
-        ExtensionRestRequest updateRequest = new ExtensionRestRequest(Method.PUT, "/hello/Passing+Test", params, token);
-        ExtensionRestRequest badRequest = new ExtensionRestRequest(Method.PUT, "/hello/Bad%Request", params, token);
-        ExtensionRestRequest unsuccessfulRequest = new ExtensionRestRequest(Method.GET, "/goodbye", params, token);
+        ExtensionRestRequest putRequest = new ExtensionRestRequest(
+            Method.PUT,
+            "/hello/Passing+Test",
+            Map.of("name", "Passing+Test"),
+            token
+        );
+        ExtensionRestRequest badRequest = new ExtensionRestRequest(Method.PUT, "/hello/Bad%Request", Map.of("name", "Bad%Request"), token);
 
         RestResponse response = restHelloAction.handleRequest(getRequest);
         assertEquals(RestStatus.OK, response.status());
@@ -69,12 +72,6 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         assertEquals("Hello, World!", responseStr);
 
         response = restHelloAction.handleRequest(putRequest);
-        assertEquals(RestStatus.NOT_FOUND, response.status());
-        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
-        responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
-        assertTrue(responseStr.contains("PUT"));
-
-        response = restHelloAction.handleRequest(updateRequest);
         assertEquals(RestStatus.OK, response.status());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
@@ -91,12 +88,6 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("Illegal hex characters in escape (%) pattern"));
-
-        response = restHelloAction.handleRequest(unsuccessfulRequest);
-        assertEquals(RestStatus.NOT_FOUND, response.status());
-        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
-        responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
-        assertTrue(responseStr.contains("/goodbye"));
     }
 
 }

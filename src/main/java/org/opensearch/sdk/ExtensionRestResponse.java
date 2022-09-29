@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.xcontent.XContentBuilder;
+import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestStatus;
 
@@ -27,64 +28,64 @@ public class ExtensionRestResponse extends BytesRestResponse {
     /**
      * Creates a new response based on {@link XContentBuilder}.
      *
+     * @param request  the REST request being responded to.
      * @param status  The REST status.
      * @param builder  The builder for the response.
-     * @param consumedParams  Parameters consumed by the handler.
      */
-    public ExtensionRestResponse(RestStatus status, XContentBuilder builder, List<String> consumedParams) {
+    public ExtensionRestResponse(ExtensionRestRequest request, RestStatus status, XContentBuilder builder) {
         super(status, builder);
-        addConsumedParamHeader(consumedParams);
+        addConsumedParamHeader(request.consumedParams());
     }
 
     /**
      * Creates a new plain text response.
      *
+     * @param request  the REST request being responded to.
      * @param status  The REST status.
      * @param content  A plain text response string.
-     * @param consumedParams  Parameters consumed by the handler.
      */
-    public ExtensionRestResponse(RestStatus status, String content, List<String> consumedParams) {
+    public ExtensionRestResponse(ExtensionRestRequest request, RestStatus status, String content) {
         super(status, content);
-        addConsumedParamHeader(consumedParams);
+        addConsumedParamHeader(request.consumedParams());
     }
 
     /**
      * Creates a new plain text response.
      *
+     * @param request  the REST request being responded to.
      * @param status  The REST status.
      * @param contentType  The content type of the response string.
      * @param content  A response string.
-     * @param consumedParams  Parameters consumed by the handler.
      */
-    public ExtensionRestResponse(RestStatus status, String contentType, String content, List<String> consumedParams) {
+    public ExtensionRestResponse(ExtensionRestRequest request, RestStatus status, String contentType, String content) {
         super(status, contentType, content);
-        addConsumedParamHeader(consumedParams);
+        addConsumedParamHeader(request.consumedParams());
     }
 
     /**
      * Creates a binary response.
      *
+     * @param request  the REST request being responded to.
      * @param status  The REST status.
      * @param contentType  The content type of the response bytes.
      * @param content  Response bytes.
-     * @param consumedParams  Parameters consumed by the handler.
      */
-    public ExtensionRestResponse(RestStatus status, String contentType, byte[] content, List<String> consumedParams) {
+    public ExtensionRestResponse(ExtensionRestRequest request, RestStatus status, String contentType, byte[] content) {
         super(status, contentType, content);
-        addConsumedParamHeader(consumedParams);
+        addConsumedParamHeader(request.consumedParams());
     }
 
     /**
      * Creates a binary response.
      *
+     * @param request  the REST request being responded to.
      * @param status  The REST status.
      * @param contentType  The content type of the response bytes.
      * @param content  Response bytes.
-     * @param consumedParams  Parameters consumed by the handler.
      */
-    public ExtensionRestResponse(RestStatus status, String contentType, BytesReference content, List<String> consumedParams) {
+    public ExtensionRestResponse(ExtensionRestRequest request, RestStatus status, String contentType, BytesReference content) {
         super(status, contentType, content);
-        addConsumedParamHeader(consumedParams);
+        addConsumedParamHeader(request.consumedParams());
     }
 
     private void addConsumedParamHeader(List<String> consumedParams) {

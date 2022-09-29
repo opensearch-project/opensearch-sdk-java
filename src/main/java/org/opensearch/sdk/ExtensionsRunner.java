@@ -327,7 +327,7 @@ public class ExtensionsRunner {
                 "No handler for " + ExtensionRestPathRegistry.restPathToString(request.method(), request.uri())
             );
         }
-
+        logger.trace("Handling " + request.toString());
         // Get response from extension
         RestResponse response = restHandler.handleRequest(request);
         logger.info("Sending extension response to OpenSearch: " + response.status());
