@@ -104,7 +104,7 @@ public class ExtensionsRunner {
     private NamedWriteableRegistryAPI namedWriteableRegistryApi = new NamedWriteableRegistryAPI();
     private TransportActions transportActions;
     /**
-     * Instantiates a Update Settings Runner for extensions.
+     * Instantiates a new update settings request handler
      */
     UpdateSettingsRequestHandler updateSettingsRequestHandler = new UpdateSettingsRequestHandler();
 

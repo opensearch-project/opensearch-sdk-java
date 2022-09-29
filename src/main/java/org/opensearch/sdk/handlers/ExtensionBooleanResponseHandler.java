@@ -26,7 +26,6 @@ public class ExtensionBooleanResponseHandler implements TransportResponseHandler
     @Override
     public void handleResponse(ExtensionBooleanResponse response) {
         logger.info("received {}", response);
-
     }
 
     @Override
