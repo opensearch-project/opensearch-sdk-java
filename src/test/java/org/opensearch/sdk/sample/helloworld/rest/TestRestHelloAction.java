@@ -64,6 +64,7 @@ public class TestRestHelloAction extends OpenSearchTestCase {
             token
         );
         ExtensionRestRequest badRequest = new ExtensionRestRequest(Method.PUT, "/hello/Bad%Request", Map.of("name", "Bad%Request"), token);
+        ExtensionRestRequest unsuccessfulRequest = new ExtensionRestRequest(Method.POST, "/goodbye", params, token);
 
         RestResponse response = restHelloAction.handleRequest(getRequest);
         assertEquals(RestStatus.OK, response.status());
@@ -88,6 +89,12 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("Illegal hex characters in escape (%) pattern"));
+
+        response = restHelloAction.handleRequest(unsuccessfulRequest);
+        assertEquals(RestStatus.NOT_FOUND, response.status());
+        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
+        responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
+        assertTrue(responseStr.contains("/goodbye"));
     }
 
 }
