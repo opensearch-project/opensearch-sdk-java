@@ -25,8 +25,11 @@ import static org.mockito.Mockito.verify;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,24 +37,32 @@ import org.opensearch.Version;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.common.settings.Setting.Property;
 import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
 import org.opensearch.extensions.DiscoveryExtension;
+import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
 import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
+import org.opensearch.identity.ExtensionTokenProcessor;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestStatus;
+import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
+import org.opensearch.common.settings.Setting;
+import org.opensearch.extensions.UpdateSettingsRequest;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
+import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
-import org.opensearch.sdk.handlers.RegisterRestActionsResponseHandler;
+import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.Transport;
 import org.opensearch.transport.TransportService;
+import org.opensearch.common.settings.WriteableSetting;
 
 public class TestExtensionsRunner extends OpenSearchTestCase {
 
@@ -100,7 +111,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     public void testRegisterRequestHandler() {
 
         extensionsRunner.startTransportService(transportService);
-        verify(transportService, times(6)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
+        verify(transportService, times(7)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
     }
 
     @Test
@@ -150,7 +161,9 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testHandleRestExecuteOnExtensionRequest() throws Exception {
 
-        RestExecuteOnExtensionRequest request = new RestExecuteOnExtensionRequest(Method.GET, "/foo");
+        ExtensionTokenProcessor ext = new ExtensionTokenProcessor(EXTENSION_NAME);
+        Principal userPrincipal = () -> "user1";
+        RestExecuteOnExtensionRequest request = new RestExecuteOnExtensionRequest(Method.GET, "/foo", ext.generateToken(userPrincipal));
         RestExecuteOnExtensionResponse response = extensionsRunner.handleRestExecuteOnExtensionRequest(request);
         // this will fail in test environment with no registered actions
         assertEquals(RestStatus.NOT_FOUND, response.getStatus());
@@ -158,6 +171,18 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         String responseStr = new String(response.getContent(), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("GET"));
         assertTrue(responseStr.contains("/foo"));
+    }
+
+    @Test
+    public void testHandleUpdateSettingsRequest() throws Exception {
+
+        Setting<Integer> fallbackSetting = Setting.intSetting("component.fallback.setting.key", 0, 0, Property.Dynamic);
+        Setting<Integer> componentSetting = Setting.intSetting("component.setting.key", fallbackSetting, Property.Dynamic);
+        UpdateSettingsRequest request = new UpdateSettingsRequest(WriteableSetting.SettingType.Integer, componentSetting, null);
+        assertEquals(
+            ExtensionBooleanResponse.class,
+            extensionsRunner.updateSettingsRequestHandler.handleUpdateSettingsRequest(request).getClass()
+        );
     }
 
     @Test
@@ -185,10 +210,35 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     }
 
     @Test
+    public void testActionListenerOnFailureRequest() {
+
+        extensionsRunner.sendActionListenerOnFailureRequest(transportService, new Exception("Test failure"));
+
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ActionListenerOnFailureResponseHandler.class));
+    }
+
+    @Test
+    public void testEnvironmentSettingsRequest() {
+
+        List<Setting<?>> componentSettings = new ArrayList<>();
+        extensionsRunner.sendEnvironmentSettingsRequest(transportService, componentSettings);
+
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(EnvironmentSettingsResponseHandler.class));
+    }
+
+    @Test
     public void testRegisterRestActionsRequest() {
 
         extensionsRunner.sendRegisterRestActionsRequest(transportService);
 
-        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(RegisterRestActionsResponseHandler.class));
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ExtensionStringResponseHandler.class));
+    }
+
+    @Test
+    public void testRegisterCustomSettingsRequest() {
+
+        extensionsRunner.sendRegisterCustomSettingsRequest(transportService);
+
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ExtensionStringResponseHandler.class));
     }
 }

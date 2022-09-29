@@ -22,13 +22,19 @@ import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
+import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
 import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
+import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.PageCacheRecycler;
 import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
+import org.opensearch.extensions.DiscoveryExtension;
+import org.opensearch.extensions.EnvironmentSettingsRequest;
+import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
+import org.opensearch.extensions.UpdateSettingsRequest;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.index.IndicesModuleRequest;
@@ -41,10 +47,14 @@ import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestResponse;
 import org.opensearch.transport.netty4.Netty4Transport;
 import org.opensearch.transport.SharedGroupFactory;
+import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
+import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
+import org.opensearch.sdk.handlers.ExtensionBooleanResponseHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
-import org.opensearch.sdk.handlers.RegisterRestActionsResponseHandler;
+import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
+import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
 import org.opensearch.search.SearchModule;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.ClusterConnectionManager;
@@ -56,12 +66,15 @@ import org.opensearch.transport.TransportResponse;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 import static java.util.Collections.emptySet;
 import static org.opensearch.common.UUIDs.randomBase64UUID;
@@ -78,9 +91,13 @@ public class ExtensionsRunner {
 
     private String uniqueId;
     private DiscoveryNode opensearchNode;
+    private DiscoveryExtension extensionNode;
     private TransportService extensionTransportService = null;
-    private ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
-
+    // The routes and classes which handle the REST requests
+    private final ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
+    // Custom settings from the extension's getSettings
+    private final List<Setting<?>> customSettings;
+    // Node name, host, and port
     private final Settings settings;
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
@@ -90,6 +107,10 @@ public class ExtensionsRunner {
      * https://github.com/opensearch-project/opensearch-sdk-java/issues/119
      */
     private TransportActions transportActions = new TransportActions(new HashMap<>());
+    /**
+     * Instantiates a new update settings request handler
+     */
+    UpdateSettingsRequestHandler updateSettingsRequestHandler = new UpdateSettingsRequestHandler();
 
     /**
      * Instantiates a new Extensions Runner using test settings.
@@ -103,6 +124,7 @@ public class ExtensionsRunner {
             .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
             .build();
+        this.customSettings = Collections.emptyList();
     }
 
     /**
@@ -118,12 +140,14 @@ public class ExtensionsRunner {
             .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
             .build();
-        // store rest handlers in the map
+        // store REST handlers in the registry
         for (ExtensionRestHandler extensionRestHandler : extension.getExtensionRestHandlers()) {
             for (Route route : extensionRestHandler.routes()) {
                 extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
             }
         }
+        // save custom settings
+        this.customSettings = extension.getSettings();
         // initialize the transport service
         this.initializeExtensionTransportService(this.getSettings());
         // start listening on configured port and wait for connection from OpenSearch
@@ -152,6 +176,10 @@ public class ExtensionsRunner {
         this.opensearchNode = opensearchNode;
     }
 
+    private void setExtensionNode(DiscoveryExtension extensionNode) {
+        this.extensionNode = extensionNode;
+    }
+
     DiscoveryNode getOpensearchNode() {
         return opensearchNode;
     }
@@ -170,10 +198,12 @@ public class ExtensionsRunner {
         try {
             return new InitializeExtensionsResponse(settings.get(NODE_NAME_SETTING));
         } finally {
-            // After sending successful response to initialization, send the REST API
+            // After sending successful response to initialization, send the REST API and Settings
             setOpensearchNode(opensearchNode);
+            setExtensionNode(extensionInitRequest.getExtension());
             extensionTransportService.connectToNode(opensearchNode);
             sendRegisterRestActionsRequest(extensionTransportService);
+            sendRegisterCustomSettingsRequest(extensionTransportService);
             transportActions.sendRegisterTransportActionsRequest(extensionTransportService, opensearchNode);
         }
     }
@@ -237,8 +267,15 @@ public class ExtensionsRunner {
                 "No handler for " + ExtensionRestPathRegistry.restPathToString(request.getMethod(), request.getUri())
             );
         }
+        // ExtensionRestRequest restRequest = new ExtensionRestRequest(request);
+        ExtensionRestRequest restRequest = new ExtensionRestRequest(
+            request.getMethod(),
+            request.getUri(),
+            request.getRequestIssuerIdentity()
+        );
+
         // Get response from extension
-        RestResponse response = restHandler.handleRequest(request.getMethod(), request.getUri());
+        RestResponse response = restHandler.handleRequest(restRequest);
         logger.info("Sending extension response to OpenSearch: " + response.status());
         return new RestExecuteOnExtensionResponse(
             response.status(),
@@ -392,6 +429,15 @@ public class ExtensionsRunner {
             ((request, channel, task) -> channel.sendResponse(handleRestExecuteOnExtensionRequest(request)))
         );
 
+        transportService.registerRequestHandler(
+            ExtensionsOrchestrator.REQUEST_EXTENSION_UPDATE_SETTINGS,
+            ThreadPool.Names.GENERIC,
+            false,
+            false,
+            UpdateSettingsRequest::new,
+            ((request, channel, task) -> channel.sendResponse(updateSettingsRequestHandler.handleUpdateSettingsRequest(request)))
+        );
+
     }
 
     /**
@@ -402,7 +448,7 @@ public class ExtensionsRunner {
     public void sendRegisterRestActionsRequest(TransportService transportService) {
         List<String> extensionRestPaths = extensionRestPathRegistry.getRegisteredPaths();
         logger.info("Sending Register REST Actions request to OpenSearch for " + extensionRestPaths);
-        RegisterRestActionsResponseHandler registerActionsResponseHandler = new RegisterRestActionsResponseHandler();
+        ExtensionStringResponseHandler registerActionsResponseHandler = new ExtensionStringResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
@@ -412,6 +458,26 @@ public class ExtensionsRunner {
             );
         } catch (Exception e) {
             logger.info("Failed to send Register REST Actions request to OpenSearch", e);
+        }
+    }
+
+    /**
+     * Requests that OpenSearch register the custom settings for this extension.
+     *
+     * @param transportService  The TransportService defining the connection to OpenSearch.
+     */
+    public void sendRegisterCustomSettingsRequest(TransportService transportService) {
+        logger.info("Sending Settings request to OpenSearch");
+        ExtensionStringResponseHandler registerCustomSettingsResponseHandler = new ExtensionStringResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_CUSTOM_SETTINGS,
+                new RegisterCustomSettingsRequest(getUniqueId(), customSettings),
+                registerCustomSettingsResponseHandler
+            );
+        } catch (Exception e) {
+            logger.info("Failed to send Register Settings request to OpenSearch", e);
         }
     }
 
@@ -473,6 +539,87 @@ public class ExtensionsRunner {
         } catch (Exception e) {
             logger.info("Failed to send Cluster Settings request to OpenSearch", e);
         }
+    }
+
+    /**
+     * Requests the ActionListener onFailure method to be run by OpenSearch.  The result will be handled by a {@link ActionListenerOnFailureResponseHandler}.
+     *
+     * @param transportService  The TransportService defining the connection to OpenSearch.
+     * @param failureException The exception to be sent to OpenSearch
+     */
+    public void sendActionListenerOnFailureRequest(TransportService transportService, Exception failureException) {
+        logger.info("Sending ActionListener onFailure request to OpenSearch");
+        ActionListenerOnFailureResponseHandler listenerHandler = new ActionListenerOnFailureResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_EXTENSION_ACTION_LISTENER_ON_FAILURE,
+                new ExtensionActionListenerOnFailureRequest(failureException.toString()),
+                listenerHandler
+            );
+        } catch (Exception e) {
+            logger.info("Failed to send ActionListener onFailure request to OpenSearch", e);
+        }
+    }
+
+    /**
+     * Requests the environment setting values from OpenSearch for the corresponding component settings. The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
+     *
+     * @param componentSettings The component setting that correspond to the values provided by the environment settings
+     * @param transportService  The TransportService defining the connection to OpenSearch.
+     */
+    public void sendEnvironmentSettingsRequest(TransportService transportService, List<Setting<?>> componentSettings) {
+        logger.info("Sending Environment Settings request to OpenSearch");
+        EnvironmentSettingsResponseHandler environmentSettingsResponseHandler = new EnvironmentSettingsResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS,
+                new EnvironmentSettingsRequest(componentSettings),
+                environmentSettingsResponseHandler
+            );
+        } catch (Exception e) {
+            logger.info("Failed to send Environment Settings request to OpenSearch", e);
+        }
+    }
+
+    /**
+     * Registers settings and setting consumers with the {@link UpdateSettingsRequestHandler} and then sends a request to OpenSearch to register these Setting objects with a callback to this extension.
+     * The result will be handled by a {@link ExtensionBooleanResponseHandler}.
+     *
+     * @param transportService  The TransportService defining the connection to OpenSearch.
+     * @param settingUpdateConsumers A map of setting objects and their corresponding consumers
+     * @throws Exception if there are no setting update consumers within the settingUpdateConsumers map
+     */
+    public void sendAddSettingsUpdateConsumerRequest(TransportService transportService, Map<Setting<?>, Consumer<?>> settingUpdateConsumers)
+        throws Exception {
+        logger.info("Sending Add Settings Update Consumer request to OpenSearch");
+
+        // Determine if there are setting update consumers to be registered
+        if (settingUpdateConsumers.isEmpty()) {
+            throw new Exception("There are no setting update consumers to be registered");
+        } else {
+
+            // Register setting update consumers to UpdateSettingsRequestHandler
+            this.updateSettingsRequestHandler.registerSettingUpdateConsumer(settingUpdateConsumers);
+
+            // Extract registered settings from setting update consumer map
+            List<Setting<?>> componentSettings = new ArrayList<>(settingUpdateConsumers.size());
+            componentSettings.addAll(settingUpdateConsumers.keySet());
+
+            ExtensionBooleanResponseHandler extensionBooleanResponseHandler = new ExtensionBooleanResponseHandler();
+            try {
+                transportService.sendRequest(
+                    opensearchNode,
+                    ExtensionsOrchestrator.REQUEST_EXTENSION_ADD_SETTINGS_UPDATE_CONSUMER,
+                    new AddSettingsUpdateConsumerRequest(this.extensionNode, componentSettings),
+                    extensionBooleanResponseHandler
+                );
+            } catch (Exception e) {
+                logger.info("Failed to send Add Settings Update Consumer request to OpenSearch", e);
+            }
+        }
+
     }
 
     private Settings getSettings() {

@@ -9,19 +9,21 @@ package org.opensearch.sdk.handlers;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.extensions.ExtensionBooleanResponse;
+import org.opensearch.common.io.stream.StreamInput;
+import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportException;
 import org.opensearch.transport.TransportResponseHandler;
+import org.opensearch.transport.TransportService;
 
 import java.io.IOException;
 
 /**
- * This class handles the response {{@link org.opensearch.extensions.ExtensionBooleanResponse }} from OpenSearch to Extension.
+ * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendActionListenerOnFailureRequest(TransportService, Exception)} call.
  */
-public class ExtensionResponseHandler implements TransportResponseHandler<ExtensionBooleanResponse> {
-    private static final Logger logger = LogManager.getLogger(ExtensionResponseHandler.class);
+public class ActionListenerOnFailureResponseHandler implements TransportResponseHandler<ExtensionBooleanResponse> {
+    private static final Logger logger = LogManager.getLogger(ActionListenerOnFailureResponseHandler.class);
 
     @Override
     public void handleResponse(ExtensionBooleanResponse response) {
@@ -30,7 +32,7 @@ public class ExtensionResponseHandler implements TransportResponseHandler<Extens
 
     @Override
     public void handleException(TransportException exp) {
-        logger.info("Extension Request failed", exp);
+        logger.info("ActionListenerOnFailureRequest failed", exp);
     }
 
     @Override

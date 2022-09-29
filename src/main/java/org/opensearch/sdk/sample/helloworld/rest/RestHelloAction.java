@@ -10,6 +10,7 @@ package org.opensearch.sdk.sample.helloworld.rest;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.sdk.ExtensionRestHandler;
+import org.opensearch.sdk.ExtensionRestRequest;
 import org.opensearch.sdk.ExtensionRestResponse;
 
 import java.net.URLDecoder;
@@ -37,9 +38,12 @@ public class RestHelloAction implements ExtensionRestHandler {
     }
 
     @Override
-    public ExtensionRestResponse handleRequest(Method method, String uri) {
+    public ExtensionRestResponse handleRequest(ExtensionRestRequest request) {
         // We need to track which parameters are consumed to pass back to OpenSearch
         List<String> consumedParams = new ArrayList<>();
+        Method method = request.method();
+        String uri = request.uri();
+
         if (Method.GET.equals(method) && "/hello".equals(uri)) {
             return new ExtensionRestResponse(OK, String.format(GREETING, worldName), consumedParams);
         } else if (Method.PUT.equals(method) && uri.startsWith("/hello/")) {

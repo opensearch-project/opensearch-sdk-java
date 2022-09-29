@@ -15,7 +15,7 @@ import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.extensions.RegisterTransportActionsRequest;
-import org.opensearch.sdk.handlers.ExtensionResponseHandler;
+import org.opensearch.sdk.handlers.ExtensionBooleanResponseHandler;
 import org.opensearch.transport.TransportService;
 
 import java.util.HashMap;
@@ -30,6 +30,9 @@ public class TransportActions {
 
     /**
      * Constructor for TransportActions. Creates a map of transportActions for this extension.
+     *
+     * @param <Request> the TransportAction request
+     * @param <Response> the TransportAction response
      * @param transportActions is the list of actions the extension would like to register with OpenSearch.
      */
     public <Request extends ActionRequest, Response extends ActionResponse> TransportActions(
@@ -46,7 +49,7 @@ public class TransportActions {
      */
     public void sendRegisterTransportActionsRequest(TransportService transportService, DiscoveryNode opensearchNode) {
         logger.info("Sending Register Transport Actions request to OpenSearch");
-        ExtensionResponseHandler registerTransportActionsResponseHandler = new ExtensionResponseHandler();
+        ExtensionBooleanResponseHandler registerTransportActionsResponseHandler = new ExtensionBooleanResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,

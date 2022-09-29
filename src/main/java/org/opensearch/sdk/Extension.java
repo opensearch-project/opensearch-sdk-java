@@ -10,20 +10,16 @@ package org.opensearch.sdk;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Supplier;
 
-import org.opensearch.client.Client;
-import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
 import org.opensearch.cluster.service.ClusterService;
-import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.xcontent.NamedXContentRegistry;
 import org.opensearch.env.Environment;
-import org.opensearch.env.NodeEnvironment;
-import org.opensearch.repositories.RepositoriesService;
-import org.opensearch.script.ScriptService;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.watcher.ResourceWatcherService;
+
+import org.opensearch.common.settings.Setting;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -50,81 +46,37 @@ public interface Extension {
     List<ExtensionRestHandler> getExtensionRestHandlers();
 
     /**
-     * Gets the {@link Client} of this extension
-     * 
-     * @return the client
+    <<<<<<< Updated upstream
+     * Gets an optional list of custom {@link Setting} for the extension to register with OpenSearch.
+     *
+     * @return a list of custom settings this extension uses.
      */
-    Client getClient();
+    default List<Setting<?>> getSettings() {
+        return Collections.emptyList();
+    }
 
     /**
-     * Gets the {@link ClusterService} of this extension
-     * 
-     * @return the cluster service
+    =======
+    >>>>>>> Stashed changes
+     * Returns components added by this plugin.
+     *
+     * Any components returned that implement {@link LifecycleComponent} will have their lifecycle managed.
+     * Note: To aid in the migration away from guice, all objects returned as components will be bound in guice
+     * to themselves.
+     *
+     * @param client A client to make requests to the system
+     * @param clusterService A service to allow watching and updating cluster state
+     * @param threadPool A service to allow retrieving an executor to run an async action
+     * @param xContentRegistry the registry for extensible xContent parsing
+     * @param environment the environment for path and setting configurations
      */
-    ClusterService getClusterService();
-
-    /**
-     * Gets the {@link ThreadPool} of this extension
-     * 
-     * @return the thread pool
-     */
-    ThreadPool getThreadPool();
-
-    /**
-     * Gets the {@link ResourceWatcherService} of this extension
-     * 
-     * @return the resource watcher service
-     */
-    ResourceWatcherService getResourceWatcherService();
-
-    /**
-     * Gets the {@link ScriptService} of this extension
-     * 
-     * @return the script service
-     */
-    ScriptService getScriptService();
-
-    /**
-     * Gets the {@link NamedXContentRegistry} of this extension
-     * 
-     * @return the NamedXContentRegistry
-     */
-    NamedXContentRegistry getNamedXContentRegistry();
-
-    /**
-     * Gets the {@link Environment} of this extension
-     * 
-     * @return the environment
-     */
-    Environment getEnvironment();
-
-    /**
-     * Gets the {@link NodeEnvironment} of this extension
-     * 
-     * @return the node environment
-     */
-    NodeEnvironment getNodeEnvironment();
-
-    /**
-     * Gets the {@link NamedWritableRegistry} of this extension
-     * 
-     * @return the NamedWritableRegistry
-     */
-    NamedWriteableRegistry getNamedWriteableRegistry();
-
-    /**
-     * Gets the {@link IndexNameExpressionResolver} of this extension
-     * 
-     * @return the IndexNameExpressionResolver
-     */
-    IndexNameExpressionResolver getIndexNameExpressionResolver();
-
-    /**
-     * Gets the {@link Supplier} of {@link RepositoriesService} of this extension
-     * 
-     * @return the repositories service supplier
-     */
-    Supplier<RepositoriesService> getRepositoriesServiceSupplier();
+    public Collection<Object> createComponents(
+        SDKClient client,
+        ClusterService clusterService,
+        ThreadPool threadPool,
+        NamedXContentRegistry xContentRegistry,
+        Environment environment
+    );
 
     /**
      * Helper method to read extension settings from a YAML file.
