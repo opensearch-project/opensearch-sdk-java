@@ -59,6 +59,7 @@ import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
+import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
 import org.opensearch.sdk.handlers.OpensearchRequestHandler;
@@ -72,6 +73,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     private static final String EXTENSION_NAME = "sample-extension";
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler();
     private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler();
+    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler();
     private ExtensionsRunner extensionsRunner;
     private TransportService transportService;
 
@@ -178,7 +180,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
             new BytesArray("bar"),
             ext.generateToken(userPrincipal)
         );
-        RestExecuteOnExtensionResponse response = extensionsRunner.handleRestExecuteOnExtensionRequest(request);
+        RestExecuteOnExtensionResponse response = extensionsRestRequestHandler.handleRestExecuteOnExtensionRequest(request);
         // this will fail in test environment with no registered actions
         assertEquals(RestStatus.NOT_FOUND, response.getStatus());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.getContentType());
