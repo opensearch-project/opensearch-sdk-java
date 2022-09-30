@@ -24,6 +24,10 @@ public class ExtensionRestResponse extends BytesRestResponse {
      * Key passed in {@link BytesRestResponse} headers to identify parameters consumed by the handler. For internal use.
      */
     static final String CONSUMED_PARAMS_KEY = "extension.consumed.parameters";
+    /**
+     * Key passed in {@link BytesRestResponse} headers to identify content consumed by the handler. For internal use.
+     */
+    static final String CONSUMED_CONTENT_KEY = "extension.consumed.content";
 
     /**
      * Creates a new response based on {@link XContentBuilder}.
@@ -34,7 +38,7 @@ public class ExtensionRestResponse extends BytesRestResponse {
      */
     public ExtensionRestResponse(ExtensionRestRequest request, RestStatus status, XContentBuilder builder) {
         super(status, builder);
-        addConsumedParamHeader(request.consumedParams());
+        addConsumedHeaders(request.consumedParams(), request.isContentConsumed());
     }
 
     /**
@@ -46,7 +50,7 @@ public class ExtensionRestResponse extends BytesRestResponse {
      */
     public ExtensionRestResponse(ExtensionRestRequest request, RestStatus status, String content) {
         super(status, content);
-        addConsumedParamHeader(request.consumedParams());
+        addConsumedHeaders(request.consumedParams(), request.isContentConsumed());
     }
 
     /**
@@ -59,7 +63,7 @@ public class ExtensionRestResponse extends BytesRestResponse {
      */
     public ExtensionRestResponse(ExtensionRestRequest request, RestStatus status, String contentType, String content) {
         super(status, contentType, content);
-        addConsumedParamHeader(request.consumedParams());
+        addConsumedHeaders(request.consumedParams(), request.isContentConsumed());
     }
 
     /**
@@ -72,7 +76,7 @@ public class ExtensionRestResponse extends BytesRestResponse {
      */
     public ExtensionRestResponse(ExtensionRestRequest request, RestStatus status, String contentType, byte[] content) {
         super(status, contentType, content);
-        addConsumedParamHeader(request.consumedParams());
+        addConsumedHeaders(request.consumedParams(), request.isContentConsumed());
     }
 
     /**
@@ -85,10 +89,11 @@ public class ExtensionRestResponse extends BytesRestResponse {
      */
     public ExtensionRestResponse(ExtensionRestRequest request, RestStatus status, String contentType, BytesReference content) {
         super(status, contentType, content);
-        addConsumedParamHeader(request.consumedParams());
+        addConsumedHeaders(request.consumedParams(), request.isContentConsumed());
     }
 
-    private void addConsumedParamHeader(List<String> consumedParams) {
+    private void addConsumedHeaders(List<String> consumedParams, boolean contentConusmed) {
         consumedParams.stream().forEach(p -> addHeader(CONSUMED_PARAMS_KEY, p));
+        addHeader(CONSUMED_CONTENT_KEY, Boolean.toString(contentConusmed));
     }
 }

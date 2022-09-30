@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.xcontent.XContentBuilder;
 import org.opensearch.common.xcontent.XContentType;
@@ -34,10 +35,12 @@ public class TestExtensionRestResponse extends OpenSearchTestCase {
         super.setUp();
         testText = "plain text";
         testBytes = new byte[] { 1, 2 };
-        request = new ExtensionRestRequest(Method.GET, "/foo", Collections.emptyMap(), null);
+        request = new ExtensionRestRequest(Method.GET, "/foo", Collections.emptyMap(), null, new BytesArray("Text Content"), null);
         // consume params "foo" and "bar"
         request.param("foo");
         request.param("bar");
+        // consume content
+        request.content();
     }
 
     @Test
@@ -55,6 +58,7 @@ public class TestExtensionRestResponse extends OpenSearchTestCase {
         for (String param : consumedParams) {
             assertTrue(request.consumedParams().contains(param));
         }
+        assertTrue(request.isContentConsumed());
     }
 
     @Test
@@ -68,6 +72,7 @@ public class TestExtensionRestResponse extends OpenSearchTestCase {
         for (String param : consumedParams) {
             assertTrue(request.consumedParams().contains(param));
         }
+        assertTrue(request.isContentConsumed());
     }
 
     @Test
@@ -82,6 +87,7 @@ public class TestExtensionRestResponse extends OpenSearchTestCase {
         for (String param : consumedParams) {
             assertTrue(request.consumedParams().contains(param));
         }
+        assertTrue(request.isContentConsumed());
     }
 
     @Test
@@ -95,6 +101,7 @@ public class TestExtensionRestResponse extends OpenSearchTestCase {
         for (String param : consumedParams) {
             assertTrue(request.consumedParams().contains(param));
         }
+        assertTrue(request.isContentConsumed());
     }
 
     @Test
@@ -113,5 +120,6 @@ public class TestExtensionRestResponse extends OpenSearchTestCase {
         for (String param : consumedParams) {
             assertTrue(request.consumedParams().contains(param));
         }
+        assertTrue(request.isContentConsumed());
     }
 }

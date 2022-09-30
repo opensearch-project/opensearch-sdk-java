@@ -176,7 +176,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
             "/foo",
             Collections.emptyMap(),
             null,
-            new BytesArray(""),
+            new BytesArray("bar"),
             ext.generateToken(userPrincipal)
         );
         RestExecuteOnExtensionResponse response = extensionsRunner.handleRestExecuteOnExtensionRequest(request);

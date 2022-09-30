@@ -19,6 +19,7 @@ import org.opensearch.identity.ExtensionTokenProcessor;
 import org.opensearch.identity.PrincipalIdentifierToken;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest.Method;
+import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.rest.BytesRestResponse;
@@ -56,15 +57,31 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         PrincipalIdentifierToken token = extensionTokenProcessor.generateToken(userPrincipal);
         Map<String, String> params = Collections.emptyMap();
 
-        ExtensionRestRequest getRequest = new ExtensionRestRequest(Method.GET, "/hello", params, token);
+        ExtensionRestRequest getRequest = new ExtensionRestRequest(Method.GET, "/hello", params, null, new BytesArray(""), token);
         ExtensionRestRequest putRequest = new ExtensionRestRequest(
             Method.PUT,
             "/hello/Passing+Test",
             Map.of("name", "Passing+Test"),
+            null,
+            new BytesArray(""),
             token
         );
-        ExtensionRestRequest badRequest = new ExtensionRestRequest(Method.PUT, "/hello/Bad%Request", Map.of("name", "Bad%Request"), token);
-        ExtensionRestRequest unsuccessfulRequest = new ExtensionRestRequest(Method.POST, "/goodbye", params, token);
+        ExtensionRestRequest badRequest = new ExtensionRestRequest(
+            Method.PUT,
+            "/hello/Bad%Request",
+            Map.of("name", "Bad%Request"),
+            null,
+            new BytesArray(""),
+            token
+        );
+        ExtensionRestRequest unsuccessfulRequest = new ExtensionRestRequest(
+            Method.POST,
+            "/goodbye",
+            params,
+            null,
+            new BytesArray(""),
+            token
+        );
 
         RestResponse response = restHelloAction.handleRequest(getRequest);
         assertEquals(RestStatus.OK, response.status());
