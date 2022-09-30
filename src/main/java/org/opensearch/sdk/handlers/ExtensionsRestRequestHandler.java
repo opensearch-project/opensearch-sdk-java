@@ -10,12 +10,12 @@ package org.opensearch.sdk.handlers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.bytes.BytesReference;
+import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.ExtensionRestPathRegistry;
-import org.opensearch.sdk.ExtensionRestRequest;
 import org.opensearch.sdk.ExtensionRestResponse;
 
 /**

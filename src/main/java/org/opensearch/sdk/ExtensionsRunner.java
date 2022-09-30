@@ -226,9 +226,6 @@ public class ExtensionsRunner {
     }
 
     /**
-<<<<<<< HEAD
-     * Initializes a Netty4Transport object. This object will be wrapped in a {@link TransportService} object.
-=======
      * Handles a extension request from OpenSearch. This is the first request for
      * the transport communication and will initialize the extension and will be a
      * part of OpenSearch bootstrap.
@@ -342,7 +339,7 @@ public class ExtensionsRunner {
     /**
      * Initializes a Netty4Transport object. This object will be wrapped in a
      * {@link TransportService} object.
->>>>>>> 60694f1 (Rename/merge duplicate ExtensionRestRequest implementations)
+    >>>>>>> 60694f1 (Rename/merge duplicate ExtensionRestRequest implementations)
      *
      * @param settings
      *            The transport settings to configure.
