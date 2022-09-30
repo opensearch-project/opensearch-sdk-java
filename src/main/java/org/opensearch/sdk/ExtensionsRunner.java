@@ -18,8 +18,8 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
 import org.opensearch.extensions.OpenSearchRequest;
+import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
-import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
 import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
 import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
@@ -357,7 +357,7 @@ public class ExtensionsRunner {
             ThreadPool.Names.GENERIC,
             false,
             false,
-            RestExecuteOnExtensionRequest::new,
+            ExtensionRestRequest::new,
             ((request, channel, task) -> channel.sendResponse(extensionsRestRequestHandler.handleRestExecuteOnExtensionRequest(request)))
         );
 
@@ -477,7 +477,7 @@ public class ExtensionsRunner {
      * Requests the ActionListener onFailure method to be run by OpenSearch.  The result will be handled by a {@link ActionListenerOnFailureResponseHandler}.
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
-     * @param failureException The exception to be sent to OpenSearch
+     * @param failureException  The exception to be sent to OpenSearch
      */
     public void sendActionListenerOnFailureRequest(TransportService transportService, Exception failureException) {
         logger.info("Sending ActionListener onFailure request to OpenSearch");
