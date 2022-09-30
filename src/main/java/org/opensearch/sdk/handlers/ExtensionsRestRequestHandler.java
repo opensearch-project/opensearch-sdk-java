@@ -34,11 +34,11 @@ public class ExtensionsRestRequestHandler {
      */
     public RestExecuteOnExtensionResponse handleRestExecuteOnExtensionRequest(ExtensionRestRequest request) {
 
-        ExtensionRestHandler restHandler = extensionRestPathRegistry.getHandler(request.method(), request.uri());
+        ExtensionRestHandler restHandler = extensionRestPathRegistry.getHandler(request.method(), request.path());
         if (restHandler == null) {
             return new RestExecuteOnExtensionResponse(
                 RestStatus.NOT_FOUND,
-                "No handler for " + ExtensionRestPathRegistry.restPathToString(request.method(), request.uri())
+                "No handler for " + ExtensionRestPathRegistry.restPathToString(request.method(), request.path())
             );
         }
 

@@ -32,7 +32,6 @@ public interface ExtensionRestHandler {
      * Handles REST Requests forwarded from OpenSearch for a configured route on an extension.
      * Parameter contains components of the {@link RestRequest} received from a user.
      * This method corresponds to the {@link BaseRestHandler#prepareRequest} method.
-     * As in that method, consumed parameters must be tracked and returned in the response.
      *
      * @param request a REST request object for a request to be forwarded to extensions
      * @return An {@link ExtensionRestResponse} to the request.
