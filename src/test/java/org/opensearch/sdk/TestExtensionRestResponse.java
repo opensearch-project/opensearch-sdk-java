@@ -2,13 +2,17 @@ package org.opensearch.sdk;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.xcontent.XContentBuilder;
 import org.opensearch.common.xcontent.XContentType;
+import org.opensearch.extensions.rest.ExtensionRestRequest;
+import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.test.OpenSearchTestCase;
 
 import static org.opensearch.rest.BytesRestResponse.TEXT_CONTENT_TYPE;
@@ -23,7 +27,7 @@ public class TestExtensionRestResponse extends OpenSearchTestCase {
 
     private String testText;
     private byte[] testBytes;
-    private List<String> testConsumedParams;
+    private ExtensionRestRequest request;
 
     @Override
     @BeforeEach
@@ -31,7 +35,12 @@ public class TestExtensionRestResponse extends OpenSearchTestCase {
         super.setUp();
         testText = "plain text";
         testBytes = new byte[] { 1, 2 };
-        testConsumedParams = List.of("foo", "bar");
+        request = new ExtensionRestRequest(Method.GET, "/foo", Collections.emptyMap(), null, new BytesArray("Text Content"), null);
+        // consume params "foo" and "bar"
+        request.param("foo");
+        request.param("bar");
+        // consume content
+        request.content();
     }
 
     @Test
@@ -40,33 +49,35 @@ public class TestExtensionRestResponse extends OpenSearchTestCase {
         builder.startObject();
         builder.field("status", ACCEPTED);
         builder.endObject();
-        ExtensionRestResponse response = new ExtensionRestResponse(OK, builder, testConsumedParams);
+        ExtensionRestResponse response = new ExtensionRestResponse(request, OK, builder);
 
         assertEquals(OK, response.status());
         assertEquals(JSON_CONTENT_TYPE, response.contentType());
         assertEquals("{\"status\":\"ACCEPTED\"}", response.content().utf8ToString());
         List<String> consumedParams = response.getHeaders().get(CONSUMED_PARAMS_KEY);
         for (String param : consumedParams) {
-            assertTrue(testConsumedParams.contains(param));
+            assertTrue(request.consumedParams().contains(param));
         }
+        assertTrue(request.isContentConsumed());
     }
 
     @Test
     public void testConstructorWithPlainText() {
-        ExtensionRestResponse response = new ExtensionRestResponse(OK, testText, testConsumedParams);
+        ExtensionRestResponse response = new ExtensionRestResponse(request, OK, testText);
 
         assertEquals(OK, response.status());
         assertEquals(TEXT_CONTENT_TYPE, response.contentType());
         assertEquals(testText, response.content().utf8ToString());
         List<String> consumedParams = response.getHeaders().get(CONSUMED_PARAMS_KEY);
         for (String param : consumedParams) {
-            assertTrue(testConsumedParams.contains(param));
+            assertTrue(request.consumedParams().contains(param));
         }
+        assertTrue(request.isContentConsumed());
     }
 
     @Test
     public void testConstructorWithText() {
-        ExtensionRestResponse response = new ExtensionRestResponse(OK, TEXT_CONTENT_TYPE, testText, testConsumedParams);
+        ExtensionRestResponse response = new ExtensionRestResponse(request, OK, TEXT_CONTENT_TYPE, testText);
 
         assertEquals(OK, response.status());
         assertEquals(TEXT_CONTENT_TYPE, response.contentType());
@@ -74,30 +85,32 @@ public class TestExtensionRestResponse extends OpenSearchTestCase {
 
         List<String> consumedParams = response.getHeaders().get(CONSUMED_PARAMS_KEY);
         for (String param : consumedParams) {
-            assertTrue(testConsumedParams.contains(param));
+            assertTrue(request.consumedParams().contains(param));
         }
+        assertTrue(request.isContentConsumed());
     }
 
     @Test
     public void testConstructorWithByteArray() {
-        ExtensionRestResponse response = new ExtensionRestResponse(OK, OCTET_CONTENT_TYPE, testBytes, testConsumedParams);
+        ExtensionRestResponse response = new ExtensionRestResponse(request, OK, OCTET_CONTENT_TYPE, testBytes);
 
         assertEquals(OK, response.status());
         assertEquals(OCTET_CONTENT_TYPE, response.contentType());
         assertArrayEquals(testBytes, BytesReference.toBytes(response.content()));
         List<String> consumedParams = response.getHeaders().get(CONSUMED_PARAMS_KEY);
         for (String param : consumedParams) {
-            assertTrue(testConsumedParams.contains(param));
+            assertTrue(request.consumedParams().contains(param));
         }
+        assertTrue(request.isContentConsumed());
     }
 
     @Test
     public void testConstructorWithBytesReference() {
         ExtensionRestResponse response = new ExtensionRestResponse(
+            request,
             OK,
             OCTET_CONTENT_TYPE,
-            BytesReference.fromByteBuffer(ByteBuffer.wrap(testBytes, 0, 2)),
-            testConsumedParams
+            BytesReference.fromByteBuffer(ByteBuffer.wrap(testBytes, 0, 2))
         );
 
         assertEquals(OK, response.status());
@@ -105,7 +118,8 @@ public class TestExtensionRestResponse extends OpenSearchTestCase {
         assertArrayEquals(testBytes, BytesReference.toBytes(response.content()));
         List<String> consumedParams = response.getHeaders().get(CONSUMED_PARAMS_KEY);
         for (String param : consumedParams) {
-            assertTrue(testConsumedParams.contains(param));
+            assertTrue(request.consumedParams().contains(param));
         }
+        assertTrue(request.isContentConsumed());
     }
 }
