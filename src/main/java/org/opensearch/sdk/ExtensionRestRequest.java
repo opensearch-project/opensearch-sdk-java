@@ -56,7 +56,7 @@ public class ExtensionRestRequest extends TransportRequest {
     /**
      * Object generated from input stream
      * @param in Input stream
-     * @throws IOException
+     * @throws IOException if there's an error in generating object from input stream
      */
     public ExtensionRestRequest(StreamInput in) throws IOException {
         super(in);
@@ -68,7 +68,7 @@ public class ExtensionRestRequest extends TransportRequest {
     /**
      * Write this object to output stream
      * @param out the writeable output stream
-     * @throws IOException
+     * @throws IOException if there's an error in generating object from output stream
      */
     @Override
     public void writeTo(StreamOutput out) throws IOException {
