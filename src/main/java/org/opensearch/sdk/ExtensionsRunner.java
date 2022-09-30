@@ -12,20 +12,14 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opensearch.Version;
-import org.opensearch.cluster.ClusterModule;
 import org.opensearch.cluster.node.DiscoveryNode;
-import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
 import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
-import org.opensearch.common.network.NetworkModule;
-import org.opensearch.common.network.NetworkService;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
-import org.opensearch.common.util.PageCacheRecycler;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.extensions.ExtensionActionListenerOnFailureRequest;
 import org.opensearch.extensions.DiscoveryExtension;
@@ -35,12 +29,7 @@ import org.opensearch.extensions.UpdateSettingsRequest;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.index.IndicesModuleRequest;
-import org.opensearch.indices.IndicesModule;
-import org.opensearch.indices.breaker.CircuitBreakerService;
-import org.opensearch.indices.breaker.NoneCircuitBreakerService;
 import org.opensearch.rest.RestHandler.Route;
-import org.opensearch.transport.netty4.Netty4Transport;
-import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
@@ -54,10 +43,7 @@ import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
 import org.opensearch.sdk.handlers.OpensearchRequestHandler;
-import org.opensearch.search.SearchModule;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.transport.ClusterConnectionManager;
-import org.opensearch.transport.ConnectionManager;
 import org.opensearch.transport.TransportInterceptor;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
@@ -69,13 +55,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.function.Consumer;
-
-import static java.util.Collections.emptySet;
-import static org.opensearch.common.UUIDs.randomBase64UUID;
 
 /**
  * The primary class to run an extension.
@@ -85,7 +65,10 @@ import static org.opensearch.common.UUIDs.randomBase64UUID;
 public class ExtensionsRunner {
 
     private static final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
-    private static final String NODE_NAME_SETTING = "node.name";
+    /**
+     * This String get a call from {@link GetNetty4Transport}.
+     */
+    public static final String NODE_NAME_SETTING = "node.name";
 
     private String uniqueId;
     /**
@@ -109,7 +92,10 @@ public class ExtensionsRunner {
      * This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
      */
     public final Settings settings;
-    private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
+    /**
+     * This field is initialized by a call from {@link GetNetty4Transport}.
+     */
+    public final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
     private ExtensionNamedWriteableRegistry namedWriteableRegistryApi = new ExtensionNamedWriteableRegistry();
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler();
@@ -118,6 +104,7 @@ public class ExtensionsRunner {
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler();
+    private GetNetty4Transport getNetty4Transport = new GetNetty4Transport();
 
     /*
      * TODO: expose an interface for extension to register actions
@@ -170,7 +157,7 @@ public class ExtensionsRunner {
         // save custom settings
         this.customSettings = extension.getSettings();
         // initialize the transport service
-        this.initializeExtensionTransportService(this.getSettings());
+        this.getNetty4Transport.initializeExtensionTransportService(this.getSettings(), null);
         // start listening on configured port and wait for connection from OpenSearch
         this.startActionListener(0);
     }
@@ -211,83 +198,6 @@ public class ExtensionsRunner {
 
     DiscoveryNode getOpensearchNode() {
         return opensearchNode;
-    }
-
-    /**
-     * Initializes a Netty4Transport object. This object will be wrapped in a {@link TransportService} object.
-     *
-     * @param settings  The transport settings to configure.
-     * @param threadPool  A thread pool to use.
-     * @return The configured Netty4Transport object.
-     */
-    public Netty4Transport getNetty4Transport(Settings settings, ThreadPool threadPool) {
-        NetworkService networkService = new NetworkService(Collections.emptyList());
-        PageCacheRecycler pageCacheRecycler = new PageCacheRecycler(settings);
-        IndicesModule indicesModule = new IndicesModule(Collections.emptyList());
-        SearchModule searchModule = new SearchModule(settings, Collections.emptyList());
-
-        List<NamedWriteableRegistry.Entry> namedWriteables = Stream.of(
-            NetworkModule.getNamedWriteables().stream(),
-            indicesModule.getNamedWriteables().stream(),
-            searchModule.getNamedWriteables().stream(),
-            null,
-            ClusterModule.getNamedWriteables().stream()
-        ).flatMap(Function.identity()).collect(Collectors.toList());
-
-        final NamedWriteableRegistry namedWriteableRegistry = new NamedWriteableRegistry(namedWriteables);
-
-        final CircuitBreakerService circuitBreakerService = new NoneCircuitBreakerService();
-
-        Netty4Transport transport = new Netty4Transport(
-            settings,
-            Version.CURRENT,
-            threadPool,
-            networkService,
-            pageCacheRecycler,
-            namedWriteableRegistry,
-            circuitBreakerService,
-            new SharedGroupFactory(settings)
-        );
-
-        return transport;
-    }
-
-    /**
-     * Initializes the TransportService object for this extension. This object will control communication between the extension and OpenSearch.
-     *
-     * @param settings  The transport settings to configure.
-     * @return The initialized TransportService object.
-     */
-    public TransportService initializeExtensionTransportService(Settings settings) {
-
-        ThreadPool threadPool = new ThreadPool(settings);
-
-        Netty4Transport transport = getNetty4Transport(settings, threadPool);
-
-        final ConnectionManager connectionManager = new ClusterConnectionManager(settings, transport);
-
-        // Stop any existing transport service
-        if (extensionTransportService != null) {
-            extensionTransportService.stop();
-        }
-
-        // create transport service
-        extensionTransportService = new TransportService(
-            settings,
-            transport,
-            threadPool,
-            NOOP_TRANSPORT_INTERCEPTOR,
-            boundAddress -> DiscoveryNode.createLocal(
-                Settings.builder().put(NODE_NAME_SETTING, settings.get(NODE_NAME_SETTING)).build(),
-                boundAddress.publishAddress(),
-                randomBase64UUID()
-            ),
-            null,
-            emptySet(),
-            connectionManager
-        );
-        startTransportService(extensionTransportService);
-        return extensionTransportService;
     }
 
     /**
@@ -591,7 +501,7 @@ public class ExtensionsRunner {
         ExtensionsRunner extensionsRunner = new ExtensionsRunner();
 
         // initialize the transport service
-        extensionsRunner.initializeExtensionTransportService(extensionsRunner.getSettings());
+        extensionsRunner.getNetty4Transport.initializeExtensionTransportService(extensionsRunner.getSettings(), extensionsRunner);
         // start listening on configured port and wait for connection from OpenSearch
         extensionsRunner.startActionListener(0);
     }
