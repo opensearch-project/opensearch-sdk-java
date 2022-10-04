@@ -35,7 +35,7 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
     private final int port = 7777;
     private final String host = "127.0.0.1";
     private volatile String clientResult;
-    private GetNetty4Transport getNetty4Transport = new GetNetty4Transport();
+    private NettyTransport nettyTransport = new NettyTransport();
 
     @Override
     @BeforeEach
@@ -53,7 +53,7 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
     public void testSocketSetup() throws IOException {
 
         ThreadPool threadPool = new TestThreadPool("test");
-        Netty4Transport transport = getNetty4Transport.getNetty4Transport(settings, threadPool);
+        Netty4Transport transport = nettyTransport.getNetty4Transport(settings, threadPool);
 
         // start netty transport and ensure that address info is exposed
         try {
@@ -147,7 +147,7 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
         // retrieve transport service
         ExtensionsRunner extensionsRunner = new ExtensionsRunner();
         // start transport service
-        TransportService transportService = getNetty4Transport.initializeExtensionTransportService(settings, extensionsRunner);
+        TransportService transportService = nettyTransport.initializeExtensionTransportService(settings, extensionsRunner);
 
         assertEquals(Lifecycle.State.STARTED, transportService.lifecycleState());
 

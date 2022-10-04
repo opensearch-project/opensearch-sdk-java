@@ -26,9 +26,8 @@ import org.opensearch.indices.breaker.CircuitBreakerService;
 import org.opensearch.indices.breaker.NoneCircuitBreakerService;
 import org.opensearch.search.SearchModule;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.transport.ClusterConnectionManager;
-import org.opensearch.transport.ConnectionManager;
 import org.opensearch.transport.SharedGroupFactory;
+import org.opensearch.transport.TransportInterceptor;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.netty4.Netty4Transport;
 
@@ -39,7 +38,10 @@ import static org.opensearch.common.UUIDs.randomBase64UUID;
  * This class initializes a Netty4Transport object and control communication between the extension and OpenSearch.
  */
 
-public class GetNetty4Transport {
+public class NettyTransport {
+    private static final String NODE_NAME_SETTING = "node.name";
+    private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
+    };
 
     /**
      * Initializes a Netty4Transport object. This object will be wrapped in a {@link TransportService} object.
@@ -58,7 +60,6 @@ public class GetNetty4Transport {
             NetworkModule.getNamedWriteables().stream(),
             indicesModule.getNamedWriteables().stream(),
             searchModule.getNamedWriteables().stream(),
-            null,
             ClusterModule.getNamedWriteables().stream()
         ).flatMap(Function.identity()).collect(Collectors.toList());
 
@@ -93,8 +94,6 @@ public class GetNetty4Transport {
 
         Netty4Transport transport = getNetty4Transport(settings, threadPool);
 
-        final ConnectionManager connectionManager = new ClusterConnectionManager(settings, transport);
-
         // Stop any existing transport service
         if (extensionsRunner.extensionTransportService != null) {
             extensionsRunner.extensionTransportService.stop();
@@ -105,15 +104,14 @@ public class GetNetty4Transport {
             settings,
             transport,
             threadPool,
-            extensionsRunner.NOOP_TRANSPORT_INTERCEPTOR,
+            NOOP_TRANSPORT_INTERCEPTOR,
             boundAddress -> DiscoveryNode.createLocal(
-                Settings.builder().put(extensionsRunner.NODE_NAME_SETTING, settings.get(extensionsRunner.NODE_NAME_SETTING)).build(),
+                Settings.builder().put(NODE_NAME_SETTING, settings.get(NODE_NAME_SETTING)).build(),
                 boundAddress.publishAddress(),
                 randomBase64UUID()
             ),
             null,
-            emptySet(),
-            connectionManager
+            emptySet()
         );
         extensionsRunner.startTransportService(extensionsRunner.extensionTransportService);
         return extensionsRunner.extensionTransportService;

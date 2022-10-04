@@ -44,7 +44,6 @@ import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
 import org.opensearch.sdk.handlers.OpensearchRequestHandler;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.transport.TransportInterceptor;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
 
@@ -65,10 +64,7 @@ import java.util.function.Consumer;
 public class ExtensionsRunner {
 
     private static final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
-    /**
-     * This String get a call from {@link GetNetty4Transport}.
-     */
-    public static final String NODE_NAME_SETTING = "node.name";
+    private static final String NODE_NAME_SETTING = "node.name";
 
     private String uniqueId;
     /**
@@ -92,11 +88,6 @@ public class ExtensionsRunner {
      * This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
      */
     public final Settings settings;
-    /**
-     * This field is initialized by a call from {@link GetNetty4Transport}.
-     */
-    public final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
-    };
     private ExtensionNamedWriteableRegistry namedWriteableRegistryApi = new ExtensionNamedWriteableRegistry();
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler();
     private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler();
@@ -104,7 +95,7 @@ public class ExtensionsRunner {
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler();
-    private GetNetty4Transport getNetty4Transport = new GetNetty4Transport();
+    private NettyTransport nettyTransport = new NettyTransport();
 
     /*
      * TODO: expose an interface for extension to register actions
@@ -157,7 +148,7 @@ public class ExtensionsRunner {
         // save custom settings
         this.customSettings = extension.getSettings();
         // initialize the transport service
-        this.getNetty4Transport.initializeExtensionTransportService(this.getSettings(), null);
+        nettyTransport.initializeExtensionTransportService(this.getSettings(), this);
         // start listening on configured port and wait for connection from OpenSearch
         this.startActionListener(0);
     }
@@ -501,7 +492,7 @@ public class ExtensionsRunner {
         ExtensionsRunner extensionsRunner = new ExtensionsRunner();
 
         // initialize the transport service
-        extensionsRunner.getNetty4Transport.initializeExtensionTransportService(extensionsRunner.getSettings(), extensionsRunner);
+        extensionsRunner.nettyTransport.initializeExtensionTransportService(extensionsRunner.getSettings(), extensionsRunner);
         // start listening on configured port and wait for connection from OpenSearch
         extensionsRunner.startActionListener(0);
     }

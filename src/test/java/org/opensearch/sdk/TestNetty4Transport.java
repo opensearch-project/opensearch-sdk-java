@@ -25,11 +25,10 @@ import org.opensearch.transport.netty4.Netty4Transport;
 public class TestNetty4Transport extends OpenSearchTestCase {
 
     private ThreadPool threadPool;
-    private GetNetty4Transport getNetty4Transport = new GetNetty4Transport();
+    private NettyTransport nettyTransport = new NettyTransport();
 
     @BeforeEach
     public void setUp() throws IOException {
-        new ExtensionsRunner();
         this.threadPool = new TestThreadPool("test");
     }
 
@@ -44,7 +43,7 @@ public class TestNetty4Transport extends OpenSearchTestCase {
             .put("transport.profiles.client1.port", 0)
             .build();
 
-        Netty4Transport transport = getNetty4Transport.getNetty4Transport(settings, threadPool);
+        Netty4Transport transport = nettyTransport.getNetty4Transport(settings, threadPool);
 
         try {
             startNetty4Transport(transport);
@@ -67,7 +66,7 @@ public class TestNetty4Transport extends OpenSearchTestCase {
             .put("transport.profiles.client1.port", 0)
             .build();
 
-        Netty4Transport transport = getNetty4Transport.getNetty4Transport(settings, threadPool);
+        Netty4Transport transport = nettyTransport.getNetty4Transport(settings, threadPool);
 
         try {
             startNetty4Transport(transport);
@@ -94,7 +93,7 @@ public class TestNetty4Transport extends OpenSearchTestCase {
             // attempt creating netty object with invalid settings
             IllegalStateException ex = expectThrows(
                 IllegalStateException.class,
-                () -> getNetty4Transport.getNetty4Transport(settings, threadPool)
+                () -> nettyTransport.getNetty4Transport(settings, threadPool)
             );
             assertEquals("profile [no_port] has no port configured", ex.getMessage());
         } finally {
@@ -112,7 +111,7 @@ public class TestNetty4Transport extends OpenSearchTestCase {
             .put("transport.profiles.default.port", 0) // default port configuration will overwrite attempt
             .build();
 
-        Netty4Transport transport = getNetty4Transport.getNetty4Transport(settings, threadPool);
+        Netty4Transport transport = nettyTransport.getNetty4Transport(settings, threadPool);
 
         try {
             startNetty4Transport(transport);
