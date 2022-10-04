@@ -13,19 +13,10 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Supplier;
 
-import org.opensearch.client.Client;
-import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
 import org.opensearch.cluster.service.ClusterService;
-import org.opensearch.common.io.stream.NamedWriteableRegistry;
-import org.opensearch.common.xcontent.NamedXContentRegistry;
 import org.opensearch.env.Environment;
-import org.opensearch.env.NodeEnvironment;
-import org.opensearch.repositories.RepositoriesService;
-import org.opensearch.script.ScriptService;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.watcher.ResourceWatcherService;
 
 import org.opensearch.common.settings.Setting;
 
@@ -79,7 +70,6 @@ public interface Extension {
         SDKClient client,
         ClusterService clusterService,
         ThreadPool threadPool,
-        NamedXContentRegistry xContentRegistry,
         Environment environment
     );
 

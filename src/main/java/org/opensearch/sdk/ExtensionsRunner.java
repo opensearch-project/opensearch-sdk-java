@@ -149,7 +149,10 @@ public class ExtensionsRunner {
         // save custom settings
         this.customSettings = extension.getSettings();
         // initialize the transport service
-        this.initializeExtensionTransportService(this.getSettings());
+        ThreadPool threadPool = new ThreadPool(this.getSettings());
+        this.initializeExtensionTransportService(this.getSettings(), threadPool);
+        // Create components
+        extension.createComponents(new SDKClient(), null, threadPool, null);
         // start listening on configured port and wait for connection from OpenSearch
         this.startActionListener(0);
     }
@@ -330,9 +333,7 @@ public class ExtensionsRunner {
      * @param settings  The transport settings to configure.
      * @return The initialized TransportService object.
      */
-    public TransportService initializeExtensionTransportService(Settings settings) {
-
-        ThreadPool threadPool = new ThreadPool(settings);
+    public TransportService initializeExtensionTransportService(Settings settings, ThreadPool threadPool) {
 
         Netty4Transport transport = getNetty4Transport(settings, threadPool);
 
@@ -659,7 +660,8 @@ public class ExtensionsRunner {
         ExtensionsRunner extensionsRunner = new ExtensionsRunner();
 
         // initialize the transport service
-        extensionsRunner.initializeExtensionTransportService(extensionsRunner.getSettings());
+        ThreadPool threadPool = new ThreadPool(extensionsRunner.getSettings());
+        extensionsRunner.initializeExtensionTransportService(extensionsRunner.getSettings(), threadPool);
         // start listening on configured port and wait for connection from OpenSearch
         extensionsRunner.startActionListener(0);
     }
