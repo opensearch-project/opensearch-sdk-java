@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Collection;
 import java.util.List;
 
+import org.opensearch.client.OpenSearchClient;
 import org.opensearch.cluster.service.ClusterService;
 import org.opensearch.env.Environment;
 import org.opensearch.threadpool.ThreadPool;
@@ -54,20 +55,15 @@ public interface Extension {
     }
 
     /**
-     * Returns components added by this plugin.
-     *
-     * Any components returned that implement {@link LifecycleComponent} will have their lifecycle managed.
-     * Note: To aid in the migration away from guice, all objects returned as components will be bound in guice
-     * to themselves.
+     * Returns components added by this extension.
      *
      * @param client A client to make requests to the system
      * @param clusterService A service to allow watching and updating cluster state
      * @param threadPool A service to allow retrieving an executor to run an async action
-     * @param xContentRegistry the registry for extensible xContent parsing
      * @param environment the environment for path and setting configurations
      */
     public Collection<Object> createComponents(
-        SDKClient client,
+        OpenSearchClient client,
         ClusterService clusterService,
         ThreadPool threadPool,
         Environment environment
