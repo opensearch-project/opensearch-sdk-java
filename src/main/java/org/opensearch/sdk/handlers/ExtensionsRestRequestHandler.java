@@ -24,7 +24,16 @@ import org.opensearch.sdk.ExtensionRestResponse;
 
 public class ExtensionsRestRequestHandler {
     private static final Logger logger = LogManager.getLogger(ExtensionsRestRequestHandler.class);
-    private ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
+    private final ExtensionRestPathRegistry extensionRestPathRegistry;
+
+    /**
+     * Instantiate this class with an existing registry
+     *
+     * @param restPathRegistry The ExtensionsRunnerer's REST path registry
+     */
+    public ExtensionsRestRequestHandler(ExtensionRestPathRegistry restPathRegistry) {
+        this.extensionRestPathRegistry = restPathRegistry;
+    }
 
     /**
      * Handles a request from OpenSearch to execute a REST request on the extension.
