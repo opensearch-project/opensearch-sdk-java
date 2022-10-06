@@ -26,6 +26,7 @@ import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.extensions.EnvironmentSettingsRequest;
 import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
 import org.opensearch.extensions.UpdateSettingsRequest;
+import org.opensearch.extensions.ExtensionsOrchestrator.RequestType;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.index.IndicesModuleRequest;
@@ -44,6 +45,8 @@ import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
 import org.opensearch.sdk.handlers.OpensearchRequestHandler;
 import org.opensearch.threadpool.ThreadPool;
+import org.opensearch.transport.TransportResponse;
+import org.opensearch.transport.TransportResponseHandler;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
 
@@ -314,24 +317,32 @@ public class ExtensionsRunner {
         }
     }
 
+    private void sendGenericRequestWithExceptionHandling(
+        TransportService transportService,
+        RequestType requestType,
+        String orchestratorNameString,
+        TransportResponseHandler<? extends TransportResponse> responseHandler
+    ) {
+        logger.info("Sending " + requestType + " request to OpenSearch");
+        try {
+            transportService.sendRequest(opensearchNode, orchestratorNameString, new ExtensionRequest(requestType), responseHandler);
+        } catch (Exception e) {
+            logger.info("Failed to send " + requestType + " request to OpenSearch", e);
+        }
+    }
+
     /**
      * Requests the cluster state from OpenSearch.  The result will be handled by a {@link ClusterStateResponseHandler}.
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
     public void sendClusterStateRequest(TransportService transportService) {
-        logger.info("Sending Cluster State request to OpenSearch");
-        ClusterStateResponseHandler clusterStateResponseHandler = new ClusterStateResponseHandler();
-        try {
-            transportService.sendRequest(
-                opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_STATE,
-                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_STATE),
-                clusterStateResponseHandler
-            );
-        } catch (Exception e) {
-            logger.info("Failed to send Cluster State request to OpenSearch", e);
-        }
+        sendGenericRequestWithExceptionHandling(
+            transportService,
+            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_STATE,
+            ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_STATE,
+            new ClusterStateResponseHandler()
+        );
     }
 
     /**
@@ -340,18 +351,12 @@ public class ExtensionsRunner {
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
     public void sendClusterSettingsRequest(TransportService transportService) {
-        logger.info("Sending Cluster Settings request to OpenSearch");
-        ClusterSettingsResponseHandler clusterSettingsResponseHandler = new ClusterSettingsResponseHandler();
-        try {
-            transportService.sendRequest(
-                opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_SETTINGS,
-                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_SETTINGS),
-                clusterSettingsResponseHandler
-            );
-        } catch (Exception e) {
-            logger.info("Failed to send Cluster Settings request to OpenSearch", e);
-        }
+        sendGenericRequestWithExceptionHandling(
+            transportService,
+            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_LOCAL_NODE,
+            ExtensionsOrchestrator.REQUEST_EXTENSION_LOCAL_NODE,
+            new ClusterSettingsResponseHandler()
+        );
     }
 
     /**
@@ -360,18 +365,12 @@ public class ExtensionsRunner {
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
     public void sendLocalNodeRequest(TransportService transportService) {
-        logger.info("Sending Local Node request to OpenSearch");
-        LocalNodeResponseHandler localNodeResponseHandler = new LocalNodeResponseHandler();
-        try {
-            transportService.sendRequest(
-                opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_LOCAL_NODE,
-                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_LOCAL_NODE),
-                localNodeResponseHandler
-            );
-        } catch (Exception e) {
-            logger.info("Failed to send Cluster Settings request to OpenSearch", e);
-        }
+        sendGenericRequestWithExceptionHandling(
+            transportService,
+            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_LOCAL_NODE,
+            ExtensionsOrchestrator.REQUEST_EXTENSION_LOCAL_NODE,
+            new LocalNodeResponseHandler()
+        );
     }
 
     /**
