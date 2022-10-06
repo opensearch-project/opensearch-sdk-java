@@ -8,11 +8,10 @@
 package org.opensearch.sdk.sample.helloworld.rest;
 
 import org.opensearch.extensions.rest.ExtensionRestRequest;
+import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.sdk.ExtensionRestHandler;
-import org.opensearch.sdk.ExtensionRestResponse;
-
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
