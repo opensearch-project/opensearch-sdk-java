@@ -19,12 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static org.opensearch.rest.RestRequest.Method.DELETE;
 import static org.opensearch.rest.RestRequest.Method.GET;
 import static org.opensearch.rest.RestRequest.Method.POST;
 import static org.opensearch.rest.RestRequest.Method.PUT;
 import static org.opensearch.rest.RestStatus.BAD_REQUEST;
 import static org.opensearch.rest.RestStatus.NOT_ACCEPTABLE;
 import static org.opensearch.rest.RestStatus.NOT_FOUND;
+import static org.opensearch.rest.RestStatus.NOT_MODIFIED;
 import static org.opensearch.rest.RestStatus.OK;
 
 /**
@@ -39,7 +41,7 @@ public class RestHelloAction implements ExtensionRestHandler {
 
     @Override
     public List<Route> routes() {
-        return List.of(new Route(GET, "/hello"), new Route(POST, "/hello"), new Route(PUT, "/hello/{name}"));
+        return List.of(new Route(GET, "/hello"), new Route(POST, "/hello"), new Route(DELETE, "/hello"), new Route(PUT, "/hello/{name}"));
     }
 
     @Override
@@ -50,6 +52,8 @@ public class RestHelloAction implements ExtensionRestHandler {
             return handleGetRequest(request);
         } else if (Method.POST.equals(method)) {
             return handlePostRequest(request);
+        } else if (Method.DELETE.equals(method)) {
+            return handleDeleteRequest(request);
         } else if (Method.PUT.equals(method)) {
             return handlePutRequest(request);
         }
@@ -65,34 +69,50 @@ public class RestHelloAction implements ExtensionRestHandler {
 
     private ExtensionRestResponse handlePostRequest(ExtensionRestRequest request) {
         if (request.hasContent()) {
+            String adjective = "";
             XContentType contentType = request.getXContentType();
             if (contentType == null) {
                 // Plain text
-                String adjective = request.content().utf8ToString();
+                adjective = request.content().utf8ToString();
+            } else if (contentType.equals(XContentType.JSON)) {
+                adjective = parseJsonAdjective(request.content().utf8ToString());
+            } else {
+                return new ExtensionRestResponse(request, NOT_ACCEPTABLE, "Only text and JSON content types are supported");
+            }
+            if (!adjective.isBlank()) {
                 worldAdjectives.add(adjective);
                 return new ExtensionRestResponse(request, OK, "Added " + adjective + " to words that describe the world!");
-            } else if (contentType.equals(XContentType.JSON)) {
-                // TODO: Once CreateComponents has an XContentRegistry available we can parse from there
-                // For now we just hack our way into the result.
-                String json = request.content().utf8ToString();
-                boolean foundLabel = false;
-                boolean foundColon = false;
-                for (String s : json.split("\"")) {
-                    if (!foundLabel) {
-                        foundLabel = "adjective".equals(s);
-                    } else if (!foundColon) {
-                        foundColon = s.contains(":");
-                    } else {
-                        // This is the adjective!
-                        worldAdjectives.add(s);
-                        return new ExtensionRestResponse(request, OK, "Added " + s + " to words that describe the world!");
-                    }
-                }
-                return new ExtensionRestResponse(request, OK, request.content().utf8ToString());
             }
-            return new ExtensionRestResponse(request, NOT_ACCEPTABLE, "Only text and JSON content types are supported");
+            return new ExtensionRestResponse(request, BAD_REQUEST, "No adjective included with POST request");
         }
         return new ExtensionRestResponse(request, BAD_REQUEST, "No content included with POST request");
+    }
+
+    private ExtensionRestResponse handleDeleteRequest(ExtensionRestRequest request) {
+        if (request.hasContent()) {
+            String adjective = "";
+            XContentType contentType = request.getXContentType();
+            if (contentType == null) {
+                // Plain text
+                adjective = request.content().utf8ToString();
+            } else if (contentType.equals(XContentType.JSON)) {
+                adjective = parseJsonAdjective(request.content().utf8ToString());
+            } else {
+                return new ExtensionRestResponse(request, NOT_ACCEPTABLE, "Only text and JSON content types are supported");
+            }
+            if (!adjective.isBlank()) {
+                if (worldAdjectives.remove(adjective)) {
+                    return new ExtensionRestResponse(request, OK, "Goodbye, " + adjective + " world!");
+                }
+                return new ExtensionRestResponse(
+                    request,
+                    NOT_MODIFIED,
+                    "Could not find " + adjective + " in the list of words that describe the world."
+                );
+            }
+            return new ExtensionRestResponse(request, BAD_REQUEST, "No adjective included with DELETE request");
+        }
+        return new ExtensionRestResponse(request, BAD_REQUEST, "No content included with DELETE request");
     }
 
     private ExtensionRestResponse handlePutRequest(ExtensionRestRequest request) {
@@ -109,4 +129,21 @@ public class RestHelloAction implements ExtensionRestHandler {
         return new ExtensionRestResponse(request, NOT_FOUND, "Extension REST action improperly configured to handle " + request.toString());
     }
 
+    private String parseJsonAdjective(String json) {
+        // TODO: Once CreateComponents has an XContentRegistry available we can parse from there
+        // For now we just hack our way into the result.
+        boolean foundLabel = false;
+        boolean foundColon = false;
+        for (String s : json.split("\"")) {
+            if (!foundLabel) {
+                foundLabel = "adjective".equals(s);
+            } else if (!foundColon) {
+                foundColon = s.contains(":");
+            } else {
+                // This is the adjective!
+                return s;
+            }
+        }
+        return "";
+    }
 }
