@@ -25,8 +25,7 @@ import org.opensearch.transport.netty4.Netty4Transport;
 public class TestNetty4Transport extends OpenSearchTestCase {
 
     private ThreadPool threadPool;
-    private ExtensionsRunner extensionsRunner;
-    private NettyTransport nettyTransport = new NettyTransport(extensionsRunner);
+    private NettyTransport nettyTransport = new NettyTransport();
 
     @BeforeEach
     public void setUp() throws IOException {

@@ -35,8 +35,7 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
     private final int port = 7777;
     private final String host = "127.0.0.1";
     private volatile String clientResult;
-    private ExtensionsRunner extensionsRunner;
-    private NettyTransport nettyTransport = new NettyTransport(extensionsRunner);
+    private NettyTransport nettyTransport = new NettyTransport();
 
     @Override
     @BeforeEach
@@ -148,7 +147,7 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
         // retrieve transport service
         ExtensionsRunner extensionsRunner = new ExtensionsRunner();
         // start transport service
-        TransportService transportService = nettyTransport.initializeExtensionTransportService(settings);
+        TransportService transportService = nettyTransport.initializeExtensionTransportService(settings, extensionsRunner);
 
         assertEquals(Lifecycle.State.STARTED, transportService.lifecycleState());
 

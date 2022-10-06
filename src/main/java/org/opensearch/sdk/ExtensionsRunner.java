@@ -98,7 +98,7 @@ public class ExtensionsRunner {
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler();
-    private NettyTransport nettyTransport = new NettyTransport(this);
+    private NettyTransport nettyTransport = new NettyTransport();
 
     /*
      * TODO: expose an interface for extension to register actions
@@ -151,7 +151,7 @@ public class ExtensionsRunner {
         // save custom settings
         this.customSettings = extension.getSettings();
         // initialize the transport service
-        nettyTransport.initializeExtensionTransportService(this.getSettings());
+        nettyTransport.initializeExtensionTransportService(this.getSettings(), this);
         // start listening on configured port and wait for connection from OpenSearch
         this.startActionListener(0);
     }
@@ -491,7 +491,7 @@ public class ExtensionsRunner {
         ExtensionsRunner extensionsRunner = new ExtensionsRunner();
 
         // initialize the transport service
-        extensionsRunner.nettyTransport.initializeExtensionTransportService(extensionsRunner.getSettings());
+        extensionsRunner.nettyTransport.initializeExtensionTransportService(extensionsRunner.getSettings(), extensionsRunner);
         // start listening on configured port and wait for connection from OpenSearch
         extensionsRunner.startActionListener(0);
     }

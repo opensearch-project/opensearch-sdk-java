@@ -40,17 +40,8 @@ import static org.opensearch.common.UUIDs.randomBase64UUID;
 
 public class NettyTransport {
     private static final String NODE_NAME_SETTING = "node.name";
-    private ExtensionsRunner extensionsRunner;
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
-
-    /**
-     *
-     * @param extensionsRunner method to call
-     */
-    public NettyTransport(ExtensionsRunner extensionsRunner) {
-        this.extensionsRunner = extensionsRunner;
-    }
 
     /**
      * Initializes a Netty4Transport object. This object will be wrapped in a {@link TransportService} object.
@@ -94,18 +85,22 @@ public class NettyTransport {
      * Initializes the TransportService object for this extension. This object will control communication between the extension and OpenSearch.
      *
      * @param settings  The transport settings to configure.
+     * @param extensionsRunner method to call
      * @return The initialized TransportService object.
      */
-    public TransportService initializeExtensionTransportService(Settings settings) {
+    public TransportService initializeExtensionTransportService(Settings settings, ExtensionsRunner extensionsRunner) {
 
         ThreadPool threadPool = new ThreadPool(settings);
 
         Netty4Transport transport = getNetty4Transport(settings, threadPool);
 
-        // delete stop
+        // Stop any existing transport service
+        if (extensionsRunner.extensionTransportService != null) {
+            extensionsRunner.extensionTransportService.stop();
+        }
 
         // create transport service
-        TransportService transportService = new TransportService(
+        extensionsRunner.extensionTransportService = new TransportService(
             settings,
             transport,
             threadPool,
@@ -118,8 +113,8 @@ public class NettyTransport {
             null,
             emptySet()
         );
-        extensionsRunner.startTransportService(transportService);
-        return transportService;
+        extensionsRunner.startTransportService(extensionsRunner.extensionTransportService);
+        return extensionsRunner.extensionTransportService;
     }
 
 }
