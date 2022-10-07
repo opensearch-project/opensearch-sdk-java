@@ -10,6 +10,7 @@ package org.opensearch.sdk;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.cluster.node.DiscoveryNode;
+import org.opensearch.common.Nullable;
 import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
 import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
@@ -72,6 +73,7 @@ public class ExtensionsRunner {
     /**
      * This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
      */
+    @Nullable
     public TransportService extensionTransportService = null;
     // The routes and classes which handle the REST requests
     private final ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
