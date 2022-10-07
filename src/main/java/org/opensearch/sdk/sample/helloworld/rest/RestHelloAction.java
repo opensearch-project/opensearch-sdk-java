@@ -104,11 +104,7 @@ public class RestHelloAction implements ExtensionRestHandler {
                 if (worldAdjectives.remove(adjective)) {
                     return new ExtensionRestResponse(request, OK, "Goodbye, " + adjective + " world!");
                 }
-                return new ExtensionRestResponse(
-                    request,
-                    NOT_MODIFIED,
-                    "Could not find " + adjective + " in the list of words that describe the world."
-                );
+                return new ExtensionRestResponse(request, NOT_MODIFIED, "");
             }
             return new ExtensionRestResponse(request, BAD_REQUEST, "No adjective included with DELETE request");
         }

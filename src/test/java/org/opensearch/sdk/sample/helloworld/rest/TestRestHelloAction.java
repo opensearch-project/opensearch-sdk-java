@@ -21,6 +21,7 @@ import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.common.bytes.BytesReference;
+import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestResponse;
@@ -43,11 +44,15 @@ public class TestRestHelloAction extends OpenSearchTestCase {
     @Test
     public void testRoutes() {
         List<Route> routes = restHelloAction.routes();
-        assertEquals(2, routes.size());
+        assertEquals(4, routes.size());
         assertEquals(Method.GET, routes.get(0).getMethod());
         assertEquals("/hello", routes.get(0).getPath());
-        assertEquals(Method.PUT, routes.get(1).getMethod());
-        assertEquals("/hello/{name}", routes.get(1).getPath());
+        assertEquals(Method.POST, routes.get(1).getMethod());
+        assertEquals("/hello", routes.get(1).getPath());
+        assertEquals(Method.DELETE, routes.get(2).getMethod());
+        assertEquals("/hello", routes.get(2).getPath());
+        assertEquals(Method.PUT, routes.get(3).getMethod());
+        assertEquals("/hello/{name}", routes.get(3).getPath());
     }
 
     @Test
@@ -66,6 +71,22 @@ public class TestRestHelloAction extends OpenSearchTestCase {
             new BytesArray(""),
             token
         );
+        ExtensionRestRequest postRequest = new ExtensionRestRequest(
+            Method.POST,
+            "/hello",
+            params,
+            XContentType.JSON,
+            new BytesArray("{\"adjective\":\"testable\"}"),
+            token
+        );
+        ExtensionRestRequest deleteRequest = new ExtensionRestRequest(
+            Method.DELETE,
+            "/hello",
+            params,
+            null,
+            new BytesArray("testable"),
+            token
+        );
         ExtensionRestRequest badRequest = new ExtensionRestRequest(
             Method.PUT,
             "/hello/Bad%Request",
@@ -74,21 +95,16 @@ public class TestRestHelloAction extends OpenSearchTestCase {
             new BytesArray(""),
             token
         );
-        ExtensionRestRequest unsuccessfulRequest = new ExtensionRestRequest(
-            Method.POST,
-            "/goodbye",
-            params,
-            null,
-            new BytesArray(""),
-            token
-        );
+        ExtensionRestRequest unhandledRequest = new ExtensionRestRequest(Method.HEAD, "/goodbye", params, null, new BytesArray(""), token);
 
+        // Initial default response
         RestResponse response = restHelloAction.handleRequest(getRequest);
         assertEquals(RestStatus.OK, response.status());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
         String responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertEquals("Hello, World!", responseStr);
 
+        // Change world's name
         response = restHelloAction.handleRequest(putRequest);
         assertEquals(RestStatus.OK, response.status());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
@@ -101,17 +117,48 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertEquals("Hello, Passing Test!", responseStr);
 
+        // Add an adjective
+        response = restHelloAction.handleRequest(postRequest);
+        assertEquals(RestStatus.OK, response.status());
+        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
+        responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
+        assertTrue(responseStr.contains("testable"));
+
+        response = restHelloAction.handleRequest(getRequest);
+        assertEquals(RestStatus.OK, response.status());
+        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
+        responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
+        assertEquals("Hello, testable Passing Test!", responseStr);
+
+        // Remove the adjective
+        response = restHelloAction.handleRequest(deleteRequest);
+        assertEquals(RestStatus.OK, response.status());
+        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
+        responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
+        assertTrue(responseStr.contains("testable"));
+
+        response = restHelloAction.handleRequest(getRequest);
+        assertEquals(RestStatus.OK, response.status());
+        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
+        responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
+        assertEquals("Hello, Passing Test!", responseStr);
+
+        // Try to remove nonexistent adjective
+        response = restHelloAction.handleRequest(deleteRequest);
+        assertEquals(RestStatus.NOT_MODIFIED, response.status());
+
+        // Unparseable
         response = restHelloAction.handleRequest(badRequest);
         assertEquals(RestStatus.BAD_REQUEST, response.status());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("Illegal hex characters in escape (%) pattern"));
 
-        response = restHelloAction.handleRequest(unsuccessfulRequest);
+        // Not registered
+        response = restHelloAction.handleRequest(unhandledRequest);
         assertEquals(RestStatus.NOT_FOUND, response.status());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("/goodbye"));
     }
-
 }
