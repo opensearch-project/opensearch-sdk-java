@@ -40,8 +40,22 @@ import static org.opensearch.common.UUIDs.randomBase64UUID;
 
 public class NettyTransport {
     private static final String NODE_NAME_SETTING = "node.name";
+    private ExtensionsRunner extensionsRunner;
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
+
+    /**
+     *
+     * @param extensionsRunner method to call
+     */
+    public NettyTransport(ExtensionsRunner extensionsRunner) {
+        this.extensionsRunner = extensionsRunner;
+    }
+
+    /**
+     * empty constructor for getNetty4Transport method call
+     */
+    public NettyTransport() {}
 
     /**
      * Initializes a Netty4Transport object. This object will be wrapped in a {@link TransportService} object.
@@ -85,22 +99,18 @@ public class NettyTransport {
      * Initializes the TransportService object for this extension. This object will control communication between the extension and OpenSearch.
      *
      * @param settings  The transport settings to configure.
-     * @param extensionsRunner method to call
      * @return The initialized TransportService object.
      */
-    public TransportService initializeExtensionTransportService(Settings settings, ExtensionsRunner extensionsRunner) {
+    public TransportService initializeExtensionTransportService(Settings settings) {
 
         ThreadPool threadPool = new ThreadPool(settings);
 
         Netty4Transport transport = getNetty4Transport(settings, threadPool);
 
-        // Stop any existing transport service
-        if (extensionsRunner.extensionTransportService != null) {
-            extensionsRunner.extensionTransportService.stop();
-        }
+        // delete stop
 
         // create transport service
-        extensionsRunner.extensionTransportService = new TransportService(
+        TransportService transportService = new TransportService(
             settings,
             transport,
             threadPool,
@@ -113,8 +123,8 @@ public class NettyTransport {
             null,
             emptySet()
         );
-        extensionsRunner.startTransportService(extensionsRunner.extensionTransportService);
-        return extensionsRunner.extensionTransportService;
+        extensionsRunner.startTransportService(transportService);
+        return transportService;
     }
 
 }

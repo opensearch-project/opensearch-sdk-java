@@ -91,8 +91,13 @@ public class ExtensionsRunner {
     private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
+<<<<<<< HEAD
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
     private NettyTransport nettyTransport = new NettyTransport();
+=======
+    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler();
+    private NettyTransport nettyTransport = new NettyTransport(this);
+>>>>>>> handle transportService object
 
     /*
      * TODO: expose an interface for extension to register actions
