@@ -11,12 +11,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
+import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
-import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.ExtensionRestPathRegistry;
-import org.opensearch.sdk.ExtensionRestResponse;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptyList;
+import static org.opensearch.rest.BytesRestResponse.TEXT_CONTENT_TYPE;
+import static org.opensearch.rest.RestStatus.NOT_FOUND;
 
 /**
  * This class handles the request from OpenSearch to a {@link ExtensionsRunner#startTransportService(TransportService transportService)} call.
@@ -24,7 +29,16 @@ import org.opensearch.sdk.ExtensionRestResponse;
 
 public class ExtensionsRestRequestHandler {
     private static final Logger logger = LogManager.getLogger(ExtensionsRestRequestHandler.class);
-    private ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
+    private final ExtensionRestPathRegistry extensionRestPathRegistry;
+
+    /**
+     * Instantiate this class with an existing registry
+     *
+     * @param restPathRegistry The ExtensionsRunnerer's REST path registry
+     */
+    public ExtensionsRestRequestHandler(ExtensionRestPathRegistry restPathRegistry) {
+        this.extensionRestPathRegistry = restPathRegistry;
+    }
 
     /**
      * Handles a request from OpenSearch to execute a REST request on the extension.
@@ -37,8 +51,12 @@ public class ExtensionsRestRequestHandler {
         ExtensionRestHandler restHandler = extensionRestPathRegistry.getHandler(request.method(), request.path());
         if (restHandler == null) {
             return new RestExecuteOnExtensionResponse(
-                RestStatus.NOT_FOUND,
-                "No handler for " + ExtensionRestPathRegistry.restPathToString(request.method(), request.path())
+                NOT_FOUND,
+                TEXT_CONTENT_TYPE,
+                String.join(" ", "No handler for", request.method().name(), request.path()).getBytes(UTF_8),
+                emptyMap(),
+                emptyList(),
+                false
             );
         }
 
@@ -49,7 +67,9 @@ public class ExtensionsRestRequestHandler {
             response.status(),
             response.contentType(),
             BytesReference.toBytes(response.content()),
-            response.getHeaders()
+            response.getHeaders(),
+            response.getConsumedParams(),
+            response.isContentConsumed()
         );
     }
 
