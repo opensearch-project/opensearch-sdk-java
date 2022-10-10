@@ -41,7 +41,7 @@ public class HelloWorldExtension extends BaseExtension {
     /**
      * Instantiate this extension, initializing the connection settings and REST actions.
      */
-    public HelloWorldExtension() throws IOException {
+    public HelloWorldExtension() {
         super();
         try {
             this.settings = initializeSettings();
