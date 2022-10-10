@@ -31,7 +31,6 @@ public class TestNetty4Transport extends OpenSearchTestCase {
     @BeforeEach
     public void setUp() throws IOException {
         this.threadPool = new TestThreadPool("test");
-        this.extensionsRunner = new ExtensionsRunner();
         this.nettyTransport = new NettyTransport(extensionsRunner);
     }
 

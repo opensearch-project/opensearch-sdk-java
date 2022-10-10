@@ -139,7 +139,7 @@ public class ExtensionsRunner {
         // save custom transport actions
         this.transportActions = new TransportActions(extension.getActions());
         // initialize the transport service
-        nettyTransport.initializeExtensionTransportService(this.getSettings(), this);
+        nettyTransport.initializeExtensionTransportService(this.getSettings());
     }
 
     /**

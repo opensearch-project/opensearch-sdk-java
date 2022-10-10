@@ -48,7 +48,6 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
             .put(TransportSettings.BIND_HOST.getKey(), host)
             .put(TransportSettings.PORT.getKey(), port)
             .build();
-        this.extensionsRunner = new ExtensionsRunner();
         this.nettyTransport = new NettyTransport(extensionsRunner);
     }
 
