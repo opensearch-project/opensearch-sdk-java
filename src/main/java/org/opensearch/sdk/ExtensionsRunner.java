@@ -7,9 +7,6 @@
  */
 package org.opensearch.sdk;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.cluster.node.DiscoveryNode;
@@ -26,6 +23,7 @@ import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.extensions.EnvironmentSettingsRequest;
 import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
 import org.opensearch.extensions.UpdateSettingsRequest;
+import org.opensearch.extensions.ExtensionsOrchestrator.RequestType;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.index.IndicesModuleRequest;
@@ -44,14 +42,13 @@ import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
 import org.opensearch.sdk.handlers.OpensearchRequestHandler;
 import org.opensearch.threadpool.ThreadPool;
+import org.opensearch.transport.TransportResponse;
+import org.opensearch.transport.TransportResponseHandler;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -104,7 +101,7 @@ public class ExtensionsRunner {
     /**
      * Instantiates a new transportActions
      */
-    public TransportActions transportActions = new TransportActions(new HashMap<>());
+    public TransportActions transportActions;
 
     /**
      * Instantiates a new update settings request handler
@@ -112,27 +109,12 @@ public class ExtensionsRunner {
     UpdateSettingsRequestHandler updateSettingsRequestHandler = new UpdateSettingsRequestHandler();
 
     /**
-     * Instantiates a new Extensions Runner using test settings.
-     *
-     * @throws IOException if the runner failed to read settings or API.
-     */
-    public ExtensionsRunner() throws IOException {
-        ExtensionSettings extensionSettings = readExtensionSettings();
-        this.settings = Settings.builder()
-            .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
-            .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
-            .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
-            .build();
-        this.customSettings = Collections.emptyList();
-    }
-
-    /**
      * Instantiates a new Extensions Runner using the specified extension.
      *
      * @param extension  The settings with which to start the runner.
      * @throws IOException if the runner failed to read settings or API.
      */
-    private ExtensionsRunner(Extension extension) throws IOException {
+    protected ExtensionsRunner(Extension extension) throws IOException {
         ExtensionSettings extensionSettings = extension.getExtensionSettings();
         this.settings = Settings.builder()
             .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
@@ -147,16 +129,10 @@ public class ExtensionsRunner {
         }
         // save custom settings
         this.customSettings = extension.getSettings();
+        // save custom transport actions
+        this.transportActions = new TransportActions(extension.getActions());
         // initialize the transport service
         nettyTransport.initializeExtensionTransportService(this.getSettings(), this);
-        // start listening on configured port and wait for connection from OpenSearch
-        this.startActionListener(0);
-    }
-
-    private static ExtensionSettings readExtensionSettings() throws IOException {
-        File file = new File(ExtensionSettings.EXTENSION_DESCRIPTOR);
-        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        return objectMapper.readValue(file, ExtensionSettings.class);
     }
 
     /**
@@ -175,7 +151,7 @@ public class ExtensionsRunner {
         this.uniqueId = id;
     }
 
-    String getUniqueId() {
+    public String getUniqueId() {
         return uniqueId;
     }
 
@@ -314,24 +290,32 @@ public class ExtensionsRunner {
         }
     }
 
+    private void sendGenericRequestWithExceptionHandling(
+        TransportService transportService,
+        RequestType requestType,
+        String orchestratorNameString,
+        TransportResponseHandler<? extends TransportResponse> responseHandler
+    ) {
+        logger.info("Sending " + requestType + " request to OpenSearch");
+        try {
+            transportService.sendRequest(opensearchNode, orchestratorNameString, new ExtensionRequest(requestType), responseHandler);
+        } catch (Exception e) {
+            logger.info("Failed to send " + requestType + " request to OpenSearch", e);
+        }
+    }
+
     /**
      * Requests the cluster state from OpenSearch.  The result will be handled by a {@link ClusterStateResponseHandler}.
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
     public void sendClusterStateRequest(TransportService transportService) {
-        logger.info("Sending Cluster State request to OpenSearch");
-        ClusterStateResponseHandler clusterStateResponseHandler = new ClusterStateResponseHandler();
-        try {
-            transportService.sendRequest(
-                opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_STATE,
-                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_STATE),
-                clusterStateResponseHandler
-            );
-        } catch (Exception e) {
-            logger.info("Failed to send Cluster State request to OpenSearch", e);
-        }
+        sendGenericRequestWithExceptionHandling(
+            transportService,
+            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_STATE,
+            ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_STATE,
+            new ClusterStateResponseHandler()
+        );
     }
 
     /**
@@ -340,18 +324,12 @@ public class ExtensionsRunner {
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
     public void sendClusterSettingsRequest(TransportService transportService) {
-        logger.info("Sending Cluster Settings request to OpenSearch");
-        ClusterSettingsResponseHandler clusterSettingsResponseHandler = new ClusterSettingsResponseHandler();
-        try {
-            transportService.sendRequest(
-                opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_SETTINGS,
-                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_SETTINGS),
-                clusterSettingsResponseHandler
-            );
-        } catch (Exception e) {
-            logger.info("Failed to send Cluster Settings request to OpenSearch", e);
-        }
+        sendGenericRequestWithExceptionHandling(
+            transportService,
+            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_LOCAL_NODE,
+            ExtensionsOrchestrator.REQUEST_EXTENSION_LOCAL_NODE,
+            new ClusterSettingsResponseHandler()
+        );
     }
 
     /**
@@ -360,18 +338,12 @@ public class ExtensionsRunner {
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
     public void sendLocalNodeRequest(TransportService transportService) {
-        logger.info("Sending Local Node request to OpenSearch");
-        LocalNodeResponseHandler localNodeResponseHandler = new LocalNodeResponseHandler();
-        try {
-            transportService.sendRequest(
-                opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_LOCAL_NODE,
-                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_LOCAL_NODE),
-                localNodeResponseHandler
-            );
-        } catch (Exception e) {
-            logger.info("Failed to send Cluster Settings request to OpenSearch", e);
-        }
+        sendGenericRequestWithExceptionHandling(
+            transportService,
+            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_LOCAL_NODE,
+            ExtensionsOrchestrator.REQUEST_EXTENSION_LOCAL_NODE,
+            new LocalNodeResponseHandler()
+        );
     }
 
     /**
@@ -479,21 +451,6 @@ public class ExtensionsRunner {
         logger.info("Starting extension " + extension.getExtensionSettings().getExtensionName());
         @SuppressWarnings("unused")
         ExtensionsRunner runner = new ExtensionsRunner(extension);
-    }
-
-    /**
-     * Run the Extension. For internal/testing purposes only. Imports settings and sets up Transport Service listening for incoming connections.
-     *
-     * @param args  Unused
-     * @throws IOException if the runner failed to connect to the OpenSearch cluster.
-     */
-    public static void main(String[] args) throws IOException {
-
-        ExtensionsRunner extensionsRunner = new ExtensionsRunner();
-
-        // initialize the transport service
-        extensionsRunner.nettyTransport.initializeExtensionTransportService(extensionsRunner.getSettings(), extensionsRunner);
-        // start listening on configured port and wait for connection from OpenSearch
-        extensionsRunner.startActionListener(0);
+        runner.startActionListener(0);
     }
 }

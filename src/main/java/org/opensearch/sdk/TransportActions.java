@@ -46,15 +46,16 @@ public class TransportActions {
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      * @param opensearchNode The OpenSearch node where transport actions being registered.
+     * @param uniqueId The identity used to
      */
-    public void sendRegisterTransportActionsRequest(TransportService transportService, DiscoveryNode opensearchNode) {
+    public void sendRegisterTransportActionsRequest(TransportService transportService, DiscoveryNode opensearchNode, String uniqueId) {
         logger.info("Sending Register Transport Actions request to OpenSearch");
         ExtensionBooleanResponseHandler registerTransportActionsResponseHandler = new ExtensionBooleanResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_TRANSPORT_ACTIONS,
-                new RegisterTransportActionsRequest(transportActions),
+                new RegisterTransportActionsRequest(uniqueId, transportActions),
                 registerTransportActionsResponseHandler
             );
         } catch (Exception e) {
