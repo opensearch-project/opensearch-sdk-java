@@ -50,6 +50,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -370,14 +372,27 @@ public class ExtensionsRunner {
      * Requests the environment settings from OpenSearch. The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
+     * @return A Setting object from the OpenSearch Node environment
      */
-    public void sendEnvironmentSettingsRequest(TransportService transportService) {
-        sendGenericRequestWithExceptionHandling(
-            transportService,
-            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS,
-            ExtensionsOrchestrator.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS,
-            new EnvironmentSettingsResponseHandler()
-        );
+    public Settings sendEnvironmentSettingsRequest(TransportService transportService) {
+        final CountDownLatch inProgressLatch = new CountDownLatch(1);
+        logger.info("Sending Environment Settings request to OpenSearch");
+        EnvironmentSettingsResponseHandler environmentSettingsResponseHandler = new EnvironmentSettingsResponseHandler(inProgressLatch);
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS,
+                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS),
+                environmentSettingsResponseHandler
+            );
+            // Wait on environment settings response
+            inProgressLatch.await(100, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            logger.info("Failed to send Environment Settings request to OpenSearch", e);
+        }
+
+        // At this point, response handler has read in the environment settings
+        return environmentSettingsResponseHandler.getEnvironmentSettings();
     }
 
     /**

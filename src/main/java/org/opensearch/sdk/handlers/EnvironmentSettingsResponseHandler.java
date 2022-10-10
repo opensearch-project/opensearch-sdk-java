@@ -11,12 +11,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.env.EnvironmentSettingsResponse;
 import org.opensearch.common.io.stream.StreamInput;
+import org.opensearch.common.settings.Settings;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportException;
 import org.opensearch.transport.TransportResponseHandler;
 
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendEnvironmentSettingsRequest} call.
@@ -24,14 +26,28 @@ import java.io.IOException;
 public class EnvironmentSettingsResponseHandler implements TransportResponseHandler<EnvironmentSettingsResponse> {
     private static final Logger logger = LogManager.getLogger(EnvironmentSettingsResponseHandler.class);
 
+    private CountDownLatch inProgressLatch;
+    private Settings environmentSettings;
+
+
+    public EnvironmentSettingsResponseHandler(CountDownLatch inProgressLatch) {
+        this.inProgressLatch = inProgressLatch;
+        this.environmentSettings = null;
+    }
+
     @Override
     public void handleResponse(EnvironmentSettingsResponse response) {
         logger.info("received {}", response);
+
+        // Set environmentSettings from response
+        this.environmentSettings = response.getEnvironmentSettings();
+        inProgressLatch.countDown();
     }
 
     @Override
     public void handleException(TransportException exp) {
         logger.info("EnvironmentSettingsRequest failed", exp);
+        inProgressLatch.countDown();
     }
 
     @Override
@@ -42,5 +58,9 @@ public class EnvironmentSettingsResponseHandler implements TransportResponseHand
     @Override
     public EnvironmentSettingsResponse read(StreamInput in) throws IOException {
         return new EnvironmentSettingsResponse(in);
+    }
+
+    public Settings getEnvironmentSettings() {
+        return this.environmentSettings;
     }
 }
