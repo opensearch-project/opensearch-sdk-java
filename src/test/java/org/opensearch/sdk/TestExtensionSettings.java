@@ -9,14 +9,14 @@ import org.opensearch.test.OpenSearchTestCase;
 import java.io.File;
 
 public class TestExtensionSettings extends OpenSearchTestCase {
-
+    private static final String EXTENSION_DESCRIPTOR = "src/test/resources/extension.yml";
     private ExtensionSettings extensionSettings;
 
     @Override
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        File file = new File(ExtensionSettings.EXTENSION_DESCRIPTOR);
+        File file = new File(EXTENSION_DESCRIPTOR);
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
         extensionSettings = objectMapper.readValue(file, ExtensionSettings.class);
     }

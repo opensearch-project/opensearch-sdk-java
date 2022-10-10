@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.Version;
@@ -77,11 +78,14 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     private ExtensionsRunner extensionsRunner;
     private TransportService transportService;
 
+    private TransportService initialTransportService;
+
     @Override
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        this.extensionsRunner = new ExtensionsRunner();
+        this.extensionsRunner = new ExtensionsRunnerForTest();
+        this.initialTransportService = extensionsRunner.extensionTransportService;
         this.transportService = spy(
             new TransportService(
                 Settings.EMPTY,
@@ -93,6 +97,17 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
                 Collections.emptySet()
             )
         );
+    }
+
+    @Override
+    @AfterEach
+    public void tearDown() throws Exception {
+        super.tearDown();
+        if (initialTransportService != null) {
+            this.initialTransportService.stop();
+            this.initialTransportService.close();
+            Thread.sleep(1000);
+        }
     }
 
     // test manager method invokes start on transport service

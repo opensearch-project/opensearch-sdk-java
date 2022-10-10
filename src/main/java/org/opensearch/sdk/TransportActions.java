@@ -54,7 +54,7 @@ public class TransportActions {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_TRANSPORT_ACTIONS,
-                new RegisterTransportActionsRequest(transportActions),
+                new RegisterTransportActionsRequest("", transportActions),
                 registerTransportActionsResponseHandler
             );
         } catch (Exception e) {

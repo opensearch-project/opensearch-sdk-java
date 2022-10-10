@@ -7,9 +7,6 @@
  */
 package org.opensearch.sdk;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.cluster.node.DiscoveryNode;
@@ -50,10 +47,8 @@ import org.opensearch.transport.TransportResponseHandler;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,27 +110,12 @@ public class ExtensionsRunner {
     UpdateSettingsRequestHandler updateSettingsRequestHandler = new UpdateSettingsRequestHandler();
 
     /**
-     * Instantiates a new Extensions Runner using test settings.
-     *
-     * @throws IOException if the runner failed to read settings or API.
-     */
-    public ExtensionsRunner() throws IOException {
-        ExtensionSettings extensionSettings = readExtensionSettings();
-        this.settings = Settings.builder()
-            .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
-            .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
-            .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
-            .build();
-        this.customSettings = Collections.emptyList();
-    }
-
-    /**
      * Instantiates a new Extensions Runner using the specified extension.
      *
      * @param extension  The settings with which to start the runner.
      * @throws IOException if the runner failed to read settings or API.
      */
-    private ExtensionsRunner(Extension extension) throws IOException {
+    protected ExtensionsRunner(Extension extension) throws IOException {
         ExtensionSettings extensionSettings = extension.getExtensionSettings();
         this.settings = Settings.builder()
             .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
@@ -152,14 +132,6 @@ public class ExtensionsRunner {
         this.customSettings = extension.getSettings();
         // initialize the transport service
         nettyTransport.initializeExtensionTransportService(this.getSettings(), this);
-        // start listening on configured port and wait for connection from OpenSearch
-        this.startActionListener(0);
-    }
-
-    private static ExtensionSettings readExtensionSettings() throws IOException {
-        File file = new File(ExtensionSettings.EXTENSION_DESCRIPTOR);
-        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        return objectMapper.readValue(file, ExtensionSettings.class);
     }
 
     /**
@@ -478,21 +450,6 @@ public class ExtensionsRunner {
         logger.info("Starting extension " + extension.getExtensionSettings().getExtensionName());
         @SuppressWarnings("unused")
         ExtensionsRunner runner = new ExtensionsRunner(extension);
-    }
-
-    /**
-     * Run the Extension. For internal/testing purposes only. Imports settings and sets up Transport Service listening for incoming connections.
-     *
-     * @param args  Unused
-     * @throws IOException if the runner failed to connect to the OpenSearch cluster.
-     */
-    public static void main(String[] args) throws IOException {
-
-        ExtensionsRunner extensionsRunner = new ExtensionsRunner();
-
-        // initialize the transport service
-        extensionsRunner.nettyTransport.initializeExtensionTransportService(extensionsRunner.getSettings(), extensionsRunner);
-        // start listening on configured port and wait for connection from OpenSearch
-        extensionsRunner.startActionListener(0);
+        runner.startActionListener(0);
     }
 }
