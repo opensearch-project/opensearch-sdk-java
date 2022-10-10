@@ -7,9 +7,6 @@
  */
 package org.opensearch.sdk;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.cluster.node.DiscoveryNode;
@@ -50,11 +47,8 @@ import org.opensearch.transport.TransportResponseHandler;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -91,13 +85,13 @@ public class ExtensionsRunner {
      * This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
      */
     public final Settings settings;
-    private ExtensionNamedWriteableRegistry namedWriteableRegistryApi = new ExtensionNamedWriteableRegistry();
+    private ExtensionNamedWriteableRegistry namedWriteableRegistry = new ExtensionNamedWriteableRegistry();
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler();
-    private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler();
+    private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler(namedWriteableRegistry);
     private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
-    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler();
+    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
     private NettyTransport nettyTransport = new NettyTransport();
 
     /*
@@ -107,7 +101,7 @@ public class ExtensionsRunner {
     /**
      * Instantiates a new transportActions
      */
-    public TransportActions transportActions = new TransportActions(new HashMap<>());
+    public TransportActions transportActions;
 
     /**
      * Instantiates a new update settings request handler
@@ -115,27 +109,12 @@ public class ExtensionsRunner {
     UpdateSettingsRequestHandler updateSettingsRequestHandler = new UpdateSettingsRequestHandler();
 
     /**
-     * Instantiates a new Extensions Runner using test settings.
-     *
-     * @throws IOException if the runner failed to read settings or API.
-     */
-    public ExtensionsRunner() throws IOException {
-        ExtensionSettings extensionSettings = readExtensionSettings();
-        this.settings = Settings.builder()
-            .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
-            .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
-            .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
-            .build();
-        this.customSettings = Collections.emptyList();
-    }
-
-    /**
      * Instantiates a new Extensions Runner using the specified extension.
      *
      * @param extension  The settings with which to start the runner.
      * @throws IOException if the runner failed to read settings or API.
      */
-    private ExtensionsRunner(Extension extension) throws IOException {
+    protected ExtensionsRunner(Extension extension) throws IOException {
         ExtensionSettings extensionSettings = extension.getExtensionSettings();
         this.settings = Settings.builder()
             .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
@@ -150,19 +129,13 @@ public class ExtensionsRunner {
         }
         // save custom settings
         this.customSettings = extension.getSettings();
+        // save custom transport actions
+        this.transportActions = new TransportActions(extension.getActions());
         // initialize the transport service
         ThreadPool threadPool = new ThreadPool(this.getSettings());
         nettyTransport.initializeExtensionTransportService(this.getSettings(), threadPool, this);
-        // Create components
+        // create components
         extension.createComponents(new SDKClient(), null, threadPool);
-        // start listening on configured port and wait for connection from OpenSearch
-        this.startActionListener(0);
-    }
-
-    private static ExtensionSettings readExtensionSettings() throws IOException {
-        File file = new File(ExtensionSettings.EXTENSION_DESCRIPTOR);
-        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        return objectMapper.readValue(file, ExtensionSettings.class);
     }
 
     /**
@@ -181,7 +154,7 @@ public class ExtensionsRunner {
         this.uniqueId = id;
     }
 
-    String getUniqueId() {
+    public String getUniqueId() {
         return uniqueId;
     }
 
@@ -233,7 +206,7 @@ public class ExtensionsRunner {
             false,
             false,
             NamedWriteableRegistryParseRequest::new,
-            (request, channel, task) -> channel.sendResponse(namedWriteableRegistryApi.handleNamedWriteableRegistryParseRequest(request))
+            (request, channel, task) -> channel.sendResponse(namedWriteableRegistry.handleNamedWriteableRegistryParseRequest(request))
         );
 
         transportService.registerRequestHandler(
@@ -481,25 +454,6 @@ public class ExtensionsRunner {
         logger.info("Starting extension " + extension.getExtensionSettings().getExtensionName());
         @SuppressWarnings("unused")
         ExtensionsRunner runner = new ExtensionsRunner(extension);
-    }
-
-    /**
-     * Run the Extension. For internal/testing purposes only. Imports settings and sets up Transport Service listening for incoming connections.
-     *
-     * @param args  Unused
-     * @throws IOException if the runner failed to connect to the OpenSearch cluster.
-     */
-    public static void main(String[] args) throws IOException {
-
-        ExtensionsRunner extensionsRunner = new ExtensionsRunner();
-
-        // initialize the transport service
-        extensionsRunner.nettyTransport.initializeExtensionTransportService(
-            extensionsRunner.getSettings(),
-            new ThreadPool(extensionsRunner.getSettings()),
-            extensionsRunner
-        );
-        // start listening on configured port and wait for connection from OpenSearch
-        extensionsRunner.startActionListener(0);
+        runner.startActionListener(0);
     }
 }

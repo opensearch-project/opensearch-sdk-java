@@ -145,7 +145,7 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
     private void startTransportandClient(Settings settings, Thread client) throws IOException, InterruptedException {
 
         // retrieve transport service
-        ExtensionsRunner extensionsRunner = new ExtensionsRunner();
+        ExtensionsRunner extensionsRunner = new ExtensionsRunnerForTest();
         // start transport service
         TransportService transportService = nettyTransport.initializeExtensionTransportService(settings, extensionsRunner);
 

@@ -48,7 +48,8 @@ public class ExtensionsInitRequestHandler {
             extensionsRunner.sendRegisterCustomSettingsRequest(extensionsRunner.extensionTransportService);
             extensionsRunner.transportActions.sendRegisterTransportActionsRequest(
                 extensionsRunner.extensionTransportService,
-                extensionsRunner.opensearchNode
+                extensionsRunner.opensearchNode,
+                extensionsRunner.getUniqueId()
             );
         }
     }

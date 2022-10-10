@@ -82,7 +82,7 @@ public class TestExtensionTransportActionsAPI extends OpenSearchTestCase {
 
     @Test
     public void testRegisterTransportAction() {
-        transportActions.sendRegisterTransportActionsRequest(transportService, opensearchNode);
+        transportActions.sendRegisterTransportActionsRequest(transportService, opensearchNode, "test-extension");
         verify(transportService, times(1)).sendRequest(
             any(),
             eq(ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_TRANSPORT_ACTIONS),

@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.1.0",
   "info": {
     "title": "Hello World",
     "description": "This is a sample Hello World extension.",
@@ -43,6 +43,53 @@
             "description": "Improper REST action configuration"
           }
         }
+      },
+      "post": {
+        "tags": [
+          "hello"
+        ],
+        "summary": "Adds an adjective to a list",
+        "description": "Adds an adjective to a list from which a random element will be prepended to the world name",
+        "operationId": "",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Syntax Error in request"
+          },
+          "404": {
+            "description": "Improper REST action configuration"
+          },
+          "406": {
+            "description": "Content format not text or JSON"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "hello"
+        ],
+        "summary": "Removes an adjective from the list",
+        "description": "Removes an adjective from the list from which a random element will be prepended to the world name",
+        "operationId": "",
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "304": {
+            "description": "Adjective not in the list, no action taken"
+          },
+          "400": {
+            "description": "Syntax Error in request"
+          },
+          "404": {
+            "description": "Improper REST action configuration"
+          },
+          "406": {
+            "description": "Content format not text or JSON"
+          }
+        }
       }
     },
     "/hello/{name}": {
@@ -56,7 +103,7 @@
           {
             "name": "name",
             "in": "path",
-            "description": "a new name for the world",
+            "description": "A new name for the world",
             "required": true,
             "schema": {
               "type": "string"

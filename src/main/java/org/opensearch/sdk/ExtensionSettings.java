@@ -17,11 +17,6 @@ public class ExtensionSettings {
     private String hostPort;
 
     /**
-     * Path to extension.yml file for testing. Internal use only.
-     */
-    static final String EXTENSION_DESCRIPTOR = "src/test/resources/extension.yml";
-
-    /**
      * Jackson requires a default constructor.
      */
     @SuppressWarnings("unused")

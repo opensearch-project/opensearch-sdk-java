@@ -13,10 +13,14 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.opensearch.cluster.service.ClusterService;
 import org.opensearch.threadpool.ThreadPool;
 
+import org.opensearch.action.ActionRequest;
+import org.opensearch.action.ActionResponse;
+import org.opensearch.action.support.TransportAction;
 import org.opensearch.common.settings.Setting;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,6 +64,15 @@ public interface Extension {
      * @param threadPool A service to allow retrieving an executor to run an async action
      */
     public Collection<Object> createComponents(SDKClient client, ClusterService clusterService, ThreadPool threadPool);
+
+    /**
+     * Gets an optional list of custom {@link TransportAction} for the extension to register with OpenSearch.
+     *
+     * @return a list of custom transport actions this extension uses.
+     */
+    default Map<String, Class<? extends TransportAction<ActionRequest, ActionResponse>>> getActions() {
+        return Collections.emptyMap();
+    }
 
     /**
      * Helper method to read extension settings from a YAML file.

@@ -27,7 +27,11 @@ apply plugin: 'application'
 apply from: 'gradle/formatting.gradle'
 apply plugin: 'maven-publish'
 
-mainClassName = 'org.opensearch.sdk.ExtensionsRunner'
+// Temporary to keep "gradle run" working
+// TODO: change this to an extension designed for testing instead of duplicating a sample
+// https://github.com/opensearch-project/opensearch-sdk-java/issues/175
+mainClassName = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
+
   
 group 'org.opensearch.sdk'
 version '1.0.0-SNAPSHOT'
