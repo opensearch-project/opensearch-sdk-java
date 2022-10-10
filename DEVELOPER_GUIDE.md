@@ -38,12 +38,6 @@ The work done to support the extensions framework is located on the `feature/ext
 
 Navigate to the directory that OpenSearch-SDK-Java has been cloned to.
 
-You can execute just the SDK's `ExtensionsRunner` main method with test settings using `./gradlew run`.
-
-```
-./gradlew run
-```
-
 You can execute the sample Hello World extension using the `helloWorld` task:
 
 ```
