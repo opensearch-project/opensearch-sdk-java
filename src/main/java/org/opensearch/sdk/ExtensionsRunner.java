@@ -20,7 +20,6 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.extensions.ExtensionActionListenerOnFailureRequest;
 import org.opensearch.extensions.DiscoveryExtension;
-import org.opensearch.extensions.EnvironmentSettingsRequest;
 import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
 import org.opensearch.extensions.UpdateSettingsRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator.RequestType;
@@ -368,24 +367,17 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Requests the environment setting values from OpenSearch for the corresponding component settings. The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
+     * Requests the environment settings from OpenSearch. The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
      *
-     * @param componentSettings The component setting that correspond to the values provided by the environment settings
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
-    public void sendEnvironmentSettingsRequest(TransportService transportService, List<Setting<?>> componentSettings) {
-        logger.info("Sending Environment Settings request to OpenSearch");
-        EnvironmentSettingsResponseHandler environmentSettingsResponseHandler = new EnvironmentSettingsResponseHandler();
-        try {
-            transportService.sendRequest(
-                opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS,
-                new EnvironmentSettingsRequest(componentSettings),
-                environmentSettingsResponseHandler
-            );
-        } catch (Exception e) {
-            logger.info("Failed to send Environment Settings request to OpenSearch", e);
-        }
+    public void sendEnvironmentSettingsRequest(TransportService transportService) {
+        sendGenericRequestWithExceptionHandling(
+            transportService,
+            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS,
+            ExtensionsOrchestrator.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS,
+            new EnvironmentSettingsResponseHandler()
+        );
     }
 
     /**
