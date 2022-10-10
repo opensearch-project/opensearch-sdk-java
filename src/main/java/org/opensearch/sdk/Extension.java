@@ -14,9 +14,7 @@ import java.util.Collections;
 import java.util.Collection;
 import java.util.List;
 
-import org.opensearch.client.OpenSearchClient;
 import org.opensearch.cluster.service.ClusterService;
-import org.opensearch.env.Environment;
 import org.opensearch.threadpool.ThreadPool;
 
 import org.opensearch.common.settings.Setting;
@@ -60,14 +58,8 @@ public interface Extension {
      * @param client A client to make requests to the system
      * @param clusterService A service to allow watching and updating cluster state
      * @param threadPool A service to allow retrieving an executor to run an async action
-     * @param environment the environment for path and setting configurations
      */
-    public Collection<Object> createComponents(
-        OpenSearchClient client,
-        ClusterService clusterService,
-        ThreadPool threadPool,
-        Environment environment
-    );
+    public Collection<Object> createComponents(SDKClient client, ClusterService clusterService, ThreadPool threadPool);
 
     /**
      * Helper method to read extension settings from a YAML file.
