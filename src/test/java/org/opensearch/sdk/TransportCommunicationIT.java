@@ -11,6 +11,7 @@
 
 package org.opensearch.sdk;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.common.component.Lifecycle;
@@ -37,6 +38,7 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
     private volatile String clientResult;
     private ExtensionsRunner extensionsRunner;
     private NettyTransport nettyTransport;
+    private TransportService initialTransportService;
 
     @Override
     @BeforeEach
@@ -48,7 +50,20 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
             .put(TransportSettings.BIND_HOST.getKey(), host)
             .put(TransportSettings.PORT.getKey(), port)
             .build();
+        this.extensionsRunner = new ExtensionsRunnerForTest();
+        this.initialTransportService = extensionsRunner.extensionTransportService;
         this.nettyTransport = new NettyTransport(extensionsRunner);
+    }
+    
+    @Override
+    @AfterEach
+    public void tearDown() throws Exception {
+        super.tearDown();
+        if (initialTransportService != null) {
+            this.initialTransportService.stop();
+            this.initialTransportService.close();
+            Thread.sleep(1000);
+        }
     }
 
     @Test
