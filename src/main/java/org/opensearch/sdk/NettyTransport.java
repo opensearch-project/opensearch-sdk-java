@@ -45,8 +45,7 @@ public class NettyTransport {
     };
 
     /**
-     *
-     * @param extensionsRunner method to call
+     * @param extensionsRunner Instantiate this object with a reference to the ExtensionsRunner.
      */
     public NettyTransport(ExtensionsRunner extensionsRunner) {
         this.extensionsRunner = extensionsRunner;
