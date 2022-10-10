@@ -85,12 +85,15 @@ public class NettyTransport {
      * Initializes the TransportService object for this extension. This object will control communication between the extension and OpenSearch.
      *
      * @param settings  The transport settings to configure.
+     * @param threadPool The thread pool to use to start transport service.
      * @param extensionsRunner method to call
      * @return The initialized TransportService object.
      */
-    public TransportService initializeExtensionTransportService(Settings settings, ExtensionsRunner extensionsRunner) {
-
-        ThreadPool threadPool = new ThreadPool(settings);
+    public TransportService initializeExtensionTransportService(
+        Settings settings,
+        ThreadPool threadPool,
+        ExtensionsRunner extensionsRunner
+    ) {
 
         Netty4Transport transport = getNetty4Transport(settings, threadPool);
 

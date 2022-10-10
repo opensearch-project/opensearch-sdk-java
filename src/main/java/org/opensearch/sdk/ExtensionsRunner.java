@@ -494,7 +494,11 @@ public class ExtensionsRunner {
         ExtensionsRunner extensionsRunner = new ExtensionsRunner();
 
         // initialize the transport service
-        extensionsRunner.nettyTransport.initializeExtensionTransportService(extensionsRunner.getSettings(), extensionsRunner);
+        extensionsRunner.nettyTransport.initializeExtensionTransportService(
+            extensionsRunner.getSettings(),
+            new ThreadPool(extensionsRunner.getSettings()),
+            extensionsRunner
+        );
         // start listening on configured port and wait for connection from OpenSearch
         extensionsRunner.startActionListener(0);
     }
