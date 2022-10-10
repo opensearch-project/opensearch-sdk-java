@@ -12,7 +12,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import org.opensearch.action.ActionRequest;
+import org.opensearch.action.ActionResponse;
+import org.opensearch.action.support.TransportAction;
 import org.opensearch.common.settings.Setting;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,6 +50,15 @@ public interface Extension {
      */
     default List<Setting<?>> getSettings() {
         return Collections.emptyList();
+    }
+
+    /**
+     * Gets an optional list of custom {@link TransportAction} for the extension to register with OpenSearch.
+     *
+     * @return a list of custom transport actions this extension uses.
+     */
+    default Map<String, Class<? extends TransportAction<ActionRequest, ActionResponse>>> getActions() {
+        return Collections.emptyMap();
     }
 
     /**

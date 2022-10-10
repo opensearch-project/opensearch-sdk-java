@@ -49,7 +49,6 @@ import org.opensearch.transport.TransportSettings;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -102,7 +101,7 @@ public class ExtensionsRunner {
     /**
      * Instantiates a new transportActions
      */
-    public TransportActions transportActions = new TransportActions(new HashMap<>());
+    public TransportActions transportActions;
 
     /**
      * Instantiates a new update settings request handler
@@ -130,6 +129,8 @@ public class ExtensionsRunner {
         }
         // save custom settings
         this.customSettings = extension.getSettings();
+        // save custom transport actions
+        this.transportActions = new TransportActions(extension.getActions());
         // initialize the transport service
         nettyTransport.initializeExtensionTransportService(this.getSettings(), this);
     }
@@ -150,7 +151,7 @@ public class ExtensionsRunner {
         this.uniqueId = id;
     }
 
-    String getUniqueId() {
+    public String getUniqueId() {
         return uniqueId;
     }
 
