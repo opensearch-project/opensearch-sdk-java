@@ -10,6 +10,7 @@ package org.opensearch.sdk;
 import java.util.List;
 
 import org.opensearch.extensions.rest.ExtensionRestRequest;
+import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.RestHandler;
 import org.opensearch.rest.RestHandler.Route;

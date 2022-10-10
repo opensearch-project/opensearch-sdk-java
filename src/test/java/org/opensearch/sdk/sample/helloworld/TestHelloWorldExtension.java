@@ -43,7 +43,7 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         List<ExtensionRestHandler> extensionRestHandlers = extension.getExtensionRestHandlers();
         assertEquals(1, extensionRestHandlers.size());
         List<Route> routes = extensionRestHandlers.get(0).routes();
-        assertEquals(2, routes.size());
+        assertEquals(4, routes.size());
     }
 
 }
