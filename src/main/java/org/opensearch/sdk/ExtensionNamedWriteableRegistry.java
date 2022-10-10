@@ -29,25 +29,25 @@ import org.opensearch.extensions.OpenSearchRequest;
 /**
  * API used to handle named writeable registry requests from OpenSearch
  */
-public class NamedWriteableRegistryAPI {
-    private final Logger logger = LogManager.getLogger(NamedWriteableRegistryAPI.class);
+public class ExtensionNamedWriteableRegistry {
+    private final Logger logger = LogManager.getLogger(ExtensionNamedWriteableRegistry.class);
     private List<NamedWriteableRegistry.Entry> namedWriteables;
     private final NamedWriteableRegistry namedWriteableRegistry;
 
     /**
-     * Constructor for NamedWriteableRegistryAPI. Creates a NamedWriteableRegistry for this extension
+     * Constructor for ExtensionNamedWriteableRegistry. Creates a NamedWriteableRegistry for this extension
      */
-    public NamedWriteableRegistryAPI() {
+    public ExtensionNamedWriteableRegistry() {
         this.namedWriteables = getNamedWriteables();
         this.namedWriteableRegistry = new NamedWriteableRegistry(namedWriteables);
     }
 
     /**
-     * Constructor for NamedWriteableRegistryAPI. Creates and populates a NamedWriteableRegistry with the given NamedWriteableRegistry entries for this extension
+     * Constructor for ExtensionNamedWriteableRegistry. Creates and populates a NamedWriteableRegistry with the given NamedWriteableRegistry entries for this extension
      *
      * @param extensionNamedWriteables List of NamedWriteableRegistry.Entry to be registered
      */
-    public NamedWriteableRegistryAPI(List<NamedWriteableRegistry.Entry> extensionNamedWriteables) {
+    public ExtensionNamedWriteableRegistry(List<NamedWriteableRegistry.Entry> extensionNamedWriteables) {
         this.namedWriteables = extensionNamedWriteables;
         this.namedWriteableRegistry = new NamedWriteableRegistry(namedWriteables);
     }

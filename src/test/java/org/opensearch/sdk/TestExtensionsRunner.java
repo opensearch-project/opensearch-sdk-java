@@ -35,6 +35,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.Version;
 import org.opensearch.cluster.node.DiscoveryNode;
+import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.settings.Setting.Property;
@@ -45,7 +46,7 @@ import org.opensearch.extensions.DiscoveryExtension;
 import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
 import org.opensearch.extensions.OpenSearchRequest;
-import org.opensearch.extensions.rest.RestExecuteOnExtensionRequest;
+import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
 import org.opensearch.identity.ExtensionTokenProcessor;
 import org.opensearch.rest.BytesRestResponse;
@@ -57,8 +58,11 @@ import org.opensearch.extensions.UpdateSettingsRequest;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
+import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
+import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
+import org.opensearch.sdk.handlers.OpensearchRequestHandler;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.Transport;
 import org.opensearch.transport.TransportService;
@@ -67,7 +71,9 @@ import org.opensearch.common.settings.WriteableSetting;
 public class TestExtensionsRunner extends OpenSearchTestCase {
 
     private static final String EXTENSION_NAME = "sample-extension";
-
+    private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler();
+    private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler();
+    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler();
     private ExtensionsRunner extensionsRunner;
     private TransportService transportService;
 
@@ -141,7 +147,10 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         InitializeExtensionsRequest extensionInitRequest = new InitializeExtensionsRequest(sourceNode, extension);
 
-        InitializeExtensionsResponse response = extensionsRunner.handleExtensionInitRequest(extensionInitRequest);
+        InitializeExtensionsResponse response = extensionsInitRequestHandler.handleExtensionInitRequest(
+            extensionInitRequest,
+            extensionsRunner
+        );
         // Test if name and unique ID are set
         assertEquals(EXTENSION_NAME, response.getName());
         assertEquals("opensearch-sdk-1", extensionsRunner.getUniqueId());
@@ -153,18 +162,25 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     public void testHandleOpenSearchRequest() throws Exception {
 
         OpenSearchRequest request = new OpenSearchRequest(OpenSearchRequestType.REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY);
-        assertEquals(NamedWriteableRegistryResponse.class, extensionsRunner.handleOpenSearchRequest(request).getClass());
+        assertEquals(NamedWriteableRegistryResponse.class, opensearchRequestHandler.handleOpenSearchRequest(request).getClass());
 
         // Add additional OpenSearch request handler tests here for each default extension point
     }
 
     @Test
-    public void testHandleRestExecuteOnExtensionRequest() throws Exception {
+    public void testHandleExtensionRestRequest() throws Exception {
 
         ExtensionTokenProcessor ext = new ExtensionTokenProcessor(EXTENSION_NAME);
         Principal userPrincipal = () -> "user1";
-        RestExecuteOnExtensionRequest request = new RestExecuteOnExtensionRequest(Method.GET, "/foo", ext.generateToken(userPrincipal));
-        RestExecuteOnExtensionResponse response = extensionsRunner.handleRestExecuteOnExtensionRequest(request);
+        ExtensionRestRequest request = new ExtensionRestRequest(
+            Method.GET,
+            "/foo",
+            Collections.emptyMap(),
+            null,
+            new BytesArray("bar"),
+            ext.generateToken(userPrincipal)
+        );
+        RestExecuteOnExtensionResponse response = extensionsRestRequestHandler.handleRestExecuteOnExtensionRequest(request);
         // this will fail in test environment with no registered actions
         assertEquals(RestStatus.NOT_FOUND, response.getStatus());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.getContentType());
