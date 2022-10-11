@@ -50,8 +50,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -375,9 +373,8 @@ public class ExtensionsRunner {
      * @return A Setting object from the OpenSearch Node environment
      */
     public Settings sendEnvironmentSettingsRequest(TransportService transportService) {
-        final CountDownLatch inProgressLatch = new CountDownLatch(1);
         logger.info("Sending Environment Settings request to OpenSearch");
-        EnvironmentSettingsResponseHandler environmentSettingsResponseHandler = new EnvironmentSettingsResponseHandler(inProgressLatch);
+        EnvironmentSettingsResponseHandler environmentSettingsResponseHandler = new EnvironmentSettingsResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
@@ -386,7 +383,7 @@ public class ExtensionsRunner {
                 environmentSettingsResponseHandler
             );
             // Wait on environment settings response
-            inProgressLatch.await(ExtensionsOrchestrator.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
+            environmentSettingsResponseHandler.awaitResponse();
         } catch (InterruptedException e) {
             logger.info("Failed to recieve Environment Settings response from OpenSearch", e);
         } catch (Exception e) {

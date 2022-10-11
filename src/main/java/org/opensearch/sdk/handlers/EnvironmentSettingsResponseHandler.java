@@ -10,6 +10,7 @@ package org.opensearch.sdk.handlers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.env.EnvironmentSettingsResponse;
+import org.opensearch.extensions.ExtensionsOrchestrator;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.sdk.ExtensionsRunner;
@@ -19,18 +20,19 @@ import org.opensearch.transport.TransportResponseHandler;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendEnvironmentSettingsRequest} call.
  */
 public class EnvironmentSettingsResponseHandler implements TransportResponseHandler<EnvironmentSettingsResponse> {
-    private static final Logger logger = LogManager.getLogger(EnvironmentSettingsResponseHandler.class);
 
+    private static final Logger logger = LogManager.getLogger(EnvironmentSettingsResponseHandler.class);
     private final CountDownLatch inProgressLatch;
     private Settings environmentSettings;
 
-    public EnvironmentSettingsResponseHandler(CountDownLatch inProgressLatch) {
-        this.inProgressLatch = inProgressLatch;
+    public EnvironmentSettingsResponseHandler() {
+        this.inProgressLatch = new CountDownLatch(1);
         this.environmentSettings = Settings.EMPTY;
     }
 
@@ -57,6 +59,10 @@ public class EnvironmentSettingsResponseHandler implements TransportResponseHand
     @Override
     public EnvironmentSettingsResponse read(StreamInput in) throws IOException {
         return new EnvironmentSettingsResponse(in);
+    }
+
+    public void awaitResponse() throws InterruptedException {
+        inProgressLatch.await(ExtensionsOrchestrator.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
     }
 
     public Settings getEnvironmentSettings() {
