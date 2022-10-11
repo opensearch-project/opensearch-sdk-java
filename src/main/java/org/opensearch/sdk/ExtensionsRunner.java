@@ -386,7 +386,9 @@ public class ExtensionsRunner {
                 environmentSettingsResponseHandler
             );
             // Wait on environment settings response
-            inProgressLatch.await(100, TimeUnit.SECONDS);
+            inProgressLatch.await(ExtensionsOrchestrator.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            logger.info("Failed to recieve Environment Settings response from OpenSearch", e);
         } catch (Exception e) {
             logger.info("Failed to send Environment Settings request to OpenSearch", e);
         }

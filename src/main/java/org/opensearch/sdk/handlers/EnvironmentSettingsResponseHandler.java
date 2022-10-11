@@ -26,13 +26,12 @@ import java.util.concurrent.CountDownLatch;
 public class EnvironmentSettingsResponseHandler implements TransportResponseHandler<EnvironmentSettingsResponse> {
     private static final Logger logger = LogManager.getLogger(EnvironmentSettingsResponseHandler.class);
 
-    private CountDownLatch inProgressLatch;
+    private final CountDownLatch inProgressLatch;
     private Settings environmentSettings;
-
 
     public EnvironmentSettingsResponseHandler(CountDownLatch inProgressLatch) {
         this.inProgressLatch = inProgressLatch;
-        this.environmentSettings = null;
+        this.environmentSettings = Settings.EMPTY;
     }
 
     @Override
