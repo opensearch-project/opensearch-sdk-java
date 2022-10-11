@@ -93,6 +93,7 @@ public class ExtensionsRunner {
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
     private NettyTransport nettyTransport = new NettyTransport();
+    private SDKClient client = new SDKClient();
 
     /*
      * TODO: expose an interface for extension to register actions
@@ -135,7 +136,7 @@ public class ExtensionsRunner {
         ThreadPool threadPool = new ThreadPool(this.getSettings());
         nettyTransport.initializeExtensionTransportService(this.getSettings(), threadPool, this);
         // create components
-        extension.createComponents(new SDKClient(), null, threadPool);
+        extension.createComponents(client, null, threadPool);
     }
 
     /**
