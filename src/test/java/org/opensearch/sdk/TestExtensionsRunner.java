@@ -34,6 +34,7 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.opensearch.Version;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.bytes.BytesArray;
@@ -69,6 +70,7 @@ import org.opensearch.transport.Transport;
 import org.opensearch.transport.TransportService;
 import org.opensearch.common.settings.WriteableSetting;
 
+@ResourceLock("transportService")
 public class TestExtensionsRunner extends OpenSearchTestCase {
 
     private static final String EXTENSION_NAME = "sample-extension";

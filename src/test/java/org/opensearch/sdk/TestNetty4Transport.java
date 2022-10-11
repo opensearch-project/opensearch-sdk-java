@@ -16,6 +16,7 @@ import java.io.IOException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.opensearch.common.component.Lifecycle;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.test.OpenSearchTestCase;
@@ -25,6 +26,7 @@ import org.opensearch.transport.TransportSettings;
 
 import org.opensearch.transport.netty4.Netty4Transport;
 
+@ResourceLock("transportService")
 public class TestNetty4Transport extends OpenSearchTestCase {
 
     private ThreadPool threadPool;
