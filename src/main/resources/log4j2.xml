@@ -9,9 +9,10 @@
         </File>
     </Appenders>
     <Loggers>
-        <Root level="trace">
+        <Root level="debug">
             <AppenderRef ref="ConsoleAppender" />
             <AppenderRef ref="FileAppender"/>
         </Root>
+        <logger name="io.netty.util" level="ERROR"/>
     </Loggers>
 </Configuration>
