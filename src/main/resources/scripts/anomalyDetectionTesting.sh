@@ -1,23 +1,13 @@
+#!/bin/bash
 ##===========SETUP===============##
-sudo yum install -y java-17-amazon-corretto-devel
-java -version
-sudo yum -y update
-sudo yum -y install docker
-docker -v
+sudo yum install -y java-17-amazon-corretto-devel && sudo yum -y update && sudo yum -y install docker && sudo yum -y install git && sudo yum remove -y python3.7 && sudo yum update -y && sudo yum groupinstall "Development Tools" -y && sudo yum erase openssl-devel -y && sudo yum install openssl11 openssl11-devel libffi-devel bzip2-devel wget -y
 sudo service docker start
-sudo yum -y install git
-sudo yum remove -y python3.7
-sudo yum update -y
-sudo yum groupinstall "Development Tools" -y
-sudo yum erase openssl-devel -y
-sudo yum install openssl11 openssl11-devel  libffi-devel bzip2-devel wget -y
 wget https://www.python.org/ftp/python/3.9.9/Python-3.9.9.tgz
 tar -xf Python-3.9.9.tgz
 cd Python-3.9.9/
 ./configure --enable-optimizations
 make -j $(nproc)
-sudo make altinstall
-sudo yum install -y python3-pip
+sudo make altinstall && sudo yum install -y python3-pip
 cd ~
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.9 1
 
@@ -25,19 +15,13 @@ sudo update-alternatives --install /usr/bin/python3 python3 /usr/local/bin/pytho
 git clone https://github.com/opensearch-project/OpenSearch.git
 cd OpenSearch
 git checkout feature/extensions
-./gradlew clean
-./gradlew publishToMavenLocal
-./gradlew localDistro
-##cd distribution/archives/linux-tar/build/install/opensearch-3.0.0-SNAPSHOT/
-##nohup ./bin/opensearch >/home/ec2-user/OpenSearchOutput.log 2>&1 &
-##curl -X GET localhost:9200
+./gradlew clean && ./gradlew publishToMavenLocal && ./gradlew localDistro
 cd ~
 
 ##===========OpenSearch-SDK-Java===============##
 git clone https://github.com/opensearch-project/opensearch-sdk-java.git
 cd opensearch-sdk-java
-./gradlew clean
-./gradlew publishToMavenLocal
+./gradlew clean && ./gradlew publishToMavenLocal
 cd ~
 
 ##===========Anomaly Detection===============##
@@ -74,6 +58,9 @@ cd ~
 
 ##===========OpenSearch-Benchmark===============##
 git clone https://github.com/opensearch-project/opensearch-benchmark.git
-pip3 install --upgrade pip
-pip3 install opensearch-benchmark
+pip3 install --upgrade pip && pip3 install opensearch-benchmark
 opensearch-benchmark execute_test --workload=nyc_taxis --test-mode --target-hosts=localhost:9200 --pipeline benchmark-only
+
+##===========Cleanup=================##
+sudo service docker stop
+
