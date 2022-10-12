@@ -20,7 +20,6 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.extensions.ExtensionActionListenerOnFailureRequest;
 import org.opensearch.extensions.DiscoveryExtension;
-import org.opensearch.extensions.EnvironmentSettingsRequest;
 import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
 import org.opensearch.extensions.UpdateSettingsRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator.RequestType;
@@ -372,24 +371,31 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Requests the environment setting values from OpenSearch for the corresponding component settings. The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
+     * Requests the environment settings from OpenSearch. The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
      *
-     * @param componentSettings The component setting that correspond to the values provided by the environment settings
      * @param transportService  The TransportService defining the connection to OpenSearch.
+     * @return A Setting object from the OpenSearch Node environment
      */
-    public void sendEnvironmentSettingsRequest(TransportService transportService, List<Setting<?>> componentSettings) {
+    public Settings sendEnvironmentSettingsRequest(TransportService transportService) {
         logger.info("Sending Environment Settings request to OpenSearch");
         EnvironmentSettingsResponseHandler environmentSettingsResponseHandler = new EnvironmentSettingsResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsOrchestrator.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS,
-                new EnvironmentSettingsRequest(componentSettings),
+                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS),
                 environmentSettingsResponseHandler
             );
+            // Wait on environment settings response
+            environmentSettingsResponseHandler.awaitResponse();
+        } catch (InterruptedException e) {
+            logger.info("Failed to recieve Environment Settings response from OpenSearch", e);
         } catch (Exception e) {
             logger.info("Failed to send Environment Settings request to OpenSearch", e);
         }
+
+        // At this point, response handler has read in the environment settings
+        return environmentSettingsResponseHandler.getEnvironmentSettings();
     }
 
     /**
