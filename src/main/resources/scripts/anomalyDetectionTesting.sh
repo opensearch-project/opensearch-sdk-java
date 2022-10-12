@@ -9,8 +9,10 @@ cd Python-3.9.9/
 make -j $(nproc)
 sudo make altinstall && sudo yum install -y python3-pip
 cd ~
+echo "Setting Python version in update-alternatives"
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.9 1
 
+echo "Cloning OpenSearch"
 ##===========OpenSearch===============##
 git clone https://github.com/opensearch-project/OpenSearch.git
 cd OpenSearch
@@ -18,12 +20,14 @@ git checkout feature/extensions
 ./gradlew clean && ./gradlew publishToMavenLocal && ./gradlew localDistro
 cd ~
 
+echo "Cloning opensearch-sdk-java"
 ##===========OpenSearch-SDK-Java===============##
 git clone https://github.com/opensearch-project/opensearch-sdk-java.git
 cd opensearch-sdk-java
 ./gradlew clean && ./gradlew publishToMavenLocal
 cd ~
 
+echo "Cloning Anomaly Detection"
 ##===========Anomaly Detection===============##
 git clone https://github.com/opensearch-project/anomaly-detection.git
 cd anomaly-detection
@@ -31,6 +35,7 @@ cd anomaly-detection
 nohup ./gradlew run >/home/ec2-user/AnomalyDetectionExtensionOutput.log 2>&1 &
 cd ~
 
+echo "Starting OpenSearch Cluster"
 ##===========Starting OpenSearch===============##
 cd OpenSearch/distribution/archives/linux-tar/build/install/opensearch-3.0.0-SNAPSHOT/
 mkdir extensions
@@ -56,6 +61,7 @@ cd ..
 nohup ./bin/opensearch >/home/ec2-user/OpenSearchOutput.log 2>&1 &
 cd ~ 
 
+echo "Cloning OpenSearch Benchmark"
 ##===========OpenSearch-Benchmark===============##
 git clone https://github.com/opensearch-project/opensearch-benchmark.git
 pip3 install --upgrade pip && pip3 install opensearch-benchmark

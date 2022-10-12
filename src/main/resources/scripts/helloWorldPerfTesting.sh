@@ -10,6 +10,7 @@ cd Python-3.9.9/
 make -j $(nproc)
 sudo make altinstall && sudo yum install -y python3-pip
 cd ~
+echo "Setting Python version in update-alternatives"
 sudo update-alternatives —install /usr/bin/python3 python3 /usr/local/bin/python3.9 1
 
 ##===========OpenSearch===============##
@@ -19,6 +20,7 @@ git checkout feature/extensions
 ./gradlew clean && ./gradlew publishToMavenLocal && ./gradlew localDistro
 cd ~
 
+echo "Cloning opensearch-sdk-java"
 ##===========OpenSearch-SDK-Java===============##
 git clone https://github.com/opensearch-project/opensearch-sdk-java.git
 cd opensearch-sdk-java
@@ -27,6 +29,7 @@ cd opensearch-sdk-java
 nohup ./gradlew helloWorld >/home/ec2-user/HelloWorldExtensionOutput.log 2>&1 &
 cd ~
 
+echo "Starting OpenSearch Cluster"
 ##===========Starting OpenSearch===============##
 cd OpenSearch/distribution/archives/linux-tar/build/install/opensearch-3.0.0-SNAPSHOT/
 mkdir extensions
@@ -50,9 +53,10 @@ hasNativeController: false
 } > extension.yml
 cd ..
 nohup ./bin/opensearch >/home/ec2-user/OpenSearchOutput.log 2>&1 &
-cd ~
 curl -X GET localhost:9200/_extensions/_opensearch-sdk-java-1/hello
+cd ~
 
+echo "Cloning OpenSearch Benchmark"
 ##===========OpenSearch-Benchmark===============##
 git clone https://github.com/opensearch-project/opensearch-benchmark.git
 pip3 install —upgrade pip && pip3 install opensearch-benchmark
