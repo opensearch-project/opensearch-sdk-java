@@ -13,7 +13,6 @@ package org.opensearch.sdk;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.ResourceLock;
 import org.opensearch.common.component.Lifecycle;
 import org.opensearch.common.network.NetworkAddress;
 import org.opensearch.common.settings.Settings;
@@ -30,7 +29,6 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 
-@ResourceLock("transportService")
 public class TransportCommunicationIT extends OpenSearchIntegTestCase {
 
     private Settings settings;
