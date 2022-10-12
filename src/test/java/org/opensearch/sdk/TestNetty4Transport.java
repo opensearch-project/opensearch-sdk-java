@@ -13,7 +13,6 @@ package org.opensearch.sdk;
 
 import java.io.IOException;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
@@ -21,7 +20,6 @@ import org.opensearch.common.component.Lifecycle;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
 
 import org.opensearch.transport.netty4.Netty4Transport;
@@ -32,25 +30,12 @@ public class TestNetty4Transport extends OpenSearchTestCase {
     private ThreadPool threadPool;
     private ExtensionsRunner extensionsRunner;
     private NettyTransport nettyTransport;
-    private TransportService initialTransportService;
 
     @BeforeEach
     public void setUp() throws IOException {
         this.threadPool = new TestThreadPool("test");
         this.extensionsRunner = new ExtensionsRunnerForTest();
-        this.initialTransportService = extensionsRunner.extensionTransportService;
         this.nettyTransport = new NettyTransport(extensionsRunner);
-    }
-
-    @Override
-    @AfterEach
-    public void tearDown() throws Exception {
-        super.tearDown();
-        if (initialTransportService != null) {
-            this.initialTransportService.stop();
-            this.initialTransportService.close();
-            Thread.sleep(1000);
-        }
     }
 
     // test Netty can bind to multiple ports, default and additional client
