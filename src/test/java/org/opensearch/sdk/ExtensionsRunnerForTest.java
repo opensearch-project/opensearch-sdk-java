@@ -15,7 +15,7 @@ public class ExtensionsRunnerForTest extends ExtensionsRunner {
      * @throws IOException if the runner failed to read settings or API.
      */
     public ExtensionsRunnerForTest() throws IOException {
-        super(new Extension() {
+        super(new BaseExtension() {
             @Override
             public ExtensionSettings getExtensionSettings() {
                 return new ExtensionSettings("sample-extension", "127.0.0.1", "4532");

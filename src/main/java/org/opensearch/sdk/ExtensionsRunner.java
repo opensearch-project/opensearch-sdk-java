@@ -92,6 +92,7 @@ public class ExtensionsRunner {
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
+    private SDKClient client = new SDKClient();
 
     /*
      * TODO: expose an interface for extension to register actions
@@ -130,6 +131,9 @@ public class ExtensionsRunner {
         this.customSettings = extension.getSettings();
         // save custom transport actions
         this.transportActions = new TransportActions(extension.getActions());
+        ThreadPool threadPool = new ThreadPool(this.getSettings());
+        // create components
+        extension.createComponents(client, null, threadPool);
     }
 
     /**
