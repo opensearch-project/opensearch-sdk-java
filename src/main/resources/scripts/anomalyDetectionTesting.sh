@@ -69,4 +69,3 @@ opensearch-benchmark execute_test --workload=nyc_taxis --test-mode --target-host
 
 ##===========Cleanup=================##
 sudo service docker stop
-
