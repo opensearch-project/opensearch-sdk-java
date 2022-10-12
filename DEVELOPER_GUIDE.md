@@ -112,7 +112,7 @@ During OpenSearch bootstrap, `ExtensionsOrchestrator` will then discover the ext
 
 OpenSearch SDK terminal will also log all requests and responses it receives from OpenSearch :
 
-TCP HandShake Request :
+TCP HandShake Request:
 
 ```
 21:30:18.943 [opensearch[extension][transport_worker][T#7]] TRACE org.opensearch.latencytester.transportservice.netty4.OpenSearchLoggingHandler - [id: 0x37b22600, L:/127.0.0.1:4532 - R:/127.0.0.1:47766] READ: 55B
