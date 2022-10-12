@@ -85,13 +85,13 @@ public class ExtensionsRunner {
      * This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
      */
     public final Settings settings;
-    private ExtensionNamedWriteableRegistry namedWriteableRegistryApi = new ExtensionNamedWriteableRegistry();
+    private ExtensionNamedWriteableRegistry namedWriteableRegistry = new ExtensionNamedWriteableRegistry();
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler();
-    private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler();
+    private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler(namedWriteableRegistry);
     private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
-    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler();
+    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
     private NettyTransport nettyTransport = new NettyTransport();
 
     /*
@@ -203,7 +203,7 @@ public class ExtensionsRunner {
             false,
             false,
             NamedWriteableRegistryParseRequest::new,
-            (request, channel, task) -> channel.sendResponse(namedWriteableRegistryApi.handleNamedWriteableRegistryParseRequest(request))
+            (request, channel, task) -> channel.sendResponse(namedWriteableRegistry.handleNamedWriteableRegistryParseRequest(request))
         );
 
         transportService.registerRequestHandler(
