@@ -11,8 +11,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import org.opensearch.cluster.service.ClusterService;
+import org.opensearch.threadpool.ThreadPool;
 
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
@@ -51,6 +55,16 @@ public interface Extension {
     default List<Setting<?>> getSettings() {
         return Collections.emptyList();
     }
+
+    /**
+     * Returns components added by this extension.
+     *
+     * @param client A client to make requests to the system
+     * @param clusterService A service to allow watching and updating cluster state
+     * @param threadPool A service to allow retrieving an executor to run an async action
+     * @return A collection of objects
+     */
+    public Collection<Object> createComponents(SDKClient client, ClusterService clusterService, ThreadPool threadPool);
 
     /**
      * Gets an optional list of custom {@link TransportAction} for the extension to register with OpenSearch.
