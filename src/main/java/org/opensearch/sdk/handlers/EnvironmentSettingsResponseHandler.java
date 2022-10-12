@@ -31,6 +31,9 @@ public class EnvironmentSettingsResponseHandler implements TransportResponseHand
     private final CountDownLatch inProgressLatch;
     private Settings environmentSettings;
 
+    /**
+    * Instantiates a new EnvironmentSettingsResponseHandler with a count down latch and an empty Settings object
+    */
     public EnvironmentSettingsResponseHandler() {
         this.inProgressLatch = new CountDownLatch(1);
         this.environmentSettings = Settings.EMPTY;
@@ -61,6 +64,9 @@ public class EnvironmentSettingsResponseHandler implements TransportResponseHand
         return new EnvironmentSettingsResponse(in);
     }
 
+    /**
+     * Invokes await on the EnvironmentSettingsResponseHandler count down latch
+     */
     public void awaitResponse() throws InterruptedException {
         inProgressLatch.await(ExtensionsOrchestrator.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
     }
