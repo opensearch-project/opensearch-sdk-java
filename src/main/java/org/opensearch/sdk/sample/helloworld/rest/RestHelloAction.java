@@ -88,8 +88,8 @@ public class RestHelloAction implements ExtensionRestHandler {
             } else {
                 return new ExtensionRestResponse(request, NOT_ACCEPTABLE, "Only text and JSON content types are supported");
             }
-            if (!adjective.isBlank()) {
-                worldAdjectives.add(adjective);
+            if (adjective != null && !adjective.isBlank()) {
+                worldAdjectives.add(adjective.trim());
                 return new ExtensionRestResponse(request, OK, "Added " + adjective + " to words that describe the world!");
             }
             return new ExtensionRestResponse(request, BAD_REQUEST, "No adjective included with POST request");
