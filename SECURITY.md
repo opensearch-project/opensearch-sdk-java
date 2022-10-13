@@ -32,7 +32,7 @@ These guidelines and this document are meant to evolve, the follow list captures
 1. [X] Agreement of areas and 'as-is' state of OpenSearch Plugins and Extensions. **<-- Doc is here**
 2. [ ] All areas have recommendations and areas of investigation are filed as issues and linked back on this document.
 3. [ ] All investigation conclusions are captured and linked in this document, effectively define the scope of work for these areas.  Implementation of work is can be completed or outstanding.
-4. [ ] All planned work has been completed, issues around this work can be completed or outstanding. 
+4. [ ] All planned work has been completed, issues around this work can be completed or outstanding.
 5. [ ] Document complete, future work and issue will be captured out of band instead of as updates this document.
 
 ## Terms
@@ -70,7 +70,7 @@ With the security plugin installed, role based access control (RBAC) is availabl
 
 For resource that are managed by plugins, access control is governed within individual plugin. By examining [user](https://github.com/opensearch-project/common-utils/blob/main/src/main/java/org/opensearch/commons/authuser/User.java) object from OpenSearch's thread context permissions are available for approval/denial. An example from anomaly detection is [checkUserPermissions](https://github.com/opensearch-project/anomaly-detection/blob/875b03c1c7596cb34d74fea285c28d949cfb0d19/src/main/java/org/opensearch/ad/util/ParseUtils.java#L568).  Uniform resource controls and models are needed to protect from misconfiguration and code defects.
 
-* :building_construction: Adding a uniform resource permission check is being worked on in [sdk#40](https://github.com/opensearch-project/opensearch-sdk-java/issues/40). 
+* :building_construction: Adding a uniform resource permission check is being worked on in [sdk#40](https://github.com/opensearch-project/opensearch-sdk-java/issues/40).
 
 
 As Extensions do not have access OpenSearch's thread context, identity and its associated privileges must be communicated through APIs.
@@ -85,7 +85,7 @@ With the security plugin installed, when actions are performed on the OpenSearch
 
 Plugin installation is managed by using a binary on the node, it is used when OpenSearch is not running. The tool can perform signature the native plugins and extracts the plugin zip files into the file system.  When OpenSearch starts it discovers and loads installed plugins into its JVM runtime.
 
-Extensions installation is managed through on disk configuration. 
+Extensions installation is managed through on disk configuration.
 
 ## Versioning
 
@@ -126,10 +126,10 @@ When OpenSearch sends a request to an extension, the identity of the requestor s
 anomaly Detection has detectors that analyzer data and store its results so it can be inspected or alerted on, [more details](https://opensearch.org/docs/latest/monitoring-plugins/ad/index/). OpenSearch should be responsible for inspecting the user, roles, resources to ensure standard practices are used.  An access check API should be designed and implemented to offload this work from extensions creators.
 
 ### Delegate Authority  [OpenSearch#3850](https://github.com/opensearch-project/OpenSearch/issues/3850) :negative_squared_cross_mark:
-anomaly Detection runs background jobs to scan for anamolies and alerts that trigger if conditions are detected.  Background tasks should be tied to an idenity and a delegated identity so permissions can be verified.  The underlying systems depends on the [Job Scheduler](https://github.com/opensearch-project/job-scheduler/blob/main/src/main/java/org/opensearch/jobscheduler/scheduler/JobScheduler.java) plugin to execute these requests. 
+anomaly Detection runs background jobs to scan for anamolies and alerts that trigger if conditions are detected.  Background tasks should be tied to an idenity and a delegated identity so permissions can be verified.  The underlying systems depends on the [Job Scheduler](https://github.com/opensearch-project/job-scheduler/blob/main/src/main/java/org/opensearch/jobscheduler/scheduler/JobScheduler.java) plugin to execute these requests.
 
 #### Extension identity [sdk#41](https://github.com/opensearch-project/opensearch-sdk-java/issues/41)
-There should be different levels of permissions granularity interactive allowing for disgushing a user actions or user action through an extension.  Extensions should have an identity and there should be a way that the identity of action is layered with all the parties that have triggered it. 
+There should be different levels of permissions granularity interactive allowing for disgushing a user actions or user action through an extension.  Extensions should have an identity and there should be a way that the identity of action is layered with all the parties that have triggered it.
 
 #### Delayed action API [sdk#42](https://github.com/opensearch-project/opensearch-sdk-java/issues/42)
 When actions are triggered without an interactive user session OpenSearch will need to permit the action to occur or not.  Create an API for these background tasks to get an identity associated with the session.

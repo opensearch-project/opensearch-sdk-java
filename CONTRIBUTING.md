@@ -68,7 +68,7 @@ By making a contribution to this project, I certify that:
     consistent with this project or the open source license(s)
     involved.
  ```
-We require that every contribution to OpenSearch-SDK-Java is signed with a [Developer Certificate of Origin](https://github.com/opensearch-project/OpenSearch/blob/main/CONTRIBUTING.md#developer-certificate-of-origin). Additionally, please use your real name. We do not accept anonymous contributors nor those utilizing pseudonyms. 
+We require that every contribution to OpenSearch-SDK-Java is signed with a [Developer Certificate of Origin](https://github.com/opensearch-project/OpenSearch/blob/main/CONTRIBUTING.md#developer-certificate-of-origin). Additionally, please use your real name. We do not accept anonymous contributors nor those utilizing pseudonyms.
 
 Each commit must include a DCO which looks like this
 
