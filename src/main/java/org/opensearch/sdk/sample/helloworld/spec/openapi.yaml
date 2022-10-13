@@ -30,7 +30,7 @@ paths:
           description: Improper REST action configuration
     post:
       tags:
-        - hello    
+        - hello
       summary: Adds a descriptive world adjective to a list
       description: >-
         Adds an adjective to a list from which a random element will be
@@ -88,7 +88,7 @@ paths:
   /goodbye:
     delete:
       tags:
-        - hello    
+        - hello
       summary: Restores the world to default
       description: >-
         Removes all adjectives and the custom world name
@@ -96,4 +96,3 @@ paths:
       responses:
         '200':
           description: Successful operation
-
