@@ -30,7 +30,7 @@ paths:
           description: Improper REST action configuration
     post:
       tags:
-        - hello    
+        - hello
       summary: Adds an adjective to a list
       description: >-
         Adds an adjective to a list from which a random element will be
@@ -47,7 +47,7 @@ paths:
           description: Content format not text or JSON
     delete:
       tags:
-        - hello    
+        - hello
       summary: Removes an adjective from the list
       description: >-
         Removes an adjective from the list from which a random element
