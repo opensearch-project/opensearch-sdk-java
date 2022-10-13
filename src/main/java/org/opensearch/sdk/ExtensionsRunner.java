@@ -459,10 +459,10 @@ public class ExtensionsRunner {
      */
     public static void run(Extension extension) throws IOException {
         logger.info("Starting extension " + extension.getExtensionSettings().getExtensionName());
-        @SuppressWarnings("unused")
         ExtensionsRunner runner = new ExtensionsRunner(extension);
         // initialize the transport service
-        new NettyTransport(runner).initializeExtensionTransportService(runner.getSettings(), new ThreadPool(runner.getSettings()), runner);
+        NettyTransport nettyTransport = new NettyTransport(runner);
+        nettyTransport.initializeExtensionTransportService(runner.getSettings(), new ThreadPool(runner.getSettings()), runner);
         runner.startActionListener(0);
     }
 }
