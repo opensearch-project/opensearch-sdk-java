@@ -91,7 +91,7 @@ public class ExtensionsRunner {
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
-    private NettyTransport nettyTransport = new NettyTransport();
+
     private SDKClient client = new SDKClient();
 
     /*
@@ -131,9 +131,9 @@ public class ExtensionsRunner {
         this.customSettings = extension.getSettings();
         // save custom transport actions
         this.transportActions = new TransportActions(extension.getActions());
-        // initialize the transport service
+
         ThreadPool threadPool = new ThreadPool(this.getSettings());
-        nettyTransport.initializeExtensionTransportService(this.getSettings(), threadPool, this);
+
         // create components
         extension.createComponents(client, null, threadPool);
     }
@@ -459,8 +459,10 @@ public class ExtensionsRunner {
      */
     public static void run(Extension extension) throws IOException {
         logger.info("Starting extension " + extension.getExtensionSettings().getExtensionName());
-        @SuppressWarnings("unused")
         ExtensionsRunner runner = new ExtensionsRunner(extension);
+        // initialize the transport service
+        NettyTransport nettyTransport = new NettyTransport(runner);
+        nettyTransport.initializeExtensionTransportService(runner.getSettings(), new ThreadPool(runner.getSettings()), runner);
         runner.startActionListener(0);
     }
 }

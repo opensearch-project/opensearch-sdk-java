@@ -40,8 +40,16 @@ import static org.opensearch.common.UUIDs.randomBase64UUID;
 
 public class NettyTransport {
     private static final String NODE_NAME_SETTING = "node.name";
+    private final ExtensionsRunner extensionsRunner;
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
+
+    /**
+     * @param extensionsRunner Instantiate this object with a reference to the ExtensionsRunner.
+     */
+    public NettyTransport(ExtensionsRunner extensionsRunner) {
+        this.extensionsRunner = extensionsRunner;
+    }
 
     /**
      * Initializes a Netty4Transport object. This object will be wrapped in a {@link TransportService} object.
@@ -103,7 +111,7 @@ public class NettyTransport {
         }
 
         // create transport service
-        extensionsRunner.extensionTransportService = new TransportService(
+        TransportService transportService = new TransportService(
             settings,
             transport,
             threadPool,
@@ -116,8 +124,8 @@ public class NettyTransport {
             null,
             emptySet()
         );
-        extensionsRunner.startTransportService(extensionsRunner.extensionTransportService);
-        return extensionsRunner.extensionTransportService;
+        extensionsRunner.startTransportService(transportService);
+        return transportService;
     }
 
 }
