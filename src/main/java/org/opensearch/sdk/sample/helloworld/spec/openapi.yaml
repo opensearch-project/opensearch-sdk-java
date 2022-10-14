@@ -60,6 +60,25 @@ paths:
           description: Improper REST action configuration
         '406':
           description: Content format not text or JSON
+    delete:
+      tags:
+        - hello
+      summary: Removes an adjective from the list
+      description: >-
+        Removes an adjective from the list from which a random element
+        will be prepended to the world name
+      operationId: ''
+      responses:
+        '200':
+          description: Successful operation
+        '304':
+          description: Adjective not in the list, no action taken
+        '400':
+          description: Syntax Error in request
+        '404':
+          description: Improper REST action configuration
+        '406':
+          description: Content format not text or JSON
   /hello/{name}:
     put:
       tags:

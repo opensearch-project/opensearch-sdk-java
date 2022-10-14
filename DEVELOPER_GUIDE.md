@@ -14,7 +14,7 @@
     - [Submitting Changes](#submitting-changes)
 
 ## Introduction
-OpenSearch plugins have allowed the extension and enhancements of various core features. However, the current plugin architecture carries the risk of fatally impacting clusters should they fail. In order to ensure that plugins may run safely without impacting the system, our goal is to effectively isolate plugin interactions with OpenSearch by modularizing the [extension points](https://opensearch.org/blog/technical-post/2021/12/plugins-intro/) to which they hook onto. 
+OpenSearch plugins have allowed the extension and enhancements of various core features. However, the current plugin architecture carries the risk of fatally impacting clusters should they fail. In order to ensure that plugins may run safely without impacting the system, our goal is to effectively isolate plugin interactions with OpenSearch by modularizing the [extension points](https://opensearch.org/blog/technical-post/2021/12/plugins-intro/) to which they hook onto.
 
 Read more about extensibility [here](https://github.com/opensearch-project/OpenSearch/issues/1422)
 
@@ -27,12 +27,12 @@ Fork [OpenSearch SDK for Java](https://github.com/opensearch-project/opensearch-
 Fork [OpenSearch](https://github.com/opensearch-project/OpenSearch/), clone locally, e.g., `git clone https://github.com/[your username]/OpenSearch.git`, and checkout the `feature/extensions` branch.
 
 ## Publish OpenSearch feature/extensions Branch to Maven local
-The work done to support the extensions framework is located on the `feature/extensions` branch of the OpenSearch project. Until this branch is merged to `main`, it is necessary to publish the dependencies of this branch to your local maven repository prior to running an Extension on a separate process. 
+The work done to support the extensions framework is located on the `feature/extensions` branch of the OpenSearch project. Until this branch is merged to `main`, it is necessary to publish the dependencies of this branch to your local maven repository prior to running an Extension on a separate process.
 
 - First navigate to the directory that OpenSearch has been cloned to
 - Checkout the correct branch, e.g. `git checkout feature/extensions`.
 - Run `./gradlew check` to make sure the build is successful.
-- Run `./gradlew publishToMavenLocal`. 
+- Run `./gradlew publishToMavenLocal`.
 
 ## Run the Sample Extension
 
@@ -92,7 +92,7 @@ extensions:
     javaVersion: '14'
     className: ExtensionsRunner
     customFolderName: opensearch-sdk-java
-    hasNativeController: false	
+    hasNativeController: false
 ```
 
 ## Run OpenSearch
@@ -127,7 +127,7 @@ TCP HandShake Request :
 MESSAGE RECEIVED:E«󀀀internal:tcp/handshake£·A
 ```
 
-Extension Name Request / Response : 
+Extension Name Request / Response :
 
 ```
 21:30:18.992 [opensearch[extension][transport_worker][T#6]] TRACE org.opensearch.latencytester.transportservice.netty4.OpenSearchLoggingHandler - [id: 0xb2be651b, L:/127.0.0.1:4532 - R:/127.0.0.1:47782] READ: 204B
@@ -166,7 +166,7 @@ MESSAGE RECEIVED:ES-ǣ!internal:discovery/extensionsnode_extensionQSt9oKXFTSWqgX
 21:30:18.999 [opensearch[extension][transport_worker][T#6]] TRACE org.opensearch.transport.TransportService.tracer - [3][internal:discovery/extensions] sent response
 ```
 
-It is important that the OpenSearch SDK for Java is already up and running on a seperate process prior to starting OpenSearch, since extension discovery occurs only if the OpenSearch SDK for Java is already listening on a pre-defined port. Once discovery is complete and the data transfer connection between both nodes has been established, OpenSearch and the OpenSearch SDK for Java will now be able to comminicate. 
+It is important that the OpenSearch SDK for Java is already up and running on a seperate process prior to starting OpenSearch, since extension discovery occurs only if the OpenSearch SDK for Java is already listening on a pre-defined port. Once discovery is complete and the data transfer connection between both nodes has been established, OpenSearch and the OpenSearch SDK for Java will now be able to comminicate.
 
 ## Perform a REST Request on the Extension
 
@@ -192,7 +192,7 @@ Look for tar ball in `/build/distributions`. To run the artifact i.e., tar ball,
 tar -xvf opensearch-sdk-java-1.0.0-SNAPSHOT.tar
 ```
 
-The artifact will include extension settings for the sample extension on the class path under the path `/sample/extension-settings.yml`. This path is used by the sample `HelloWorldExtension`. 
+The artifact will include extension settings for the sample extension on the class path under the path `/sample/extension-settings.yml`. This path is used by the sample `HelloWorldExtension`.
 
 ```
   extensionName: hello-world

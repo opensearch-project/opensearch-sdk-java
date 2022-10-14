@@ -32,7 +32,7 @@ apply plugin: 'maven-publish'
 // https://github.com/opensearch-project/opensearch-sdk-java/issues/175
 mainClassName = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
 
-  
+
 group 'org.opensearch.sdk'
 version '1.0.0-SNAPSHOT'
 
@@ -88,7 +88,7 @@ task requireJavadoc(type: JavaExec) {
   description = 'Ensures that Javadoc documentation exists.'
   mainClass = "org.plumelib.javadoc.RequireJavadoc"
   classpath = configurations.requireJavadoc
-  args "src/main/java" 
+  args "src/main/java"
   // javadocs on private methods optional
   args "--dont-require-private=true"
   // javadocs on trivial getters/setters optional
@@ -134,4 +134,4 @@ jacocoTestReport {
     reports {
         xml.required = true
     }
-}  
+}
