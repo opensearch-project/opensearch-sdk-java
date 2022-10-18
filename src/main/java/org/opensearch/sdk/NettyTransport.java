@@ -94,14 +94,9 @@ public class NettyTransport {
      *
      * @param settings  The transport settings to configure.
      * @param threadPool The thread pool to use to start transport service.
-     * @param extensionsRunner method to call
      * @return The initialized TransportService object.
      */
-    public TransportService initializeExtensionTransportService(
-        Settings settings,
-        ThreadPool threadPool,
-        ExtensionsRunner extensionsRunner
-    ) {
+    public TransportService initializeExtensionTransportService(Settings settings, ThreadPool threadPool) {
 
         Netty4Transport transport = getNetty4Transport(settings, threadPool);
 

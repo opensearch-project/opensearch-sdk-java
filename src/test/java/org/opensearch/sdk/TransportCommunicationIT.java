@@ -151,7 +151,7 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
         ExtensionsRunner extensionsRunner = new ExtensionsRunnerForTest();
         // start transport service
         ThreadPool threadPool = new ThreadPool(settings);
-        TransportService transportService = nettyTransport.initializeExtensionTransportService(settings, threadPool, extensionsRunner);
+        TransportService transportService = nettyTransport.initializeExtensionTransportService(settings, threadPool);
 
         assertEquals(Lifecycle.State.STARTED, transportService.lifecycleState());
 
