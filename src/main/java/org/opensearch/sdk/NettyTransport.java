@@ -100,11 +100,6 @@ public class NettyTransport {
 
         Netty4Transport transport = getNetty4Transport(settings, threadPool);
 
-        // Stop any existing transport service
-        if (extensionsRunner.extensionTransportService != null) {
-            extensionsRunner.extensionTransportService.stop();
-        }
-
         // create transport service
         TransportService transportService = new TransportService(
             settings,

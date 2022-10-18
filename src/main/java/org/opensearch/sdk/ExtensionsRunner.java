@@ -71,7 +71,7 @@ public class ExtensionsRunner {
     /**
      * This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
      */
-    TransportService extensionTransportService = null;
+    private TransportService extensionTransportService = null;
 
     // The routes and classes which handle the REST requests
     private final ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
