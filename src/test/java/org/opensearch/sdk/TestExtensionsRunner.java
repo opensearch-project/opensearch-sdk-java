@@ -69,7 +69,7 @@ import org.opensearch.common.settings.WriteableSetting;
 public class TestExtensionsRunner extends OpenSearchTestCase {
 
     private static final String EXTENSION_NAME = "sample-extension";
-    private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler();
+    private ExtensionsInitRequestHandler extensionsInitRequestHandler;
     private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler(new ExtensionNamedWriteableRegistry());
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(new ExtensionRestPathRegistry());
     private ExtensionsRunner extensionsRunner;
@@ -80,6 +80,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     public void setUp() throws Exception {
         super.setUp();
         this.extensionsRunner = new ExtensionsRunnerForTest();
+        this.extensionsInitRequestHandler = new ExtensionsInitRequestHandler(extensionsRunner);
 
         this.transportService = spy(
             new TransportService(
@@ -146,10 +147,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         InitializeExtensionsRequest extensionInitRequest = new InitializeExtensionsRequest(sourceNode, extension);
 
-        InitializeExtensionsResponse response = extensionsInitRequestHandler.handleExtensionInitRequest(
-            extensionInitRequest,
-            extensionsRunner
-        );
+        InitializeExtensionsResponse response = extensionsInitRequestHandler.handleExtensionInitRequest(extensionInitRequest);
         // Test if name and unique ID are set
         assertEquals(EXTENSION_NAME, response.getName());
         assertEquals("opensearch-sdk-1", extensionsRunner.getUniqueId());

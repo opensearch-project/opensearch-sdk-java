@@ -71,7 +71,8 @@ public class ExtensionsRunner {
     /**
      * This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
      */
-    public TransportService extensionTransportService = null;
+    private TransportService extensionTransportService = null;
+
     // The routes and classes which handle the REST requests
     private final ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
     // Custom settings from the extension's getSettings
@@ -85,7 +86,7 @@ public class ExtensionsRunner {
      */
     public final Settings settings;
     private ExtensionNamedWriteableRegistry namedWriteableRegistry = new ExtensionNamedWriteableRegistry();
-    private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler();
+    private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
     private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler(namedWriteableRegistry);
     private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
@@ -188,7 +189,7 @@ public class ExtensionsRunner {
             false,
             false,
             InitializeExtensionsRequest::new,
-            (request, channel, task) -> channel.sendResponse(extensionsInitRequestHandler.handleExtensionInitRequest(request, this))
+            (request, channel, task) -> channel.sendResponse(extensionsInitRequestHandler.handleExtensionInitRequest(request))
         );
 
         transportService.registerRequestHandler(
@@ -441,6 +442,10 @@ public class ExtensionsRunner {
         return settings;
     }
 
+    public TransportService getExtensionTransportService() {
+        return extensionTransportService;
+    }
+
     /**
      * Starts an ActionListener.
      *
@@ -462,7 +467,9 @@ public class ExtensionsRunner {
         ExtensionsRunner runner = new ExtensionsRunner(extension);
         // initialize the transport service
         NettyTransport nettyTransport = new NettyTransport(runner);
-        nettyTransport.initializeExtensionTransportService(runner.getSettings(), new ThreadPool(runner.getSettings()), runner);
+        Settings runnerSettings = runner.getSettings();
+        ThreadPool threadPool = new ThreadPool(runnerSettings);
+        runner.extensionTransportService = nettyTransport.initializeExtensionTransportService(runnerSettings, threadPool);
         runner.startActionListener(0);
     }
 }
