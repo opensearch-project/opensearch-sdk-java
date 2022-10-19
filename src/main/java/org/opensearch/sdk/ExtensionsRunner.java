@@ -11,6 +11,7 @@ package org.opensearch.sdk;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
 import org.opensearch.extensions.OpenSearchRequest;
@@ -314,14 +315,29 @@ public class ExtensionsRunner {
      * Requests the cluster state from OpenSearch.  The result will be handled by a {@link ClusterStateResponseHandler}.
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
+     * @return The cluster state of OpenSearch
      */
-    public void sendClusterStateRequest(TransportService transportService) {
-        sendGenericRequestWithExceptionHandling(
-            transportService,
-            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_STATE,
-            ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_STATE,
-            new ClusterStateResponseHandler()
-        );
+
+    public ClusterState sendClusterStateRequest(TransportService transportService) {
+        logger.info("Sending Cluster State request to OpenSearch");
+        ClusterStateResponseHandler clusterStateResponseHandler = new ClusterStateResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_STATE,
+                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_STATE),
+                clusterStateResponseHandler
+            );
+            // Wait on cluster state response
+            clusterStateResponseHandler.awaitResponse();
+        } catch (InterruptedException e) {
+            logger.info("Failed to recieve Cluster State response from OpenSearch", e);
+        } catch (Exception e) {
+            logger.info("Failed to send Cluster State request to OpenSearch", e);
+        }
+
+        // At this point, response handler has read in the cluster state
+        return clusterStateResponseHandler.getClusterState();
     }
 
     /**
