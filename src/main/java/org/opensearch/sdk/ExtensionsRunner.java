@@ -359,13 +359,26 @@ public class ExtensionsRunner {
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      */
-    public void sendLocalNodeRequest(TransportService transportService) {
-        sendGenericRequestWithExceptionHandling(
-            transportService,
-            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_LOCAL_NODE,
-            ExtensionsOrchestrator.REQUEST_EXTENSION_LOCAL_NODE,
-            new LocalNodeResponseHandler()
-        );
+    public DiscoveryNode sendLocalNodeRequest(TransportService transportService) {
+        logger.info("Sending Local Node request to OpenSearch");
+        LocalNodeResponseHandler localNodeResponseHandler = new LocalNodeResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_EXTENSION_LOCAL_NODE,
+                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_LOCAL_NODE),
+                localNodeResponseHandler
+            );
+            // Wait on local node response
+            localNodeResponseHandler.awaitResponse();
+        } catch (InterruptedException e) {
+            logger.info("Failed to recieve Local Node response from OpenSearch", e);
+        } catch (Exception e) {
+            logger.info("Failed to send Local Node request to OpenSearch", e);
+        }
+
+        // At this point, response handler has read in the local node
+        return localNodeResponseHandler.getLocalNode();
     }
 
     /**
