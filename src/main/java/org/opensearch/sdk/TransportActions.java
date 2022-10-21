@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class TransportActions {
     private final Logger logger = LogManager.getLogger(TransportActions.class);
-    private Map<String, Class> transportActions;
+    private Map<String, Class<? extends TransportAction<? extends ActionRequest, ? extends ActionResponse>>> transportActions;
 
     /**
      * Constructor for TransportActions. Creates a map of transportActions for this extension.
