@@ -169,7 +169,7 @@ public class ExtensionsRunner {
         this.extensionNode = extensionNode;
     }
 
-    public DiscoveryNode getLocalNode() {
+    public DiscoveryNode getOpensearchNode() {
         return this.opensearchNode;
     }
 

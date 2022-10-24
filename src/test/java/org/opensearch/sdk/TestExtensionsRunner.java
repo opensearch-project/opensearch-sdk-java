@@ -151,7 +151,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         assertEquals(EXTENSION_NAME, response.getName());
         assertEquals("opensearch-sdk-1", extensionsRunner.getUniqueId());
         // Test if the source node is set after handleExtensionInitRequest() is called during OpenSearch bootstrap
-        assertEquals(sourceNode, extensionsRunner.getLocalNode());
+        assertEquals(sourceNode, extensionsRunner.getOpensearchNode());
     }
 
     @Test
