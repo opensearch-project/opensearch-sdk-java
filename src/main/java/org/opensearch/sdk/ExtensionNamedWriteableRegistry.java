@@ -100,7 +100,6 @@ public class ExtensionNamedWriteableRegistry {
      * @throws IOException if InputStream generated from the byte array is unsuccessfully closed
      * @return A response acknowledging the request to parse has executed successfully
      */
-    @SuppressWarnings("unchecked")
     public ExtensionBooleanResponse handleNamedWriteableRegistryParseRequest(NamedWriteableRegistryParseRequest request)
         throws IOException {
 
@@ -108,6 +107,7 @@ public class ExtensionNamedWriteableRegistry {
         boolean status = false;
 
         // Extract data from request and procress fully qualified category class name into class instance
+        @SuppressWarnings("unchecked")
         Class<? extends NamedWriteable> categoryClass = request.getCategoryClass();
         byte[] context = request.getContext();
 
