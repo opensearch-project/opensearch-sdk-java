@@ -170,7 +170,7 @@ public class ExtensionsRunner {
         this.extensionNode = extensionNode;
     }
 
-    DiscoveryNode getOpensearchNode() {
+    public DiscoveryNode getOpensearchNode() {
         return opensearchNode;
     }
 
