@@ -107,7 +107,6 @@ public class ExtensionNamedWriteableRegistry {
         boolean status = false;
 
         // Extract data from request and procress fully qualified category class name into class instance
-        @SuppressWarnings("unchecked")
         Class<? extends NamedWriteable> categoryClass = request.getCategoryClass();
         byte[] context = request.getContext();
 
