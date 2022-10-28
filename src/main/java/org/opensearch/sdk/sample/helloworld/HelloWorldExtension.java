@@ -31,25 +31,11 @@ import org.opensearch.sdk.sample.helloworld.rest.RestHelloAction;
 public class HelloWorldExtension extends BaseExtension {
 
     /**
-     * Optional classpath-relative path to a yml file containing extension settings.
-     */
-    private static final String EXTENSION_SETTINGS_PATH = "/sample/helloworld-settings.yml";
-
-    /**
-     * The extension settings include a name, host address, and port.
-     */
-    private ExtensionSettings settings;
-
-    /**
      * Instantiate this extension, initializing the connection settings and REST actions.
      */
     public HelloWorldExtension() {
         super();
-        try {
-            this.settings = initializeSettings();
-        } catch (IOException e) {
-            throw new ExceptionInInitializerError(e);
-        }
+
     }
 
     @Override
@@ -60,22 +46,6 @@ public class HelloWorldExtension extends BaseExtension {
     @Override
     public List<ExtensionRestHandler> getExtensionRestHandlers() {
         return List.of(new RestHelloAction());
-    }
-
-    /**
-     * The Extension must provide its settings to the ExtensionsRunner.
-     * These may be optionally read from a YAML file on the class path.
-     * Or you may directly instantiate with the ExtensionSettings constructor.
-     *
-     * @return This extension's settings.
-     * @throws IOException on failure to load settings.
-     */
-    private static ExtensionSettings initializeSettings() throws IOException {
-        ExtensionSettings settings = Extension.readSettingsFromYaml(EXTENSION_SETTINGS_PATH);
-        if (settings == null || settings.getHostAddress() == null || settings.getHostPort() == null) {
-            throw new IOException("Failed to initialize Extension settings. No port bound.");
-        }
-        return settings;
     }
 
     /**
