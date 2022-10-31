@@ -53,10 +53,10 @@ public abstract class BaseExtension implements Extension {
      */
     protected BaseExtension(String path) throws IOException {
         try {
-            this.settings = Extension.readSettingsFromYaml(path);
             if (settings == null || settings.getHostAddress() == null || settings.getHostPort() == null) {
                 throw new IOException("Failed to initialize Extension settings. No port bound.");
             }
+            this.settings = Extension.readSettingsFromYaml(path);   
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e);
         }
