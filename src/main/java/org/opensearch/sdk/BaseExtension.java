@@ -36,40 +36,35 @@ public abstract class BaseExtension implements Extension {
     protected ThreadPool threadPool;
 
     /**
-     * Optional classpath-relative path to a yml file containing extension settings.
-     */
-    protected static final String EXTENSION_SETTINGS_PATH = "/sample/helloworld-settings.yml";
-
-    /**
      * The extension settings include a name, host address, and port.
      */
-    protected ExtensionSettings settings;
+    private ExtensionSettings settings;
+
+    /**
+     * Empty constructor to fulfill abastract class requirement
+     */
+    protected BaseExtension() {
+
+    }
 
     /**
      * Instantiate this extension, initializing the connection settings and REST actions.
+     * @throws IOException on failure to load settings.
      */
-    protected BaseExtension() {
+    protected BaseExtension(String path) throws IOException {
         try {
-            this.settings = initializeSettings();
+            this.settings = Extension.readSettingsFromYaml(path);
+            if (settings == null || settings.getHostAddress() == null || settings.getHostPort() == null) {
+                throw new IOException("Failed to initialize Extension settings. No port bound.");
+            }
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e);
         }
     }
 
-    /**
-     * The Extension must provide its settings to the ExtensionsRunner.
-     * These may be optionally read from a YAML file on the class path.
-     * Or you may directly instantiate with the ExtensionSettings constructor.
-     *
-     * @return This extension's settings.
-     * @throws IOException on failure to load settings.
-     */
-    protected static ExtensionSettings initializeSettings() throws IOException {
-        ExtensionSettings settings = Extension.readSettingsFromYaml(EXTENSION_SETTINGS_PATH);
-        if (settings == null || settings.getHostAddress() == null || settings.getHostPort() == null) {
-            throw new IOException("Failed to initialize Extension settings. No port bound.");
-        }
-        return settings;
+    @Override
+    public ExtensionSettings getExtensionSettings() {
+        return this.settings;
     }
 
     /**

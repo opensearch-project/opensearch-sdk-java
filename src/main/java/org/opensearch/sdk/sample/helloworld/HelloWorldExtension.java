@@ -31,16 +31,20 @@ import org.opensearch.sdk.sample.helloworld.rest.RestHelloAction;
 public class HelloWorldExtension extends BaseExtension {
 
     /**
-     * Instantiate this extension, initializing the connection settings and REST actions.
+     * Optional classpath-relative path to a yml file containing extension settings.
      */
-    public HelloWorldExtension() {
-        super();
+    private static final String EXTENSION_SETTINGS_PATH = "/sample/helloworld-settings.yml";
 
-    }
-
-    @Override
-    public ExtensionSettings getExtensionSettings() {
-        return this.settings;
+    /**
+     *
+     * The Extension must provide its settings to the ExtensionsRunner.
+     * These may be optionally read from a YAML file on the class path.
+     * Or you may directly instantiate with the ExtensionSettings constructor.
+     *
+     * @throws IOException on failure to load settings.
+     */
+    public HelloWorldExtension() throws IOException {
+        super(EXTENSION_SETTINGS_PATH);
     }
 
     @Override
