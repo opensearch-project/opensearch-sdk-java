@@ -135,12 +135,12 @@ public class TestNamedWriteableRegistryAPI extends OpenSearchTestCase {
         StreamInput in = new InputStreamStreamInput(input);
 
         // Category Class ExtensionRunner is not registered
-        NamedWriteableRegistryParseRequest request = new NamedWriteableRegistryParseRequest(ExtensionsRunner.class, in);
+        NamedWriteableRegistryParseRequest request = new NamedWriteableRegistryParseRequest(NamedWriteable.class, in);
         Exception e = expectThrows(
             Exception.class,
             () -> extensionNamedWriteableRegistry.handleNamedWriteableRegistryParseRequest(request)
         );
-        assertEquals(e.getMessage(), "Unknown NamedWriteable category [" + ExtensionsRunner.class.getName() + "]");
+        assertEquals(e.getMessage(), "Unknown NamedWriteable category [" + NamedWriteable.class.getName() + "]");
     }
 
     @Test

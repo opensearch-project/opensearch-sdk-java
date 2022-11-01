@@ -39,7 +39,6 @@ import org.opensearch.sdk.handlers.ExtensionsIndicesModuleNameRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
-import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
 import org.opensearch.sdk.handlers.OpensearchRequestHandler;
@@ -171,7 +170,7 @@ public class ExtensionsRunner {
     }
 
     public DiscoveryNode getOpensearchNode() {
-        return opensearchNode;
+        return this.opensearchNode;
     }
 
     /**
@@ -348,23 +347,9 @@ public class ExtensionsRunner {
     public void sendClusterSettingsRequest(TransportService transportService) {
         sendGenericRequestWithExceptionHandling(
             transportService,
-            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_LOCAL_NODE,
-            ExtensionsOrchestrator.REQUEST_EXTENSION_LOCAL_NODE,
+            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_SETTINGS,
+            ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_SETTINGS,
             new ClusterSettingsResponseHandler()
-        );
-    }
-
-    /**
-     * Requests the local node from OpenSearch.  The result will be handled by a {@link LocalNodeResponseHandler}.
-     *
-     * @param transportService  The TransportService defining the connection to OpenSearch.
-     */
-    public void sendLocalNodeRequest(TransportService transportService) {
-        sendGenericRequestWithExceptionHandling(
-            transportService,
-            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_LOCAL_NODE,
-            ExtensionsOrchestrator.REQUEST_EXTENSION_LOCAL_NODE,
-            new LocalNodeResponseHandler()
         );
     }
 
