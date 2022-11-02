@@ -36,14 +36,13 @@ public class HelloWorldExtension extends BaseExtension {
     private static final String EXTENSION_SETTINGS_PATH = "/sample/helloworld-settings.yml";
 
     /**
-     *
+     * Instantiate this extension, initializing the connection settings and REST actions.
      * The Extension must provide its settings to the ExtensionsRunner.
      * These may be optionally read from a YAML file on the class path.
      * Or you may directly instantiate with the ExtensionSettings constructor.
      *
-     * @throws IOException on failure to load settings.
      */
-    public HelloWorldExtension() throws IOException {
+    public HelloWorldExtension() {
         super(EXTENSION_SETTINGS_PATH);
     }
 

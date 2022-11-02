@@ -38,20 +38,12 @@ public abstract class BaseExtension implements Extension {
     /**
      * The extension settings include a name, host address, and port.
      */
-    private ExtensionSettings settings;
-
-    /**
-     * Empty constructor to fulfill abastract class requirement
-     */
-    protected BaseExtension() {
-
-    }
+    private final ExtensionSettings settings;
 
     /**
      * Instantiate this extension, initializing the connection settings and REST actions.
-     * @throws IOException on failure to load settings.
      */
-    protected BaseExtension(String path) throws IOException {
+    protected BaseExtension(String path) {
         try {
             this.settings = Extension.readSettingsFromYaml(path);
             if (settings == null || settings.getHostAddress() == null || settings.getHostPort() == null) {
@@ -60,6 +52,13 @@ public abstract class BaseExtension implements Extension {
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e);
         }
+    }
+
+    /**
+     * take an ExtensionSettings object and set it directly
+     */
+    protected BaseExtension(ExtensionSettings settings) {
+        this.settings = settings;
     }
 
     @Override
