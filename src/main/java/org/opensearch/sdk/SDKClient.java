@@ -52,7 +52,7 @@ public class SDKClient {
             try {
                 final TlsStrategy tlsStrategy = ClientTlsStrategyBuilder.create()
                     .setSslContext(SSLContextBuilder.create().loadTrustMaterial(null, (chains, authType) -> true).build())
-                    // disable the certificate since our testing cluster just uses the default security configuration
+                    // disable the certificate since our cluster currently just uses the default security configuration
                     .setHostnameVerifier(NoopHostnameVerifier.INSTANCE)
                     // See please https://issues.apache.org/jira/browse/HTTPCLIENT-2219
                     .setTlsDetailsFactory(new Factory<SSLEngine, TlsDetails>() {
