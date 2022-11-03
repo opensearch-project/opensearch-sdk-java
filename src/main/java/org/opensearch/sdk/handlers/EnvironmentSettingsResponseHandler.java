@@ -68,6 +68,8 @@ public class EnvironmentSettingsResponseHandler implements TransportResponseHand
 
     /**
      * Invokes await on the EnvironmentSettingsResponseHandler count down latch
+     * @throws InterruptedException
+     *        if await returns an exception
      */
     public void awaitResponse() throws InterruptedException {
         inProgressLatch.await(ExtensionsOrchestrator.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
