@@ -46,7 +46,7 @@ public class SDKClient {
      * @return SDKClient which is internally an OpenSearchClient. The user is responsible for calling {@link #doCloseRestClient()} when finished with the client
      */
     public OpenSearchClient initializeClient(String hostAddress, int port) throws IOException {
-        RestClientBuilder builder = RestClient.builder(new HttpHost("http", hostAddress, port));
+        RestClientBuilder builder = RestClient.builder(new HttpHost(hostAddress, port));
         builder.setStrictDeprecationMode(true);
         builder.setHttpClientConfigCallback(httpClientBuilder -> {
             try {
