@@ -1,10 +1,12 @@
 /*
+ * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * The OpenSearch Contributors require contributions made to
  * this file be licensed under the Apache-2.0 license or a
  * compatible open source license.
  */
+
 package org.opensearch.sdk;
 
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +28,7 @@ import java.util.Map;
  */
 public class TransportActions {
     private final Logger logger = LogManager.getLogger(TransportActions.class);
-    private Map<String, Class> transportActions;
+    private Map<String, Class<? extends TransportAction<? extends ActionRequest, ? extends ActionResponse>>> transportActions;
 
     /**
      * Constructor for TransportActions. Creates a map of transportActions for this extension.

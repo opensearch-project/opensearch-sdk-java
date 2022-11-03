@@ -1,10 +1,12 @@
 /*
+ * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * The OpenSearch Contributors require contributions made to
  * this file be licensed under the Apache-2.0 license or a
  * compatible open source license.
  */
+
 package org.opensearch.sdk;
 
 import java.io.ByteArrayInputStream;
@@ -18,6 +20,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.io.stream.InputStreamStreamInput;
+import org.opensearch.common.io.stream.NamedWriteable;
 import org.opensearch.common.io.stream.NamedWriteableAwareStreamInput;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
@@ -77,12 +80,13 @@ public class ExtensionNamedWriteableRegistry {
      * @param request  The OpenSearch request to handle.
      * @return A response with a list of writeable names and fully qualified category class names to register within OpenSearch
      */
+    @SuppressWarnings("unchecked")
     public NamedWriteableRegistryResponse handleNamedWriteableRegistryRequest(OpenSearchRequest request) {
         logger.info("Registering Named Writeable Registry Request recieved from OpenSearch.");
         // Iterate through Extensions's named writeables and add to extension entries
-        Map<String, Class> extensionEntries = new HashMap<>();
+        Map<String, Class<? extends NamedWriteable>> extensionEntries = new HashMap<>();
         for (NamedWriteableRegistry.Entry entry : this.namedWriteables) {
-            extensionEntries.put(entry.name, entry.categoryClass);
+            extensionEntries.put(entry.name, (Class<? extends NamedWriteable>) entry.categoryClass);
         }
         NamedWriteableRegistryResponse namedWriteableRegistryResponse = new NamedWriteableRegistryResponse(extensionEntries);
         return namedWriteableRegistryResponse;
@@ -103,7 +107,7 @@ public class ExtensionNamedWriteableRegistry {
         boolean status = false;
 
         // Extract data from request and procress fully qualified category class name into class instance
-        Class categoryClass = request.getCategoryClass();
+        Class<? extends NamedWriteable> categoryClass = request.getCategoryClass();
         byte[] context = request.getContext();
 
         // Transform byte array context into an input stream

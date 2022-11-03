@@ -49,10 +49,10 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         assertEquals("/hello", routes.get(0).getPath());
         assertEquals(Method.POST, routes.get(1).getMethod());
         assertEquals("/hello", routes.get(1).getPath());
-        assertEquals(Method.DELETE, routes.get(2).getMethod());
-        assertEquals("/hello", routes.get(2).getPath());
-        assertEquals(Method.PUT, routes.get(3).getMethod());
-        assertEquals("/hello/{name}", routes.get(3).getPath());
+        assertEquals(Method.PUT, routes.get(2).getMethod());
+        assertEquals("/hello/{name}", routes.get(2).getPath());
+        assertEquals(Method.DELETE, routes.get(3).getMethod());
+        assertEquals("/goodbye", routes.get(3).getPath());
     }
 
     @Test
@@ -79,14 +79,7 @@ public class TestRestHelloAction extends OpenSearchTestCase {
             new BytesArray("{\"adjective\":\"testable\"}"),
             token
         );
-        ExtensionRestRequest deleteRequest = new ExtensionRestRequest(
-            Method.DELETE,
-            "/hello",
-            params,
-            null,
-            new BytesArray("testable"),
-            token
-        );
+        ExtensionRestRequest deleteRequest = new ExtensionRestRequest(Method.DELETE, "/goodbye", params, null, new BytesArray(""), token);
         ExtensionRestRequest badRequest = new ExtensionRestRequest(
             Method.PUT,
             "/hello/Bad%Request",
@@ -95,7 +88,7 @@ public class TestRestHelloAction extends OpenSearchTestCase {
             new BytesArray(""),
             token
         );
-        ExtensionRestRequest unhandledRequest = new ExtensionRestRequest(Method.HEAD, "/goodbye", params, null, new BytesArray(""), token);
+        ExtensionRestRequest unhandledRequest = new ExtensionRestRequest(Method.HEAD, "/hi", params, null, new BytesArray(""), token);
 
         // Initial default response
         RestResponse response = restHelloAction.handleRequest(getRequest);
@@ -130,22 +123,18 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertEquals("Hello, testable Passing Test!", responseStr);
 
-        // Remove the adjective
+        // Remove the name and adjective
         response = restHelloAction.handleRequest(deleteRequest);
         assertEquals(RestStatus.OK, response.status());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
-        assertTrue(responseStr.contains("testable"));
+        assertTrue(responseStr.contains("Goodbye, cruel world!"));
 
         response = restHelloAction.handleRequest(getRequest);
         assertEquals(RestStatus.OK, response.status());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
-        assertEquals("Hello, Passing Test!", responseStr);
-
-        // Try to remove nonexistent adjective
-        response = restHelloAction.handleRequest(deleteRequest);
-        assertEquals(RestStatus.NOT_MODIFIED, response.status());
+        assertEquals("Hello, World!", responseStr);
 
         // Unparseable
         response = restHelloAction.handleRequest(badRequest);
@@ -159,6 +148,6 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         assertEquals(RestStatus.NOT_FOUND, response.status());
         assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
-        assertTrue(responseStr.contains("/goodbye"));
+        assertTrue(responseStr.contains("/hi"));
     }
 }

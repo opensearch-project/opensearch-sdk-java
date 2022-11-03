@@ -6,14 +6,14 @@ Plugin architecture enables extending core features of OpenSearch. There are var
 But, the architecture has significant problems for OpenSearch customers. Importantly, plugins can fatally impact the cluster
 i.e., critical workloads like ingestion/search traffic would be impacted because of a non-critical plugin like s3-repository failed with an exception.
 
-This problem exponentially grows when we would like to run a third Party plugin from the community.  
+This problem exponentially grows when we would like to run a third Party plugin from the community.
 As OpenSearch and plugins run in the same process, it brings in security risk, dependency conflicts and reduces the velocity of releases.
 
 Introducing extensions, a simple and easy way to extend features of OpenSearch. It would support all plugin features and enable them to run in a seperate process or on another node via OpenSearch SDK for Java (other SDKs will be developed).
 
-Meta Issue: [Steps to make OpenSearch extensible](https://github.com/opensearch-project/OpenSearch/issues/2447)  
-Sandboxing: [Step towards modular architecture in OpenSearch](https://github.com/opensearch-project/OpenSearch/issues/1422)  
-Security: [Security for extensions](SECURITY.md) 
+Meta Issue: [Steps to make OpenSearch extensible](https://github.com/opensearch-project/OpenSearch/issues/2447)
+Sandboxing: [Step towards modular architecture in OpenSearch](https://github.com/opensearch-project/OpenSearch/issues/1422)
+Security: [Security for extensions](SECURITY.md)
 
 ## Plugins Architecture
 
@@ -21,10 +21,10 @@ Security: [Security for extensions](SECURITY.md)
 
 Plugins are installed via [`opensearch-plugin`](https://github.com/opensearch-project/OpenSearch/blob/main/distribution/tools/plugin-cli/src/main/java/org/opensearch/plugins/InstallPluginCommand.java) and are class loaded into OpenSearch.
 Plugins run within OpenSearch as a single process. Plugins interface with OpenSearch via extension points which plug into the core modules of OpenSearch.
-This [blog post](https://opensearch.org/blog/technical-post/2021/12/plugins-intro/) helps untangle how plugins work. 
+This [blog post](https://opensearch.org/blog/technical-post/2021/12/plugins-intro/) helps untangle how plugins work.
 
-Walking through an example, a Plugin would like to register a custom setting which could be toggled via Rest API by the user. 
-The plugin uses compiles with OpenSearch x.y.z version and generates a `.zip`.   
+Walking through an example, a Plugin would like to register a custom setting which could be toggled via Rest API by the user.
+The plugin uses compiles with OpenSearch x.y.z version and generates a `.zip`.
 This `.zip` file is installed via `opensearch-plugin` tool which unpacks the code and places it under `~/plugins/<plugin-name>`.
 During the bootstrap of OpenSearch node, it class loads all the code under `~/plugins/` directory. `Node.java` makes a call to get all settings the plugins would like to register. These settings are used as `additionalSettings` and construct `SettingsModule` instance which tracks all settings.
 
@@ -32,7 +32,7 @@ During the bootstrap of OpenSearch node, it class loads all the code under `~/pl
 
 ![](Docs/Extensions.png)
 
-Extensions are independent processes which are built using `opensearch-sdk-java`. They communicate with OpenSearch via [transport](https://github.com/opensearch-project/OpenSearch/tree/main/modules/transport-netty4) protocol which today is used to communicate between OpenSearch nodes.  
+Extensions are independent processes which are built using `opensearch-sdk-java`. They communicate with OpenSearch via [transport](https://github.com/opensearch-project/OpenSearch/tree/main/modules/transport-netty4) protocol which today is used to communicate between OpenSearch nodes.
 
 Extensions are designed to extend features via transport APIs which are exposed using extension points of OpenSearch.
 
@@ -56,7 +56,7 @@ extensions:
 
 ### Communication
 
-Extensions will use a ServerSocket which binds them listen on a host address and port defined in their configuration file. Each type of incoming request will invoke code from an associated handler. 
+Extensions will use a ServerSocket which binds them listen on a host address and port defined in their configuration file. Each type of incoming request will invoke code from an associated handler.
 
 OpenSearch will have its own configuration file, presently `extensions.yml`, matching these addresses and ports. On startup, the ExtensionsOrchestrator will use the node's TransportService to communicate its requests to each extension, with the first request initializing the extension and validating the host and port.
 
@@ -118,7 +118,7 @@ The `ExtensionsOrchestrator` reads a list of extensions present in `extensions.y
 
 ## FAQ
 
-- Will extensions replace plugins?  
+- Will extensions replace plugins?
   Plugins will continue to be supported and extensions are preferred as they will be easier to develop, deploy, and operate.
 - How is the latency going to be for extensions?
   https://github.com/opensearch-project/OpenSearch/issues/3012#issuecomment-1122682444

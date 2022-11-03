@@ -1,14 +1,17 @@
 /*
+ * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * The OpenSearch Contributors require contributions made to
  * this file be licensed under the Apache-2.0 license or a
  * compatible open source license.
  */
+
 package org.opensearch.sdk;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
 import org.opensearch.extensions.OpenSearchRequest;
@@ -20,7 +23,6 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.extensions.ExtensionActionListenerOnFailureRequest;
 import org.opensearch.extensions.DiscoveryExtension;
-import org.opensearch.extensions.EnvironmentSettingsRequest;
 import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
 import org.opensearch.extensions.UpdateSettingsRequest;
 import org.opensearch.extensions.ExtensionsOrchestrator.RequestType;
@@ -37,7 +39,6 @@ import org.opensearch.sdk.handlers.ExtensionsIndicesModuleNameRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
-import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
 import org.opensearch.sdk.handlers.OpensearchRequestHandler;
@@ -72,7 +73,8 @@ public class ExtensionsRunner {
     /**
      * This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
      */
-    public TransportService extensionTransportService = null;
+    private TransportService extensionTransportService = null;
+
     // The routes and classes which handle the REST requests
     private final ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
     // Custom settings from the extension's getSettings
@@ -86,13 +88,13 @@ public class ExtensionsRunner {
      */
     public final Settings settings;
     private ExtensionNamedWriteableRegistry namedWriteableRegistry = new ExtensionNamedWriteableRegistry();
-    private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler();
+    private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
     private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler(namedWriteableRegistry);
     private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
-    private NettyTransport nettyTransport = new NettyTransport();
+
     private SDKClient client = new SDKClient();
 
     /*
@@ -132,9 +134,9 @@ public class ExtensionsRunner {
         this.customSettings = extension.getSettings();
         // save custom transport actions
         this.transportActions = new TransportActions(extension.getActions());
-        // initialize the transport service
+
         ThreadPool threadPool = new ThreadPool(this.getSettings());
-        nettyTransport.initializeExtensionTransportService(this.getSettings(), threadPool, this);
+
         // create components
         extension.createComponents(client, null, threadPool);
     }
@@ -167,8 +169,8 @@ public class ExtensionsRunner {
         this.extensionNode = extensionNode;
     }
 
-    DiscoveryNode getOpensearchNode() {
-        return opensearchNode;
+    public DiscoveryNode getOpensearchNode() {
+        return this.opensearchNode;
     }
 
     /**
@@ -189,7 +191,7 @@ public class ExtensionsRunner {
             false,
             false,
             InitializeExtensionsRequest::new,
-            (request, channel, task) -> channel.sendResponse(extensionsInitRequestHandler.handleExtensionInitRequest(request, this))
+            (request, channel, task) -> channel.sendResponse(extensionsInitRequestHandler.handleExtensionInitRequest(request))
         );
 
         transportService.registerRequestHandler(
@@ -312,14 +314,29 @@ public class ExtensionsRunner {
      * Requests the cluster state from OpenSearch.  The result will be handled by a {@link ClusterStateResponseHandler}.
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
+     * @return The cluster state of OpenSearch
      */
-    public void sendClusterStateRequest(TransportService transportService) {
-        sendGenericRequestWithExceptionHandling(
-            transportService,
-            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_STATE,
-            ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_STATE,
-            new ClusterStateResponseHandler()
-        );
+
+    public ClusterState sendClusterStateRequest(TransportService transportService) {
+        logger.info("Sending Cluster State request to OpenSearch");
+        ClusterStateResponseHandler clusterStateResponseHandler = new ClusterStateResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_STATE,
+                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_STATE),
+                clusterStateResponseHandler
+            );
+            // Wait on cluster state response
+            clusterStateResponseHandler.awaitResponse();
+        } catch (InterruptedException e) {
+            logger.info("Failed to recieve Cluster State response from OpenSearch", e);
+        } catch (Exception e) {
+            logger.info("Failed to send Cluster State request to OpenSearch", e);
+        }
+
+        // At this point, response handler has read in the cluster state
+        return clusterStateResponseHandler.getClusterState();
     }
 
     /**
@@ -330,23 +347,9 @@ public class ExtensionsRunner {
     public void sendClusterSettingsRequest(TransportService transportService) {
         sendGenericRequestWithExceptionHandling(
             transportService,
-            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_LOCAL_NODE,
-            ExtensionsOrchestrator.REQUEST_EXTENSION_LOCAL_NODE,
+            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_SETTINGS,
+            ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_SETTINGS,
             new ClusterSettingsResponseHandler()
-        );
-    }
-
-    /**
-     * Requests the local node from OpenSearch.  The result will be handled by a {@link LocalNodeResponseHandler}.
-     *
-     * @param transportService  The TransportService defining the connection to OpenSearch.
-     */
-    public void sendLocalNodeRequest(TransportService transportService) {
-        sendGenericRequestWithExceptionHandling(
-            transportService,
-            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_LOCAL_NODE,
-            ExtensionsOrchestrator.REQUEST_EXTENSION_LOCAL_NODE,
-            new LocalNodeResponseHandler()
         );
     }
 
@@ -372,24 +375,31 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Requests the environment setting values from OpenSearch for the corresponding component settings. The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
+     * Requests the environment settings from OpenSearch. The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
      *
-     * @param componentSettings The component setting that correspond to the values provided by the environment settings
      * @param transportService  The TransportService defining the connection to OpenSearch.
+     * @return A Setting object from the OpenSearch Node environment
      */
-    public void sendEnvironmentSettingsRequest(TransportService transportService, List<Setting<?>> componentSettings) {
+    public Settings sendEnvironmentSettingsRequest(TransportService transportService) {
         logger.info("Sending Environment Settings request to OpenSearch");
         EnvironmentSettingsResponseHandler environmentSettingsResponseHandler = new EnvironmentSettingsResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsOrchestrator.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS,
-                new EnvironmentSettingsRequest(componentSettings),
+                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS),
                 environmentSettingsResponseHandler
             );
+            // Wait on environment settings response
+            environmentSettingsResponseHandler.awaitResponse();
+        } catch (InterruptedException e) {
+            logger.info("Failed to recieve Environment Settings response from OpenSearch", e);
         } catch (Exception e) {
             logger.info("Failed to send Environment Settings request to OpenSearch", e);
         }
+
+        // At this point, response handler has read in the environment settings
+        return environmentSettingsResponseHandler.getEnvironmentSettings();
     }
 
     /**
@@ -435,6 +445,10 @@ public class ExtensionsRunner {
         return settings;
     }
 
+    public TransportService getExtensionTransportService() {
+        return extensionTransportService;
+    }
+
     /**
      * Starts an ActionListener.
      *
@@ -453,8 +467,12 @@ public class ExtensionsRunner {
      */
     public static void run(Extension extension) throws IOException {
         logger.info("Starting extension " + extension.getExtensionSettings().getExtensionName());
-        @SuppressWarnings("unused")
         ExtensionsRunner runner = new ExtensionsRunner(extension);
+        // initialize the transport service
+        NettyTransport nettyTransport = new NettyTransport(runner);
+        Settings runnerSettings = runner.getSettings();
+        ThreadPool threadPool = new ThreadPool(runnerSettings);
+        runner.extensionTransportService = nettyTransport.initializeExtensionTransportService(runnerSettings, threadPool);
         runner.startActionListener(0);
     }
 }

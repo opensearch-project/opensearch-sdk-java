@@ -25,13 +25,10 @@ import static org.mockito.Mockito.verify;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.Version;
@@ -61,7 +58,6 @@ import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
-import org.opensearch.sdk.handlers.LocalNodeResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
 import org.opensearch.sdk.handlers.OpensearchRequestHandler;
 import org.opensearch.test.OpenSearchTestCase;
@@ -72,20 +68,19 @@ import org.opensearch.common.settings.WriteableSetting;
 public class TestExtensionsRunner extends OpenSearchTestCase {
 
     private static final String EXTENSION_NAME = "sample-extension";
-    private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler();
+    private ExtensionsInitRequestHandler extensionsInitRequestHandler;
     private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler(new ExtensionNamedWriteableRegistry());
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(new ExtensionRestPathRegistry());
     private ExtensionsRunner extensionsRunner;
     private TransportService transportService;
-
-    private TransportService initialTransportService;
 
     @Override
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         this.extensionsRunner = new ExtensionsRunnerForTest();
-        this.initialTransportService = extensionsRunner.extensionTransportService;
+        this.extensionsInitRequestHandler = new ExtensionsInitRequestHandler(extensionsRunner);
+
         this.transportService = spy(
             new TransportService(
                 Settings.EMPTY,
@@ -97,17 +92,6 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
                 Collections.emptySet()
             )
         );
-    }
-
-    @Override
-    @AfterEach
-    public void tearDown() throws Exception {
-        super.tearDown();
-        if (initialTransportService != null) {
-            this.initialTransportService.stop();
-            this.initialTransportService.close();
-            Thread.sleep(1000);
-        }
     }
 
     // test manager method invokes start on transport service
@@ -162,10 +146,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         InitializeExtensionsRequest extensionInitRequest = new InitializeExtensionsRequest(sourceNode, extension);
 
-        InitializeExtensionsResponse response = extensionsInitRequestHandler.handleExtensionInitRequest(
-            extensionInitRequest,
-            extensionsRunner
-        );
+        InitializeExtensionsResponse response = extensionsInitRequestHandler.handleExtensionInitRequest(extensionInitRequest);
         // Test if name and unique ID are set
         assertEquals(EXTENSION_NAME, response.getName());
         assertEquals("opensearch-sdk-1", extensionsRunner.getUniqueId());
@@ -233,14 +214,6 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     }
 
     @Test
-    public void testLocalNodeRequest() {
-
-        extensionsRunner.sendLocalNodeRequest(transportService);
-
-        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(LocalNodeResponseHandler.class));
-    }
-
-    @Test
     public void testActionListenerOnFailureRequest() {
 
         extensionsRunner.sendActionListenerOnFailureRequest(transportService, new Exception("Test failure"));
@@ -250,9 +223,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
     @Test
     public void testEnvironmentSettingsRequest() {
-
-        List<Setting<?>> componentSettings = new ArrayList<>();
-        extensionsRunner.sendEnvironmentSettingsRequest(transportService, componentSettings);
+        extensionsRunner.sendEnvironmentSettingsRequest(transportService);
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(EnvironmentSettingsResponseHandler.class));
     }

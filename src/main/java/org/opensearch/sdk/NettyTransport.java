@@ -1,10 +1,12 @@
 /*
+ * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * The OpenSearch Contributors require contributions made to
  * this file be licensed under the Apache-2.0 license or a
  * compatible open source license.
  */
+
 package org.opensearch.sdk;
 
 import java.util.Collections;
@@ -40,8 +42,16 @@ import static org.opensearch.common.UUIDs.randomBase64UUID;
 
 public class NettyTransport {
     private static final String NODE_NAME_SETTING = "node.name";
+    private final ExtensionsRunner extensionsRunner;
     private final TransportInterceptor NOOP_TRANSPORT_INTERCEPTOR = new TransportInterceptor() {
     };
+
+    /**
+     * @param extensionsRunner Instantiate this object with a reference to the ExtensionsRunner.
+     */
+    public NettyTransport(ExtensionsRunner extensionsRunner) {
+        this.extensionsRunner = extensionsRunner;
+    }
 
     /**
      * Initializes a Netty4Transport object. This object will be wrapped in a {@link TransportService} object.
@@ -86,24 +96,14 @@ public class NettyTransport {
      *
      * @param settings  The transport settings to configure.
      * @param threadPool The thread pool to use to start transport service.
-     * @param extensionsRunner method to call
      * @return The initialized TransportService object.
      */
-    public TransportService initializeExtensionTransportService(
-        Settings settings,
-        ThreadPool threadPool,
-        ExtensionsRunner extensionsRunner
-    ) {
+    public TransportService initializeExtensionTransportService(Settings settings, ThreadPool threadPool) {
 
         Netty4Transport transport = getNetty4Transport(settings, threadPool);
 
-        // Stop any existing transport service
-        if (extensionsRunner.extensionTransportService != null) {
-            extensionsRunner.extensionTransportService.stop();
-        }
-
         // create transport service
-        extensionsRunner.extensionTransportService = new TransportService(
+        TransportService transportService = new TransportService(
             settings,
             transport,
             threadPool,
@@ -116,8 +116,8 @@ public class NettyTransport {
             null,
             emptySet()
         );
-        extensionsRunner.startTransportService(extensionsRunner.extensionTransportService);
-        return extensionsRunner.extensionTransportService;
+        extensionsRunner.startTransportService(transportService);
+        return transportService;
     }
 
 }

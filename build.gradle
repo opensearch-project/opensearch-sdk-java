@@ -11,7 +11,7 @@
 
 plugins {
     id 'java'
-    id "com.diffplug.spotless" version "6.3.0" apply false
+    id "com.diffplug.spotless" version "6.11.0" apply false
     id 'jacoco'
 }
 
@@ -32,7 +32,7 @@ apply plugin: 'maven-publish'
 // https://github.com/opensearch-project/opensearch-sdk-java/issues/175
 mainClassName = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
 
-  
+
 group 'org.opensearch.sdk'
 version '1.0.0-SNAPSHOT'
 
@@ -64,7 +64,7 @@ dependencies {
     implementation "org.opensearch:opensearch:3.0.0-SNAPSHOT"
     implementation "org.opensearch.plugin:transport-netty4-client:3.0.0-SNAPSHOT"
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.1'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.1'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.19.0'
     implementation 'org.opensearch.client:opensearch-rest-client:2.0.0'
     implementation 'org.opensearch.client:opensearch-java:2.0.0'
     implementation "io.netty:netty-all:4.1.73.Final"
@@ -88,7 +88,7 @@ task requireJavadoc(type: JavaExec) {
   description = 'Ensures that Javadoc documentation exists.'
   mainClass = "org.plumelib.javadoc.RequireJavadoc"
   classpath = configurations.requireJavadoc
-  args "src/main/java" 
+  args "src/main/java"
   // javadocs on private methods optional
   args "--dont-require-private=true"
   // javadocs on trivial getters/setters optional
@@ -134,4 +134,4 @@ jacocoTestReport {
     reports {
         xml.required = true
     }
-}  
+}
