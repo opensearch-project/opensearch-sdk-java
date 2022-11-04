@@ -83,8 +83,8 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonDatabindVersion}")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonDatabindVersion}")
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:${junit5Version}'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:${junit5Version}'
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junit5Version}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junit5Version}"
     testImplementation("org.opensearch.test:framework:${opensearchVersion}")
     requireJavadoc "org.plumelib:require-javadoc:1.0.4"
 }
