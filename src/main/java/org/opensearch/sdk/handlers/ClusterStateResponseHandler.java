@@ -69,7 +69,7 @@ public class ClusterStateResponseHandler implements TransportResponseHandler<Clu
     /**
      * Invokes await on the ClusterStateResponseHandler count down latch
      * @throws InterruptedException
-     *     if await returns an exception
+     *     if the response times out
      */
     public void awaitResponse() throws InterruptedException {
         inProgressLatch.await(ExtensionsOrchestrator.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
