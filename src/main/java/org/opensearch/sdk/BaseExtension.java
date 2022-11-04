@@ -9,6 +9,7 @@
 
 package org.opensearch.sdk;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -35,10 +36,34 @@ public abstract class BaseExtension implements Extension {
     protected ThreadPool threadPool;
 
     /**
-     * Empty constructor to fulfill abstract class requirements
+     * The extension settings include a name, host address, and port.
      */
-    protected BaseExtension() {
+    private final ExtensionSettings settings;
 
+    /**
+     * Instantiate this extension, initializing the connection settings and REST actions.
+     */
+    protected BaseExtension(String path) {
+        try {
+            this.settings = Extension.readSettingsFromYaml(path);
+            if (settings == null || settings.getHostAddress() == null || settings.getHostPort() == null) {
+                throw new IOException("Failed to initialize Extension settings. No port bound.");
+            }
+        } catch (IOException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
+
+    /**
+     * take an ExtensionSettings object and set it directly
+     */
+    protected BaseExtension(ExtensionSettings settings) {
+        this.settings = settings;
+    }
+
+    @Override
+    public ExtensionSettings getExtensionSettings() {
+        return this.settings;
     }
 
     /**
