@@ -62,29 +62,36 @@ configurations {
 
 dependencies {
 
-    def jacksonDatabindVersion = "2.12.6.1"
     def opensearchVersion = "3.0.0-SNAPSHOT"
+    def log4jVersion = "2.19.0"
+    def nettyVersion = "4.1.84.Final"
+    def luceneVersion = "9.4.0-snapshot-ddf0d0a"
+    def jacksonDatabindVersion = "2.12.6.1"
+    def junit4Version = "4.13.2"
+    def junit5Version = "5.9.1"
+    def jaxbVersion = "2.2.2"
+    def requireJavadocVersion = "1.0.4"
 
     implementation("org.opensearch:opensearch:${opensearchVersion}")
-    implementation("org.opensearch.plugin:transport-netty4-client:${opensearchVersion}")
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.1'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.19.0'
+    implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
+    implementation("org.apache.logging.log4j:log4j-core:${log4jVersion}")
     implementation("org.opensearch.client:opensearch-rest-client:${opensearchVersion}")
     implementation("org.opensearch.client:opensearch-java:${opensearchVersion}")
-    implementation "io.netty:netty-all:4.1.73.Final"
-    implementation "org.apache.lucene:lucene-core:9.4.0-snapshot-ddf0d0a"
-    testCompileOnly ("junit:junit:4.13.2") {
+    implementation("org.opensearch.plugin:transport-netty4-client:${opensearchVersion}")
+    implementation("io.netty:netty-all:${nettyVersion}")
+    implementation("org.apache.lucene:lucene-core:${luceneVersion}")
+    testCompileOnly("junit:junit:${junit4Version}") {
         exclude module : 'hamcrest'
         exclude module : 'hamcrest-core'
     }
-    implementation 'javax.xml.bind:jaxb-api:2.2.2'
+    implementation("javax.xml.bind:jaxb-api:${jaxbVersion}")
     implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonDatabindVersion}")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonDatabindVersion}")
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${junit5Version}")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junit5Version}")
     testImplementation("org.opensearch.test:framework:${opensearchVersion}")
-    requireJavadoc "org.plumelib:require-javadoc:1.0.4"
+    requireJavadoc("org.plumelib:require-javadoc:${requireJavadocVersion}")
 }
 
 // this task tests for the presence of javadocs but not the content/tags
