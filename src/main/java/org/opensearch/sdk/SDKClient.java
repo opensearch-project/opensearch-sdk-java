@@ -42,10 +42,9 @@ public class SDKClient {
      * Creates OpenSearchClient for SDK. It also creates a restClient as a wrapper around Java OpenSearchClient
      * @param hostAddress The address of OpenSearch cluster, client can connect to
      * @param port The port of OpenSearch cluster
-     * @throws IOException if client failed
      * @return SDKClient which is internally an OpenSearchClient. The user is responsible for calling {@link #doCloseRestClient()} when finished with the client
      */
-    public OpenSearchClient initializeClient(String hostAddress, int port) throws IOException {
+    public OpenSearchClient initializeClient(String hostAddress, int port) {
         RestClientBuilder builder = RestClient.builder(new HttpHost(hostAddress, port));
         builder.setStrictDeprecationMode(true);
         builder.setHttpClientConfigCallback(httpClientBuilder -> {
