@@ -17,6 +17,8 @@ public class ExtensionSettings {
     private String extensionName;
     private String hostAddress;
     private String hostPort;
+    private String opensearchAddress;
+    private String opensearchPort;
 
     /**
      * Jackson requires a default constructor.
@@ -33,11 +35,13 @@ public class ExtensionSettings {
      * @param hostAddress  The IP Address to bind this extension to.
      * @param hostPort  The port to bind this extension to.
      */
-    public ExtensionSettings(String extensionName, String hostAddress, String hostPort) {
+    public ExtensionSettings(String extensionName, String hostAddress, String hostPort, String opensearchAddress, String opensearchPort) {
         super();
         this.extensionName = extensionName;
         this.hostAddress = hostAddress;
         this.hostPort = hostPort;
+        this.opensearchAddress = opensearchAddress;
+        this.opensearchPort = opensearchPort;
     }
 
     public String getExtensionName() {
@@ -52,8 +56,26 @@ public class ExtensionSettings {
         return hostPort;
     }
 
+    public String getOpensearchAddress() {
+        return opensearchAddress;
+    }
+
+    public String getOpensearchPort() {
+        return opensearchPort;
+    }
+
     @Override
     public String toString() {
-        return "ExtensionSettings{extensionName=" + extensionName + ", hostAddress=" + hostAddress + ", hostPort=" + hostPort + "}";
+        return "ExtensionSettings{extensionName="
+            + extensionName
+            + ", hostAddress="
+            + hostAddress
+            + ", hostPort="
+            + hostPort
+            + ", opensearchAddress="
+            + opensearchAddress
+            + ", opensearchPort="
+            + opensearchPort
+            + "}";
     }
 }

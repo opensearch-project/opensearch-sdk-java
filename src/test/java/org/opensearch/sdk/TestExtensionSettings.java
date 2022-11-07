@@ -38,9 +38,11 @@ public class TestExtensionSettings extends OpenSearchTestCase {
 
     @Test
     public void testConstructorWithArgs() {
-        ExtensionSettings settings = new ExtensionSettings("foo", "bar", "baz");
+        ExtensionSettings settings = new ExtensionSettings("foo", "bar", "baz", "os", "port");
         assertEquals("foo", settings.getExtensionName());
         assertEquals("bar", settings.getHostAddress());
         assertEquals("baz", settings.getHostPort());
+        assertEquals("os", settings.getOpensearchAddress());
+        assertEquals("port", settings.getOpensearchPort());
     }
 }

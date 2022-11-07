@@ -198,6 +198,8 @@ The artifact will include extension settings for the sample extension on the cla
   extensionName: hello-world
   hostAddress: 127.0.0.1
   hostPort: 4532
+  opensearchAddress: 127.0.0.1
+  opensearchPort: 9200
 ```
 - Start the sample extension with `./bin/opensearch-sdk-java`
 
