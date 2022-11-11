@@ -21,6 +21,11 @@ import org.opensearch.threadpool.ThreadPool;
  */
 public abstract class BaseExtension implements Extension {
     /**
+     * The {@link ExtensionsRunner} instance running this extension
+     */
+    protected ExtensionsRunner extensionsRunner;
+
+    /**
      * A client to make requests to the system
      */
     protected SDKClient client;
@@ -66,14 +71,12 @@ public abstract class BaseExtension implements Extension {
         return this.settings;
     }
 
-    /**
-     * Returns components added by this extension.
-     *
-     * @param client A client to make requests to the system
-     * @param clusterService A service to allow watching and updating cluster state
-     * @param threadPool A service to allow retrieving an executor to run an async action
-     * @return A collection of objects
-     */
+    @Override
+    public void setExtensionsRunner(ExtensionsRunner extensionsRunner) {
+        this.extensionsRunner = extensionsRunner;
+    }
+
+    @Override
     public Collection<Object> createComponents(SDKClient client, ClusterService clusterService, ThreadPool threadPool) {
         this.client = client;
         this.clusterService = clusterService;

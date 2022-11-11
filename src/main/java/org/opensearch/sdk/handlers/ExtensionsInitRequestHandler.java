@@ -11,8 +11,10 @@ package org.opensearch.sdk.handlers;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.opensearch.common.settings.Settings;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
+import org.opensearch.sdk.ExtensionNamedXContentRegistry;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.transport.TransportService;
 
@@ -28,6 +30,7 @@ public class ExtensionsInitRequestHandler {
 
     /**
      * Instantiate this object with a reference to the ExtensionsRunner
+     *
      * @param extensionsRunner the ExtensionsRunner instance
      */
     public ExtensionsInitRequestHandler(ExtensionsRunner extensionsRunner) {
@@ -35,7 +38,7 @@ public class ExtensionsInitRequestHandler {
     }
 
     /**
-     * Handles a extension request from OpenSearch.  This is the first request for the transport communication and will initialize the extension and will be a part of OpenSearch bootstrap.
+     * Handles a extension request from OpenSearch. This is the first request for the transport communication and will initialize the extension and will be a part of OpenSearch bootstrap.
      *
      * @param extensionInitRequest  The request to handle.
      * @return A response to OpenSearch validating that this is an extension.
@@ -60,6 +63,15 @@ public class ExtensionsInitRequestHandler {
                 extensionsRunner.opensearchNode,
                 extensionsRunner.getUniqueId()
             );
+            // Get OpenSearch Settings and set values on ExtensionsRunner
+            Settings settings = extensionsRunner.sendEnvironmentSettingsRequest(extensionTransportService);
+            extensionsRunner.setEnvironmentSettings(settings);
+            extensionsRunner.setNamedXContentRegistry(
+                new ExtensionNamedXContentRegistry(settings, extensionsRunner.getCustomNamedXContent())
+            );
+
+            // Last step of initialization
+            extensionsRunner.setInitialized();
         }
     }
 }

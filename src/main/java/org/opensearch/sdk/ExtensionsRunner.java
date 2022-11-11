@@ -20,6 +20,7 @@ import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.common.xcontent.NamedXContentRegistry;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.extensions.ExtensionActionListenerOnFailureRequest;
 import org.opensearch.extensions.DiscoveryExtension;
@@ -50,6 +51,7 @@ import org.opensearch.transport.TransportSettings;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -64,6 +66,9 @@ public class ExtensionsRunner {
     private static final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
     private static final String NODE_NAME_SETTING = "node.name";
 
+    // Set when initialization is complete
+    private boolean initialized = false;
+
     private String uniqueId;
     /**
      * This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
@@ -77,16 +82,27 @@ public class ExtensionsRunner {
 
     // The routes and classes which handle the REST requests
     private final ExtensionRestPathRegistry extensionRestPathRegistry = new ExtensionRestPathRegistry();
-    // Custom settings from the extension's getSettings
     /**
-     * This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
+     * Custom namedXContent from the extension's getNamedXContent. This field is initialized in the constructor.
+     */
+    private final List<NamedXContentRegistry.Entry> customNamedXContent;
+    /**
+     * Custom settings from the extension's getSettings. This field is initialized in the constructor.
      */
     private final List<Setting<?>> customSettings;
-    // Node name, host, and port
     /**
-     * This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
+     * Environment settings from OpenSearch. This field is initialized by a call from
+     * {@link ExtensionsInitRequestHandler}.
+     */
+    private Settings environmentSettings = Settings.EMPTY;
+    /**
+     * Node name, host, and port. This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
      */
     public final Settings settings;
+    private ExtensionNamedXContentRegistry extensionNamedXContentRegistry = new ExtensionNamedXContentRegistry(
+        Settings.EMPTY,
+        Collections.emptyList()
+    );
     private ExtensionNamedWriteableRegistry namedWriteableRegistry = new ExtensionNamedWriteableRegistry();
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
     private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler(namedWriteableRegistry);
@@ -114,10 +130,11 @@ public class ExtensionsRunner {
     /**
      * Instantiates a new Extensions Runner using the specified extension.
      *
-     * @param extension  The settings with which to start the runner.
+     * @param extension The settings with which to start the runner.
      * @throws IOException if the runner failed to read settings or API.
      */
     protected ExtensionsRunner(Extension extension) throws IOException {
+        extension.setExtensionsRunner(this);
         ExtensionSettings extensionSettings = extension.getExtensionSettings();
         this.settings = Settings.builder()
             .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
@@ -132,6 +149,8 @@ public class ExtensionsRunner {
         }
         // save custom settings
         this.customSettings = extension.getSettings();
+        // save custom namedXContent
+        this.customNamedXContent = extension.getNamedXContent();
         // save custom transport actions
         this.transportActions = new TransportActions(extension.getActions());
 
@@ -142,7 +161,25 @@ public class ExtensionsRunner {
     }
 
     /**
-     * This method is call from {@link ExtensionsInitRequestHandler}.
+     * Marks the extension initialized.
+     */
+    public void setInitialized() {
+        this.initialized = true;
+        logger.info("Extension initialization is complete!");
+    }
+
+    /**
+     * Reports if the extension has finished initializing.
+     *
+     * @return true if the extension has been initialized
+     */
+    boolean isInitialized() {
+        return this.initialized;
+    }
+
+    /**
+     * Sets the TransportService. Called from {@link ExtensionsInitRequestHandler}.
+     *
      * @param extensionTransportService assign value for extensionTransportService
      */
     void setExtensionTransportService(TransportService extensionTransportService) {
@@ -150,7 +187,44 @@ public class ExtensionsRunner {
     }
 
     /**
+     * Sets the Environment Settings. Called from {@link ExtensionsInitRequestHandler}.
+     *
+     * @param settings assign value for environmentSettings
+     */
+    public void setEnvironmentSettings(Settings settings) {
+        this.environmentSettings = settings;
+    }
+
+    /**
+     * Gets the Environment Settings. Only valid if {@link #isInitialized()} returns true.
+     *
+     * @return the environment settings if initialized, an empty settings object otherwise.
+     */
+    public Settings getEnvironmentSettings() {
+        return this.environmentSettings;
+    }
+
+    /**
+     * Sets the NamedXContentRegistry. Called from {@link ExtensionsInitRequestHandler}.
+     *
+     * @param registry assign value for namedXContentRegistry
+     */
+    public void setNamedXContentRegistry(ExtensionNamedXContentRegistry registry) {
+        this.extensionNamedXContentRegistry = registry;
+    }
+
+    /**
+     * Gets the NamedXContentRegistry. Only valid if {@link #isInitialized()} returns true.
+     *
+     * @return the NamedXContentRegistry if initialized, an empty registry otherwise.
+     */
+    public ExtensionNamedXContentRegistry getNamedXContentRegistry() {
+        return this.extensionNamedXContentRegistry;
+    }
+
+    /**
      * Sets the Unique ID, used in REST requests to uniquely identify this extension
+     *
      * @param id assign value for id
      */
     public void setUniqueId(String id) {
@@ -171,6 +245,10 @@ public class ExtensionsRunner {
 
     public DiscoveryNode getOpensearchNode() {
         return this.opensearchNode;
+    }
+
+    public List<NamedXContentRegistry.Entry> getCustomNamedXContent() {
+        return this.customNamedXContent;
     }
 
     /**

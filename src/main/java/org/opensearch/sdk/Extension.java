@@ -24,6 +24,7 @@ import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.common.settings.Setting;
+import org.opensearch.common.xcontent.NamedXContentRegistry;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -59,6 +60,22 @@ public interface Extension {
     }
 
     /**
+     * Gets an optional list of custom {@link NamedXContentRegistry.Entry} for the extension to combine with OpenSearch NamedXConent.
+     *
+     * @return a list of custom NamedXConent this extension uses.
+     */
+    default List<NamedXContentRegistry.Entry> getNamedXContent() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Set the Extension's instance of its corresponding {@link ExtensionsRunner}.
+     *
+     * @param extensionsRunner The ExtensionsRunner running this extension.
+     */
+    void setExtensionsRunner(ExtensionsRunner extensionsRunner);
+
+    /**
      * Returns components added by this extension.
      *
      * @param client A client to make requests to the system
@@ -66,7 +83,7 @@ public interface Extension {
      * @param threadPool A service to allow retrieving an executor to run an async action
      * @return A collection of objects
      */
-    public Collection<Object> createComponents(SDKClient client, ClusterService clusterService, ThreadPool threadPool);
+    Collection<Object> createComponents(SDKClient client, ClusterService clusterService, ThreadPool threadPool);
 
     /**
      * Gets an optional list of custom {@link TransportAction} for the extension to register with OpenSearch.
