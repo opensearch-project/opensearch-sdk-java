@@ -11,7 +11,6 @@ package org.opensearch.sdk;
 
 import static java.util.stream.Collectors.toList;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -25,23 +24,19 @@ import org.opensearch.indices.IndicesModule;
 import org.opensearch.search.SearchModule;
 
 /**
- * API used to handle named XContent registry requests from OpenSearch
+ * Combines Extension NamedXContent with core OpenSearch NamedXContent
  */
 public class ExtensionNamedXContentRegistry {
-    private final List<NamedXContentRegistry.Entry> namedXContent = new ArrayList<>();
     private final NamedXContentRegistry namedXContentRegistry;
 
     /**
      * Creates and populates a NamedXContentRegistry with the given NamedXContentRegistry entries for this extension and
      * locally defined content.
      *
-     * @param settings Combined OpenSearch and Extension settings
+     * @param settings OpenSearch environment settings
      * @param extensionNamedXContent List of NamedXContentRegistry.Entry to be registered
      */
     public ExtensionNamedXContentRegistry(Settings settings, List<NamedXContentRegistry.Entry> extensionNamedXContent) {
-        // Save a local copy of just the extension-added entries
-        this.namedXContent.addAll(extensionNamedXContent);
-        // Now include those entries plus core XContent in the registry
         this.namedXContentRegistry = new NamedXContentRegistry(
             Stream.of(
                 extensionNamedXContent.stream(),
@@ -56,19 +51,9 @@ public class ExtensionNamedXContentRegistry {
     /**
      * Gets the NamedXContentRegistry.
      *
-     * @return The NamedXContentRegistry of this API. Includes both extension-defined XContent and core OpenSearch
-     *         XContent.
+     * @return The NamedXContentRegistry. Includes both extension-defined XContent and core OpenSearch XContent.
      */
     public NamedXContentRegistry getRegistry() {
         return this.namedXContentRegistry;
-    }
-
-    /**
-     * Gets the extension's namedXContent.
-     *
-     * @return a list of extension-defined XContent. Does not include core OpenSearch XContent.
-     */
-    public List<NamedXContentRegistry.Entry> getNamedXContent() {
-        return namedXContent;
     }
 }

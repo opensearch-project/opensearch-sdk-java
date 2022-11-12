@@ -9,6 +9,8 @@
 
 package org.opensearch.sdk;
 
+import static org.opensearch.common.xcontent.XContentParserUtils.ensureExpectedToken;
+
 import org.opensearch.cluster.ClusterModule;
 import org.opensearch.common.ParseField;
 import org.opensearch.common.bytes.BytesReference;
@@ -24,7 +26,6 @@ import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.indices.IndicesModule;
 import org.opensearch.search.SearchModule;
 import org.opensearch.test.OpenSearchTestCase;
-import static org.opensearch.common.xcontent.XContentParserUtils.ensureExpectedToken;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +35,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class TestExtensionNamedXContentRegistry extends OpenSearchTestCase {
-    private List<NamedXContentRegistry.Entry> namedXContents;
     private ExtensionNamedXContentRegistry extensionNamedXContentRegistry;
 
     private static class Example implements ToXContentObject {
@@ -100,7 +100,7 @@ public class TestExtensionNamedXContentRegistry extends OpenSearchTestCase {
     @Override
     @BeforeEach
     public void setUp() {
-        this.namedXContents = Collections.singletonList(Example.XCONTENT_REGISTRY);
+        List<NamedXContentRegistry.Entry> namedXContents = Collections.singletonList(Example.XCONTENT_REGISTRY);
         this.extensionNamedXContentRegistry = new ExtensionNamedXContentRegistry(Settings.EMPTY, namedXContents);
     }
 
