@@ -23,13 +23,15 @@ import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
-import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestResponse;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestRestHelloAction extends OpenSearchTestCase {
+
+    private static final String TEXT_CONTENT_TYPE = "text/plain; charset=UTF-8";
+    private static final String JSON_CONTENT_TYPE = "application/json; charset=UTF-8";
 
     private ExtensionRestHandler restHelloAction;
     private static final String EXTENSION_NAME = "hello-world";
@@ -93,60 +95,60 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         // Initial default response
         RestResponse response = restHelloAction.handleRequest(getRequest);
         assertEquals(RestStatus.OK, response.status());
-        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
+        assertEquals(TEXT_CONTENT_TYPE, response.contentType());
         String responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertEquals("Hello, World!", responseStr);
 
         // Change world's name
         response = restHelloAction.handleRequest(putRequest);
         assertEquals(RestStatus.OK, response.status());
-        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
+        assertEquals(TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertEquals("Updated the world's name to Passing Test", responseStr);
 
         response = restHelloAction.handleRequest(getRequest);
         assertEquals(RestStatus.OK, response.status());
-        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
+        assertEquals(TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertEquals("Hello, Passing Test!", responseStr);
 
         // Add an adjective
         response = restHelloAction.handleRequest(postRequest);
         assertEquals(RestStatus.OK, response.status());
-        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
+        assertEquals(JSON_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("testable"));
 
         response = restHelloAction.handleRequest(getRequest);
         assertEquals(RestStatus.OK, response.status());
-        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
+        assertEquals(TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertEquals("Hello, testable Passing Test!", responseStr);
 
         // Remove the name and adjective
         response = restHelloAction.handleRequest(deleteRequest);
         assertEquals(RestStatus.OK, response.status());
-        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
+        assertEquals(TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("Goodbye, cruel world!"));
 
         response = restHelloAction.handleRequest(getRequest);
         assertEquals(RestStatus.OK, response.status());
-        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
+        assertEquals(TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertEquals("Hello, World!", responseStr);
 
         // Unparseable
         response = restHelloAction.handleRequest(badRequest);
         assertEquals(RestStatus.BAD_REQUEST, response.status());
-        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
+        assertEquals(TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("Illegal hex characters in escape (%) pattern"));
 
         // Not registered
         response = restHelloAction.handleRequest(unhandledRequest);
         assertEquals(RestStatus.NOT_FOUND, response.status());
-        assertEquals(BytesRestResponse.TEXT_CONTENT_TYPE, response.contentType());
+        assertEquals(TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("/hi"));
     }
