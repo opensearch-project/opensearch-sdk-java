@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 
 import static org.opensearch.rest.RestRequest.Method.DELETE;
 import static org.opensearch.rest.RestRequest.Method.GET;
@@ -55,21 +56,21 @@ public class RestHelloAction extends BaseExtensionRestHandler {
     @Override
     public List<RouteHandler> routeHandlers() {
         return List.of(
-            new RouteHandler(GET, "/hello", r -> handleGetRequest(r)),
-            new RouteHandler(POST, "/hello", r -> handlePostRequest(r)),
-            new RouteHandler(PUT, "/hello/{name}", r -> handlePutRequest(r)),
-            new RouteHandler(DELETE, "/goodbye", r -> handleDeleteRequest(r))
+            new RouteHandler(GET, "/hello", handleGetRequest),
+            new RouteHandler(POST, "/hello", handlePostRequest),
+            new RouteHandler(PUT, "/hello/{name}", handlePutRequest),
+            new RouteHandler(DELETE, "/goodbye", handleDeleteRequest)
         );
     }
 
-    private ExtensionRestResponse handleGetRequest(ExtensionRestRequest request) {
+    private Function<ExtensionRestRequest, ExtensionRestResponse> handleGetRequest = (request) -> {
         String worldNameWithRandomAdjective = worldAdjectives.isEmpty()
             ? worldName
             : String.join(" ", worldAdjectives.get(rand.nextInt(worldAdjectives.size())), worldName);
         return new ExtensionRestResponse(request, OK, String.format(GREETING, worldNameWithRandomAdjective));
-    }
+    };
 
-    private ExtensionRestResponse handlePostRequest(ExtensionRestRequest request) {
+    private Function<ExtensionRestRequest, ExtensionRestResponse> handlePostRequest = (request) -> {
         if (request.hasContent()) {
             String adjective = "";
             XContentType contentType = request.getXContentType();
@@ -115,9 +116,9 @@ public class RestHelloAction extends BaseExtensionRestHandler {
             ByteBuffer.wrap("No content included with POST request".getBytes(StandardCharsets.UTF_8))
         );
         return new ExtensionRestResponse(request, BAD_REQUEST, TEXT_CONTENT_TYPE, noContent);
-    }
+    };
 
-    private ExtensionRestResponse handlePutRequest(ExtensionRestRequest request) {
+    private Function<ExtensionRestRequest, ExtensionRestResponse> handlePutRequest = (request) -> {
         String name = request.param("name");
         try {
             worldName = URLDecoder.decode(name, StandardCharsets.UTF_8);
@@ -125,11 +126,11 @@ public class RestHelloAction extends BaseExtensionRestHandler {
             return new ExtensionRestResponse(request, BAD_REQUEST, e.getMessage());
         }
         return new ExtensionRestResponse(request, OK, "Updated the world's name to " + worldName);
-    }
+    };
 
-    private ExtensionRestResponse handleDeleteRequest(ExtensionRestRequest request) {
+    private Function<ExtensionRestRequest, ExtensionRestResponse> handleDeleteRequest = (request) -> {
         this.worldName = DEFAULT_NAME;
         this.worldAdjectives.clear();
         return new ExtensionRestResponse(request, OK, "Goodbye, cruel world! Restored default values.");
-    }
+    };
 }
