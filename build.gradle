@@ -13,6 +13,7 @@ plugins {
     id 'java'
     id "com.diffplug.spotless" version "6.11.0" apply false
     id 'jacoco'
+    id "com.form.diff-coverage" version "0.9.5"
 }
 
 
@@ -145,5 +146,30 @@ jacocoTestReport {
     dependsOn test
     reports {
         xml.required = true
+    }
+}
+
+diffCoverageReport {
+    diffSource { // Only one source may be specified
+        // This requires files to have been committed
+        // https://github.com/form-com/diff-coverage-gradle/issues/73
+        git.compareWith 'refs/remotes/origin/main'
+
+        // To compare uncommitted files, uncomment the below:
+        // file = 'build/tmp/git.diff'
+        // And then run:
+        //   git diff refs/remotes/origin/main > build/tmp/git.diff
+        //   ./gradlew diffCoverage
+    }
+
+    // View report at build/reports/jacoco/diffCoverage/html/index.html
+    reports {
+        html = true
+    }
+
+    violationRules {
+        minBranches = 0.9
+        minLines = 0.9
+        minInstructions = 0.9
     }
 }
