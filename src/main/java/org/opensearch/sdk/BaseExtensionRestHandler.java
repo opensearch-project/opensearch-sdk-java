@@ -14,19 +14,14 @@ import static org.opensearch.rest.RestStatus.NOT_FOUND;
 import java.util.List;
 import java.util.Optional;
 
-import org.opensearch.common.bytes.BytesReference;
-import org.opensearch.common.xcontent.XContentBuilder;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestHandler.Route;
-import org.opensearch.rest.RestStatus;
 
 /**
  * Provides convenience methods to reduce boilerplate code in an {@link ExtensionRestHandler} implementation.
  */
 public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
-
-    private ExtensionRestRequest request;
 
     /**
      * Defines a list of methods which handle each rest {@link Route}.
@@ -42,12 +37,11 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
 
     @Override
     public ExtensionRestResponse handleRequest(ExtensionRestRequest request) {
-        this.request = request;
         Optional<RouteHandler> handler = routeHandlers().stream()
             .filter(rh -> rh.getMethod().equals(request.method()))
             .filter(rh -> restPathMatches(request.path(), rh.getPath()))
             .findFirst();
-        return handler.isPresent() ? handler.get().getExtensionRestResponse() : unhandledRequest();
+        return handler.isPresent() ? handler.get().handleRequest(request) : unhandledRequest(request);
     }
 
     /**
@@ -77,74 +71,13 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     }
 
     /**
-     * Returns a default response when a request does not match the handled methods or paths. This can occur if a
-     * handler indicates routes that it handles but does not actually handle them.
+     * Returns a default response when a request does not match the handled methods or paths.
+     * This can occur if a handler indicates routes that it handles but does not actually handle them.
      *
+     * @param request The request that couldn't be handled.
      * @return an ExtensionRestResponse identifying the unhandled request.
      */
-    protected ExtensionRestResponse unhandledRequest() {
-        return createResponse(NOT_FOUND, "Extension REST action improperly configured to handle " + getRequest().toString());
-    }
-
-    /**
-     * Creates an {@link ExtensionRestResponse} with the given status and Xcontent.
-     *
-     * @param status The {@link RestStatus} for the response.
-     * @param builder An {@link XContentBuilder} for the response.
-     * @return the response.
-     */
-    protected ExtensionRestResponse createResponse(RestStatus status, XContentBuilder builder) {
-        return new ExtensionRestResponse(getRequest(), status, builder);
-    }
-
-    /**
-     * Creates an {@link ExtensionRestResponse} with the given status and text content.
-     *
-     * @param status The {@link RestStatus} for the response.
-     * @param content The content.
-     * @return the response.
-     */
-    protected ExtensionRestResponse createResponse(RestStatus status, String content) {
-        return new ExtensionRestResponse(getRequest(), status, content);
-    }
-
-    /**
-     * Creates an {@link ExtensionRestResponse} with the given status and content.
-     *
-     * @param status The {@link RestStatus} for the response.
-     * @param contentType The type of the content.
-     * @param content The content.
-     * @return the response.
-     */
-    protected ExtensionRestResponse createResponse(RestStatus status, String contentType, String content) {
-        return new ExtensionRestResponse(getRequest(), status, contentType, content);
-    }
-
-    /**
-     * Creates an {@link ExtensionRestResponse} with the given status and binary content.
-     *
-     * @param status The {@link RestStatus} for the response.
-     * @param contentType The type of the content.
-     * @param content The content.
-     * @return the response.
-     */
-    protected ExtensionRestResponse createResponse(RestStatus status, String contentType, byte[] content) {
-        return new ExtensionRestResponse(getRequest(), status, contentType, content);
-    }
-
-    /**
-     * Creates an {@link ExtensionRestResponse} with the given status and binary content.
-     *
-     * @param status The {@link RestStatus} for the response.
-     * @param contentType The type of the content.
-     * @param content The content.
-     * @return the response.
-     */
-    protected ExtensionRestResponse createResponse(RestStatus status, String contentType, BytesReference content) {
-        return new ExtensionRestResponse(getRequest(), status, contentType, content);
-    }
-
-    public ExtensionRestRequest getRequest() {
-        return request;
+    protected ExtensionRestResponse unhandledRequest(ExtensionRestRequest request) {
+        return new ExtensionRestResponse(request, NOT_FOUND, "Extension REST action improperly configured to handle " + request.toString());
     }
 }

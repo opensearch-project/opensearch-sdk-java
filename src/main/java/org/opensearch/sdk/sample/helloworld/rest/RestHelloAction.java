@@ -55,22 +55,21 @@ public class RestHelloAction extends BaseExtensionRestHandler {
     @Override
     public List<RouteHandler> routeHandlers() {
         return List.of(
-            new RouteHandler(GET, "/hello", this::handleGetRequest),
-            new RouteHandler(POST, "/hello", this::handlePostRequest),
-            new RouteHandler(PUT, "/hello/{name}", this::handlePutRequest),
-            new RouteHandler(DELETE, "/goodbye", this::handleDeleteRequest)
+            new RouteHandler(GET, "/hello", r -> handleGetRequest(r)),
+            new RouteHandler(POST, "/hello", r -> handlePostRequest(r)),
+            new RouteHandler(PUT, "/hello/{name}", r -> handlePutRequest(r)),
+            new RouteHandler(DELETE, "/goodbye", r -> handleDeleteRequest(r))
         );
     }
 
-    private ExtensionRestResponse handleGetRequest() {
+    private ExtensionRestResponse handleGetRequest(ExtensionRestRequest request) {
         String worldNameWithRandomAdjective = worldAdjectives.isEmpty()
             ? worldName
             : String.join(" ", worldAdjectives.get(rand.nextInt(worldAdjectives.size())), worldName);
-        return createResponse(OK, String.format(GREETING, worldNameWithRandomAdjective));
+        return new ExtensionRestResponse(request, OK, String.format(GREETING, worldNameWithRandomAdjective));
     }
 
-    private ExtensionRestResponse handlePostRequest() {
-        ExtensionRestRequest request = getRequest();
+    private ExtensionRestResponse handlePostRequest(ExtensionRestRequest request) {
         if (request.hasContent()) {
             String adjective = "";
             XContentType contentType = request.getXContentType();
@@ -82,11 +81,16 @@ public class RestHelloAction extends BaseExtensionRestHandler {
                     adjective = request.contentParser(NamedXContentRegistry.EMPTY).mapStrings().get("adjective");
                 } catch (IOException | OpenSearchParseException e) {
                     // Sample plain text response
-                    return createResponse(BAD_REQUEST, "Unable to parse adjective from JSON");
+                    return new ExtensionRestResponse(request, BAD_REQUEST, "Unable to parse adjective from JSON");
                 }
             } else {
                 // Sample text response with content type
-                return createResponse(NOT_ACCEPTABLE, TEXT_CONTENT_TYPE, "Only text and JSON content types are supported");
+                return new ExtensionRestResponse(
+                    request,
+                    NOT_ACCEPTABLE,
+                    TEXT_CONTENT_TYPE,
+                    "Only text and JSON content types are supported"
+                );
             }
             if (adjective != null && !adjective.isBlank()) {
                 worldAdjectives.add(adjective.trim());
@@ -96,37 +100,36 @@ public class RestHelloAction extends BaseExtensionRestHandler {
                         .startObject()
                         .field("worldAdjectives", worldAdjectives)
                         .endObject();
-                    return createResponse(OK, builder);
+                    return new ExtensionRestResponse(request, OK, builder);
                 } catch (IOException e) {
                     // Sample response for developer error
-                    return unhandledRequest();
+                    return unhandledRequest(request);
                 }
             }
             byte[] noAdjective = "No adjective included with POST request".getBytes(StandardCharsets.UTF_8);
             // Sample binary response with content type
-            return createResponse(BAD_REQUEST, TEXT_CONTENT_TYPE, noAdjective);
+            return new ExtensionRestResponse(request, BAD_REQUEST, TEXT_CONTENT_TYPE, noAdjective);
         }
         // Sample bytes reference response with content type
         BytesReference noContent = BytesReference.fromByteBuffer(
             ByteBuffer.wrap("No content included with POST request".getBytes(StandardCharsets.UTF_8))
         );
-        return createResponse(BAD_REQUEST, TEXT_CONTENT_TYPE, noContent);
+        return new ExtensionRestResponse(request, BAD_REQUEST, TEXT_CONTENT_TYPE, noContent);
     }
 
-    private ExtensionRestResponse handlePutRequest() {
-        ExtensionRestRequest request = getRequest();
+    private ExtensionRestResponse handlePutRequest(ExtensionRestRequest request) {
         String name = request.param("name");
         try {
             worldName = URLDecoder.decode(name, StandardCharsets.UTF_8);
         } catch (IllegalArgumentException e) {
-            return createResponse(BAD_REQUEST, e.getMessage());
+            return new ExtensionRestResponse(request, BAD_REQUEST, e.getMessage());
         }
-        return createResponse(OK, "Updated the world's name to " + worldName);
+        return new ExtensionRestResponse(request, OK, "Updated the world's name to " + worldName);
     }
 
-    private ExtensionRestResponse handleDeleteRequest() {
+    private ExtensionRestResponse handleDeleteRequest(ExtensionRestRequest request) {
         this.worldName = DEFAULT_NAME;
         this.worldAdjectives.clear();
-        return createResponse(OK, "Goodbye, cruel world! Restored default values.");
+        return new ExtensionRestResponse(request, OK, "Goodbye, cruel world! Restored default values.");
     }
 }
