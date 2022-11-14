@@ -64,7 +64,7 @@ dependencies {
 
     def opensearchVersion = "3.0.0-SNAPSHOT"
     def log4jVersion = "2.19.0"
-    def nettyVersion = "4.1.84.Final"
+    def nettyVersion = "4.1.85.Final"
     def luceneVersion = "9.4.1"
     def jacksonDatabindVersion = "2.14.0"
     def junit4Version = "4.13.2"
