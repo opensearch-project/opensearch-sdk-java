@@ -45,7 +45,7 @@ import static org.opensearch.rest.RestStatus.OK;
  */
 public class RestHelloAction extends BaseExtensionRestHandler {
 
-    private static final String TEXT_CONTENT_TYPE = "text/plain;charset=UTF-8";
+    private static final String TEXT_CONTENT_TYPE = "text/plain; charset=UTF-8";
     private static final String GREETING = "Hello, %s!";
     private static final String DEFAULT_NAME = "World";
 
