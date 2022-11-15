@@ -9,6 +9,8 @@
  * GitHub history for details.
  */
 
+import java.nio.file.Files
+
 plugins {
     id 'java'
     id "com.diffplug.spotless" version "6.11.0" apply false
@@ -149,17 +151,26 @@ jacocoTestReport {
     }
 }
 
-diffCoverageReport {
-    diffSource { // Only one source may be specified
-        // This requires files to have been committed
-        // https://github.com/form-com/diff-coverage-gradle/issues/73
-        git.compareWith 'refs/remotes/origin/main'
+// Get uncommitted files via git diff
+// https://github.com/form-com/diff-coverage-gradle/issues/73
+ext.createDiffFile = { ->
+    def file = Files.createTempFile(URLEncoder.encode(project.name, 'UTF-8'), '.diff').toFile()
+    def diffBase = 'refs/remotes/origin/main'
+    if (System.getenv('CI')) {
+        diffBase = 'origin/' + System.getenv('GITHUB_BASE_REF')
+    }
+    file.withOutputStream { out ->
+        exec {
+            commandLine 'git', 'diff', '--no-color', '--minimal', diffBase
+            standardOutput = out
+        }
+    }
+    return file
+}
 
-        // To compare uncommitted files, uncomment the below:
-        // file = 'build/tmp/git.diff'
-        // And then run:
-        //   git diff refs/remotes/origin/main > build/tmp/git.diff
-        //   ./gradlew diffCoverage
+diffCoverageReport {
+    afterEvaluate {
+        diffSource.file = createDiffFile()
     }
 
     // View report at build/reports/jacoco/diffCoverage/html/index.html
