@@ -9,10 +9,13 @@
  * GitHub history for details.
  */
 
+import java.nio.file.Files
+
 plugins {
     id 'java'
     id "com.diffplug.spotless" version "6.11.0" apply false
     id 'jacoco'
+    id "com.form.diff-coverage" version "0.9.5"
 }
 
 
@@ -145,5 +148,39 @@ jacocoTestReport {
     dependsOn test
     reports {
         xml.required = true
+    }
+}
+
+// Get uncommitted files via git diff
+// https://github.com/form-com/diff-coverage-gradle/issues/73
+ext.createDiffFile = { ->
+    def file = Files.createTempFile(URLEncoder.encode(project.name, 'UTF-8'), '.diff').toFile()
+    def diffBase = 'refs/remotes/origin/main'
+    if (System.getenv('CI')) {
+        diffBase = 'origin/' + System.getenv('GITHUB_BASE_REF')
+    }
+    file.withOutputStream { out ->
+        exec {
+            commandLine 'git', 'diff', '--no-color', '--minimal', diffBase
+            standardOutput = out
+        }
+    }
+    return file
+}
+
+diffCoverageReport {
+    afterEvaluate {
+        diffSource.file = createDiffFile()
+    }
+
+    // View report at build/reports/jacoco/diffCoverage/html/index.html
+    reports {
+        html = true
+    }
+
+    violationRules {
+        minBranches = 0.60
+        minLines = 0.75
+        failOnViolation = true
     }
 }
