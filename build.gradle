@@ -155,9 +155,16 @@ jacocoTestReport {
 // https://github.com/form-com/diff-coverage-gradle/issues/73
 ext.createDiffFile = { ->
     def file = Files.createTempFile(URLEncoder.encode(project.name, 'UTF-8'), '.diff').toFile()
+    // ref for local runs
     def diffBase = 'refs/remotes/origin/main'
     if (System.getenv('CI')) {
-        diffBase = 'origin/' + System.getenv('GITHUB_BASE_REF')
+        if (System.getenv('GITHUB_BASE_REF')) {
+            // we are on a PR
+            diffBase = 'origin/' + System.getenv('GITHUB_BASE_REF')
+        } else {
+            // we are on main branch, no diff
+            diffBase = 'HEAD'
+        }
     }
     file.withOutputStream { out ->
         exec {
