@@ -9,9 +9,6 @@
 
 package org.opensearch.sdk;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.Collection;
 import java.util.List;
@@ -24,9 +21,6 @@ import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.common.settings.Setting;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 /**
  * This interface defines methods which an extension must provide. Extensions
@@ -75,29 +69,5 @@ public interface Extension {
      */
     default Map<String, Class<? extends TransportAction<ActionRequest, ActionResponse>>> getActions() {
         return Collections.emptyMap();
-    }
-
-    /**
-     * Helper method to read extension settings from a YAML file.
-     *
-     * @param extensionSettingsPath
-     *            The path (relative to the classpath) of the extension settings
-     *            file.
-     * @return A settings file encapsulating the extension host and port if the file
-     *         exists, null otherwise.
-     * @throws IOException
-     *             if there is an error reading the file.
-     */
-    static ExtensionSettings readSettingsFromYaml(String extensionSettingsPath) throws IOException {
-        URL resource = Extension.class.getResource(extensionSettingsPath);
-        if (resource == null) {
-            return null;
-        }
-        File file = new File(resource.getPath());
-        if (!file.exists()) {
-            return null;
-        }
-        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        return objectMapper.readValue(file, ExtensionSettings.class);
     }
 }
