@@ -11,6 +11,7 @@ package org.opensearch.sdk;
 
 import static org.opensearch.rest.RestStatus.NOT_FOUND;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,10 +26,13 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
 
     /**
      * Defines a list of methods which handle each rest {@link Route}.
+     * Override this in a subclass to use the functional syntax.
      *
      * @return a list of {@link RouteHandler} with corresponding methods to each route.
      */
-    protected abstract List<RouteHandler> routeHandlers();
+    protected List<RouteHandler> routeHandlers() {
+        return Collections.emptyList();
+    }
 
     @Override
     public List<Route> routes() {
