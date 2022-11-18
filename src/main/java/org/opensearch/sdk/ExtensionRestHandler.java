@@ -9,6 +9,7 @@
 
 package org.opensearch.sdk;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.opensearch.extensions.rest.ExtensionRestRequest;
@@ -22,14 +23,8 @@ import org.opensearch.rest.RestRequest;
  * This interface defines methods which an extension REST handler (action) must provide.
  * It is the Extension counterpart to core OpenSearch {@link RestHandler}.
  */
+@FunctionalInterface
 public interface ExtensionRestHandler {
-
-    /**
-     * The list of {@link Route}s that this ExtensionRestHandler is responsible for handling.
-     *
-     * @return The routes this handler will handle.
-     */
-    List<Route> routes();
 
     /**
      * Handles REST Requests forwarded from OpenSearch for a configured route on an extension.
@@ -40,4 +35,13 @@ public interface ExtensionRestHandler {
      * @return An {@link ExtensionRestResponse} to the request.
      */
     ExtensionRestResponse handleRequest(ExtensionRestRequest request);
+
+    /**
+     * A list of {@link Route}s that this ExtensionRestHandler is responsible for handling.
+     *
+     * @return The routes this handler will handle.
+     */
+    default List<Route> routes() {
+        return Collections.emptyList();
+    }
 }
