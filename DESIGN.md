@@ -74,9 +74,9 @@ The sequence diagram below shows the process of initializing an Extension, regis
 
 The `org.opensearch.sdk.sample` package contains a sample `HelloWorldExtension` implementing the below steps. It is executed following the steps in the [`DEVELOPER_GUIDE`](DEVELOPER_GUIDE.md).
 
-![](Docs/ExtensionRestActions.svg)
-
 #### Extension REST Actions Walk Through
+
+![](Docs/ExtensionRestActions.svg)
 
 ##### Extension Startup
 
@@ -116,9 +116,35 @@ The `ExtensionsOrchestrator` reads a list of extensions present in `extensions.y
 
 (27) The User receives the response.
 
+#### Extension Point Implementation Walk Through
+
+An example of a more complex extension point, `getNamedXContent()` is shown below. A similar pattern can be followed for most extension points.
+
+![](Docs/NamedXContent.svg)
+
+##### Extension Startup
+
+(1, 2) Extensions initialize by passing an instance of themselves to the `ExtensionsRunner`. The first step in the constructor is for the `ExtensionsRunner` to pass its own instance back to the Extension via setter.
+
+(3, 4) The `Extension` interface includes extensions points such as `getNamedXContent()` (returning a default empty list). If overridden, the Extension will return a list of `NamedXContentRegistry.Entry` which will be saved as `customNamedXContent`. Other extension points operate in a similar manner.
+
+(5) The `ExtensionsRunner` registers an `ExtensionInitRequestHandler` which will complete the initialization process on OpenSearch startup.
+
+##### OpenSearch Startup, Extension Initialization, and NamedXContent Registration
+
+(6) Upon receipt of an `InitializeExtensionsRequest` (among other actions):
+
+(7, 8) Obtains Environment Settings from OpenSearch, necessary for some core XContent.
+
+(9, 10) Instantiates a new `ExtensionNamedXContentRegistry` which is set on the ExtensionsRunner.
+This uses the OpenSearch environment settings along with NamedXContent from several OpenSearch modules,
+and combines it the custom Extension NamedXContent.
+
+Since the Extension has an instance of the ExtensionsRunner, it can now access the registry via getter and pass it to Extension Rest Handlers as needed.
+
 ## FAQ
 
 - Will extensions replace plugins?
-  Plugins will continue to be supported and extensions are preferred as they will be easier to develop, deploy, and operate.
+  Plugins will continue to be supported in the near term but are on a path to deprecation. New development should consider using extensions, as they will be easier to develop, deploy, and operate.
 - How is the latency going to be for extensions?
   https://github.com/opensearch-project/OpenSearch/issues/3012#issuecomment-1122682444
