@@ -45,7 +45,7 @@ public abstract class BaseExtension implements Extension {
      */
     protected BaseExtension(String path) {
         try {
-            this.settings = Extension.readSettingsFromYaml(path);
+            this.settings = ExtensionSettings.readSettingsFromYaml(path);
             if (settings == null || settings.getHostAddress() == null || settings.getHostPort() == null) {
                 throw new IOException("Failed to initialize Extension settings. No port bound.");
             }
