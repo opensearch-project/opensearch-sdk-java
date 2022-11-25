@@ -11,8 +11,12 @@ package org.opensearch.sdk;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import org.apache.hc.core5.function.Factory;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
@@ -73,11 +77,15 @@ public class SDKClient {
 
         restClient = builder.build();
 
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.registerModule(new GuavaModule());
+        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE, JsonTypeInfo.As.PROPERTY);
+        mapper.configure(MapperFeature.USE_GETTERS_AS_SETTERS, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         // Create Client
-        OpenSearchTransport transport = new RestClientTransport(
-            restClient,
-            new JacksonJsonpMapper(new ObjectMapper().registerModule(new JavaTimeModule()))
-        );
+        OpenSearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper(mapper));
         javaClient = new OpenSearchClient(transport);
         return javaClient;
     }
