@@ -1,13 +1,14 @@
-- [Contributing to OpenSearch-SDK-Java](#contributing-to-opensearch-sdk-java)
+- [Contributing to OpenSearch SDK for Java](#contributing-to-opensearch-sdk-for-java)
   - [First Things First](#first-things-first)
   - [Ways to Contribute](#ways-to-contribute)
     - [Bug Reports](#bug-reports)
     - [Feature Requests](#feature-requests)
     - [Contributing Code](#contributing-code)
   - [Developer Certificate of Origin](#developer-certificate-of-origin)
+  - [Code Coverage](#code-coverage)
   - [Review Process](#review-process)
 
-# Contributing to OpenSearch-SDK
+# Contributing to OpenSearch SDK for Java
 
 OpenSearch-SDK is a community project that is built and maintained by people just like **you**. We're glad you're interested in helping out. There are several different ways you can do it, but before we talk about that, let's talk about how to get started.
 
@@ -76,6 +77,12 @@ Each commit must include a DCO which looks like this
 Signed-off-by: Jane Smith <jane.smith@email.com>
 ```
 You may type this line on your own when writing your commit messages. However, if your user.name and user.email are set in your git configs, you can use `-s` or `--signoff` to add the `Signed-off-by` line to the end of the commit message.
+
+## Code Coverage
+
+Any new functionality requires testing. Your PR will trigger an automatic assessment of the code coverage of the lines you've added. You should add unit and/or integration tests to exercise as much of your new code as possible.
+
+If you'd like to preview your coverage before submitting your PR, to identify lines of code which are not tested, you may run `./gradlew diffCoverage` and review the report available in the project build directory at `build/reports/jacoco/diffCoverage/html/index.html`.
 
 ## Review Process
 

@@ -1,12 +1,10 @@
 /*
+ * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * The OpenSearch Contributors require contributions made to
  * this file be licensed under the Apache-2.0 license or a
  * compatible open source license.
- *
- * Modifications Copyright OpenSearch Contributors. See
- * GitHub history for details.
  */
 
 package org.opensearch.sdk;
@@ -22,6 +20,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
@@ -38,6 +37,7 @@ import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.settings.Setting.Property;
 import org.opensearch.common.transport.TransportAddress;
+import org.opensearch.common.xcontent.NamedXContentRegistry;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
 import org.opensearch.extensions.DiscoveryExtension;
@@ -242,5 +242,22 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         extensionsRunner.sendRegisterCustomSettingsRequest(transportService);
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ExtensionStringResponseHandler.class));
+    }
+
+    @Test
+    public void testGettersAndSetters() throws IOException {
+        assertFalse(extensionsRunner.isInitialized());
+        extensionsRunner.setInitialized();
+        assertTrue(extensionsRunner.isInitialized());
+
+        Settings settings = Settings.builder().put("test.key", "test.value").build();
+        assertTrue(extensionsRunner.getEnvironmentSettings().isEmpty());
+        extensionsRunner.setEnvironmentSettings(settings);
+        assertEquals("test.value", extensionsRunner.getEnvironmentSettings().get("test.key"));
+
+        assertTrue(extensionsRunner.getCustomNamedXContent().isEmpty());
+        assertTrue(extensionsRunner.getNamedXContentRegistry().getRegistry() instanceof NamedXContentRegistry);
+        extensionsRunner.setNamedXContentRegistry(null);
+        assertNull(extensionsRunner.getNamedXContentRegistry());
     }
 }

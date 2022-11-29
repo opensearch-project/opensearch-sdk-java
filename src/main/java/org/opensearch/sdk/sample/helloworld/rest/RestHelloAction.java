@@ -10,20 +10,25 @@
 package org.opensearch.sdk.sample.helloworld.rest;
 
 import org.opensearch.OpenSearchParseException;
+import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.xcontent.NamedXContentRegistry;
+import org.opensearch.common.xcontent.XContentBuilder;
 import org.opensearch.common.xcontent.XContentType;
+import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
-import org.opensearch.rest.RestHandler.Route;
-import org.opensearch.rest.RestRequest.Method;
+import org.opensearch.sdk.BaseExtensionRestHandler;
 import org.opensearch.sdk.ExtensionRestHandler;
+import org.opensearch.sdk.RouteHandler;
 
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 
 import static org.opensearch.rest.RestRequest.Method.DELETE;
 import static org.opensearch.rest.RestRequest.Method.GET;
@@ -31,14 +36,16 @@ import static org.opensearch.rest.RestRequest.Method.POST;
 import static org.opensearch.rest.RestRequest.Method.PUT;
 import static org.opensearch.rest.RestStatus.BAD_REQUEST;
 import static org.opensearch.rest.RestStatus.NOT_ACCEPTABLE;
-import static org.opensearch.rest.RestStatus.NOT_FOUND;
 import static org.opensearch.rest.RestStatus.OK;
 
 /**
- * Sample REST Handler (REST Action). Extension REST handlers must implement {@link ExtensionRestHandler}.
+ * Sample REST Handler (REST Action).
+ * Extension REST handlers must implement {@link ExtensionRestHandler}.
+ * Extending {@link BaseExtensionRestHandler} provides many convenience methods.
  */
-public class RestHelloAction implements ExtensionRestHandler {
+public class RestHelloAction extends BaseExtensionRestHandler {
 
+    private static final String TEXT_CONTENT_TYPE = "text/plain; charset=UTF-8";
     private static final String GREETING = "Hello, %s!";
     private static final String DEFAULT_NAME = "World";
 
@@ -47,34 +54,23 @@ public class RestHelloAction implements ExtensionRestHandler {
     private Random rand = new Random();
 
     @Override
-    public List<Route> routes() {
-        return List.of(new Route(GET, "/hello"), new Route(POST, "/hello"), new Route(PUT, "/hello/{name}"), new Route(DELETE, "/goodbye"));
+    public List<RouteHandler> routeHandlers() {
+        return List.of(
+            new RouteHandler(GET, "/hello", handleGetRequest),
+            new RouteHandler(POST, "/hello", handlePostRequest),
+            new RouteHandler(PUT, "/hello/{name}", handlePutRequest),
+            new RouteHandler(DELETE, "/goodbye", handleDeleteRequest)
+        );
     }
 
-    @Override
-    public ExtensionRestResponse handleRequest(ExtensionRestRequest request) {
-        Method method = request.method();
-
-        if (Method.GET.equals(method)) {
-            return handleGetRequest(request);
-        } else if (Method.POST.equals(method)) {
-            return handlePostRequest(request);
-        } else if (Method.PUT.equals(method)) {
-            return handlePutRequest(request);
-        } else if (Method.DELETE.equals(method)) {
-            return handleDeleteRequest(request);
-        }
-        return handleBadRequest(request);
-    }
-
-    private ExtensionRestResponse handleGetRequest(ExtensionRestRequest request) {
+    private Function<ExtensionRestRequest, ExtensionRestResponse> handleGetRequest = (request) -> {
         String worldNameWithRandomAdjective = worldAdjectives.isEmpty()
             ? worldName
             : String.join(" ", worldAdjectives.get(rand.nextInt(worldAdjectives.size())), worldName);
         return new ExtensionRestResponse(request, OK, String.format(GREETING, worldNameWithRandomAdjective));
-    }
+    };
 
-    private ExtensionRestResponse handlePostRequest(ExtensionRestRequest request) {
+    private Function<ExtensionRestRequest, ExtensionRestResponse> handlePostRequest = (request) -> {
         if (request.hasContent()) {
             String adjective = "";
             XContentType contentType = request.getXContentType();
@@ -85,21 +81,44 @@ public class RestHelloAction implements ExtensionRestHandler {
                 try {
                     adjective = request.contentParser(NamedXContentRegistry.EMPTY).mapStrings().get("adjective");
                 } catch (IOException | OpenSearchParseException e) {
+                    // Sample plain text response
                     return new ExtensionRestResponse(request, BAD_REQUEST, "Unable to parse adjective from JSON");
                 }
             } else {
-                return new ExtensionRestResponse(request, NOT_ACCEPTABLE, "Only text and JSON content types are supported");
+                // Sample text response with content type
+                return new ExtensionRestResponse(
+                    request,
+                    NOT_ACCEPTABLE,
+                    TEXT_CONTENT_TYPE,
+                    "Only text and JSON content types are supported"
+                );
             }
             if (adjective != null && !adjective.isBlank()) {
                 worldAdjectives.add(adjective.trim());
-                return new ExtensionRestResponse(request, OK, "Added " + adjective + " to words that describe the world!");
+                // Sample JSON response with a builder
+                try {
+                    XContentBuilder builder = JsonXContent.contentBuilder()
+                        .startObject()
+                        .field("worldAdjectives", worldAdjectives)
+                        .endObject();
+                    return new ExtensionRestResponse(request, OK, builder);
+                } catch (IOException e) {
+                    // Sample response for developer error
+                    return unhandledRequest(request);
+                }
             }
-            return new ExtensionRestResponse(request, BAD_REQUEST, "No adjective included with POST request");
+            byte[] noAdjective = "No adjective included with POST request".getBytes(StandardCharsets.UTF_8);
+            // Sample binary response with content type
+            return new ExtensionRestResponse(request, BAD_REQUEST, TEXT_CONTENT_TYPE, noAdjective);
         }
-        return new ExtensionRestResponse(request, BAD_REQUEST, "No content included with POST request");
-    }
+        // Sample bytes reference response with content type
+        BytesReference noContent = BytesReference.fromByteBuffer(
+            ByteBuffer.wrap("No content included with POST request".getBytes(StandardCharsets.UTF_8))
+        );
+        return new ExtensionRestResponse(request, BAD_REQUEST, TEXT_CONTENT_TYPE, noContent);
+    };
 
-    private ExtensionRestResponse handlePutRequest(ExtensionRestRequest request) {
+    private Function<ExtensionRestRequest, ExtensionRestResponse> handlePutRequest = (request) -> {
         String name = request.param("name");
         try {
             worldName = URLDecoder.decode(name, StandardCharsets.UTF_8);
@@ -107,15 +126,11 @@ public class RestHelloAction implements ExtensionRestHandler {
             return new ExtensionRestResponse(request, BAD_REQUEST, e.getMessage());
         }
         return new ExtensionRestResponse(request, OK, "Updated the world's name to " + worldName);
-    }
+    };
 
-    private ExtensionRestResponse handleDeleteRequest(ExtensionRestRequest request) {
+    private Function<ExtensionRestRequest, ExtensionRestResponse> handleDeleteRequest = (request) -> {
         this.worldName = DEFAULT_NAME;
         this.worldAdjectives.clear();
         return new ExtensionRestResponse(request, OK, "Goodbye, cruel world! Restored default values.");
-    }
-
-    private ExtensionRestResponse handleBadRequest(ExtensionRestRequest request) {
-        return new ExtensionRestResponse(request, NOT_FOUND, "Extension REST action improperly configured to handle " + request.toString());
-    }
+    };
 }

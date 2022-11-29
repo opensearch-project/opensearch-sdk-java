@@ -9,6 +9,7 @@
 
 package org.opensearch.sdk;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -19,6 +20,11 @@ import org.opensearch.threadpool.ThreadPool;
  * An abstract class that provides sample methods required by extensions
  */
 public abstract class BaseExtension implements Extension {
+    /**
+     * The {@link ExtensionsRunner} instance running this extension
+     */
+    protected ExtensionsRunner extensionsRunner;
+
     /**
      * A client to make requests to the system
      */
@@ -35,20 +41,42 @@ public abstract class BaseExtension implements Extension {
     protected ThreadPool threadPool;
 
     /**
-     * Empty constructor to fulfill abstract class requirements
+     * The extension settings include a name, host address, and port.
      */
-    protected BaseExtension() {
+    private final ExtensionSettings settings;
 
+    /**
+     * Instantiate this extension, initializing the connection settings and REST actions.
+     */
+    protected BaseExtension(String path) {
+        try {
+            this.settings = ExtensionSettings.readSettingsFromYaml(path);
+            if (settings == null || settings.getHostAddress() == null || settings.getHostPort() == null) {
+                throw new IOException("Failed to initialize Extension settings. No port bound.");
+            }
+        } catch (IOException e) {
+            throw new ExceptionInInitializerError(e);
+        }
     }
 
     /**
-     * Returns components added by this extension.
-     *
-     * @param client A client to make requests to the system
-     * @param clusterService A service to allow watching and updating cluster state
-     * @param threadPool A service to allow retrieving an executor to run an async action
-     * @return A collection of objects
+     * take an ExtensionSettings object and set it directly
      */
+    protected BaseExtension(ExtensionSettings settings) {
+        this.settings = settings;
+    }
+
+    @Override
+    public ExtensionSettings getExtensionSettings() {
+        return this.settings;
+    }
+
+    @Override
+    public void setExtensionsRunner(ExtensionsRunner extensionsRunner) {
+        this.extensionsRunner = extensionsRunner;
+    }
+
+    @Override
     public Collection<Object> createComponents(SDKClient client, ClusterService clusterService, ThreadPool threadPool) {
         this.client = client;
         this.clusterService = clusterService;
