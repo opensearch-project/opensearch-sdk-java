@@ -70,6 +70,7 @@ dependencies {
     def nettyVersion = "4.1.85.Final"
     def luceneVersion = "9.4.2"
     def jacksonDatabindVersion = "2.14.0"
+    def guavaVersion = "31.1-jre"
     def junit4Version = "4.13.2"
     def junit5Version = "5.9.1"
     def jaxbVersion = "2.3.1"
@@ -92,6 +93,11 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonDatabindVersion}")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonDatabindVersion}")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava:${jacksonDatabindVersion}")
+    constraints {
+        implementation("com.google.guava:guava:${guavaVersion}") {
+            because 'versions below 30.0 have active CVE'
+        }
+    }
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junit5Version}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junit5Version}")
     testImplementation("org.opensearch.test:framework:${opensearchVersion}")
