@@ -69,7 +69,7 @@ dependencies {
     def log4jVersion = "2.19.0"
     def nettyVersion = "4.1.85.Final"
     def luceneVersion = "9.4.2"
-    def jacksonDatabindVersion = "2.14.0"
+    def jacksonDatabindVersion = "2.14.1"
     def guavaVersion = "31.1-jre"
     def junit4Version = "4.13.2"
     def junit5Version = "5.9.1"
