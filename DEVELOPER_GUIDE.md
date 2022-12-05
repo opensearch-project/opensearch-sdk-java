@@ -100,14 +100,14 @@ extensions:
 - Return to the OpenSearch directory by using `cd ..`.
 - Start OpenSearch feature/extensions branch using `./bin/opensearch`.
 
-During OpenSearch bootstrap, `ExtensionsOrchestrator` will then discover the extension listenening on a pre-defined port and execute the TCP handshake protocol to establish a data transfer connection. A request will be sent to OpenSearch SDK for Java and upon acknowledgment, the extension will respond with its name which will be logged onto terminal that OpenSearch is running on.
+During OpenSearch bootstrap, `ExtensionsManager` will then discover the extension listenening on a pre-defined port and execute the TCP handshake protocol to establish a data transfer connection. A request will be sent to OpenSearch SDK for Java and upon acknowledgment, the extension will respond with its name which will be logged onto terminal that OpenSearch is running on.
 
 ```
 [2022-06-16T21:30:18,857][INFO ][o.o.t.TransportService   ] [runTask-0] publish_address {127.0.0.1:9300}, bound_addresses {[::1]:9300}, {127.0.0.1:9300}
 [2022-06-16T21:30:18,978][INFO ][o.o.t.TransportService   ] [runTask-0] Action: internal:transport/handshake
 [2022-06-16T21:30:18,989][INFO ][o.o.t.TransportService   ] [runTask-0] TransportService:sendRequest action=internal:discovery/extensions
 [2022-06-16T21:30:18,989][INFO ][o.o.t.TransportService   ] [runTask-0] Action: internal:discovery/extensions
-[2022-06-16T21:30:19,000][INFO ][o.o.e.ExtensionsOrchestrator] [runTask-0] received PluginResponse{examplepluginname}
+[2022-06-16T21:30:19,000][INFO ][o.o.e.ExtensionsManager] [runTask-0] received PluginResponse{examplepluginname}
 ```
 
 OpenSearch SDK terminal will also log all requests and responses it receives from OpenSearch :

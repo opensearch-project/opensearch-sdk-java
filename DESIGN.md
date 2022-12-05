@@ -38,7 +38,7 @@ Extensions are designed to extend features via transport APIs which are exposed 
 
 ### Discovery
 
-Extensions are discovered and configured via `extensions.yml`, the same way we currently have `plugin-descriptor.properties` which is read by OpenSearch during the node bootstrap. `ExtensionsOrchestrator` reads through the config file at `~/extensions` and registers extensions within OpenSearch.
+Extensions are discovered and configured via `extensions.yml`, the same way we currently have `plugin-descriptor.properties` which is read by OpenSearch during the node bootstrap. `ExtensionsManager` reads through the config file at `~/extensions` and registers extensions within OpenSearch.
 
 Here is an example extension configuration `extensions.yml`:
 
@@ -58,7 +58,7 @@ extensions:
 
 Extensions will use a ServerSocket which binds them listen on a host address and port defined in their configuration file. Each type of incoming request will invoke code from an associated handler.
 
-OpenSearch will have its own configuration file, presently `extensions.yml`, matching these addresses and ports. On startup, the ExtensionsOrchestrator will use the node's TransportService to communicate its requests to each extension, with the first request initializing the extension and validating the host and port.
+OpenSearch will have its own configuration file, presently `extensions.yml`, matching these addresses and ports. On startup, the ExtensionsManager will use the node's TransportService to communicate its requests to each extension, with the first request initializing the extension and validating the host and port.
 
 Immediately following initialization, each extension will establish a connection to OpenSearch on its own transport service, and send its REST API (a list of methods and URIs to which it will respond).  These will be registered with the RestController.
 
@@ -88,11 +88,11 @@ The `org.opensearch.sdk.sample` package contains a sample `HelloWorldExtension` 
 
 ##### OpenSearch Startup, Extension Initialization, and REST Action Registration
 
-(8, 9, 10) During bootstrap of the OpenSearch `Node`, it instantiates a `RestController`, passing this to the `ExtensionsOrchestrator` which subsequently passes it to a `RestActionsRequestHandler`.
+(8, 9, 10) During bootstrap of the OpenSearch `Node`, it instantiates a `RestController`, passing this to the `ExtensionsManager` which subsequently passes it to a `RestActionsRequestHandler`.
 
-The `ExtensionsOrchestrator` reads a list of extensions present in `extensions.yml`. For each configured extension:
+The `ExtensionsManager` reads a list of extensions present in `extensions.yml`. For each configured extension:
 
-(11, 12) The `ExtensionsOrchestrator` Initializes the extension using an `InitializeExtensionRequest`/`Response`, establishing the two-way transport mechanism.
+(11, 12) The `ExtensionsManager` Initializes the extension using an `InitializeExtensionRequest`/`Response`, establishing the two-way transport mechanism.
 
 (13) Each `Extension` retrieves all of its REST paths from its `ExtensionRestPathRegistry`.
 

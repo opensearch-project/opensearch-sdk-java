@@ -23,12 +23,12 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.common.xcontent.NamedXContentRegistry;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.extensions.ExtensionActionListenerOnFailureRequest;
-import org.opensearch.extensions.DiscoveryExtension;
+import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
 import org.opensearch.extensions.UpdateSettingsRequest;
-import org.opensearch.extensions.ExtensionsOrchestrator.RequestType;
+import org.opensearch.extensions.ExtensionsManager.RequestType;
 import org.opensearch.extensions.ExtensionRequest;
-import org.opensearch.extensions.ExtensionsOrchestrator;
+import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
@@ -74,7 +74,7 @@ public class ExtensionsRunner {
      * This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
      */
     public DiscoveryNode opensearchNode;
-    private DiscoveryExtension extensionNode;
+    private DiscoveryExtensionNode extensionNode;
     /**
      * This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
      */
@@ -239,7 +239,7 @@ public class ExtensionsRunner {
         this.opensearchNode = opensearchNode;
     }
 
-    public void setExtensionNode(DiscoveryExtension extensionNode) {
+    public void setExtensionNode(DiscoveryExtensionNode extensionNode) {
         this.extensionNode = extensionNode;
     }
 
@@ -264,7 +264,7 @@ public class ExtensionsRunner {
         // Extension Request is the first request for the transport communication.
         // This request will initialize the extension and will be a part of OpenSearch bootstrap
         transportService.registerRequestHandler(
-            ExtensionsOrchestrator.REQUEST_EXTENSION_ACTION_NAME,
+            ExtensionsManager.REQUEST_EXTENSION_ACTION_NAME,
             ThreadPool.Names.GENERIC,
             false,
             false,
@@ -273,7 +273,7 @@ public class ExtensionsRunner {
         );
 
         transportService.registerRequestHandler(
-            ExtensionsOrchestrator.REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY,
+            ExtensionsManager.REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY,
             ThreadPool.Names.GENERIC,
             false,
             false,
@@ -282,7 +282,7 @@ public class ExtensionsRunner {
         );
 
         transportService.registerRequestHandler(
-            ExtensionsOrchestrator.REQUEST_OPENSEARCH_PARSE_NAMED_WRITEABLE,
+            ExtensionsManager.REQUEST_OPENSEARCH_PARSE_NAMED_WRITEABLE,
             ThreadPool.Names.GENERIC,
             false,
             false,
@@ -291,7 +291,7 @@ public class ExtensionsRunner {
         );
 
         transportService.registerRequestHandler(
-            ExtensionsOrchestrator.INDICES_EXTENSION_POINT_ACTION_NAME,
+            ExtensionsManager.INDICES_EXTENSION_POINT_ACTION_NAME,
             ThreadPool.Names.GENERIC,
             false,
             false,
@@ -303,7 +303,7 @@ public class ExtensionsRunner {
         );
 
         transportService.registerRequestHandler(
-            ExtensionsOrchestrator.INDICES_EXTENSION_NAME_ACTION_NAME,
+            ExtensionsManager.INDICES_EXTENSION_NAME_ACTION_NAME,
             ThreadPool.Names.GENERIC,
             false,
             false,
@@ -314,7 +314,7 @@ public class ExtensionsRunner {
         );
 
         transportService.registerRequestHandler(
-            ExtensionsOrchestrator.REQUEST_REST_EXECUTE_ON_EXTENSION_ACTION,
+            ExtensionsManager.REQUEST_REST_EXECUTE_ON_EXTENSION_ACTION,
             ThreadPool.Names.GENERIC,
             false,
             false,
@@ -323,7 +323,7 @@ public class ExtensionsRunner {
         );
 
         transportService.registerRequestHandler(
-            ExtensionsOrchestrator.REQUEST_EXTENSION_UPDATE_SETTINGS,
+            ExtensionsManager.REQUEST_EXTENSION_UPDATE_SETTINGS,
             ThreadPool.Names.GENERIC,
             false,
             false,
@@ -345,7 +345,7 @@ public class ExtensionsRunner {
         try {
             transportService.sendRequest(
                 opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_REST_ACTIONS,
+                ExtensionsManager.REQUEST_EXTENSION_REGISTER_REST_ACTIONS,
                 new RegisterRestActionsRequest(getUniqueId(), extensionRestPaths),
                 registerActionsResponseHandler
             );
@@ -365,7 +365,7 @@ public class ExtensionsRunner {
         try {
             transportService.sendRequest(
                 opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_CUSTOM_SETTINGS,
+                ExtensionsManager.REQUEST_EXTENSION_REGISTER_CUSTOM_SETTINGS,
                 new RegisterCustomSettingsRequest(getUniqueId(), customSettings),
                 registerCustomSettingsResponseHandler
             );
@@ -401,8 +401,8 @@ public class ExtensionsRunner {
         try {
             transportService.sendRequest(
                 opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_STATE,
-                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_STATE),
+                ExtensionsManager.REQUEST_EXTENSION_CLUSTER_STATE,
+                new ExtensionRequest(ExtensionsManager.RequestType.REQUEST_EXTENSION_CLUSTER_STATE),
                 clusterStateResponseHandler
             );
             // Wait on cluster state response
@@ -425,8 +425,8 @@ public class ExtensionsRunner {
     public void sendClusterSettingsRequest(TransportService transportService) {
         sendGenericRequestWithExceptionHandling(
             transportService,
-            ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_CLUSTER_SETTINGS,
-            ExtensionsOrchestrator.REQUEST_EXTENSION_CLUSTER_SETTINGS,
+            ExtensionsManager.RequestType.REQUEST_EXTENSION_CLUSTER_SETTINGS,
+            ExtensionsManager.REQUEST_EXTENSION_CLUSTER_SETTINGS,
             new ClusterSettingsResponseHandler()
         );
     }
@@ -443,7 +443,7 @@ public class ExtensionsRunner {
         try {
             transportService.sendRequest(
                 opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_ACTION_LISTENER_ON_FAILURE,
+                ExtensionsManager.REQUEST_EXTENSION_ACTION_LISTENER_ON_FAILURE,
                 new ExtensionActionListenerOnFailureRequest(failureException.toString()),
                 listenerHandler
             );
@@ -464,8 +464,8 @@ public class ExtensionsRunner {
         try {
             transportService.sendRequest(
                 opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS,
-                new ExtensionRequest(ExtensionsOrchestrator.RequestType.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS),
+                ExtensionsManager.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS,
+                new ExtensionRequest(ExtensionsManager.RequestType.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS),
                 environmentSettingsResponseHandler
             );
             // Wait on environment settings response
@@ -508,7 +508,7 @@ public class ExtensionsRunner {
             try {
                 transportService.sendRequest(
                     opensearchNode,
-                    ExtensionsOrchestrator.REQUEST_EXTENSION_ADD_SETTINGS_UPDATE_CONSUMER,
+                    ExtensionsManager.REQUEST_EXTENSION_ADD_SETTINGS_UPDATE_CONSUMER,
                     new AddSettingsUpdateConsumerRequest(this.extensionNode, componentSettings),
                     extensionBooleanResponseHandler
                 );

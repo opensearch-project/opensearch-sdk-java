@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 import org.opensearch.action.admin.cluster.state.ClusterStateResponse;
 import org.opensearch.cluster.ClusterState;
 import org.opensearch.common.io.stream.StreamInput;
-import org.opensearch.extensions.ExtensionsOrchestrator;
+import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportException;
@@ -72,7 +72,7 @@ public class ClusterStateResponseHandler implements TransportResponseHandler<Clu
      *     if the response times out
      */
     public void awaitResponse() throws InterruptedException {
-        inProgressLatch.await(ExtensionsOrchestrator.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
+        inProgressLatch.await(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
     }
 
     public ClusterState getClusterState() {

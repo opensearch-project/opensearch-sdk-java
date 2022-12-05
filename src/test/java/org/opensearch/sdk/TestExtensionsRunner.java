@@ -40,9 +40,9 @@ import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.common.xcontent.NamedXContentRegistry;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
-import org.opensearch.extensions.DiscoveryExtension;
+import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.extensions.ExtensionBooleanResponse;
-import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
+import org.opensearch.extensions.ExtensionsManager.OpenSearchRequestType;
 import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
@@ -128,7 +128,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
             emptySet(),
             Version.CURRENT
         );
-        DiscoveryExtension extension = new DiscoveryExtension(
+        DiscoveryExtensionNode extension = new DiscoveryExtensionNode(
             EXTENSION_NAME,
             "opensearch-sdk-1",
             "",
