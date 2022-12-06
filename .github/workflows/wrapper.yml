@@ -2,7 +2,7 @@ name: Validate Gradle Wrapper
 on:
   push:
     branches-ignore:
-      - 'dependabot/**'
+      - 'whitesource-remediate/**'
   pull_request:
     types: [opened, synchronize, reopened]
 
