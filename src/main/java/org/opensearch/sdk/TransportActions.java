@@ -15,7 +15,7 @@ import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.node.DiscoveryNode;
-import org.opensearch.extensions.ExtensionsOrchestrator;
+import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.RegisterTransportActionsRequest;
 import org.opensearch.sdk.handlers.ExtensionBooleanResponseHandler;
 import org.opensearch.transport.TransportService;
@@ -56,7 +56,7 @@ public class TransportActions {
         try {
             transportService.sendRequest(
                 opensearchNode,
-                ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_TRANSPORT_ACTIONS,
+                ExtensionsManager.REQUEST_EXTENSION_REGISTER_TRANSPORT_ACTIONS,
                 new RegisterTransportActionsRequest(uniqueId, transportActions),
                 registerTransportActionsResponseHandler
             );

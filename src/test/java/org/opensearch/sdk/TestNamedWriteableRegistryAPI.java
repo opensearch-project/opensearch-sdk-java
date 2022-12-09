@@ -20,7 +20,7 @@ import org.opensearch.common.io.stream.StreamOutput;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.extensions.ExtensionBooleanResponse;
 import org.opensearch.extensions.OpenSearchRequest;
-import org.opensearch.extensions.ExtensionsOrchestrator.OpenSearchRequestType;
+import org.opensearch.extensions.ExtensionsManager.OpenSearchRequestType;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

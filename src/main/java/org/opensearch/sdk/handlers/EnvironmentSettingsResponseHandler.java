@@ -12,7 +12,7 @@ package org.opensearch.sdk.handlers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.env.EnvironmentSettingsResponse;
-import org.opensearch.extensions.ExtensionsOrchestrator;
+import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.sdk.ExtensionsRunner;
@@ -72,7 +72,7 @@ public class EnvironmentSettingsResponseHandler implements TransportResponseHand
      *        if the response times out
      */
     public void awaitResponse() throws InterruptedException {
-        inProgressLatch.await(ExtensionsOrchestrator.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
+        inProgressLatch.await(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
     }
 
     public Settings getEnvironmentSettings() {

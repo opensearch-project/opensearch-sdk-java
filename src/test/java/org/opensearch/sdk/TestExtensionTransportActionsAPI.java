@@ -21,7 +21,7 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.Writeable;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
-import org.opensearch.extensions.ExtensionsOrchestrator;
+import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.sdk.handlers.ExtensionBooleanResponseHandler;
 import org.opensearch.tasks.Task;
 import org.opensearch.test.OpenSearchTestCase;
@@ -94,7 +94,7 @@ public class TestExtensionTransportActionsAPI extends OpenSearchTestCase {
         transportActions.sendRegisterTransportActionsRequest(transportService, opensearchNode, "test-extension");
         verify(transportService, times(1)).sendRequest(
             any(),
-            eq(ExtensionsOrchestrator.REQUEST_EXTENSION_REGISTER_TRANSPORT_ACTIONS),
+            eq(ExtensionsManager.REQUEST_EXTENSION_REGISTER_TRANSPORT_ACTIONS),
             any(),
             any(ExtensionBooleanResponseHandler.class)
         );
