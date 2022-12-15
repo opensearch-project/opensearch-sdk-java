@@ -48,4 +48,12 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         assertEquals(4, routes.size());
     }
 
+    @Test
+    public void testfetchJobDetails() {
+        JobDetails jobDetails = extension.getJobDetails();
+        JobDetails expected = new JobDetails("sample-job-type", "sample-job-index");
+        assertEquals(expected.getJobType(), jobDetails.getJobType());
+        assertEquals(expected.getJobIndex(), jobDetails.getJobType());
+    }
+
 }

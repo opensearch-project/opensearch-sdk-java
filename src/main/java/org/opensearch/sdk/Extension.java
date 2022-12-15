@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.opensearch.cluster.service.ClusterService;
+import org.opensearch.extensions.JobDetails;
 import org.opensearch.threadpool.ThreadPool;
 
 import org.opensearch.action.ActionRequest;
@@ -87,4 +88,6 @@ public interface Extension {
     default Map<String, Class<? extends TransportAction<ActionRequest, ActionResponse>>> getActions() {
         return Collections.emptyMap();
     }
+
+    JobDetails getJobDetails();
 }

@@ -14,10 +14,30 @@ import org.apache.logging.log4j.Logger;
 import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
+
+import org.opensearch.extensions.DiscoveryExtensionNode;
+import org.opensearch.extensions.ExtensionsManager;
+import org.opensearch.extensions.JobDetails;
+import org.opensearch.extensions.ExtensionActionListenerOnFailureRequest;
+import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.OpenSearchRequest;
+import org.opensearch.extensions.UpdateSettingsRequest;
+import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
+import org.opensearch.sdk.handlers.ExtensionsIndicesModuleNameRequestHandler;
+import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
+import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
+import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
+import org.opensearch.sdk.handlers.ExtensionJobDetailsRequestHandler;
+import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
+import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
+import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
+import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
+import org.opensearch.sdk.handlers.ExtensionBooleanResponseHandler;
+import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
+import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.xcontent.NamedXContentRegistry;
@@ -31,17 +51,6 @@ import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.rest.RestHandler.Route;
-import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
-import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
-import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
-import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
-import org.opensearch.sdk.handlers.ExtensionBooleanResponseHandler;
-import org.opensearch.sdk.handlers.ExtensionsIndicesModuleNameRequestHandler;
-import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
-import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
-import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
-import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
-import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
 import org.opensearch.sdk.handlers.OpensearchRequestHandler;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportResponse;
@@ -110,9 +119,9 @@ public class ExtensionsRunner {
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
-
+    private ExtensionJobDetailsRequestHandler extensionJobDetailsRequestHandler = new ExtensionJobDetailsRequestHandler();
     private SDKClient client = new SDKClient();
-
+    private JobDetails jobDetails;
     /*
      * TODO: expose an interface for extension to register actions
      * https://github.com/opensearch-project/opensearch-sdk-java/issues/119
@@ -153,6 +162,9 @@ public class ExtensionsRunner {
         this.customNamedXContent = extension.getNamedXContent();
         // save custom transport actions
         this.transportActions = new TransportActions(extension.getActions());
+
+        logger.info("Job details in ExtensionRunner constructor");
+        this.jobDetails = extension.getJobDetails();
 
         ThreadPool threadPool = new ThreadPool(this.getSettings());
 
@@ -251,6 +263,14 @@ public class ExtensionsRunner {
         return this.customNamedXContent;
     }
 
+    public JobDetails getJobDetails() {
+        return jobDetails;
+    }
+
+    public void setJobDetails(JobDetails jobDetails) {
+        this.jobDetails = jobDetails;
+    }
+
     /**
      * Starts a TransportService.
      *
@@ -329,6 +349,16 @@ public class ExtensionsRunner {
             false,
             UpdateSettingsRequest::new,
             ((request, channel, task) -> channel.sendResponse(updateSettingsRequestHandler.handleUpdateSettingsRequest(request)))
+        );
+
+        logger.info(jobDetails.toString());
+        transportService.registerRequestHandler(
+            ExtensionsManager.JOB_DETAILS_REQUEST_FROM_EXTENSION,
+            ThreadPool.Names.GENERIC,
+            false,
+            false,
+            ExtensionRequest::new,
+            (request, channel, task) -> channel.sendResponse(extensionJobDetailsRequestHandler.handleJobDetailsRequest(jobDetails))
         );
 
     }

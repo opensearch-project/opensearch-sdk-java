@@ -9,6 +9,8 @@
 
 package org.opensearch.sdk;
 
+import org.opensearch.extensions.JobDetails;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +31,11 @@ public class ExtensionsRunnerForTest extends ExtensionsRunner {
             @Override
             public List<ExtensionRestHandler> getExtensionRestHandlers() {
                 return Collections.emptyList();
+            }
+
+            @Override
+            public JobDetails getJobDetails() {
+                return new JobDetails("sample-job-type", "sample-job-index");
             }
         });
 

@@ -12,6 +12,7 @@ package org.opensearch.sdk.sample.helloworld;
 import java.io.IOException;
 import java.util.List;
 
+import org.opensearch.extensions.JobDetails;
 import org.opensearch.sdk.BaseExtension;
 import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionRestHandler;
@@ -49,6 +50,11 @@ public class HelloWorldExtension extends BaseExtension {
     @Override
     public List<ExtensionRestHandler> getExtensionRestHandlers() {
         return List.of(new RestHelloAction());
+    }
+
+    @Override
+    public JobDetails getJobDetails() {
+        return null;
     }
 
     /**
