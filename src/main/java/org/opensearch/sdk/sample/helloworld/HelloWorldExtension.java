@@ -54,7 +54,7 @@ public class HelloWorldExtension extends BaseExtension {
 
     @Override
     public JobDetails getJobDetails() {
-        return null;
+        return new JobDetails("sample-job-type", "sample-job-index");
     }
 
     /**
