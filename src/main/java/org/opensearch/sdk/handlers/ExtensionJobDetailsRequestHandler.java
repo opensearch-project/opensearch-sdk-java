@@ -20,6 +20,11 @@ import org.opensearch.extensions.JobDetailsResponse;
 public class ExtensionJobDetailsRequestHandler {
     private static final Logger logger = LogManager.getLogger(ExtensionJobDetailsRequestHandler.class);
 
+    /**
+     * Handles a request from OpenSearch to fetch Job Details from the extension.
+     *
+     * @return A response acknowledging the request.
+     */
     public JobDetailsResponse handleJobDetailsRequest(JobDetails jobDetails) {
         return new JobDetailsResponse(jobDetails);
     }
