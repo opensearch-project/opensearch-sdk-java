@@ -11,7 +11,7 @@ package org.opensearch.sdk.handlers;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opensearch.extensions.ExtensionBooleanResponse;
+import org.opensearch.extensions.AcknowledgedResponse;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.index.IndicesModuleRequest;
 
@@ -28,10 +28,10 @@ public class ExtensionsIndicesModuleNameRequestHandler {
      * @param indicesModuleRequest  The request to handle.
      * @return A response acknowledging the request.
      */
-    public ExtensionBooleanResponse handleIndicesModuleNameRequest(IndicesModuleRequest indicesModuleRequest) {
+    public AcknowledgedResponse handleIndicesModuleNameRequest(IndicesModuleRequest indicesModuleRequest) {
         // Works as beforeIndexRemoved
         logger.info("Registering Indices Module Name Request received from OpenSearch");
-        ExtensionBooleanResponse indicesModuleNameResponse = new ExtensionBooleanResponse(true);
+        AcknowledgedResponse indicesModuleNameResponse = new AcknowledgedResponse(true);
         return indicesModuleNameResponse;
     }
 

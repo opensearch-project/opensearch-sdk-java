@@ -41,7 +41,7 @@ import org.opensearch.common.xcontent.NamedXContentRegistry;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
 import org.opensearch.extensions.DiscoveryExtensionNode;
-import org.opensearch.extensions.ExtensionBooleanResponse;
+import org.opensearch.extensions.AcknowledgedResponse;
 import org.opensearch.extensions.ExtensionDependency;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
@@ -181,7 +181,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         Setting<Integer> componentSetting = Setting.intSetting("component.setting.key", fallbackSetting, Property.Dynamic);
         UpdateSettingsRequest request = new UpdateSettingsRequest(WriteableSetting.SettingType.Integer, componentSetting, null);
         assertEquals(
-            ExtensionBooleanResponse.class,
+            AcknowledgedResponse.class,
             extensionsRunner.updateSettingsRequestHandler.handleUpdateSettingsRequest(request).getClass()
         );
     }

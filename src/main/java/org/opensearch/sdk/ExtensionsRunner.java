@@ -34,7 +34,7 @@ import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
-import org.opensearch.sdk.handlers.ExtensionBooleanResponseHandler;
+import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionsIndicesModuleNameRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
@@ -471,7 +471,7 @@ public class ExtensionsRunner {
 
     /**
      * Registers settings and setting consumers with the {@link UpdateSettingsRequestHandler} and then sends a request to OpenSearch to register these Setting objects with a callback to this extension.
-     * The result will be handled by a {@link ExtensionBooleanResponseHandler}.
+     * The result will be handled by a {@link AcknowledgedResponseHandler}.
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      * @param settingUpdateConsumers A map of setting objects and their corresponding consumers
@@ -493,13 +493,13 @@ public class ExtensionsRunner {
             List<Setting<?>> componentSettings = new ArrayList<>(settingUpdateConsumers.size());
             componentSettings.addAll(settingUpdateConsumers.keySet());
 
-            ExtensionBooleanResponseHandler extensionBooleanResponseHandler = new ExtensionBooleanResponseHandler();
+            AcknowledgedResponseHandler acknowledgedResponseHandler = new AcknowledgedResponseHandler();
             try {
                 transportService.sendRequest(
                     opensearchNode,
                     ExtensionsManager.REQUEST_EXTENSION_ADD_SETTINGS_UPDATE_CONSUMER,
                     new AddSettingsUpdateConsumerRequest(this.extensionNode, componentSettings),
-                    extensionBooleanResponseHandler
+                    acknowledgedResponseHandler
                 );
             } catch (Exception e) {
                 logger.info("Failed to send Add Settings Update Consumer request to OpenSearch", e);

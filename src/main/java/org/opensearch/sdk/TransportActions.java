@@ -17,7 +17,7 @@ import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.RegisterTransportActionsRequest;
-import org.opensearch.sdk.handlers.ExtensionBooleanResponseHandler;
+import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.transport.TransportService;
 
 import java.util.HashMap;
@@ -52,7 +52,7 @@ public class TransportActions {
      */
     public void sendRegisterTransportActionsRequest(TransportService transportService, DiscoveryNode opensearchNode, String uniqueId) {
         logger.info("Sending Register Transport Actions request to OpenSearch");
-        ExtensionBooleanResponseHandler registerTransportActionsResponseHandler = new ExtensionBooleanResponseHandler();
+        AcknowledgedResponseHandler registerTransportActionsResponseHandler = new AcknowledgedResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,

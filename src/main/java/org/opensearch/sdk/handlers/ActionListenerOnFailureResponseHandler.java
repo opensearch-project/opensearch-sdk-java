@@ -11,7 +11,7 @@ package org.opensearch.sdk.handlers;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opensearch.extensions.ExtensionBooleanResponse;
+import org.opensearch.extensions.AcknowledgedResponse;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.threadpool.ThreadPool;
@@ -24,11 +24,11 @@ import java.io.IOException;
 /**
  * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendActionListenerOnFailureRequest(TransportService, Exception)} call.
  */
-public class ActionListenerOnFailureResponseHandler implements TransportResponseHandler<ExtensionBooleanResponse> {
+public class ActionListenerOnFailureResponseHandler implements TransportResponseHandler<AcknowledgedResponse> {
     private static final Logger logger = LogManager.getLogger(ActionListenerOnFailureResponseHandler.class);
 
     @Override
-    public void handleResponse(ExtensionBooleanResponse response) {
+    public void handleResponse(AcknowledgedResponse response) {
         logger.info("received {}", response);
     }
 
@@ -43,7 +43,7 @@ public class ActionListenerOnFailureResponseHandler implements TransportResponse
     }
 
     @Override
-    public ExtensionBooleanResponse read(StreamInput in) throws IOException {
-        return new ExtensionBooleanResponse(in);
+    public AcknowledgedResponse read(StreamInput in) throws IOException {
+        return new AcknowledgedResponse(in);
     }
 }
