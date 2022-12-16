@@ -13,7 +13,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.node.DiscoveryNode;
-import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
 import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
@@ -103,9 +102,8 @@ public class ExtensionsRunner {
         Settings.EMPTY,
         Collections.emptyList()
     );
-    private ExtensionNamedWriteableRegistry namedWriteableRegistry = new ExtensionNamedWriteableRegistry();
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
-    private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler(namedWriteableRegistry);
+    private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler();
     private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
@@ -279,15 +277,6 @@ public class ExtensionsRunner {
             false,
             OpenSearchRequest::new,
             (request, channel, task) -> channel.sendResponse(opensearchRequestHandler.handleOpenSearchRequest(request))
-        );
-
-        transportService.registerRequestHandler(
-            ExtensionsManager.REQUEST_OPENSEARCH_PARSE_NAMED_WRITEABLE,
-            ThreadPool.Names.GENERIC,
-            false,
-            false,
-            NamedWriteableRegistryParseRequest::new,
-            (request, channel, task) -> channel.sendResponse(namedWriteableRegistry.handleNamedWriteableRegistryParseRequest(request))
         );
 
         transportService.registerRequestHandler(
