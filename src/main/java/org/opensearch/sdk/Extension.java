@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.opensearch.cluster.service.ClusterService;
-import org.opensearch.extensions.JobDetails;
 import org.opensearch.threadpool.ThreadPool;
 
 import org.opensearch.action.ActionRequest;
@@ -89,5 +88,17 @@ public interface Extension {
         return Collections.emptyMap();
     }
 
-    JobDetails getJobDetails();
+    /**
+     * Gets the jobType of this extension.
+     *
+     * @return the jobType.
+     */
+    String getJobType();
+
+    /**
+     * Gets the jobIndex of this extension.
+     *
+     * @return the jobIndex.
+     */
+    String getJobIndex();
 }

@@ -116,7 +116,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     public void testRegisterRequestHandler() {
 
         extensionsRunner.startTransportService(transportService);
-        verify(transportService, times(7)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
+        verify(transportService, times(9)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
     }
 
     @Test

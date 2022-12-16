@@ -17,7 +17,6 @@ import org.opensearch.common.io.stream.NamedWriteableRegistryParseRequest;
 
 import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.extensions.ExtensionsManager;
-import org.opensearch.extensions.JobDetails;
 import org.opensearch.extensions.ExtensionActionListenerOnFailureRequest;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.OpenSearchRequest;
@@ -30,7 +29,7 @@ import org.opensearch.sdk.handlers.ExtensionsIndicesModuleNameRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
-import org.opensearch.sdk.handlers.ExtensionJobDetailsRequestHandler;
+import org.opensearch.sdk.handlers.ExtensionStringRequestHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
@@ -119,9 +118,10 @@ public class ExtensionsRunner {
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
-    private ExtensionJobDetailsRequestHandler extensionJobDetailsRequestHandler = new ExtensionJobDetailsRequestHandler();
+    private ExtensionStringRequestHandler extensionStringRequestHandler = new ExtensionStringRequestHandler();
     private SDKClient client = new SDKClient();
-    private JobDetails jobDetails;
+    private String jobType;
+    private String jobIndex;
     /*
      * TODO: expose an interface for extension to register actions
      * https://github.com/opensearch-project/opensearch-sdk-java/issues/119
@@ -164,7 +164,11 @@ public class ExtensionsRunner {
         this.transportActions = new TransportActions(extension.getActions());
 
         logger.info("Job details in ExtensionRunner constructor");
-        this.jobDetails = extension.getJobDetails();
+        // save jobType of extension
+        this.jobType = extension.getJobType();
+
+        // save jobIndex of extension
+        this.jobIndex = extension.getJobIndex();
 
         ThreadPool threadPool = new ThreadPool(this.getSettings());
 
@@ -263,12 +267,20 @@ public class ExtensionsRunner {
         return this.customNamedXContent;
     }
 
-    public JobDetails getJobDetails() {
-        return jobDetails;
+    public String getJobType() {
+        return jobType;
     }
 
-    public void setJobDetails(JobDetails jobDetails) {
-        this.jobDetails = jobDetails;
+    public void setJobType(String jobType) {
+        this.jobType = jobType;
+    }
+
+    public String getJobIndex() {
+        return jobIndex;
+    }
+
+    public void setJobIndex(String jobIndex) {
+        this.jobIndex = jobIndex;
     }
 
     /**
@@ -351,14 +363,24 @@ public class ExtensionsRunner {
             ((request, channel, task) -> channel.sendResponse(updateSettingsRequestHandler.handleUpdateSettingsRequest(request)))
         );
 
-        logger.info(jobDetails.toString());
+        logger.info("Request for JobType");
         transportService.registerRequestHandler(
-            ExtensionsManager.JOB_DETAILS_REQUEST_FROM_EXTENSION,
+            ExtensionsManager.JOB_TYPE_REQUEST_FROM_EXTENSION,
             ThreadPool.Names.GENERIC,
             false,
             false,
             ExtensionRequest::new,
-            (request, channel, task) -> channel.sendResponse(extensionJobDetailsRequestHandler.handleJobDetailsRequest(jobDetails))
+            (request, channel, task) -> channel.sendResponse(extensionStringRequestHandler.handleRequest(jobType))
+        );
+
+        logger.info("Request for JobIndex");
+        transportService.registerRequestHandler(
+            ExtensionsManager.JOB_INDEX_REQUEST_FROM_EXTENSION,
+            ThreadPool.Names.GENERIC,
+            false,
+            false,
+            ExtensionRequest::new,
+            (request, channel, task) -> channel.sendResponse(extensionStringRequestHandler.handleRequest(jobIndex))
         );
 
     }

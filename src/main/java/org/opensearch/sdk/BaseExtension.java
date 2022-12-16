@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.opensearch.cluster.service.ClusterService;
-import org.opensearch.extensions.JobDetails;
 import org.opensearch.threadpool.ThreadPool;
 
 /**
@@ -46,7 +45,15 @@ public abstract class BaseExtension implements Extension {
      */
     private final ExtensionSettings settings;
 
-    protected JobDetails jobDetails;
+    /**
+    * JobType of the extension
+    */
+    protected String jobType;
+
+    /**
+     * JobIndex of the extension
+     */
+    protected String jobIndex;
 
     /**
      * Instantiate this extension, initializing the connection settings and REST actions.
@@ -79,12 +86,14 @@ public abstract class BaseExtension implements Extension {
         this.extensionsRunner = extensionsRunner;
     }
 
-    public JobDetails getJobDetails() {
-        return this.jobDetails;
+    @Override
+    public String getJobType() {
+        return jobType;
     }
 
-    public void setJobDetails(JobDetails jobDetails) {
-        this.jobDetails = jobDetails;
+    @Override
+    public String getJobIndex() {
+        return jobIndex;
     }
 
     @Override

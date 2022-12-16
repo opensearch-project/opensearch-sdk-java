@@ -9,8 +9,6 @@
 
 package org.opensearch.sdk;
 
-import org.opensearch.extensions.JobDetails;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -34,8 +32,13 @@ public class ExtensionsRunnerForTest extends ExtensionsRunner {
             }
 
             @Override
-            public JobDetails getJobDetails() {
-                return new JobDetails("sample-job-type", "sample-job-index");
+            public String getJobType() {
+                return "sample-job-type";
+            }
+
+            @Override
+            public String getJobIndex() {
+                return "sample-job-index";
             }
         });
 

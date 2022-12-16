@@ -49,11 +49,17 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
     }
 
     @Test
-    public void testfetchJobDetails() {
-        JobDetails jobDetails = extension.getJobDetails();
-        JobDetails expected = new JobDetails("sample-job-type", "sample-job-index");
-        assertEquals(expected.getJobType(), jobDetails.getJobType());
-        assertEquals(expected.getJobIndex(), jobDetails.getJobType());
+    public void testGetJobType() {
+        String jobType = extension.getJobType();
+        String expected = "sample-job-type";
+        assertEquals(expected, jobType);
+    }
+
+    @Test
+    public void testGetJobIndex() {
+        String jobIndex = extension.getJobIndex();
+        String expected = "sample-job-index";
+        assertEquals(expected, jobIndex);
     }
 
 }
