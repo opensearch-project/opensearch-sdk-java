@@ -163,7 +163,6 @@ public class ExtensionsRunner {
         // save custom transport actions
         this.transportActions = new TransportActions(extension.getActions());
 
-        logger.info("Job details in ExtensionRunner constructor");
         // save jobType of extension
         this.jobType = extension.getJobType();
 
@@ -363,7 +362,6 @@ public class ExtensionsRunner {
             ((request, channel, task) -> channel.sendResponse(updateSettingsRequestHandler.handleUpdateSettingsRequest(request)))
         );
 
-        logger.info("Request for JobType");
         transportService.registerRequestHandler(
             ExtensionsManager.JOB_TYPE_REQUEST_FROM_EXTENSION,
             ThreadPool.Names.GENERIC,
@@ -373,7 +371,6 @@ public class ExtensionsRunner {
             (request, channel, task) -> channel.sendResponse(extensionStringRequestHandler.handleRequest(jobType))
         );
 
-        logger.info("Request for JobIndex");
         transportService.registerRequestHandler(
             ExtensionsManager.JOB_INDEX_REQUEST_FROM_EXTENSION,
             ThreadPool.Names.GENERIC,
