@@ -10,7 +10,6 @@
 package org.opensearch.sdk.handlers;
 
 import org.opensearch.extensions.OpenSearchRequest;
-import org.opensearch.sdk.ExtensionNamedWriteableRegistry;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.transport.TransportResponse;
 
@@ -19,16 +18,6 @@ import org.opensearch.transport.TransportResponse;
  */
 
 public class OpensearchRequestHandler {
-    private final ExtensionNamedWriteableRegistry extensionNamedWriteableRegistry;
-
-    /**
-     * Instantiate this object with a namedWriteableRegistry
-     *
-     * @param namedWriteableRegistry The registry passed from ExtensionsRunner
-     */
-    public OpensearchRequestHandler(ExtensionNamedWriteableRegistry namedWriteableRegistry) {
-        this.extensionNamedWriteableRegistry = namedWriteableRegistry;
-    }
 
     /**
      * Handles a request from OpenSearch and invokes the extension point API corresponding with the request type
@@ -40,8 +29,6 @@ public class OpensearchRequestHandler {
     public TransportResponse handleOpenSearchRequest(OpenSearchRequest request) throws Exception {
         // Read enum
         switch (request.getRequestType()) {
-            case REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY:
-                return extensionNamedWriteableRegistry.handleNamedWriteableRegistryRequest(request);
             // Add additional request handlers here
             default:
                 throw new IllegalArgumentException("Handler not present for the provided request");

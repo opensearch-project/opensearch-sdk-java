@@ -20,7 +20,7 @@ import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.WriteableSetting;
 import org.opensearch.common.unit.ByteSizeValue;
 import org.opensearch.common.unit.TimeValue;
-import org.opensearch.extensions.ExtensionBooleanResponse;
+import org.opensearch.extensions.AcknowledgedResponse;
 import org.opensearch.extensions.UpdateSettingsRequest;
 
 /**
@@ -56,7 +56,7 @@ public class UpdateSettingsRequestHandler {
      * @return A response acknowledging the request.
      */
     @SuppressWarnings("unchecked")
-    public ExtensionBooleanResponse handleUpdateSettingsRequest(UpdateSettingsRequest updateSettingsRequest) {
+    public AcknowledgedResponse handleUpdateSettingsRequest(UpdateSettingsRequest updateSettingsRequest) {
 
         logger.info("Registering UpdateSettingsRequest received from OpenSearch");
 
@@ -107,6 +107,6 @@ public class UpdateSettingsRequestHandler {
             settingUpdateStatus = false;
         }
 
-        return new ExtensionBooleanResponse(settingUpdateStatus);
+        return new AcknowledgedResponse(settingUpdateStatus);
     }
 }

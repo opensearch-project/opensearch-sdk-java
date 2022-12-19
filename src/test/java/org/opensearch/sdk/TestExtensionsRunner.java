@@ -25,6 +25,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -33,7 +34,6 @@ import org.junit.jupiter.api.Test;
 import org.opensearch.Version;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.bytes.BytesArray;
-import org.opensearch.common.io.stream.NamedWriteableRegistryResponse;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.settings.Setting.Property;
 import org.opensearch.common.transport.TransportAddress;
@@ -41,9 +41,8 @@ import org.opensearch.common.xcontent.NamedXContentRegistry;
 import org.opensearch.discovery.InitializeExtensionsRequest;
 import org.opensearch.discovery.InitializeExtensionsResponse;
 import org.opensearch.extensions.DiscoveryExtensionNode;
-import org.opensearch.extensions.ExtensionBooleanResponse;
-import org.opensearch.extensions.ExtensionsManager.OpenSearchRequestType;
-import org.opensearch.extensions.OpenSearchRequest;
+import org.opensearch.extensions.AcknowledgedResponse;
+import org.opensearch.extensions.ExtensionDependency;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
 import org.opensearch.identity.ExtensionTokenProcessor;
@@ -59,7 +58,6 @@ import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
-import org.opensearch.sdk.handlers.OpensearchRequestHandler;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.Transport;
 import org.opensearch.transport.TransportService;
@@ -69,7 +67,6 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
     private static final String EXTENSION_NAME = "sample-extension";
     private ExtensionsInitRequestHandler extensionsInitRequestHandler;
-    private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler(new ExtensionNamedWriteableRegistry());
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(new ExtensionRestPathRegistry());
     private ExtensionsRunner extensionsRunner;
     private TransportService transportService;
@@ -116,7 +113,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     public void testRegisterRequestHandler() {
 
         extensionsRunner.startTransportService(transportService);
-        verify(transportService, times(7)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
+        verify(transportService, times(6)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
     }
 
     @Test
@@ -137,7 +134,8 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
             sourceNode.getAddress(),
             new HashMap<String, String>(),
             null,
-            null
+            null,
+            new ArrayList<ExtensionDependency>()
         );
 
         // Set mocked transport service
@@ -152,15 +150,6 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         assertEquals("opensearch-sdk-1", extensionsRunner.getUniqueId());
         // Test if the source node is set after handleExtensionInitRequest() is called during OpenSearch bootstrap
         assertEquals(sourceNode, extensionsRunner.getOpensearchNode());
-    }
-
-    @Test
-    public void testHandleOpenSearchRequest() throws Exception {
-
-        OpenSearchRequest request = new OpenSearchRequest(OpenSearchRequestType.REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY);
-        assertEquals(NamedWriteableRegistryResponse.class, opensearchRequestHandler.handleOpenSearchRequest(request).getClass());
-
-        // Add additional OpenSearch request handler tests here for each default extension point
     }
 
     @Test
@@ -192,7 +181,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         Setting<Integer> componentSetting = Setting.intSetting("component.setting.key", fallbackSetting, Property.Dynamic);
         UpdateSettingsRequest request = new UpdateSettingsRequest(WriteableSetting.SettingType.Integer, componentSetting, null);
         assertEquals(
-            ExtensionBooleanResponse.class,
+            AcknowledgedResponse.class,
             extensionsRunner.updateSettingsRequestHandler.handleUpdateSettingsRequest(request).getClass()
         );
     }
