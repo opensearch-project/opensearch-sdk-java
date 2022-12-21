@@ -56,6 +56,8 @@ public abstract class BaseExtension implements Extension {
             }
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e);
+        } catch (Exception e) {
+            throw new RuntimeException();
         }
     }
 
