@@ -13,15 +13,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.node.DiscoveryNode;
-import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.xcontent.NamedXContentRegistry;
-import org.opensearch.discovery.InitializeExtensionsRequest;
-import org.opensearch.extensions.ExtensionActionListenerOnFailureRequest;
+import org.opensearch.discovery.InitializeExtensionRequest;
 import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
 import org.opensearch.extensions.UpdateSettingsRequest;
@@ -30,7 +28,6 @@ import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.rest.RestHandler.Route;
-import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
@@ -40,7 +37,6 @@ import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
-import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
 import org.opensearch.sdk.handlers.OpensearchRequestHandler;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportResponse;
@@ -266,17 +262,8 @@ public class ExtensionsRunner {
             ThreadPool.Names.GENERIC,
             false,
             false,
-            InitializeExtensionsRequest::new,
+            InitializeExtensionRequest::new,
             (request, channel, task) -> channel.sendResponse(extensionsInitRequestHandler.handleExtensionInitRequest(request))
-        );
-
-        transportService.registerRequestHandler(
-            ExtensionsManager.REQUEST_OPENSEARCH_NAMED_WRITEABLE_REGISTRY,
-            ThreadPool.Names.GENERIC,
-            false,
-            false,
-            OpenSearchRequest::new,
-            (request, channel, task) -> channel.sendResponse(opensearchRequestHandler.handleOpenSearchRequest(request))
         );
 
         transportService.registerRequestHandler(
@@ -330,7 +317,7 @@ public class ExtensionsRunner {
     public void sendRegisterRestActionsRequest(TransportService transportService) {
         List<String> extensionRestPaths = extensionRestPathRegistry.getRegisteredPaths();
         logger.info("Sending Register REST Actions request to OpenSearch for " + extensionRestPaths);
-        ExtensionStringResponseHandler registerActionsResponseHandler = new ExtensionStringResponseHandler();
+        AcknowledgedResponseHandler registerActionsResponseHandler = new AcknowledgedResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
@@ -350,7 +337,7 @@ public class ExtensionsRunner {
      */
     public void sendRegisterCustomSettingsRequest(TransportService transportService) {
         logger.info("Sending Settings request to OpenSearch");
-        ExtensionStringResponseHandler registerCustomSettingsResponseHandler = new ExtensionStringResponseHandler();
+        AcknowledgedResponseHandler registerCustomSettingsResponseHandler = new AcknowledgedResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
@@ -418,27 +405,6 @@ public class ExtensionsRunner {
             ExtensionsManager.REQUEST_EXTENSION_CLUSTER_SETTINGS,
             new ClusterSettingsResponseHandler()
         );
-    }
-
-    /**
-     * Requests the ActionListener onFailure method to be run by OpenSearch.  The result will be handled by a {@link ActionListenerOnFailureResponseHandler}.
-     *
-     * @param transportService  The TransportService defining the connection to OpenSearch.
-     * @param failureException  The exception to be sent to OpenSearch
-     */
-    public void sendActionListenerOnFailureRequest(TransportService transportService, Exception failureException) {
-        logger.info("Sending ActionListener onFailure request to OpenSearch");
-        ActionListenerOnFailureResponseHandler listenerHandler = new ActionListenerOnFailureResponseHandler();
-        try {
-            transportService.sendRequest(
-                opensearchNode,
-                ExtensionsManager.REQUEST_EXTENSION_ACTION_LISTENER_ON_FAILURE,
-                new ExtensionActionListenerOnFailureRequest(failureException.toString()),
-                listenerHandler
-            );
-        } catch (Exception e) {
-            logger.info("Failed to send ActionListener onFailure request to OpenSearch", e);
-        }
     }
 
     /**
