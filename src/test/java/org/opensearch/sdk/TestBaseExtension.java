@@ -12,36 +12,33 @@ package org.opensearch.sdk;
 import org.junit.jupiter.api.Test;
 import org.opensearch.test.OpenSearchTestCase;
 
-import java.util.List;
-
+/*
+ * Most of the code in BaseExtension is tested by HelloWorld extension tests.
+ * This class tests code paths which are not tested.
+ */
 public class TestBaseExtension extends OpenSearchTestCase {
 
-    private static final String EXTENSION_DESCRIPTOR_CLASSPATH = "/bad-extension.yml";
-    private static final String EXTENSION_DESCRIPTOR_FILEPATH = "src/test/resources" + EXTENSION_DESCRIPTOR_CLASSPATH;
+    private static final String UNPARSEABLE_EXTENSION_CONFIG = "/bad-extension.yml";
+    private static final String EXTENSION_DESCRIPTOR_FILEPATH = "src/test/resources" + UNPARSEABLE_EXTENSION_CONFIG;
 
-    private class TestExtension extends BaseExtension {
+    public class TestExtension extends BaseExtension {
 
-        protected TestExtension(String path) {
+        public TestExtension(String path) {
             super(path);
-        }
-
-        @Override
-        public List<ExtensionRestHandler> getExtensionRestHandlers() {
-            return null;
         }
     }
 
     @Test
     public void testBaseExtensionWithNullPath() {
         // When a null path is passed, reading from YAML will fail.
-        assertThrows(RuntimeException.class, () -> { TestExtension testExtension = new TestExtension(null); });
+        assertThrows(IllegalArgumentException.class, () -> { TestExtension testExtension = new TestExtension(null); });
     }
 
     @Test
     public void testBaseExtensionWithBadConfig() {
         // When a bad extensions.yml config is passed, expect failing initialization.
         assertThrows(
-            ExceptionInInitializerError.class,
+            IllegalArgumentException.class,
             () -> { TestExtension testExtension = new TestExtension(EXTENSION_DESCRIPTOR_FILEPATH); }
         );
     }

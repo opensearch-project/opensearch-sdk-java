@@ -42,7 +42,9 @@ public interface Extension {
      *
      * @return a list of REST handlers (REST actions) this extension handles.
      */
-    List<ExtensionRestHandler> getExtensionRestHandlers();
+    default List<ExtensionRestHandler> getExtensionRestHandlers() {
+        return Collections.emptyList();
+    }
 
     /**
      * Gets an optional list of custom {@link Setting} for the extension to register with OpenSearch.

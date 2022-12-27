@@ -14,8 +14,6 @@ import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.test.OpenSearchTestCase;
 
-import java.util.Collections;
-
 public class TestExtensionRestHandler extends OpenSearchTestCase {
     private class NoOpExtensionRestHandler implements ExtensionRestHandler {
 
@@ -28,6 +26,6 @@ public class TestExtensionRestHandler extends OpenSearchTestCase {
     @Test
     public void testHandlerDefaultRoutes() {
         NoOpExtensionRestHandler handler = new NoOpExtensionRestHandler();
-        assertEquals(handler.routes(), Collections.emptyList());
+        assertTrue(handler.routes().isEmpty());
     }
 }
