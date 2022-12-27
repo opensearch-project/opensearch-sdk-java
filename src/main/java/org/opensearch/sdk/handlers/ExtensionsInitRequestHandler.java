@@ -12,8 +12,8 @@ package org.opensearch.sdk.handlers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.settings.Settings;
-import org.opensearch.discovery.InitializeExtensionsRequest;
-import org.opensearch.discovery.InitializeExtensionsResponse;
+import org.opensearch.discovery.InitializeExtensionRequest;
+import org.opensearch.discovery.InitializeExtensionResponse;
 import org.opensearch.sdk.ExtensionNamedXContentRegistry;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.transport.TransportService;
@@ -43,13 +43,13 @@ public class ExtensionsInitRequestHandler {
      * @param extensionInitRequest  The request to handle.
      * @return A response to OpenSearch validating that this is an extension.
      */
-    public InitializeExtensionsResponse handleExtensionInitRequest(InitializeExtensionsRequest extensionInitRequest) {
+    public InitializeExtensionResponse handleExtensionInitRequest(InitializeExtensionRequest extensionInitRequest) {
         logger.info("Registering Extension Request received from OpenSearch");
         extensionsRunner.opensearchNode = extensionInitRequest.getSourceNode();
         extensionsRunner.setUniqueId(extensionInitRequest.getExtension().getId());
         // Successfully initialized. Send the response.
         try {
-            return new InitializeExtensionsResponse(extensionsRunner.settings.get(NODE_NAME_SETTING));
+            return new InitializeExtensionResponse(extensionsRunner.settings.get(NODE_NAME_SETTING));
         } finally {
             // After sending successful response to initialization, send the REST API and Settings
             extensionsRunner.setOpensearchNode(extensionsRunner.opensearchNode);

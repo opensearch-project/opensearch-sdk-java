@@ -38,18 +38,16 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.common.settings.Setting.Property;
 import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.common.xcontent.NamedXContentRegistry;
-import org.opensearch.discovery.InitializeExtensionsRequest;
-import org.opensearch.discovery.InitializeExtensionsResponse;
+import org.opensearch.discovery.InitializeExtensionRequest;
+import org.opensearch.discovery.InitializeExtensionResponse;
 import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.extensions.AcknowledgedResponse;
 import org.opensearch.extensions.ExtensionDependency;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
-import org.opensearch.identity.ExtensionTokenProcessor;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestStatus;
-import org.opensearch.sdk.handlers.ActionListenerOnFailureResponseHandler;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.extensions.UpdateSettingsRequest;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
@@ -57,7 +55,7 @@ import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
-import org.opensearch.sdk.handlers.ExtensionStringResponseHandler;
+import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.Transport;
 import org.opensearch.transport.TransportService;
@@ -113,7 +111,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     public void testRegisterRequestHandler() {
 
         extensionsRunner.startTransportService(transportService);
-        verify(transportService, times(6)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
+        verify(transportService, times(5)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
     }
 
     @Test
@@ -142,9 +140,9 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         extensionsRunner.setExtensionTransportService(this.transportService);
         doNothing().when(this.transportService).connectToNode(sourceNode);
 
-        InitializeExtensionsRequest extensionInitRequest = new InitializeExtensionsRequest(sourceNode, extension);
+        InitializeExtensionRequest extensionInitRequest = new InitializeExtensionRequest(sourceNode, extension);
 
-        InitializeExtensionsResponse response = extensionsInitRequestHandler.handleExtensionInitRequest(extensionInitRequest);
+        InitializeExtensionResponse response = extensionsInitRequestHandler.handleExtensionInitRequest(extensionInitRequest);
         // Test if name and unique ID are set
         assertEquals(EXTENSION_NAME, response.getName());
         assertEquals("opensearch-sdk-1", extensionsRunner.getUniqueId());
@@ -155,7 +153,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testHandleExtensionRestRequest() throws Exception {
 
-        ExtensionTokenProcessor ext = new ExtensionTokenProcessor(EXTENSION_NAME);
+        String ext = "token_placeholder";
         Principal userPrincipal = () -> "user1";
         ExtensionRestRequest request = new ExtensionRestRequest(
             Method.GET,
@@ -163,7 +161,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
             Collections.emptyMap(),
             null,
             new BytesArray("bar"),
-            ext.generateToken(userPrincipal)
+            ext
         );
         RestExecuteOnExtensionResponse response = extensionsRestRequestHandler.handleRestExecuteOnExtensionRequest(request);
         // this will fail in test environment with no registered actions
@@ -203,14 +201,6 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     }
 
     @Test
-    public void testActionListenerOnFailureRequest() {
-
-        extensionsRunner.sendActionListenerOnFailureRequest(transportService, new Exception("Test failure"));
-
-        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ActionListenerOnFailureResponseHandler.class));
-    }
-
-    @Test
     public void testEnvironmentSettingsRequest() {
         extensionsRunner.sendEnvironmentSettingsRequest(transportService);
 
@@ -222,7 +212,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         extensionsRunner.sendRegisterRestActionsRequest(transportService);
 
-        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ExtensionStringResponseHandler.class));
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(AcknowledgedResponseHandler.class));
     }
 
     @Test
@@ -230,7 +220,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         extensionsRunner.sendRegisterCustomSettingsRequest(transportService);
 
-        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ExtensionStringResponseHandler.class));
+        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(AcknowledgedResponseHandler.class));
     }
 
     @Test

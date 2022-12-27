@@ -132,7 +132,7 @@ An example of a more complex extension point, `getNamedXContent()` is shown belo
 
 ##### OpenSearch Startup, Extension Initialization, and NamedXContent Registration
 
-(6) Upon receipt of an `InitializeExtensionsRequest` (among other actions):
+(6) Upon receipt of an `InitializeExtensionRequest` (among other actions):
 
 (7, 8) Obtains Environment Settings from OpenSearch, necessary for some core XContent.
 

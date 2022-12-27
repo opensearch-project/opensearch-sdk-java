@@ -17,8 +17,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opensearch.identity.ExtensionTokenProcessor;
-import org.opensearch.identity.PrincipalIdentifierToken;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.common.bytes.BytesArray;
@@ -62,8 +60,8 @@ public class TestRestHelloAction extends OpenSearchTestCase {
     @Test
     public void testHandleRequest() {
         Principal userPrincipal = () -> "user1";
-        ExtensionTokenProcessor extensionTokenProcessor = new ExtensionTokenProcessor(EXTENSION_NAME);
-        PrincipalIdentifierToken token = extensionTokenProcessor.generateToken(userPrincipal);
+        String extensionTokenProcessor = "placeholder_extension_token_processor";
+        String token = "placeholder_token";
         Map<String, String> params = Collections.emptyMap();
 
         ExtensionRestRequest getRequest = new ExtensionRestRequest(Method.GET, "/hello", params, null, new BytesArray(""), token);
