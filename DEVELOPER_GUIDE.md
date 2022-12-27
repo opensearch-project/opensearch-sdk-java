@@ -4,11 +4,11 @@
 - [Getting Started](#getting-started)
     - [Git Clone OpenSearch-SDK-Java Repo](#git-clone-opensearch-sdk-for-java-repo)
     - [Git Clone OpenSearch Repo](#git-clone-opensearch-repo)
-    - [Publish OpenSearch Feature/Extensions branch to Maven local](#publish-opensearch-feature-extensions-branch-to-maven-local)
     - [Run the Sample Extension](#run-the-sample-extension)
         - [Create extensions.yml file](#create-extensions-yml-file)
         - [Run OpenSearch](#run-opensearch)
     - [Publish OpenSearch SDK for Java to Maven Local](#publish-opensearch-sdk-for-java-to-maven-local)
+    - [Enable Extensions Feature Flag](#enable-extensions-feature-flag)
     - [Perform a REST Request on the Extension](#perform-a-rest-request-on-the-extension)
     - [Run Tests](#run-tests)
     - [Submitting Changes](#submitting-changes)
@@ -24,15 +24,22 @@ Read more about extensibility [here](https://github.com/opensearch-project/OpenS
 Fork [OpenSearch SDK for Java](https://github.com/opensearch-project/opensearch-sdk-java) and clone locally, e.g. `git clone https://github.com/[your username]/opensearch-sdk-java.git`.
 
 ### Git Clone OpenSearch Repo
-Fork [OpenSearch](https://github.com/opensearch-project/OpenSearch/), clone locally, e.g., `git clone https://github.com/[your username]/OpenSearch.git`, and checkout the `feature/extensions` branch.
+Fork [OpenSearch](https://github.com/opensearch-project/OpenSearch/), clone locally, e.g., `git clone https://github.com/[your username]/OpenSearch.git`.
 
-## Publish OpenSearch feature/extensions Branch to Maven local
-The work done to support the extensions framework is located on the `feature/extensions` branch of the OpenSearch project. Until this branch is merged to `main`, it is necessary to publish the dependencies of this branch to your local maven repository prior to running an Extension on a separate process.
+## Enable Extensions Feature Flag
 
-- First navigate to the directory that OpenSearch has been cloned to
-- Checkout the correct branch, e.g. `git checkout feature/extensions`.
-- Run `./gradlew check` to make sure the build is successful.
-- Run `./gradlew publishToMavenLocal`.
+Add the following property to run.gradle to enable extensions:
+
+```
+testClusters {
+  runTask {
+    testDistribution = 'archive'
+    if (numZones > 1) numberOfZones = numZones
+    if (numNodes > 1) numberOfNodes = numNodes
+    systemProperty 'opensearch.experimental.feature.extensions.enabled', 'true'
+  }
+}
+```
 
 ## Run the Sample Extension
 

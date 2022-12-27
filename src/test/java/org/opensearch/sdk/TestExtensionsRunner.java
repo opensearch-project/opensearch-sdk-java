@@ -153,7 +153,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testHandleExtensionRestRequest() throws Exception {
 
-        String ext = EXTENSION_NAME;
+        String ext = "token_placeholder";
         Principal userPrincipal = () -> "user1";
         ExtensionRestRequest request = new ExtensionRestRequest(
             Method.GET,
