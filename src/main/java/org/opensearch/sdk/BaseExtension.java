@@ -47,6 +47,7 @@ public abstract class BaseExtension implements Extension {
 
     /**
      * Instantiate this extension, initializing the connection settings and REST actions.
+     * @param path to extensions configuration.
      */
     protected BaseExtension(String path) {
         try {
@@ -54,13 +55,14 @@ public abstract class BaseExtension implements Extension {
             if (settings == null || settings.getHostAddress() == null || settings.getHostPort() == null) {
                 throw new IOException("Failed to initialize Extension settings. No port bound.");
             }
-        } catch (IOException e) {
-            throw new ExceptionInInitializerError(e);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
         }
     }
 
     /**
-     * take an ExtensionSettings object and set it directly
+     * take an ExtensionSettings object and set it directly.
+     * @param settings defined by the extension.
      */
     protected BaseExtension(ExtensionSettings settings) {
         this.settings = settings;
