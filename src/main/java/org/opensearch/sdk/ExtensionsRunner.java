@@ -396,32 +396,32 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Request the Dependency Information from Opensearch. 
+     * Request the Dependency Information from Opensearch.
      * @param transportService
      * @return The dependency information of Extension
      */
 
-     public List<DiscoveryExtensionNode> sendExtensionDependencyRequest(TransportService transportService) {
+    public List<DiscoveryExtensionNode> sendExtensionDependencyRequest(TransportService transportService) {
         logger.info("Sending Extension Dependency Information request to Opensearch");
         ExtensionDependencyResponseHandler extensionDependencyResponseHandler = new ExtensionDependencyResponseHandler();
-        try{
+        try {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsManager.REQUEST_EXTENSION_DEPENDENCY_INFORMATION,
                 new ExtensionRequest(ExtensionsManager.RequestType.REQUEST_EXTENSION_DEPENDENCY_INFORMATION),
                 extensionDependencyResponseHandler
             );
-            //Wait on Extension Dependency response
+            // Wait on Extension Dependency response
             extensionDependencyResponseHandler.awaitResponse();
-        }catch (InterruptedException e) {
-            logger.info("Failed to recieve Extension Dependency response from OpenSearch", e);
-        }catch (Exception e) {
+        } catch (InterruptedException e) {
+            logger.info("Failed to receive Extension Dependency response from OpenSearch", e);
+        } catch (Exception e) {
             logger.info("Failed to send Extension Dependency request to OpenSearch", e);
         }
 
         // At this point, response handler has read in the extension dependency
         return extensionDependencyResponseHandler.getExtensionDependency();
-     }
+    }
 
     /**
      * Requests the cluster settings from OpenSearch.  The result will be handled by a {@link ClusterSettingsResponseHandler}.

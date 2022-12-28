@@ -31,7 +31,7 @@ public class ExtensionDependencyResponseHandler implements TransportResponseHand
     private final CountDownLatch inProgressLatch;
     private List<DiscoveryExtensionNode> extensions;
 
-    public ExtensionDependencyResponseHandler(){
+    public ExtensionDependencyResponseHandler() {
         this.inProgressLatch = new CountDownLatch(1);
         this.extensions = extensions.emptyList;
     }
