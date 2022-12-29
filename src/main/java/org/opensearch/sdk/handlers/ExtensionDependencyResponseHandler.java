@@ -11,7 +11,7 @@ package org.opensearch.sdk.handlers;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
@@ -28,11 +28,11 @@ import org.opensearch.transport.TransportResponseHandler;
  */
 public class ExtensionDependencyResponseHandler implements TransportResponseHandler<ExtensionDependencyResponse> {
     private static final Logger logger = LogManager.getLogger(ExtensionDependencyResponseHandler.class);
-    private final CountDownLatch inProgressLatch;
+    private final CompleteableFuture<ExtensionDependencyResponse> inProgressFuture;
     private List<DiscoveryExtensionNode> extensions;
 
     public ExtensionDependencyResponseHandler() {
-        this.inProgressLatch = new CountDownLatch(1);
+        this.inProgressFuture = new CompletableFuture<>();
         this.extensions = extensions.emptyList;
     }
 
@@ -41,14 +41,14 @@ public class ExtensionDependencyResponseHandler implements TransportResponseHand
         logger.info("received {}", response);
 
         // Set cluster state from response
-        this.extensions = response.getExtensionDependency();
+        this.extensions = response.getExtensionDependencies();
         inProgressLatch.countDown();
     }
 
     @Override
     public void handleException(TransportException exp) {
         logger.info("ExtensionDependencyRequest failed", exp);
-        inProgressLatch.countDown();
+        inProgressFuture.complete(response);
     }
 
     @Override
@@ -63,14 +63,17 @@ public class ExtensionDependencyResponseHandler implements TransportResponseHand
 
     /**
      * Invokes await on the ExtensionDependencyResponseHandler count down latch
-     * @throws InterruptedException
+     * @throws Exception
      *     if the response times out
      */
     public void awaitResponse() throws InterruptedException {
-        inProgressLatch.await(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
+        inProgressFuture.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
+        if (inProgressFuture.isCompletedExceptionally()) {
+            inProgressFuture.get();
+        }
     }
 
-    public List<DiscoveryExtensionNode> getExtensionDependency() {
+    public List<DiscoveryExtensionNode> getExtensionDependencies() {
         return this.extensions;
     }
 }
