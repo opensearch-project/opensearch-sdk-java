@@ -32,7 +32,6 @@ import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
-import org.opensearch.sdk.handlers.ExtensionBooleanResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionDependencyResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionsIndicesModuleNameRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
@@ -398,7 +397,7 @@ public class ExtensionsRunner {
 
     /**
      * Request the Dependency Information from Opensearch. The result will be handled by a {@Link ExtensionDependencyResponseHandler}.
-     * 
+     *
      * @param transportService  The TransportService defining the connection to OpenSearch
      * @return A List contains details of this extension's dependencies
      */
