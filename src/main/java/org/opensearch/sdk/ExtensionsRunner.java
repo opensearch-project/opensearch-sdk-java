@@ -415,7 +415,7 @@ public class ExtensionsRunner {
             );
             // Wait on Extension Dependency response
             extensionDependencyResponseHandler.awaitResponse();
-        } catch (CancellationException e) {
+        } catch (TimeoutException e) {
             logger.warn("Failed to send Extension Dependency request to OpenSearch", e);
         }
 

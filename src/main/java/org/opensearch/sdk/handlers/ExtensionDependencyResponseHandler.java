@@ -29,7 +29,7 @@ import org.opensearch.transport.TransportResponseHandler;
  */
 public class ExtensionDependencyResponseHandler implements TransportResponseHandler<ExtensionDependencyResponse> {
     private static final Logger logger = LogManager.getLogger(ExtensionDependencyResponseHandler.class);
-    private final CompleteableFuture<ExtensionDependencyResponse> inProgressFuture;
+    private final CompletableFuture<ExtensionDependencyResponse> inProgressFuture;
     private List<DiscoveryExtensionNode> extensions;
 
     public ExtensionDependencyResponseHandler() {
@@ -64,10 +64,10 @@ public class ExtensionDependencyResponseHandler implements TransportResponseHand
 
     /**
      * Invokes await on the ExtensionDependencyResponseHandler count down latch
-     * @throws ExecutionException
+     * @throws Exception
      *     if the response times out
      */
-    public void awaitResponse() throws ExecutionException {
+    public void awaitResponse() throws Exception {
         inProgressFuture.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
         if (inProgressFuture.isCompletedExceptionally()) {
             inProgressFuture.get();
