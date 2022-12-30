@@ -12,6 +12,7 @@ package org.opensearch.sdk.handlers;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
@@ -63,10 +64,10 @@ public class ExtensionDependencyResponseHandler implements TransportResponseHand
 
     /**
      * Invokes await on the ExtensionDependencyResponseHandler count down latch
-     * @throws Exception
+     * @throws ExecutionException
      *     if the response times out
      */
-    public void awaitResponse() throws InterruptedException {
+    public void awaitResponse() throws ExecutionException {
         inProgressFuture.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
         if (inProgressFuture.isCompletedExceptionally()) {
             inProgressFuture.get();
