@@ -42,13 +42,13 @@ public class ExtensionDependencyResponseHandler implements TransportResponseHand
 
         // Set cluster state from response
         this.extensions = response.getExtensionDependencies();
-        inProgressLatch.countDown();
+        inProgressFuture.complete(response);
     }
 
     @Override
     public void handleException(TransportException exp) {
         logger.info("ExtensionDependencyRequest failed", exp);
-        inProgressFuture.complete(response);
+        inProgressFuture.completeExceptionally(exp);
     }
 
     @Override
