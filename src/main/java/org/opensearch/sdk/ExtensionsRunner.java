@@ -50,7 +50,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
@@ -416,7 +415,9 @@ public class ExtensionsRunner {
             // Wait on Extension Dependency response
             extensionDependencyResponseHandler.awaitResponse();
         } catch (TimeoutException e) {
-            logger.warn("Failed to send Extension Dependency request to OpenSearch", e);
+            logger.info("Failed to receive Extension Dependency response from OpenSearch", e);
+        } catch (Exception e) {
+            logger.info("Failed to send Extension Dependency request to OpenSearch", e);
         }
 
         // At this point, response handler has read in the extension dependency

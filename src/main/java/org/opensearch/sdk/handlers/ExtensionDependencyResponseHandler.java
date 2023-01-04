@@ -12,7 +12,6 @@ package org.opensearch.sdk.handlers;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
@@ -39,7 +38,6 @@ public class ExtensionDependencyResponseHandler implements TransportResponseHand
 
     @Override
     public void handleResponse(ExtensionDependencyResponse response) {
-        logger.info("received {}", response);
 
         // Set cluster state from response
         this.extensions = response.getExtensionDependencies();
@@ -48,7 +46,7 @@ public class ExtensionDependencyResponseHandler implements TransportResponseHand
 
     @Override
     public void handleException(TransportException exp) {
-        logger.info("ExtensionDependencyRequest failed", exp);
+        logger.info("ExtensionDependencyResponseHandler failed", exp);
         inProgressFuture.completeExceptionally(exp);
     }
 
@@ -65,7 +63,9 @@ public class ExtensionDependencyResponseHandler implements TransportResponseHand
     /**
      * Invokes await on the ExtensionDependencyResponseHandler count down latch
      * @throws Exception
-     *     if the response times out
+     *     if the response times out,
+     *     if the response has been cancelled
+     *     if the response failed
      */
     public void awaitResponse() throws Exception {
         inProgressFuture.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
