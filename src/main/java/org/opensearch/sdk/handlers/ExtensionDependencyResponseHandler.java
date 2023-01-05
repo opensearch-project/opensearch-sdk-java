@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.extensions.DiscoveryExtensionNode;
+import org.opensearch.extensions.ExtensionDependencyResponse;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportException;
@@ -33,7 +34,7 @@ public class ExtensionDependencyResponseHandler implements TransportResponseHand
 
     public ExtensionDependencyResponseHandler() {
         this.inProgressFuture = new CompletableFuture<>();
-        this.extensions = extensions.emptyList;
+        this.extensions = extensions;
     }
 
     @Override
