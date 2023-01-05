@@ -28,6 +28,7 @@ import org.apache.hc.core5.reactor.ssl.TlsDetails;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.RestClientBuilder;
+import org.opensearch.client.RestHighLevelClient;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.transport.OpenSearchTransport;
@@ -41,14 +42,9 @@ import javax.net.ssl.SSLEngine;
 public class SDKClient {
     private OpenSearchClient javaClient;
     private RestClient restClient = null;
+    private RestHighLevelClient highLevelClient;
 
-    /**
-     * Creates OpenSearchClient for SDK. It also creates a restClient as a wrapper around Java OpenSearchClient
-     * @param hostAddress The address of OpenSearch cluster, client can connect to
-     * @param port The port of OpenSearch cluster
-     * @return SDKClient which is internally an OpenSearchClient. The user is responsible for calling {@link #doCloseRestClient()} when finished with the client
-     */
-    public OpenSearchClient initializeClient(String hostAddress, int port) {
+    private RestClientBuilder builder(String hostAddress, int port) {
         RestClientBuilder builder = RestClient.builder(new HttpHost(hostAddress, port));
         builder.setStrictDeprecationMode(true);
         builder.setHttpClientConfigCallback(httpClientBuilder -> {
@@ -74,6 +70,17 @@ public class SDKClient {
                 throw new RuntimeException(e);
             }
         });
+        return builder;
+    }
+
+    /**
+     * Creates OpenSearchClient for SDK. It also creates a restClient as a wrapper around Java OpenSearchClient
+     * @param hostAddress The address of OpenSearch cluster, client can connect to
+     * @param port The port of OpenSearch cluster
+     * @return SDKClient which is internally an OpenSearchClient. The user is responsible for calling {@link #doCloseRestClient()} when finished with the client
+     */
+    public OpenSearchClient initializeJavaClient(String hostAddress, int port) {
+        RestClientBuilder builder = builder(hostAddress, port);
 
         restClient = builder.build();
 
@@ -91,13 +98,37 @@ public class SDKClient {
     }
 
     /**
-     * Close this client.
+     * Creates High Level Rest Client for SDK.
+     * @param hostAddress The address of OpenSearch cluster, client can connect to
+     * @param port The port of OpenSearch cluster
+     * @return SDKClient which is internally an RestHighLevelClient. The user is responsible for calling {@link #doCloseRestClient()} when finished with the client
+     */
+    public RestHighLevelClient initializeRestClient(String hostAddress, int port) {
+        RestClientBuilder builder = builder(hostAddress, port);
+
+        highLevelClient = new RestHighLevelClient(builder);
+        return highLevelClient;
+    }
+
+    /**
+     * Close java client.
      *
      * @throws IOException if closing the restClient fails
      */
     public void doCloseRestClient() throws IOException {
         if (restClient != null) {
             restClient.close();
+        }
+    }
+
+    /**
+     * Close high level rest client.
+     *
+     * @throws IOException if closing the highLevelClient fails
+     */
+    public void doCloseHLRClient() throws IOException {
+        if (highLevelClient != null) {
+            highLevelClient.close();
         }
     }
 }
