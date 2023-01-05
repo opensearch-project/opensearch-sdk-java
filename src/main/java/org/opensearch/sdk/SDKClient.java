@@ -126,7 +126,7 @@ public class SDKClient {
      *
      * @throws IOException if closing the highLevelClient fails
      */
-    public void doCloseHLRClient() throws IOException {
+    public void doCloseHighLevelClient() throws IOException {
         if (highLevelClient != null) {
             highLevelClient.close();
         }

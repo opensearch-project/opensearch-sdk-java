@@ -54,7 +54,7 @@ public class TestSDKClient extends OpenSearchTestCase {
 
         assertThrows(ConnectException.class, () -> testClient.indices().create(createIndexRequest, RequestOptions.DEFAULT));
 
-        sdkClient.doCloseHLRClient();
+        sdkClient.doCloseHighLevelClient();
 
     }
 
