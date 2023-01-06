@@ -41,7 +41,7 @@ public class ExtensionDependencyResponseHandler implements TransportResponseHand
     public void handleResponse(ExtensionDependencyResponse response) {
 
         // Set cluster state from response
-        this.extensions = response.getExtensionDependencies();
+        this.extensions = response.getExtensionDependency();
         inProgressFuture.complete(response);
     }
 
