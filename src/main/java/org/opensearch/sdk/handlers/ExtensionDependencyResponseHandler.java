@@ -25,7 +25,7 @@ import org.opensearch.transport.TransportException;
 import org.opensearch.transport.TransportResponseHandler;
 
 /**
- * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendExtensionDependencyRequest(TransportService)} call.
+ * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendExtensionDependencyRequest} call.
  */
 public class ExtensionDependencyResponseHandler implements TransportResponseHandler<ExtensionDependencyResponse> {
     private static final Logger logger = LogManager.getLogger(ExtensionDependencyResponseHandler.class);
