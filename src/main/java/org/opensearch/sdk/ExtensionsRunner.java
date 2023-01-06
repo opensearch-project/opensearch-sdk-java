@@ -396,7 +396,7 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Request the Dependency Information from Opensearch. The result will be handled by a {@Link ExtensionDependencyResponseHandler}.
+     * Request the Dependency Information from Opensearch. The result will be handled by a {@link ExtensionDependencyResponseHandler}.
      *
      * @param transportService  The TransportService defining the connection to OpenSearch
      * @return A List contains details of this extension's dependencies
