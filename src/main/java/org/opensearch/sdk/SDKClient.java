@@ -41,7 +41,7 @@ import javax.net.ssl.SSLEngine;
  */
 public class SDKClient {
     private OpenSearchClient javaClient;
-    private RestClient restClient = null;
+    private RestClient restClient;
     private RestHighLevelClient highLevelClient;
 
     private RestClientBuilder builder(String hostAddress, int port) {
@@ -77,7 +77,7 @@ public class SDKClient {
      * Creates OpenSearchClient for SDK. It also creates a restClient as a wrapper around Java OpenSearchClient
      * @param hostAddress The address of OpenSearch cluster, client can connect to
      * @param port The port of OpenSearch cluster
-     * @return SDKClient which is internally an OpenSearchClient. The user is responsible for calling {@link #doCloseRestClient()} when finished with the client
+     * @return The SDKClient implementation of OpenSearchClient. The user is responsible for calling {@link #doCloseJavaClient()} when finished with the client
      */
     public OpenSearchClient initializeJavaClient(String hostAddress, int port) {
         RestClientBuilder builder = builder(hostAddress, port);
@@ -101,7 +101,7 @@ public class SDKClient {
      * Creates High Level Rest Client for SDK.
      * @param hostAddress The address of OpenSearch cluster, client can connect to
      * @param port The port of OpenSearch cluster
-     * @return SDKClient which is internally an RestHighLevelClient. The user is responsible for calling {@link #doCloseRestClient()} when finished with the client
+     * @return The SDKClient implementation of RestHighLevelClient. The user is responsible for calling {@link #doCloseHighLevelClient()} when finished with the client
      */
     public RestHighLevelClient initializeRestClient(String hostAddress, int port) {
         RestClientBuilder builder = builder(hostAddress, port);
@@ -115,7 +115,7 @@ public class SDKClient {
      *
      * @throws IOException if closing the restClient fails
      */
-    public void doCloseRestClient() throws IOException {
+    public void doCloseJavaClient() throws IOException {
         if (restClient != null) {
             restClient.close();
         }

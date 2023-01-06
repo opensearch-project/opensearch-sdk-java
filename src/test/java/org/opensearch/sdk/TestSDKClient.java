@@ -40,7 +40,7 @@ public class TestSDKClient extends OpenSearchTestCase {
                 )
         );
 
-        sdkClient.doCloseRestClient();
+        sdkClient.doCloseJavaClient();
     }
 
     @Test
