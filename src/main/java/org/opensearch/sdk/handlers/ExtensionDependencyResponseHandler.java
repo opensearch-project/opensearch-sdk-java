@@ -33,6 +33,9 @@ public class ExtensionDependencyResponseHandler implements TransportResponseHand
     private final CompletableFuture<ExtensionDependencyResponse> inProgressFuture;
     private List<DiscoveryExtensionNode> extensions;
 
+    /**
+     * Instantiates a new ExtensionDependencyHandler with ConpletableFuture
+     */
     public ExtensionDependencyResponseHandler() {
         this.inProgressFuture = new CompletableFuture<>();
         this.extensions = extensions;
@@ -76,6 +79,9 @@ public class ExtensionDependencyResponseHandler implements TransportResponseHand
         }
     }
 
+    /**
+     * Get the dependency information
+     */
     public List<DiscoveryExtensionNode> getExtensionDependencies() {
         return this.extensions;
     }
