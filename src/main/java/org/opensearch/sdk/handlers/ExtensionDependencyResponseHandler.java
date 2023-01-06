@@ -80,7 +80,8 @@ public class ExtensionDependencyResponseHandler implements TransportResponseHand
     }
 
     /**
-     * Get the dependency information
+     * Get the dependency information form the Response
+     * @return dependency information
      */
     public List<DiscoveryExtensionNode> getExtensionDependencies() {
         return this.extensions;
