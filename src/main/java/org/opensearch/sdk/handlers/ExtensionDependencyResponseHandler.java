@@ -73,10 +73,7 @@ public class ExtensionDependencyResponseHandler implements TransportResponseHand
      *     if the response failed
      */
     public void awaitResponse() throws Exception {
-        inProgressFuture.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
-        if (inProgressFuture.isCompletedExceptionally()) {
-            inProgressFuture.get();
-        }
+        inProgressFuture.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS).get();
     }
 
     /**
