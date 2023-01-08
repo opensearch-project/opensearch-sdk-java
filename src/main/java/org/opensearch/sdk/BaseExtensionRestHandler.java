@@ -9,15 +9,19 @@
 
 package org.opensearch.sdk;
 
+import static org.opensearch.rest.RestStatus.INTERNAL_SERVER_ERROR;
 import static org.opensearch.rest.RestStatus.NOT_FOUND;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.rest.RestStatus;
 
 /**
  * Provides convenience methods to reduce boilerplate code in an {@link ExtensionRestHandler} implementation.
@@ -25,8 +29,8 @@ import org.opensearch.rest.RestHandler.Route;
 public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
 
     /**
-     * Defines a list of methods which handle each rest {@link Route}.
-     * Override this in a subclass to use the functional syntax.
+     * Defines a list of methods which handle each rest {@link Route}. Override this in a subclass to use the functional
+     * syntax.
      *
      * @return a list of {@link RouteHandler} with corresponding methods to each route.
      */
@@ -75,13 +79,49 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     }
 
     /**
-     * Returns a default response when a request does not match the handled methods or paths.
-     * This can occur if a handler indicates routes that it handles but does not actually handle them.
+     * Returns a default response when a request does not match the handled methods or paths. This can occur if a
+     * handler indicates routes that it handles but does not actually handle them.
      *
      * @param request The request that couldn't be handled.
      * @return an ExtensionRestResponse identifying the unhandled request.
      */
     protected ExtensionRestResponse unhandledRequest(ExtensionRestRequest request) {
-        return new ExtensionRestResponse(request, NOT_FOUND, "Extension REST action improperly configured to handle " + request.toString());
+        return createJsonErrorResponse(
+            request,
+            NOT_FOUND,
+            "Extension REST action improperly configured to handle: [" + request.toString() + "]"
+        );
+    }
+
+    /**
+     * Returns a default response when a request handler throws an exception.
+     *
+     * @param request The request that caused the exception
+     * @return an ExtensionRestResponse identifying the exception
+     */
+    protected ExtensionRestResponse exceptionalRequest(ExtensionRestRequest request, Exception e) {
+        return createJsonErrorResponse(request, INTERNAL_SERVER_ERROR, "Request failed with exception: [" + e.getMessage() + "]");
+    }
+
+    /**
+     * Returns a JSON-formatted response for a given string.
+     *
+     * @param request The request to respond to
+     * @param status The response status to send
+     * @param responseStr The string to include
+     * @return an ExtensionRestResponse in JSON format including the specified string as the content of a field named "error"
+     */
+    protected ExtensionRestResponse createJsonErrorResponse(ExtensionRestRequest request, RestStatus status, String responseStr) {
+        try {
+            return new ExtensionRestResponse(
+                request,
+                status,
+                JsonXContent.contentBuilder().startObject().field("error", responseStr).endObject()
+            );
+        } catch (IOException e) {
+            // This Should Never Happen (TM)
+            // If we messed up JSON code above, just send plain text
+            return new ExtensionRestResponse(request, status, responseStr);
+        }
     }
 }
