@@ -10,6 +10,8 @@
 package org.opensearch.sdk;
 
 import org.junit.jupiter.api.Test;
+import org.opensearch.client.RequestOptions;
+import org.opensearch.client.RestHighLevelClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch.indices.Alias;
 import org.opensearch.client.opensearch.indices.CreateIndexRequest;
@@ -23,9 +25,9 @@ public class TestSDKClient extends OpenSearchTestCase {
     SDKClient sdkClient = new SDKClient();
 
     @Test
-    public void testCreateClient() throws Exception {
+    public void testCreateJavaClient() throws Exception {
 
-        OpenSearchClient testClient = sdkClient.initializeClient("localhost", 9200);
+        OpenSearchClient testClient = sdkClient.initializeJavaClient("localhost", 9200);
         assertInstanceOf(OpenSearchClient.class, testClient);
 
         assertThrows(
@@ -38,7 +40,22 @@ public class TestSDKClient extends OpenSearchTestCase {
                 )
         );
 
-        sdkClient.doCloseRestClient();
+        sdkClient.doCloseJavaClient();
+    }
+
+    @Test
+    public void testCreateHighLevelRestClient() throws Exception {
+        RestHighLevelClient testClient = sdkClient.initializeRestClient("localhost", 9200);
+
+        // Using the package name here as Java uses package name if the filename from different packages are same
+        org.opensearch.client.indices.CreateIndexRequest createIndexRequest = new org.opensearch.client.indices.CreateIndexRequest(
+            "my-index"
+        );
+
+        assertThrows(ConnectException.class, () -> testClient.indices().create(createIndexRequest, RequestOptions.DEFAULT));
+
+        sdkClient.doCloseHighLevelClient();
+
     }
 
 }
