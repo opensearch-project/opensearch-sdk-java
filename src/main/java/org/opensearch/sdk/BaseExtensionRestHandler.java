@@ -86,9 +86,10 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
      * @return an ExtensionRestResponse identifying the unhandled request.
      */
     protected ExtensionRestResponse unhandledRequest(ExtensionRestRequest request) {
-        return createJsonErrorResponse(
+        return createJsonResponse(
             request,
             NOT_FOUND,
+            "error",
             "Extension REST action improperly configured to handle: [" + request.toString() + "]"
         );
     }
@@ -100,7 +101,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
      * @return an ExtensionRestResponse identifying the exception
      */
     protected ExtensionRestResponse exceptionalRequest(ExtensionRestRequest request, Exception e) {
-        return createJsonErrorResponse(request, INTERNAL_SERVER_ERROR, "Request failed with exception: [" + e.getMessage() + "]");
+        return createJsonResponse(request, INTERNAL_SERVER_ERROR, "error", "Request failed with exception: [" + e.getMessage() + "]");
     }
 
     /**
@@ -108,20 +109,26 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
      *
      * @param request The request to respond to
      * @param status The response status to send
+     * @param fieldName The field name for the response string
      * @param responseStr The string to include
-     * @return an ExtensionRestResponse in JSON format including the specified string as the content of a field named "error"
+     * @return an ExtensionRestResponse in JSON format including the specified string as the content of the specified field
      */
-    protected ExtensionRestResponse createJsonErrorResponse(ExtensionRestRequest request, RestStatus status, String responseStr) {
+    protected ExtensionRestResponse createJsonResponse(
+        ExtensionRestRequest request,
+        RestStatus status,
+        String fieldName,
+        String responseStr
+    ) {
         try {
             return new ExtensionRestResponse(
                 request,
                 status,
-                JsonXContent.contentBuilder().startObject().field("error", responseStr).endObject()
+                JsonXContent.contentBuilder().startObject().field(fieldName, responseStr).endObject()
             );
         } catch (IOException e) {
             // This Should Never Happen (TM)
             // If we messed up JSON code above, just send plain text
-            return new ExtensionRestResponse(request, status, responseStr);
+            return new ExtensionRestResponse(request, status, fieldName + ": " + responseStr);
         }
     }
 }

@@ -33,7 +33,7 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
         private Function<ExtensionRestRequest, ExtensionRestResponse> handleFoo = (request) -> {
             try {
                 if ("bar".equals(request.content().utf8ToString())) {
-                    return createJsonErrorResponse(request, RestStatus.OK, "bar");
+                    return createJsonResponse(request, RestStatus.OK, "success", "bar");
                 }
                 throw new IllegalArgumentException("no bar");
             } catch (Exception e) {
@@ -62,7 +62,7 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
         );
         ExtensionRestResponse response = handler.handleRequest(successfulRequest);
         assertEquals(RestStatus.OK, response.status());
-        assertEquals("{\"error\":\"bar\"}", response.content().utf8ToString());
+        assertEquals("{\"success\":\"bar\"}", response.content().utf8ToString());
     }
 
     @Test
