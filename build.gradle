@@ -191,4 +191,19 @@ diffCoverageReport {
         minLines = 0.75
         failOnViolation = true
     }
+
+    publishing {
+        publications {
+        }
+        repositories {
+            maven {
+                name = "Snapshots" //  optional target repository name
+                url = "https://aws.oss.sonatype.org/content/repositories/snapshots"
+                credentials {
+                    username "$System.env.SONATYPE_USERNAME"
+                    password "$System.env.SONATYPE_PASSWORD"
+                }
+            }
+        }
+    }
 }
