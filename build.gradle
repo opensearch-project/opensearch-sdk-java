@@ -42,8 +42,8 @@ version '1.0.0-SNAPSHOT'
 
 publishing {
     publications {
-        group = "org.opensearch.sdk"
-        version = "1.0.0-SNAPSHOT"
+        group = "${group}"
+        version = "${version}"
         mavenJava(MavenPublication) {
             from components.java
         }
