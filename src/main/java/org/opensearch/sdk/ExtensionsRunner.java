@@ -408,7 +408,6 @@ public class ExtensionsRunner {
             transportService.sendRequest(
                 opensearchNode,
                 uniqueId,
-                ExtensionsManager.REQUEST_EXTENSION_DEPENDENCY_INFORMATION,
                 new ExtensionRequest(ExtensionsManager.RequestType.REQUEST_EXTENSION_DEPENDENCY_INFORMATION),
                 extensionDependencyResponseHandler
             );
