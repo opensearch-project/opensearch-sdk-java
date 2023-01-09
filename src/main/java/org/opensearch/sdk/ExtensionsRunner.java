@@ -407,8 +407,8 @@ public class ExtensionsRunner {
         try {
             transportService.sendRequest(
                 opensearchNode,
-                uniqueId,
-                new ExtensionRequest(ExtensionsManager.RequestType.REQUEST_EXTENSION_DEPENDENCY_INFORMATION),
+                ExtensionsManager.REQUEST_EXTENSION_DEPENDENCY_INFORMATION,
+                new ExtensionRequest(ExtensionsManager.RequestType.REQUEST_EXTENSION_DEPENDENCY_INFORMATION, uniqueId),
                 extensionDependencyResponseHandler
             );
             // Wait on Extension Dependency response
