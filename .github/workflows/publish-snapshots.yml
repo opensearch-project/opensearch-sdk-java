@@ -25,6 +25,6 @@ jobs:
           aws-region: us-east-1
       - name: publish snapshots to maven
         run: |
-          echo "SONATYPE_USERNAME=$(aws secretsmanager get-secret-value --secret-id maven-snapshots-username --query SecretString --output text)" >> $GITHUB_ENV
-          echo "SONATYPE_PASSWORD=$(aws secretsmanager get-secret-value --secret-id maven-snapshots-password --query SecretString --output text)" >> $GITHUB_ENV
+          export SONATYPE_USERNAME=$(aws secretsmanager get-secret-value --secret-id maven-snapshots-username --query SecretString --output text)
+          export SONATYPE_PASSWORD=$(aws secretsmanager get-secret-value --secret-id maven-snapshots-password --query SecretString --output text)
           ./gradlew publishMavenJavaPublicationToSnapshotsRepository
