@@ -42,13 +42,24 @@ version '1.0.0-SNAPSHOT'
 
 publishing {
     publications {
-        group = "org.opensearch"
-        version = "1.0.0-SNAPSHOT"
+        group = "${group}"
+        version = "${version}"
         mavenJava(MavenPublication) {
             from components.java
         }
         sourceCompatibility = 11
         targetCompatibility = 11
+    }
+
+    repositories {
+        maven {
+            name = "Snapshots" //  optional target repository name
+            url = "https://aws.oss.sonatype.org/content/repositories/snapshots"
+            credentials {
+                username "$System.env.SONATYPE_USERNAME"
+                password "$System.env.SONATYPE_PASSWORD"
+            }
+        }
     }
 }
 
