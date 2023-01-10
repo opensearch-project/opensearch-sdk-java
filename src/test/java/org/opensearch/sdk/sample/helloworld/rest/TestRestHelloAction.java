@@ -10,7 +10,6 @@
 package org.opensearch.sdk.sample.helloworld.rest;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,8 @@ public class TestRestHelloAction extends OpenSearchTestCase {
     private static final String JSON_CONTENT_TYPE = "application/json; charset=UTF-8";
 
     private ExtensionRestHandler restHelloAction;
-    private static final String EXTENSION_NAME = "hello-world";
+    // Temporarily removed pending integration of feature/identity branch
+    // private static final String EXTENSION_NAME = "hello-world";
 
     @Override
     @BeforeEach
@@ -59,8 +59,9 @@ public class TestRestHelloAction extends OpenSearchTestCase {
 
     @Test
     public void testHandleRequest() {
-        Principal userPrincipal = () -> "user1";
-        String extensionTokenProcessor = "placeholder_extension_token_processor";
+        // Temporarily removed pending integration of feature/identity branch
+        // Principal userPrincipal = () -> "user1";
+        // String extensionTokenProcessor = "placeholder_extension_token_processor";
         String token = "placeholder_token";
         Map<String, String> params = Collections.emptyMap();
 
@@ -202,21 +203,21 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         // Not registered, fails on method
         response = restHelloAction.handleRequest(unhandledMethodRequest);
         assertEquals(RestStatus.NOT_FOUND, response.status());
-        assertEquals(TEXT_CONTENT_TYPE, response.contentType());
+        assertEquals(JSON_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("/hi"));
 
         // Not registered, fails on path name
         response = restHelloAction.handleRequest(unhandledPathRequest);
         assertEquals(RestStatus.NOT_FOUND, response.status());
-        assertEquals(TEXT_CONTENT_TYPE, response.contentType());
+        assertEquals(JSON_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("/hi"));
 
         // Not registered, fails on path length
         response = restHelloAction.handleRequest(unhandledPathLengthRequest);
         assertEquals(RestStatus.NOT_FOUND, response.status());
-        assertEquals(TEXT_CONTENT_TYPE, response.contentType());
+        assertEquals(JSON_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("/goodbye"));
     }
