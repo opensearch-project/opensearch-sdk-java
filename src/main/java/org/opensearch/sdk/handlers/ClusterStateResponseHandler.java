@@ -72,10 +72,7 @@ public class ClusterStateResponseHandler implements TransportResponseHandler<Clu
      *     if the response times out
      */
     public void awaitResponse() throws Exception {
-        inProgressFuture.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
-        if (inProgressFuture.isCompletedExceptionally()) {
-            inProgressFuture.get();
-        }
+        inProgressFuture.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS).get();
     }
 
     public ClusterState getClusterState() {
