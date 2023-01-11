@@ -32,6 +32,7 @@ import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
+import org.opensearch.sdk.handlers.ExtensionDependencyResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionsIndicesModuleNameRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
@@ -49,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
@@ -392,6 +394,34 @@ public class ExtensionsRunner {
 
         // At this point, response handler has read in the cluster state
         return clusterStateResponseHandler.getClusterState();
+    }
+
+    /**
+     * Request the Dependency Information from Opensearch. The result will be handled by a {@link ExtensionDependencyResponseHandler}.
+     *
+     * @param transportService  The TransportService defining the connection to OpenSearch
+     * @return A List contains details of this extension's dependencies
+     */
+    public List<DiscoveryExtensionNode> sendExtensionDependencyRequest(TransportService transportService) {
+        logger.info("Sending Extension Dependency Information request to Opensearch");
+        ExtensionDependencyResponseHandler extensionDependencyResponseHandler = new ExtensionDependencyResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsManager.REQUEST_EXTENSION_DEPENDENCY_INFORMATION,
+                new ExtensionRequest(ExtensionsManager.RequestType.REQUEST_EXTENSION_DEPENDENCY_INFORMATION, uniqueId),
+                extensionDependencyResponseHandler
+            );
+            // Wait on Extension Dependency response
+            extensionDependencyResponseHandler.awaitResponse();
+        } catch (TimeoutException e) {
+            logger.info("Failed to receive Extension Dependency response from OpenSearch", e);
+        } catch (Exception e) {
+            logger.info("Failed to send Extension Dependency request to OpenSearch", e);
+        }
+
+        // At this point, response handler has read in the extension dependency
+        return extensionDependencyResponseHandler.getExtensionDependencies();
     }
 
     /**

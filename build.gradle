@@ -13,7 +13,7 @@ import java.nio.file.Files
 
 plugins {
     id 'java'
-    id "com.diffplug.spotless" version "6.12.0" apply false
+    id "com.diffplug.spotless" version "6.12.1" apply false
     id 'jacoco'
     id "com.form.diff-coverage" version "0.9.5"
 }
@@ -42,13 +42,24 @@ version '1.0.0-SNAPSHOT'
 
 publishing {
     publications {
-        group = "org.opensearch"
-        version = "1.0.0-SNAPSHOT"
+        group = "${group}"
+        version = "${version}"
         mavenJava(MavenPublication) {
             from components.java
         }
         sourceCompatibility = 11
         targetCompatibility = 11
+    }
+
+    repositories {
+        maven {
+            name = "Snapshots" //  optional target repository name
+            url = "https://aws.oss.sonatype.org/content/repositories/snapshots"
+            credentials {
+                username "$System.env.SONATYPE_USERNAME"
+                password "$System.env.SONATYPE_PASSWORD"
+            }
+        }
     }
 }
 
@@ -72,13 +83,14 @@ dependencies {
     def jacksonDatabindVersion = "2.14.1"
     def guavaVersion = "31.1-jre"
     def junit4Version = "4.13.2"
-    def junit5Version = "5.9.1"
+    def junit5Version = "5.9.2"
     def jaxbVersion = "2.3.1"
     def requireJavadocVersion = "1.0.6"
 
     implementation("org.opensearch:opensearch:${opensearchVersion}")
     implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
     implementation("org.apache.logging.log4j:log4j-core:${log4jVersion}")
+    implementation("org.opensearch.client:opensearch-rest-high-level-client:${opensearchVersion}")
     implementation("org.opensearch.client:opensearch-rest-client:${opensearchVersion}")
     implementation("org.opensearch.client:opensearch-java:${opensearchVersion}")
     implementation("org.opensearch.plugin:transport-netty4-client:${opensearchVersion}")
