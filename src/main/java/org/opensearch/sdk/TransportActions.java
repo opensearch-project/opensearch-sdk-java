@@ -33,8 +33,6 @@ public class TransportActions {
     /**
      * Constructor for TransportActions. Creates a map of transportActions for this extension.
      *
-     * @param <Request> the TransportAction request
-     * @param <Response> the TransportAction response
      * @param transportActions is the list of actions the extension would like to register with OpenSearch.
      */
     public TransportActions(
