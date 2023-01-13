@@ -37,8 +37,8 @@ public class TransportActions {
      * @param <Response> the TransportAction response
      * @param transportActions is the list of actions the extension would like to register with OpenSearch.
      */
-    public <Request extends ActionRequest, Response extends ActionResponse> TransportActions(
-        Map<String, Class<? extends TransportAction<Request, Response>>> transportActions
+    public TransportActions(
+        Map<String, Class<? extends TransportAction<? extends ActionRequest, ? extends ActionResponse>>> transportActions
     ) {
         this.transportActions = new HashMap<>(transportActions);
     }
