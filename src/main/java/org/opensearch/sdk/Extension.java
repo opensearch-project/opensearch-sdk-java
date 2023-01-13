@@ -86,7 +86,7 @@ public interface Extension {
      *
      * @return a list of custom transport actions this extension uses.
      */
-    default Map<String, Class<? extends TransportAction<ActionRequest, ActionResponse>>> getActions() {
+    default Map<String, Class<? extends TransportAction<? extends ActionRequest, ? extends ActionResponse>>> getActions() {
         return Collections.emptyMap();
     }
 }
