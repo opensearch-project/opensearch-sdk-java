@@ -51,6 +51,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 /**
@@ -385,7 +386,7 @@ public class ExtensionsRunner {
             );
             // Wait on cluster state response
             clusterStateResponseHandler.awaitResponse();
-        } catch (InterruptedException e) {
+        } catch (TimeoutException e) {
             logger.info("Failed to receive Cluster State response from OpenSearch", e);
         } catch (Exception e) {
             logger.info("Failed to send Cluster State request to OpenSearch", e);
@@ -455,8 +456,8 @@ public class ExtensionsRunner {
             );
             // Wait on environment settings response
             environmentSettingsResponseHandler.awaitResponse();
-        } catch (InterruptedException e) {
-            logger.info("Failed to recieve Environment Settings response from OpenSearch", e);
+        } catch (TimeoutException e) {
+            logger.info("Failed to receive Environment Settings response from OpenSearch", e);
         } catch (Exception e) {
             logger.info("Failed to send Environment Settings request to OpenSearch", e);
         }

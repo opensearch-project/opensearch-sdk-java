@@ -21,7 +21,7 @@ import org.opensearch.transport.TransportException;
 import org.opensearch.transport.TransportResponseHandler;
 
 import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,14 +30,14 @@ import java.util.concurrent.TimeUnit;
 public class EnvironmentSettingsResponseHandler implements TransportResponseHandler<EnvironmentSettingsResponse> {
 
     private static final Logger logger = LogManager.getLogger(EnvironmentSettingsResponseHandler.class);
-    private final CountDownLatch inProgressLatch;
+    private final CompletableFuture<EnvironmentSettingsResponse> inProgressFuture;
     private Settings environmentSettings;
 
     /**
     * Instantiates a new EnvironmentSettingsResponseHandler with a count down latch and an empty Settings object
     */
     public EnvironmentSettingsResponseHandler() {
-        this.inProgressLatch = new CountDownLatch(1);
+        this.inProgressFuture = new CompletableFuture<>();
         this.environmentSettings = Settings.EMPTY;
     }
 
@@ -47,13 +47,13 @@ public class EnvironmentSettingsResponseHandler implements TransportResponseHand
 
         // Set environmentSettings from response
         this.environmentSettings = response.getEnvironmentSettings();
-        inProgressLatch.countDown();
+        inProgressFuture.complete(response);
     }
 
     @Override
     public void handleException(TransportException exp) {
         logger.info("EnvironmentSettingsRequest failed", exp);
-        inProgressLatch.countDown();
+        inProgressFuture.completeExceptionally(exp);
     }
 
     @Override
@@ -68,11 +68,11 @@ public class EnvironmentSettingsResponseHandler implements TransportResponseHand
 
     /**
      * Invokes await on the EnvironmentSettingsResponseHandler count down latch
-     * @throws InterruptedException
+     * @throws Exception
      *        if the response times out
      */
-    public void awaitResponse() throws InterruptedException {
-        inProgressLatch.await(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS);
+    public void awaitResponse() throws Exception {
+        inProgressFuture.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS).get();
     }
 
     public Settings getEnvironmentSettings() {
