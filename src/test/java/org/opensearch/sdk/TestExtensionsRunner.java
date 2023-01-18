@@ -89,28 +89,13 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         );
     }
 
-    // test manager method invokes start on transport service
     @Test
-    public void testTransportServiceStarted() {
-
-        // verify mocked object interaction in manager method
+    public void testStartTransportService() {
         extensionsRunner.startTransportService(transportService);
+        // test manager method invokes start on transport service
         verify(transportService, times(1)).start();
-    }
-
-    // test manager method invokes accept incoming requests on transport service
-    @Test
-    public void testTransportServiceAcceptedIncomingRequests() {
-
-        // verify mocked object interaction in manager method
-        extensionsRunner.startTransportService(transportService);
-        verify(transportService, times(1)).acceptIncomingRequests();
-    }
-
-    @Test
-    public void testRegisterRequestHandler() {
-
-        extensionsRunner.startTransportService(transportService);
+        // cannot verify acceptIncomingRequests as it is a final method
+        // test registerRequestHandlers
         verify(transportService, times(5)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
     }
 
