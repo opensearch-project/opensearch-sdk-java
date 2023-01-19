@@ -12,12 +12,16 @@ package org.opensearch.sdk;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.opensearch.common.settings.Setting;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.TransportService;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class TestSDKClusterService extends OpenSearchTestCase {
     private ExtensionsRunner extensionsRunner;
@@ -39,5 +43,23 @@ public class TestSDKClusterService extends OpenSearchTestCase {
         ArgumentCaptor<TransportService> argumentCaptor = ArgumentCaptor.forClass(TransportService.class);
         verify(extensionsRunner, times(1)).sendClusterStateRequest(argumentCaptor.capture());
         assertNull(argumentCaptor.getValue());
+    }
+
+    @Test
+    public void testAddSettingsUpdateConsumer() throws Exception {
+        Setting<Boolean> boolSetting = Setting.boolSetting("test", false);
+        Consumer<Boolean> boolConsumer = b -> {};
+        sdkClusterService.addSettingsUpdateConsumer(boolSetting, boolConsumer);
+        verify(extensionsRunner, times(1)).getExtensionTransportService();
+
+        ArgumentCaptor<TransportService> transportServiceArgumentCaptor = ArgumentCaptor.forClass(TransportService.class);
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Map<Setting<?>, Consumer<?>>> updateConsumerArgumentCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(extensionsRunner, times(1)).sendAddSettingsUpdateConsumerRequest(
+            transportServiceArgumentCaptor.capture(),
+            updateConsumerArgumentCaptor.capture()
+        );
+        assertNull(transportServiceArgumentCaptor.getValue());
+        assertEquals(Map.of(boolSetting, boolConsumer), updateConsumerArgumentCaptor.getValue());
     }
 }
