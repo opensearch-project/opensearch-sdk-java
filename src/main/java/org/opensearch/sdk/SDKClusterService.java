@@ -42,12 +42,13 @@ public class SDKClusterService {
 
     /**
      * Add a single settings update consumer to OpenSearch
+     * @param <T> The Type of the setting.
      *
      * @param setting The setting for which to consume updates.
      * @param consumer The consumer of the updates
      * @throws Exception if the registration of the consumer failed.
      */
-    public void addSettingsUpdateConsumer(Setting<?> setting, Consumer<?> consumer) throws Exception {
+    public <T> void addSettingsUpdateConsumer(Setting<T> setting, Consumer<T> consumer) throws Exception {
         addSettingsUpdateConsumer(Map.of(setting, consumer));
     }
 
