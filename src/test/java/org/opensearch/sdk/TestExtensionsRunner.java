@@ -117,7 +117,6 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
             sourceNode.getAddress(),
             new HashMap<String, String>(),
             null,
-            null,
             new ArrayList<ExtensionDependency>()
         );
 
