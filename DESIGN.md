@@ -51,7 +51,8 @@ extensions:
     port: '4532' // port to reach
     version: '1.0' // extension version
     description: Extension for the Opensearch SDK Repo // description of the extension
-    opensearchVersion: '3.0.0' // OpenSearch compatibility
+    opensearchVersion: '3.0.0' // Compiled with OpenSearch version
+    minimumCompatibleVersion: '3.0.0' // Minimum version of OpenSearch the extension is wire compatible with
 ```
 
 ### Communication
@@ -73,6 +74,10 @@ Extensions will use a similar registration feature, but as a separate process wi
 The sequence diagram below shows the process of initializing an Extension, registering its REST actions (API) with OpenSearch, and responding to a user's REST request.  A detailed description of the steps follows the diagram.
 
 The `org.opensearch.sdk.sample` package contains a sample `HelloWorldExtension` implementing the below steps. It is executed following the steps in the [`DEVELOPER_GUIDE`](DEVELOPER_GUIDE.md).
+
+#### Wire Compatibility
+
+Extensions will be wire compatible across minor and patch versions. The configuration contains `minimumCompatibleVersion` which is validated by ExtensionsManager in OpenSearch.
 
 #### Extension REST Actions Walk Through
 
