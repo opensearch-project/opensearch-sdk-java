@@ -196,7 +196,7 @@ public class SDKClient implements Closeable {
     @Deprecated
     public static class SDKRestClient implements Closeable {
 
-        private final RestHighLevelClient rhlc;
+        private final RestHighLevelClient restHighLevelClient;
 
         /**
          * Instantiate this class wrapping a {@link RestHighLevelClient}.
@@ -204,21 +204,21 @@ public class SDKClient implements Closeable {
          * @param restHighLevelClient The client to wrap.
          */
         public SDKRestClient(RestHighLevelClient restHighLevelClient) {
-            this.rhlc = restHighLevelClient;
+            this.restHighLevelClient = restHighLevelClient;
         }
 
         /**
          * A client allowing to perform actions/operations against the cluster.
          */
         public SDKClusterAdminClient cluster() {
-            return new SDKClusterAdminClient(rhlc.cluster());
+            return new SDKClusterAdminClient(restHighLevelClient.cluster());
         }
 
         /**
          * A client allowing to perform actions/operations against the indices.
          */
         public SDKIndicesClient indices() {
-            return new SDKIndicesClient(rhlc.indices());
+            return new SDKIndicesClient(restHighLevelClient.indices());
         }
 
         /**
@@ -231,7 +231,7 @@ public class SDKClient implements Closeable {
          * @see Requests#indexRequest(String)
          */
         public void index(IndexRequest request, ActionListener<IndexResponse> listener) {
-            rhlc.indexAsync(request, RequestOptions.DEFAULT, listener);
+            restHighLevelClient.indexAsync(request, RequestOptions.DEFAULT, listener);
         }
 
         /**
@@ -242,7 +242,7 @@ public class SDKClient implements Closeable {
          * @see Requests#getRequest(String)
          */
         public void get(GetRequest request, ActionListener<GetResponse> listener) {
-            rhlc.getAsync(request, RequestOptions.DEFAULT, listener);
+            restHighLevelClient.getAsync(request, RequestOptions.DEFAULT, listener);
         }
 
         /**
@@ -253,7 +253,7 @@ public class SDKClient implements Closeable {
          * @see Requests#deleteRequest(String)
          */
         public void delete(DeleteRequest request, ActionListener<DeleteResponse> listener) {
-            rhlc.deleteAsync(request, RequestOptions.DEFAULT, listener);
+            restHighLevelClient.deleteAsync(request, RequestOptions.DEFAULT, listener);
         }
 
         /**
@@ -264,12 +264,12 @@ public class SDKClient implements Closeable {
          * @see Requests#searchRequest(String...)
          */
         public void search(SearchRequest request, ActionListener<SearchResponse> listener) {
-            rhlc.searchAsync(request, RequestOptions.DEFAULT, listener);
+            restHighLevelClient.searchAsync(request, RequestOptions.DEFAULT, listener);
         }
 
         @Override
         public void close() throws IOException {
-            rhlc.close();
+            restHighLevelClient.close();
         }
     }
 

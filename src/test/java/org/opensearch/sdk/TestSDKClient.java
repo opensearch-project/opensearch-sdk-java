@@ -33,9 +33,19 @@ import org.opensearch.test.OpenSearchTestCase;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+
 @SuppressWarnings("deprecation")
 public class TestSDKClient extends OpenSearchTestCase {
-    SDKClient sdkClient = new SDKClient();
+    private SDKClient sdkClient;
+
+    @Override
+    @BeforeEach
+    public void setUp() throws Exception {
+        super.setUp();
+        this.sdkClient = new SDKClient();
+    }
 
     @Test
     public void testCreateJavaClient() throws Exception {
@@ -65,7 +75,7 @@ public class TestSDKClient extends OpenSearchTestCase {
         assertDoesNotThrow(() -> restClient.delete(new DeleteRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.search(new SearchRequest(), ActionListener.wrap(r -> {}, e -> {})));
 
-        restClient.close();
+        sdkClient.doCloseHighLevelClient();
     }
 
     @Test
@@ -84,7 +94,14 @@ public class TestSDKClient extends OpenSearchTestCase {
         );
         assertInstanceOf(Cancellable.class, indicesClient.getAliases(new GetAliasesRequest(), ActionListener.wrap(r -> {}, e -> {})));
 
-        restClient.close();
+        sdkClient.doCloseHighLevelClient();
+    }
+
+    @Override
+    @AfterEach
+    public void tearDown() throws Exception {
+        super.tearDown();
+        this.sdkClient.close();
     }
 
 }
