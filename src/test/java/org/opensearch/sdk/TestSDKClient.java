@@ -61,6 +61,7 @@ public class TestSDKClient extends OpenSearchTestCase {
         SDKRestClient restClient = sdkClient.initializeRestClient("localhost", 9200);
         assertInstanceOf(SDKIndicesClient.class, restClient.indices());
         assertInstanceOf(SDKClusterAdminClient.class, restClient.cluster());
+        assertEquals(restClient, restClient.admin());
 
         sdkClient.doCloseHighLevelClient();
     }

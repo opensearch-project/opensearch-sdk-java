@@ -208,6 +208,13 @@ public class SDKClient implements Closeable {
         }
 
         /**
+         * The admin client that can be used to perform administrative operations.
+         */
+        public SDKRestClient admin() {
+            return this;
+        }
+
+        /**
          * A client allowing to perform actions/operations against the cluster.
          */
         public SDKClusterAdminClient cluster() {
