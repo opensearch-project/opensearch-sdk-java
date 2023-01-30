@@ -844,7 +844,8 @@ public interface SearchExtension {
         private final Map<String, Highlighter> highlighters;
 
         /**
-         * Instantiates this object with the specified @param highlighters
+         * Instantiates this object with the specified highlighters
+         * @param highlighters
          */
         public FetchPhaseConstructionContext(Map<String, Highlighter> highlighters) {
             this.highlighters = highlighters;

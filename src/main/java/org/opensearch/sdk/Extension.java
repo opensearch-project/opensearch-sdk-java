@@ -93,11 +93,11 @@ public interface Extension {
     }
 
     /**
-     * Provides the list of this plugin's custom thread pools, empty if
+     * Provides the list of this Extension's custom thread pools, empty if
      * none.
      *
      * @param settings the current settings
-     * @return executors builders for this plugin's custom thread pools
+     * @return executors builders for this Extension's custom thread pools
      */
     default List<ExecutorBuilder<?>> getExecutorBuilders(Settings settings) {
         return Collections.emptyList();
