@@ -182,9 +182,9 @@ public interface SearchExtension {
     }
 
     /**
-     * The executor service provider to be used at search
-     * time by IndexSearcher. The {@link IllegalStateException} is going to be thrown if more then one
-     * Extension tries to register index searcher executor.
+     * The executor service provider (registered through {@link Extension#getExecutorBuilders(Settings)} to be used at search
+     * time by {@code IndexSearcher}. The {@link IllegalStateException} is going to be thrown if more then one
+     * plugin tries to register index searcher executor.
      */
     default Optional<ExecutorServiceProvider> getIndexSearcherExecutorProvider() {
         return Optional.empty();
@@ -844,15 +844,12 @@ public interface SearchExtension {
         private final Map<String, Highlighter> highlighters;
 
         /**
-         * TODO: Doc has to be written for the below method
+         * Instantiates this object with the specified @param highlighters
          */
         public FetchPhaseConstructionContext(Map<String, Highlighter> highlighters) {
             this.highlighters = highlighters;
         }
 
-        /**
-         * TODO: Doc has to be written for the below method
-         */
         public Map<String, Highlighter> getHighlighters() {
             return highlighters;
         }
