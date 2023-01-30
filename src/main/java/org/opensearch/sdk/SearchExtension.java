@@ -1,7 +1,14 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ */
+
 package org.opensearch.sdk;
 
-
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.opensearch.common.CheckedFunction;
@@ -10,7 +17,6 @@ import org.opensearch.common.io.stream.NamedWriteable;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.common.io.stream.Writeable;
 import org.opensearch.common.lucene.search.function.ScoreFunction;
-import org.opensearch.common.settings.Settings;
 import org.opensearch.common.xcontent.ContextParser;
 import org.opensearch.common.xcontent.XContent;
 import org.opensearch.common.xcontent.XContentParser;
@@ -60,7 +66,6 @@ import static java.util.Collections.emptyMap;
 /**
  * Extension for extending search time behavior.
  *
- * @opensearch.api
  */
 public interface SearchExtension {
     /**
@@ -177,8 +182,8 @@ public interface SearchExtension {
     }
 
     /**
-     * The executor service provider (registered through {@link Extension#getExecutorBuilders(Settings)} to be used at search
-     * time by {@link IndexSearcher}. The {@link IllegalStateException} is going to be thrown if more then one
+     * The executor service provider to be used at search
+     * time by IndexSearcher. The {@link IllegalStateException} is going to be thrown if more then one
      * Extension tries to register index searcher executor.
      */
     default Optional<ExecutorServiceProvider> getIndexSearcherExecutorProvider() {
@@ -838,10 +843,16 @@ public interface SearchExtension {
     class FetchPhaseConstructionContext {
         private final Map<String, Highlighter> highlighters;
 
+        /**
+         * TODO: Doc has to be written for the below method
+         */
         public FetchPhaseConstructionContext(Map<String, Highlighter> highlighters) {
             this.highlighters = highlighters;
         }
 
+        /**
+         * TODO: Doc has to be written for the below method
+         */
         public Map<String, Highlighter> getHighlighters() {
             return highlighters;
         }
