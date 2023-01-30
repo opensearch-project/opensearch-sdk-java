@@ -21,6 +21,7 @@ import org.opensearch.common.settings.Setting;
 public class SDKClusterService {
 
     private final ExtensionsRunner extensionsRunner;
+    private final SDKClusterSettings clusterSettings;
 
     /**
      * Create an instance of this object.
@@ -29,6 +30,7 @@ public class SDKClusterService {
      */
     public SDKClusterService(ExtensionsRunner extensionsRunner) {
         this.extensionsRunner = extensionsRunner;
+        this.clusterSettings = new SDKClusterSettings();
     }
 
     /**
@@ -40,25 +42,35 @@ public class SDKClusterService {
         return extensionsRunner.sendClusterStateRequest(extensionsRunner.getExtensionTransportService());
     }
 
-    /**
-     * Add a single settings update consumer to OpenSearch
-     * @param <T> The Type of the setting.
-     *
-     * @param setting The setting for which to consume updates.
-     * @param consumer The consumer of the updates
-     * @throws Exception if the registration of the consumer failed.
-     */
-    public <T> void addSettingsUpdateConsumer(Setting<T> setting, Consumer<T> consumer) throws Exception {
-        addSettingsUpdateConsumer(Map.of(setting, consumer));
+    public SDKClusterSettings getClusterSettings() {
+        return clusterSettings;
     }
 
     /**
-     * Add multiple settings update consumers to OpenSearch
-     *
-     * @param settingUpdateConsumers A map of Setting to Consumer.
-     * @throws Exception if the registration of the consumers failed.
+     * This class simulates methods normally called from OpenSearch ClusterSettings class.
      */
-    public void addSettingsUpdateConsumer(Map<Setting<?>, Consumer<?>> settingUpdateConsumers) throws Exception {
-        extensionsRunner.sendAddSettingsUpdateConsumerRequest(extensionsRunner.getExtensionTransportService(), settingUpdateConsumers);
+    public class SDKClusterSettings {
+
+        /**
+         * Add a single settings update consumer to OpenSearch
+         * @param <T> The Type of the setting.
+         *
+         * @param setting The setting for which to consume updates.
+         * @param consumer The consumer of the updates
+         * @throws Exception if the registration of the consumer failed.
+         */
+        public <T> void addSettingsUpdateConsumer(Setting<T> setting, Consumer<T> consumer) throws Exception {
+            addSettingsUpdateConsumer(Map.of(setting, consumer));
+        }
+
+        /**
+         * Add multiple settings update consumers to OpenSearch
+         *
+         * @param settingUpdateConsumers A map of Setting to Consumer.
+         * @throws Exception if the registration of the consumers failed.
+         */
+        public void addSettingsUpdateConsumer(Map<Setting<?>, Consumer<?>> settingUpdateConsumers) throws Exception {
+            extensionsRunner.sendAddSettingsUpdateConsumerRequest(extensionsRunner.getExtensionTransportService(), settingUpdateConsumers);
+        }
     }
 }
