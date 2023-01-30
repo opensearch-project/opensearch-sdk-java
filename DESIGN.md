@@ -46,11 +46,9 @@ Here is an example extension configuration `extensions.yml`:
 extensions:
   - name: sample-extension // extension name
     uniqueId: opensearch-sdk-1 // identifier for the extension
-    hostName: 'sdk_host' // name of the host where extension is running
     hostAddress: '127.0.0.1' // host to reach
     port: '4532' // port to reach
     version: '1.0' // extension version
-    description: Extension for the Opensearch SDK Repo // description of the extension
     opensearchVersion: '3.0.0' // Compiled with OpenSearch version
     minimumCompatibleVersion: '3.0.0' // Minimum version of OpenSearch the extension is wire compatible with
 ```
