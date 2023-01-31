@@ -10,7 +10,6 @@
 package org.opensearch.sdk;
 
 import org.opensearch.index.IndexSettings;
-import org.opensearch.index.codec.CodecService;
 import org.opensearch.index.codec.CodecServiceFactory;
 import org.opensearch.index.engine.EngineFactory;
 import org.opensearch.index.seqno.RetentionLeases;
@@ -38,20 +37,6 @@ public interface EngineExtension {
         return Optional.empty();
     }
 
-    /**
-     * EXPERT:
-     * When an index is created this method is invoked for each engine Extension. Engine Extensions can inspect the index settings
-     * to determine if a custom {@link CodecService} should be provided for the given index. A Extension that is not overriding
-     * the {@link CodecService} through the Extension can ignore this method and the Codec specified in the {@link IndexSettings}
-     * will be used.
-     *
-     * @deprecated Please use {@code getCustomCodecServiceFactory()} instead as it provides more context for {@link CodecService}
-     * instance construction.
-     */
-    @Deprecated
-    default Optional<CodecService> getCustomCodecService(IndexSettings indexSettings) {
-        return Optional.empty();
-    }
 
     /**
      * EXPERT:
