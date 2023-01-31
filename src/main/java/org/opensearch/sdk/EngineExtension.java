@@ -37,7 +37,6 @@ public interface EngineExtension {
         return Optional.empty();
     }
 
-
     /**
      * EXPERT:
      * When an index is created this method is invoked for each engine Extension. Engine Extensions can inspect the index settings
