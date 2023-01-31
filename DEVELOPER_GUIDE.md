@@ -188,7 +188,7 @@ It is important that the OpenSearch SDK for Java is already up and running on a 
 
 The following request is configured to be handled by the sample `HelloWorldExtension` (note the matching uniqueId):
 ```
-curl -X GET localhost:9200/_extensions/_opensearch-sdk-1/hello
+curl -X GET localhost:9200/_extensions/_opensearch-sdk-java-1/hello
 ```
 
 ## Run Tests
