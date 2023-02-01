@@ -11,25 +11,25 @@ Migration of the [Anomaly Detection Plugin](https://github.com/opensearch-projec
 
 ## Implement Extension Interfaces and Extension Points
 
-Change the implementing class `FooPlugin` to `FooExtension` and implement the `Extension` interface.
- - Implement other corresponding Extension interfaces, for example `ActionPlugin` interface would be `ActionExtension`.
- - Change extension point implementation, if necessary, to conform to new types. For example, `RestHandler` classes become `ExtensionRestHandler` classes.  Consider extending base classes such as `BaseExtensionRestHandler` to provide additional convenience methods.
+ - Change the implementing class `FooPlugin` to `FooExtension` and either implement the `Extension` interface or extend `BaseExtension`.
+   - Implement other corresponding Extension interfaces, for example `ActionPlugin` interface would be `ActionExtension`.
+   - Change extension point implementation, if necessary, to conform to new types. For example, `RestHandler` classes become `ExtensionRestHandler` classes. Consider extending base implementations such as `BaseExtensionRestHandler` to provide additional convenience methods.
 
 ## Use Wrapper Classes
 
 ### Replace ClusterService with SDKClusterService
 
- - `clusterService.getClusterSettings().addSettingsUpdateConsumer()` works as is, but has a method taking a map parameter can do multiple updates more efficiently.
- - `clusterService.state()` has no changes.
+ - Calls to `clusterService.getClusterSettings().addSettingsUpdateConsumer()` with a single consumer do not require changes.  However, this method has an overload which takes a map parameter, and can do multiple consumer updates more efficiently.
+ - Calls to `clusterService.state()` do not require changes.
 
 ### Replace Client with SDKJavaClient or SDKRestClient
 
 The `SDKClient` provides two client options.
 
-The `OpenSearchClient` will be supported, and is actively developed along with other language clients and should be used whenever possible.  This client does have significant implementation differences compared to existing `Client` API.
+The [Java Client for OpenSearch](https://github.com/opensearch-project/opensearch-java) (`OpenSearchClient`) will be supported, and is actively developed along with other language clients and should be used whenever possible. This client does have significant implementation differences compared to existing `Client` API.
 
-The `SDKRestClient` provides wrapper methods matching the `Client` API (but not implementing it), implemented internally with the `RestHighLevelClient`.  While this speeds migration efforts, it should be considered a temporary "bridge" with followup migration efforts to the `SDKJavaClient` planned.
- - While the class names amd method parameters are the same, the `Request` and `Resopnse` classes are often in different packages.  In most cases, other than changing `import` statements, no additional code changes are required.  In a few changes, there are minor changes required to interface with the new response class API.
+The `SDKRestClient` provides wrapper methods matching the `Client` API (but not implementing it), implemented internally with the (soon to be deprecated) `RestHighLevelClient`.  While this speeds migration efforts, it should be considered a temporary "bridge" with follow up migration efforts to the `OpenSearchClient` planned.
+ - While the class names and method parameters are the same, the `Request` and `Response` classes are often in different packages. In most cases, other than changing `import` statements, no additional code changes are required. In a few cases, there are minor changes required to interface with the new response class API.
 
 The `client.execute(action, request, responseListener)` method is not implemented. Instead:
  - Instantiate an instance of the corresponding transport action
