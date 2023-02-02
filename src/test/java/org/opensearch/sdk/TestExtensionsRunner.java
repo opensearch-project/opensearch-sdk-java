@@ -111,13 +111,10 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         DiscoveryExtensionNode extension = new DiscoveryExtensionNode(
             EXTENSION_NAME,
             "opensearch-sdk-1",
-            "",
-            "",
-            "",
             sourceNode.getAddress(),
             new HashMap<String, String>(),
-            null,
-            null,
+            Version.fromString("3.0.0"),
+            Version.fromString("3.0.0"),
             new ArrayList<ExtensionDependency>()
         );
 
