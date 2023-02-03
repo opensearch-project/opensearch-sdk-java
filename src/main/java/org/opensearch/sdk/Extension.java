@@ -22,6 +22,8 @@ import org.opensearch.action.ActionResponse;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.xcontent.NamedXContentRegistry;
+import org.opensearch.threadpool.ExecutorBuilder;
+import org.opensearch.common.settings.Settings;
 
 /**
  * This interface defines methods which an extension must provide. Extensions
@@ -88,5 +90,16 @@ public interface Extension {
      */
     default Map<String, Class<? extends TransportAction<? extends ActionRequest, ? extends ActionResponse>>> getActions() {
         return Collections.emptyMap();
+    }
+
+    /**
+     * Provides the list of this Extension's custom thread pools, empty if
+     * none.
+     *
+     * @param settings the current settings
+     * @return executors builders for this Extension's custom thread pools
+     */
+    default List<ExecutorBuilder<?>> getExecutorBuilders(Settings settings) {
+        return Collections.emptyList();
     }
 }
