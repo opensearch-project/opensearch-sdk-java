@@ -13,9 +13,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.opensearch.common.settings.Setting;
+import org.opensearch.sdk.SDKClusterService.SDKClusterSettings;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.TransportService;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -46,10 +48,15 @@ public class TestSDKClusterService extends OpenSearchTestCase {
     }
 
     @Test
+    public void testGetClusterSettings() {
+        assertInstanceOf(SDKClusterSettings.class, sdkClusterService.getClusterSettings());
+    }
+
+    @Test
     public void testAddSettingsUpdateConsumer() throws Exception {
         Setting<Boolean> boolSetting = Setting.boolSetting("test", false);
         Consumer<Boolean> boolConsumer = b -> {};
-        sdkClusterService.addSettingsUpdateConsumer(boolSetting, boolConsumer);
+        sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(boolSetting, boolConsumer);
         verify(extensionsRunner, times(1)).getExtensionTransportService();
 
         ArgumentCaptor<TransportService> transportServiceArgumentCaptor = ArgumentCaptor.forClass(TransportService.class);
