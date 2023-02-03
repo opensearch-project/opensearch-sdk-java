@@ -102,16 +102,11 @@ A sample `extensions.yml` file is shown below. The `uniqueId` will be used in RE
 extensions:
   - name: hello-world
     uniqueId: opensearch-sdk-java-1
-    hostName: 'sdk_host'
     hostAddress: '127.0.0.1'
     port: '4532'
     version: '1.0'
-    description: Extension for the Opensearch SDK Repo
     opensearchVersion: '3.0.0'
-    javaVersion: '14'
-    className: ExtensionsRunner
-    customFolderName: opensearch-sdk-java
-    hasNativeController: false
+    minimumCompatibleVersion: '3.0.0'
 ```
 
 #### Run OpenSearch
@@ -188,7 +183,7 @@ It is important that the OpenSearch SDK for Java is already up and running on a 
 
 The following request is configured to be handled by the sample `HelloWorldExtension` (note the matching uniqueId):
 ```
-curl -X GET localhost:9200/_extensions/_opensearch-sdk-1/hello
+curl -X GET localhost:9200/_extensions/_opensearch-sdk-java-1/hello
 ```
 
 ## Run Tests
