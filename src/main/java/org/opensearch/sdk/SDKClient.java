@@ -104,7 +104,7 @@ public class SDKClient implements Closeable {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         // Create Client
-        OpenSearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+        OpenSearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper(mapper));
         javaClient = new OpenSearchClient(transport);
         return javaClient;
     }
