@@ -76,7 +76,7 @@ configurations {
 
 dependencies {
 
-    def opensearchVersion = "2.6.0-SNAPSHOT"
+    def opensearchVersion = "2.+"
     def log4jVersion = "2.19.0"
     def nettyVersion = "4.1.87.Final"
     def luceneVersion = "9.4.2"
