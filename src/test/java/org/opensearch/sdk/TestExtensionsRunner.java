@@ -113,8 +113,8 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
             "opensearch-sdk-1",
             sourceNode.getAddress(),
             new HashMap<String, String>(),
-            Version.fromString("2.6.0"),
-            Version.fromString("2.6.0"),
+            Version.CURRENT,
+            Version.CURRENT,
             new ArrayList<ExtensionDependency>()
         );
 
