@@ -16,7 +16,6 @@ import java.util.List;
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
 import org.opensearch.common.settings.Setting;
-import org.opensearch.common.settings.Setting.Property;
 import org.opensearch.sdk.BaseExtension;
 import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionRestHandler;
@@ -43,7 +42,6 @@ public class HelloWorldExtension extends BaseExtension implements ActionExtensio
      * Optional classpath-relative path to a yml file containing extension settings.
      */
     private static final String EXTENSION_SETTINGS_PATH = "/sample/helloworld-settings.yml";
-    private static final String FORBIDDEN_REGEX = "forbidden";
 
     /**
      * Instantiate this extension, initializing the connection settings and REST actions.
@@ -66,14 +64,11 @@ public class HelloWorldExtension extends BaseExtension implements ActionExtensio
         return Arrays.asList(new ActionHandler<>(SampleAction.INSTANCE, SampleTransportAction.class));
     }
 
-    Setting<String> VALIDATED_SETTING = Setting.simpleString("custom.validated", value -> {
-        if (isForbiddenPresent(value)) {
-            throw new IllegalArgumentException("Setting must not contain [forbidden]");
-        }
-    }, Property.NodeScope, Property.Dynamic);
-
-    private boolean isForbiddenPresent(String input) {
-        return Setting.RegexValidator.validate(input, FORBIDDEN_REGEX);
+    /**
+     * A list of object that includes a single instance of Validator for Custom Setting
+     */
+    public List<Setting<?>> getSettings() {
+        return Arrays.asList(ExampleCustomSettingConfig.VALIDATED_SETTING);
     }
 
     /**
