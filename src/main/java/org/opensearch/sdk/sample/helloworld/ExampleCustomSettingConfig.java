@@ -18,7 +18,6 @@ import org.opensearch.common.settings.Setting.Property;
  */
 public class ExampleCustomSettingConfig {
     private static final String FORBIDDEN_REGEX = "forbidden";
-    private final String validated;
 
     /**
      * A string setting, if the string setting match the FORBIDDEN_REGEX string, the validation will be fail.
