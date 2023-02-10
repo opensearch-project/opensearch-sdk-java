@@ -25,6 +25,9 @@ import org.opensearch.action.ActionResponse;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.common.settings.Setting;
+import org.opensearch.common.settings.Setting.Property;
+import org.opensearch.common.settings.Setting.RegexValidator;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.sdk.ActionExtension.ActionHandler;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
@@ -237,4 +240,15 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
 
         assertEquals("failed to find action [" + UnregisteredAction.INSTANCE + "] to execute", ex.getMessage());
     }
+    public void testValidatedSettings() {
+        Setting<String> expectedSetting = Setting.simpleString(
+            "custom.validated",
+            new RegexValidator("forbidden"),
+            Property.NodeScope,
+            Property.Dynamic
+        );
+        Setting<String> extensionValidatedSetting = ExampleCustomSettingConfig.getValidated();
+        assertEquals(expectedSetting, extensionValidatedSetting);
+    }
+
 }

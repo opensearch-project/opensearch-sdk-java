@@ -30,11 +30,11 @@ public class ExampleCustomSettingConfig {
     );
 
     /**
-     * Gets the value of the custom.validated String setting.
+     * For testing
      *
      * @return the custom.validated value
      */
-    public String getValidated() {
-        return validated;
+    public static Setting<String> getValidated() {
+        return VALIDATED_SETTING;
     }
 }
