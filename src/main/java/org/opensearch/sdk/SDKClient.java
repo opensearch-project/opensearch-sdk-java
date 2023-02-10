@@ -25,6 +25,8 @@ import org.opensearch.action.delete.DeleteRequest;
 import org.opensearch.action.delete.DeleteResponse;
 import org.opensearch.action.get.GetRequest;
 import org.opensearch.action.get.GetResponse;
+import org.opensearch.action.get.MultiGetRequest;
+import org.opensearch.action.get.MultiGetResponse;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.index.IndexResponse;
 import org.opensearch.action.search.SearchRequest;
@@ -224,6 +226,15 @@ public class SDKClient implements Closeable {
          */
         public void get(GetRequest request, ActionListener<GetResponse> listener) {
             restHighLevelClient.getAsync(request, RequestOptions.DEFAULT, listener);
+        }
+
+        /**
+         * Gets all the documents that match the criteria
+         * @param request The multiGet Request
+         * @param listener A listener to be notified with a result
+         */
+        public void multiGet(MultiGetRequest request, ActionListener<MultiGetResponse> listener) {
+            restHighLevelClient.mgetAsync(request, RequestOptions.DEFAULT, listener);
         }
 
         /**
