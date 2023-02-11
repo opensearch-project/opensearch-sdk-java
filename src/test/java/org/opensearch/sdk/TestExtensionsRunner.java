@@ -57,8 +57,10 @@ import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
+import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.Transport;
 import org.opensearch.transport.TransportService;
+import org.opensearch.transport.TransportSettings;
 import org.opensearch.common.settings.WriteableSetting;
 
 public class TestExtensionsRunner extends OpenSearchTestCase {
@@ -136,6 +138,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     public void testHandleExtensionRestRequest() throws Exception {
 
         String ext = "token_placeholder";
+        @SuppressWarnings("unused") // placeholder to test the token when identity features merged
         Principal userPrincipal = () -> "user1";
         ExtensionRestRequest request = new ExtensionRestRequest(
             Method.GET,
@@ -199,7 +202,6 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
     @Test
     public void testRegisterCustomSettingsRequest() {
-
         extensionsRunner.sendRegisterCustomSettingsRequest(transportService);
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(AcknowledgedResponseHandler.class));
@@ -220,5 +222,13 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         assertTrue(extensionsRunner.getNamedXContentRegistry().getRegistry() instanceof NamedXContentRegistry);
         extensionsRunner.setNamedXContentRegistry(null);
         assertNull(extensionsRunner.getNamedXContentRegistry());
+        assertTrue(extensionsRunner.getExtension() instanceof BaseExtension);
+        assertEquals(extensionsRunner, ((BaseExtension) extensionsRunner.getExtension()).extensionsRunner());
+        assertTrue(extensionsRunner.getThreadPool() instanceof ThreadPool);
+
+        settings = extensionsRunner.getSettings();
+        assertEquals(ExtensionsRunnerForTest.NODE_NAME, settings.get(ExtensionsRunner.NODE_NAME_SETTING));
+        assertEquals(ExtensionsRunnerForTest.NODE_HOST, settings.get(TransportSettings.BIND_HOST.getKey()));
+        assertEquals(ExtensionsRunnerForTest.NODE_PORT, settings.get(TransportSettings.PORT.getKey()));
     }
 }

@@ -9,6 +9,8 @@
 
 package org.opensearch.sdk;
 
+import java.io.IOException;
+
 import org.junit.jupiter.api.Test;
 import org.opensearch.test.OpenSearchTestCase;
 
@@ -31,15 +33,18 @@ public class TestBaseExtension extends OpenSearchTestCase {
     @Test
     public void testBaseExtensionWithNullPath() {
         // When a null path is passed, reading from YAML will fail.
-        assertThrows(IllegalArgumentException.class, () -> { TestExtension testExtension = new TestExtension(null); });
+        assertThrows(IllegalArgumentException.class, () -> { new TestExtension(null); });
     }
 
     @Test
     public void testBaseExtensionWithBadConfig() {
         // When a bad extensions.yml config is passed, expect failing initialization.
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> { TestExtension testExtension = new TestExtension(EXTENSION_DESCRIPTOR_FILEPATH); }
-        );
+        assertThrows(IllegalArgumentException.class, () -> { new TestExtension(EXTENSION_DESCRIPTOR_FILEPATH); });
+    }
+
+    @Test
+    public void testGetExtensionsRunner() throws IOException {
+        ExtensionsRunnerForTest runner = new ExtensionsRunnerForTest();
+        assertEquals(runner, ((BaseExtension) runner.getExtension()).extensionsRunner());
     }
 }

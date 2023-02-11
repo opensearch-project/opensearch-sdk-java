@@ -10,35 +10,18 @@
 package org.opensearch.sdk;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
 
-import org.opensearch.cluster.service.ClusterService;
-import org.opensearch.threadpool.ThreadPool;
+import com.google.inject.Inject;
 
 /**
- * An abstract class that provides sample methods required by extensions
+ * An abstract class that simplifies extension initialization and provides an instance of the runner.
  */
 public abstract class BaseExtension implements Extension, ActionExtension {
     /**
      * The {@link ExtensionsRunner} instance running this extension
      */
-    protected ExtensionsRunner extensionsRunner;
-
-    /**
-     * A client to make requests to the system
-     */
-    protected SDKClient client;
-
-    /**
-     * A service to allow watching and updating cluster state
-     */
-    protected ClusterService clusterService;
-
-    /**
-     * A service to allow retrieving an executor to run an async action
-     */
-    protected ThreadPool threadPool;
+    @Inject
+    private ExtensionsRunner extensionsRunner;
 
     /**
      * The extension settings include a name, host address, and port.
@@ -73,17 +56,12 @@ public abstract class BaseExtension implements Extension, ActionExtension {
         return this.settings;
     }
 
-    @Override
-    public void setExtensionsRunner(ExtensionsRunner extensionsRunner) {
-        this.extensionsRunner = extensionsRunner;
-    }
-
-    @Override
-    public Collection<Object> createComponents(SDKClient client, ClusterService clusterService, ThreadPool threadPool) {
-        this.client = client;
-        this.clusterService = clusterService;
-        this.threadPool = threadPool;
-
-        return Collections.emptyList();
+    /**
+     * Gets the {@link ExtensionsRunner} of this extension.
+     *
+     * @return the extension runner.
+     */
+    public ExtensionsRunner extensionsRunner() {
+        return this.extensionsRunner;
     }
 }
