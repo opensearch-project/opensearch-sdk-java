@@ -19,7 +19,7 @@ import org.opensearch.threadpool.ThreadPool;
 /**
  * An abstract class that provides sample methods required by extensions
  */
-public abstract class BaseExtension implements Extension {
+public abstract class BaseExtension implements Extension, ActionExtension {
     /**
      * The {@link ExtensionsRunner} instance running this extension
      */

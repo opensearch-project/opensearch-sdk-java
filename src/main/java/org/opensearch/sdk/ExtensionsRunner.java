@@ -138,18 +138,21 @@ public class ExtensionsRunner {
             .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
             .build();
-        // store REST handlers in the registry
-        for (ExtensionRestHandler extensionRestHandler : extension.getExtensionRestHandlers()) {
-            for (Route route : extensionRestHandler.routes()) {
-                extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
+        if (extension instanceof ActionExtension) {
+            // store REST handlers in the registry
+            for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
+                for (Route route : extensionRestHandler.routes()) {
+                    extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
+                }
             }
+            // TODO new getActions code will go here
         }
         // save custom settings
         this.customSettings = extension.getSettings();
         // save custom namedXContent
         this.customNamedXContent = extension.getNamedXContent();
         // save custom transport actions
-        this.transportActions = new TransportActions(extension.getActions());
+        this.transportActions = new TransportActions(extension.getActionsMap());
 
         ThreadPool threadPool = new ThreadPool(this.getSettings());
 
