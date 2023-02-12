@@ -7,7 +7,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk.handlers;
+package org.opensearch.sdk.inject;
 
 import org.opensearch.common.xcontent.NamedXContentRegistry;
 import org.opensearch.sdk.Extension;
