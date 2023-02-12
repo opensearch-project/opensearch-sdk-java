@@ -112,7 +112,18 @@ public class SDKClient implements Closeable {
     }
 
     /**
-     * Creates OpenSearchClient for SDK. It also creates a restClient as a wrapper around Java OpenSearchClient
+     * Initializes an OpenSearchClient using OpenSearch JavaClient
+     *
+     * @param settings The Extension settings
+     * @return The SDKClient implementation of OpenSearchClient. The user is responsible for calling
+     *         {@link #doCloseJavaClient()} when finished with the client
+     */
+    public OpenSearchClient initializeJavaClient(ExtensionSettings settings) {
+        return initializeJavaClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
+    }
+
+    /**
+     * Initializes an OpenSearchClient using OpenSearch JavaClient
      *
      * @param hostAddress The address of OpenSearch cluster, client can connect to
      * @param port        The port of OpenSearch cluster
@@ -135,6 +146,25 @@ public class SDKClient implements Closeable {
         OpenSearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper(mapper));
         javaClient = new OpenSearchClient(transport);
         return javaClient;
+    }
+
+    /**
+     * Initializes a SDK Rest Client wrapping the {@link RestHighLevelClient}.
+     * <p>
+     * The purpose of this client is to provide a drop-in replacement for the syntax of the {@link Client}
+     * implementation in existing plugins with a minimum of code changes.
+     * <p>
+     * Do not use this client for new development.
+     *
+     * @param settings The Extension settings
+     * @return The SDKClient implementation of RestHighLevelClient. The user is responsible for calling
+     *         {@link #doCloseHighLevelClient()} when finished with the client
+     * @deprecated Provided for compatibility with existing plugins to permit migration. Use
+     *             {@link #initializeJavaClient} for new development.
+     */
+    @Deprecated
+    public SDKRestClient initializeRestClient(ExtensionSettings settings) {
+        return initializeRestClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
     }
 
     /**
