@@ -38,13 +38,13 @@ import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
-import org.opensearch.sdk.inject.ExtensionModule;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportResponse;
 import org.opensearch.transport.TransportResponseHandler;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
 
+import com.google.inject.Binder;
 import com.google.inject.Guice;
 
 import java.io.IOException;
@@ -164,12 +164,26 @@ public class ExtensionsRunner {
         // save custom transport actions
         this.transportActions = new TransportActions(extension.getActionsMap());
 
-        Guice.createInjector(new ExtensionModule(this));
-        // get actions
+        Guice.createInjector(b -> {
+            b.bind(ExtensionsRunner.class).toInstance(this);
+            b.bind(Extension.class).toInstance(extension);
+
+            b.bind(NamedXContentRegistry.class).toInstance(getNamedXContentRegistry().getRegistry());
+            b.bind(ThreadPool.class).toInstance(getThreadPool());
+
+            b.bind(SDKClient.class).toInstance(new SDKClient());
+            b.bind(SDKClusterService.class).toInstance(new SDKClusterService(this));
+
+            // create components
+            injectComponents(b);
+        });
         // TODO: put getactions in a MapBinder
-        // create components
-        extension.createComponents();
-        // TODO: figure out how to inject the returned objects
+        // Requires https://github.com/opensearch-project/opensearch-sdk-java/pull/434
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private void injectComponents(Binder b) {
+        extension.createComponents().stream().forEach(p -> b.bind((Class) p.getClass()).toInstance(p));
     }
 
     /**
