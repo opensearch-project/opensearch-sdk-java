@@ -10,6 +10,7 @@
 package org.opensearch.sdk.handlers;
 
 import org.apache.logging.log4j.LogManager;
+
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.discovery.InitializeExtensionRequest;
@@ -18,13 +19,14 @@ import org.opensearch.sdk.ExtensionNamedXContentRegistry;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.transport.TransportService;
 
+import static org.opensearch.sdk.ExtensionsRunner.NODE_NAME_SETTING;
+
 /**
  * This class handles the request from OpenSearch to a {@link ExtensionsRunner#startTransportService(TransportService transportService)} call.
  */
 
 public class ExtensionsInitRequestHandler {
     private static final Logger logger = LogManager.getLogger(ExtensionsInitRequestHandler.class);
-    private static final String NODE_NAME_SETTING = "node.name";
 
     private final ExtensionsRunner extensionsRunner;
 
@@ -49,7 +51,7 @@ public class ExtensionsInitRequestHandler {
         extensionsRunner.setUniqueId(extensionInitRequest.getExtension().getId());
         // Successfully initialized. Send the response.
         try {
-            return new InitializeExtensionResponse(extensionsRunner.settings.get(NODE_NAME_SETTING));
+            return new InitializeExtensionResponse(extensionsRunner.getSettings().get(NODE_NAME_SETTING));
         } finally {
             // After sending successful response to initialization, send the REST API and Settings
             extensionsRunner.setOpensearchNode(extensionsRunner.opensearchNode);
