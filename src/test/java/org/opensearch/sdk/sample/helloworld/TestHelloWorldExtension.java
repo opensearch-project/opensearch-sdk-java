@@ -14,6 +14,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.sdk.ActionExtension;
 import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionSettings;
@@ -42,7 +43,7 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
 
     @Test
     public void testExtensionRestHandlers() {
-        List<ExtensionRestHandler> extensionRestHandlers = extension.getExtensionRestHandlers();
+        List<ExtensionRestHandler> extensionRestHandlers = ((ActionExtension) extension).getExtensionRestHandlers();
         assertEquals(1, extensionRestHandlers.size());
         List<Route> routes = extensionRestHandlers.get(0).routes();
         assertEquals(4, routes.size());
