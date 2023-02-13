@@ -40,6 +40,7 @@ import org.junit.jupiter.api.BeforeEach;
 @SuppressWarnings("deprecation")
 public class TestSDKClient extends OpenSearchTestCase {
     private SDKClient sdkClient;
+    private final ExtensionSettings settings = new ExtensionSettings("", "", "", "localhost", "9200");
 
     @Override
     @BeforeEach
@@ -50,7 +51,7 @@ public class TestSDKClient extends OpenSearchTestCase {
 
     @Test
     public void testCreateJavaClient() throws Exception {
-        OpenSearchClient javaClient = sdkClient.initializeJavaClient("localhost", 9200);
+        OpenSearchClient javaClient = sdkClient.initializeJavaClient(settings);
         assertInstanceOf(OpenSearchIndicesClient.class, javaClient.indices());
         assertInstanceOf(OpenSearchClusterClient.class, javaClient.cluster());
 
@@ -59,7 +60,7 @@ public class TestSDKClient extends OpenSearchTestCase {
 
     @Test
     public void testCreateRestClient() throws Exception {
-        SDKRestClient restClient = sdkClient.initializeRestClient("localhost", 9200);
+        SDKRestClient restClient = sdkClient.initializeRestClient(settings);
         assertInstanceOf(SDKIndicesClient.class, restClient.indices());
         assertInstanceOf(SDKClusterAdminClient.class, restClient.cluster());
         assertEquals(restClient, restClient.admin());
@@ -69,7 +70,7 @@ public class TestSDKClient extends OpenSearchTestCase {
 
     @Test
     public void testSDKRestClient() throws Exception {
-        SDKRestClient restClient = sdkClient.initializeRestClient("localhost", 9200);
+        SDKRestClient restClient = sdkClient.initializeRestClient(settings);
 
         // Would really prefer to mock/verify the method calls but they are final
         assertDoesNotThrow(() -> restClient.index(new IndexRequest(), ActionListener.wrap(r -> {}, e -> {})));
@@ -83,7 +84,7 @@ public class TestSDKClient extends OpenSearchTestCase {
 
     @Test
     public void testSDKIndicesClient() throws Exception {
-        SDKRestClient restClient = sdkClient.initializeRestClient("localhost", 9200);
+        SDKRestClient restClient = sdkClient.initializeRestClient(settings);
         SDKIndicesClient indicesClient = restClient.indices();
 
         // Would really prefer to mock/verify the method calls but the IndicesClient class is final
@@ -106,5 +107,4 @@ public class TestSDKClient extends OpenSearchTestCase {
         super.tearDown();
         this.sdkClient.close();
     }
-
 }
