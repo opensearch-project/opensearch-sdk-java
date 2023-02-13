@@ -38,19 +38,20 @@ import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
-import org.opensearch.sdk.handlers.OpensearchRequestHandler;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportResponse;
 import org.opensearch.transport.TransportResponseHandler;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
 
+import com.google.inject.Binder;
+import com.google.inject.Guice;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
@@ -62,7 +63,13 @@ import java.util.function.Consumer;
 public class ExtensionsRunner {
 
     private static final Logger logger = LogManager.getLogger(ExtensionsRunner.class);
-    private static final String NODE_NAME_SETTING = "node.name";
+    /**
+     * The key for the extension runner's node name in its settings.
+     */
+    public static final String NODE_NAME_SETTING = "node.name";
+
+    // The extension being run
+    private final Extension extension;
 
     // Set when initialization is complete
     private boolean initialized = false;
@@ -96,19 +103,21 @@ public class ExtensionsRunner {
     /**
      * Node name, host, and port. This field is initialized by a call from {@link ExtensionsInitRequestHandler}.
      */
-    public final Settings settings;
+    private final Settings settings;
+    /**
+     * A thread pool for the extension.
+     */
+    private final ThreadPool threadPool;
+
     private ExtensionNamedXContentRegistry extensionNamedXContentRegistry = new ExtensionNamedXContentRegistry(
         Settings.EMPTY,
         Collections.emptyList()
     );
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
-    private OpensearchRequestHandler opensearchRequestHandler = new OpensearchRequestHandler();
     private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
-
-    private SDKClient client = new SDKClient();
 
     /*
      * TODO: expose an interface for extension to register actions
@@ -131,13 +140,14 @@ public class ExtensionsRunner {
      * @throws IOException if the runner failed to read settings or API.
      */
     protected ExtensionsRunner(Extension extension) throws IOException {
-        extension.setExtensionsRunner(this);
+        this.extension = extension;
         ExtensionSettings extensionSettings = extension.getExtensionSettings();
         this.settings = Settings.builder()
             .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
             .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
             .build();
+        this.threadPool = new ThreadPool(settings);
         if (extension instanceof ActionExtension) {
             // store REST handlers in the registry
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
@@ -154,10 +164,34 @@ public class ExtensionsRunner {
         // save custom transport actions
         this.transportActions = new TransportActions(extension.getActionsMap());
 
-        ThreadPool threadPool = new ThreadPool(this.getSettings());
+        Guice.createInjector(b -> {
+            b.bind(ExtensionsRunner.class).toInstance(this);
+            b.bind(Extension.class).toInstance(extension);
 
-        // create components
-        extension.createComponents(client, null, threadPool);
+            b.bind(NamedXContentRegistry.class).toInstance(getNamedXContentRegistry().getRegistry());
+            b.bind(ThreadPool.class).toInstance(getThreadPool());
+
+            b.bind(SDKClient.class).toInstance(new SDKClient());
+            b.bind(SDKClusterService.class).toInstance(new SDKClusterService(this));
+
+            // create components
+            injectComponents(b);
+        });
+        // TODO: put getactions in a MapBinder
+        // Requires https://github.com/opensearch-project/opensearch-sdk-java/pull/434
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private void injectComponents(Binder b) {
+        extension.createComponents().stream().forEach(p -> b.bind((Class) p.getClass()).toInstance(p));
+    }
+
+    /**
+     * Gets the {@link Extension} this class is running.
+     * @return the extension.
+     */
+    public Extension getExtension() {
+        return this.extension;
     }
 
     /**
@@ -503,8 +537,12 @@ public class ExtensionsRunner {
         }
     }
 
-    private Settings getSettings() {
+    public Settings getSettings() {
         return settings;
+    }
+
+    public ThreadPool getThreadPool() {
+        return threadPool;
     }
 
     public TransportService getExtensionTransportService() {
@@ -532,9 +570,7 @@ public class ExtensionsRunner {
         ExtensionsRunner runner = new ExtensionsRunner(extension);
         // initialize the transport service
         NettyTransport nettyTransport = new NettyTransport(runner);
-        Settings runnerSettings = runner.getSettings();
-        ThreadPool threadPool = new ThreadPool(runnerSettings);
-        runner.extensionTransportService = nettyTransport.initializeExtensionTransportService(runnerSettings, threadPool);
+        runner.extensionTransportService = nettyTransport.initializeExtensionTransportService(runner.getSettings(), runner.getThreadPool());
         runner.startActionListener(0);
     }
 }
