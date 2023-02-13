@@ -57,9 +57,8 @@ public class SDKClusterService {
          *
          * @param setting The setting for which to consume updates.
          * @param consumer The consumer of the updates
-         * @throws Exception if the registration of the consumer failed.
          */
-        public <T> void addSettingsUpdateConsumer(Setting<T> setting, Consumer<T> consumer) throws Exception {
+        public <T> void addSettingsUpdateConsumer(Setting<T> setting, Consumer<T> consumer) {
             addSettingsUpdateConsumer(Map.of(setting, consumer));
         }
 
@@ -67,9 +66,8 @@ public class SDKClusterService {
          * Add multiple settings update consumers to OpenSearch
          *
          * @param settingUpdateConsumers A map of Setting to Consumer.
-         * @throws Exception if the registration of the consumers failed.
          */
-        public void addSettingsUpdateConsumer(Map<Setting<?>, Consumer<?>> settingUpdateConsumers) throws Exception {
+        public void addSettingsUpdateConsumer(Map<Setting<?>, Consumer<?>> settingUpdateConsumers) {
             extensionsRunner.sendAddSettingsUpdateConsumerRequest(extensionsRunner.getExtensionTransportService(), settingUpdateConsumers);
         }
     }
