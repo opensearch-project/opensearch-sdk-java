@@ -40,15 +40,6 @@ public interface Extension {
     ExtensionSettings getExtensionSettings();
 
     /**
-     * Gets a list of {@link ExtensionRestHandler} implementations this extension handles.
-     *
-     * @return a list of REST handlers (REST actions) this extension handles.
-     */
-    default List<ExtensionRestHandler> getExtensionRestHandlers() {
-        return Collections.emptyList();
-    }
-
-    /**
      * Gets an optional list of custom {@link Setting} for the extension to register with OpenSearch.
      *
      * @return a list of custom settings this extension uses.
@@ -81,14 +72,18 @@ public interface Extension {
      * @param threadPool A service to allow retrieving an executor to run an async action
      * @return A collection of objects
      */
-    Collection<Object> createComponents(SDKClient client, ClusterService clusterService, ThreadPool threadPool);
+    default Collection<Object> createComponents(SDKClient client, ClusterService clusterService, ThreadPool threadPool) {
+        return Collections.emptyList();
+    }
 
     /**
      * Gets an optional list of custom {@link TransportAction} for the extension to register with OpenSearch.
+     * <p>
+     * TODO: ActionExtension#getActions will replace this: https://github.com/opensearch-project/opensearch-sdk-java/issues/368
      *
      * @return a list of custom transport actions this extension uses.
      */
-    default Map<String, Class<? extends TransportAction<? extends ActionRequest, ? extends ActionResponse>>> getActions() {
+    default Map<String, Class<? extends TransportAction<? extends ActionRequest, ? extends ActionResponse>>> getActionsMap() {
         return Collections.emptyMap();
     }
 

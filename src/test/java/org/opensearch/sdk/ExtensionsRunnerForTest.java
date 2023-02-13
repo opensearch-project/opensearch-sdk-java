@@ -10,8 +10,6 @@
 package org.opensearch.sdk;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * An Extension Runner for testing using test settings.
@@ -25,13 +23,7 @@ public class ExtensionsRunnerForTest extends ExtensionsRunner {
      */
     public ExtensionsRunnerForTest() throws IOException {
         super(new BaseExtension(new ExtensionSettings("sample-extension", "127.0.0.1", "4532", "127.0.0.1", "9200")) {
-
-            @Override
-            public List<ExtensionRestHandler> getExtensionRestHandlers() {
-                return Collections.emptyList();
-            }
         });
-
     }
 
 }
