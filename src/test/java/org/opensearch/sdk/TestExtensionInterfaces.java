@@ -24,14 +24,11 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
             public ExtensionSettings getExtensionSettings() {
                 return null;
             }
-
-            @Override
-            public void setExtensionsRunner(ExtensionsRunner extensionsRunner) {}
         };
 
         assertTrue(extension.getSettings().isEmpty());
         assertTrue(extension.getNamedXContent().isEmpty());
-        assertTrue(extension.createComponents(null, null, null).isEmpty());
+        assertTrue(extension.createComponents().isEmpty());
         assertTrue(extension.getExecutorBuilders(Settings.EMPTY).isEmpty());
     }
 
