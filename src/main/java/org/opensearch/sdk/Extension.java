@@ -14,9 +14,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.opensearch.cluster.service.ClusterService;
-import org.opensearch.threadpool.ThreadPool;
-
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
 import org.opensearch.action.support.TransportAction;
@@ -58,21 +55,11 @@ public interface Extension {
     }
 
     /**
-     * Set the Extension's instance of its corresponding {@link ExtensionsRunner}.
-     *
-     * @param extensionsRunner The ExtensionsRunner running this extension.
-     */
-    void setExtensionsRunner(ExtensionsRunner extensionsRunner);
-
-    /**
      * Returns components added by this extension.
      *
-     * @param client A client to make requests to the system
-     * @param clusterService A service to allow watching and updating cluster state
-     * @param threadPool A service to allow retrieving an executor to run an async action
-     * @return A collection of objects
+     * @return A collection of objects which will be bound to themselves for dependency injection.
      */
-    default Collection<Object> createComponents(SDKClient client, ClusterService clusterService, ThreadPool threadPool) {
+    default Collection<Object> createComponents() {
         return Collections.emptyList();
     }
 

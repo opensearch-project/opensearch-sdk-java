@@ -83,6 +83,7 @@ dependencies {
     def luceneVersion = "9.4.2"
     def jacksonDatabindVersion = "2.14.2"
     def guavaVersion = "31.1-jre"
+    def guiceVersion = "5.1.0"
     def junit4Version = "4.13.2"
     def junit5Version = "5.9.2"
     def jaxbVersion = "2.3.1"
@@ -111,6 +112,7 @@ dependencies {
             because 'versions below 30.0 have active CVE'
         }
     }
+    implementation("com.google.inject:guice:${guiceVersion}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junit5Version}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junit5Version}")
     testImplementation("org.opensearch.test:framework:${opensearchVersion}")
