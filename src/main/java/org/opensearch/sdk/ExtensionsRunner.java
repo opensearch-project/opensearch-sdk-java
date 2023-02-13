@@ -475,37 +475,32 @@ public class ExtensionsRunner {
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      * @param settingUpdateConsumers A map of setting objects and their corresponding consumers
-     * @throws Exception if there are no setting update consumers within the settingUpdateConsumers map
      */
-    public void sendAddSettingsUpdateConsumerRequest(TransportService transportService, Map<Setting<?>, Consumer<?>> settingUpdateConsumers)
-        throws Exception {
-        logger.info("Sending Add Settings Update Consumer request to OpenSearch");
-
+    public void sendAddSettingsUpdateConsumerRequest(
+        TransportService transportService,
+        Map<Setting<?>, Consumer<?>> settingUpdateConsumers
+    ) {
         // Determine if there are setting update consumers to be registered
-        if (settingUpdateConsumers.isEmpty()) {
-            throw new Exception("There are no setting update consumers to be registered");
-        } else {
-
+        if (!settingUpdateConsumers.isEmpty()) {
             // Register setting update consumers to UpdateSettingsRequestHandler
             this.updateSettingsRequestHandler.registerSettingUpdateConsumer(settingUpdateConsumers);
 
             // Extract registered settings from setting update consumer map
             List<Setting<?>> componentSettings = new ArrayList<>(settingUpdateConsumers.size());
             componentSettings.addAll(settingUpdateConsumers.keySet());
+            logger.info(
+                "Sending Add Settings Update Consumer request to OpenSearch for {}",
+                componentSettings.stream().map(Setting::getKey).toArray()
+            );
 
             AcknowledgedResponseHandler acknowledgedResponseHandler = new AcknowledgedResponseHandler();
-            try {
-                transportService.sendRequest(
-                    opensearchNode,
-                    ExtensionsManager.REQUEST_EXTENSION_ADD_SETTINGS_UPDATE_CONSUMER,
-                    new AddSettingsUpdateConsumerRequest(this.extensionNode, componentSettings),
-                    acknowledgedResponseHandler
-                );
-            } catch (Exception e) {
-                logger.info("Failed to send Add Settings Update Consumer request to OpenSearch", e);
-            }
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsManager.REQUEST_EXTENSION_ADD_SETTINGS_UPDATE_CONSUMER,
+                new AddSettingsUpdateConsumerRequest(this.extensionNode, componentSettings),
+                acknowledgedResponseHandler
+            );
         }
-
     }
 
     private Settings getSettings() {
