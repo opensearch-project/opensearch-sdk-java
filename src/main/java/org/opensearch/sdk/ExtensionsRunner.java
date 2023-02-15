@@ -148,6 +148,21 @@ public class ExtensionsRunner {
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
             .build();
         this.threadPool = new ThreadPool(settings);
+
+        Guice.createInjector(b -> {
+            b.bind(ExtensionsRunner.class).toInstance(this);
+            b.bind(Extension.class).toInstance(extension);
+
+            b.bind(NamedXContentRegistry.class).toInstance(getNamedXContentRegistry().getRegistry());
+            b.bind(ThreadPool.class).toInstance(getThreadPool());
+
+            b.bind(SDKClient.class).toInstance(new SDKClient());
+            b.bind(SDKClusterService.class).toInstance(new SDKClusterService(this));
+
+            // create components
+            injectComponents(b);
+        });
+
         if (extension instanceof ActionExtension) {
             // store REST handlers in the registry
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
@@ -164,19 +179,6 @@ public class ExtensionsRunner {
         // save custom transport actions
         this.transportActions = new TransportActions(extension.getActionsMap());
 
-        Guice.createInjector(b -> {
-            b.bind(ExtensionsRunner.class).toInstance(this);
-            b.bind(Extension.class).toInstance(extension);
-
-            b.bind(NamedXContentRegistry.class).toInstance(getNamedXContentRegistry().getRegistry());
-            b.bind(ThreadPool.class).toInstance(getThreadPool());
-
-            b.bind(SDKClient.class).toInstance(new SDKClient());
-            b.bind(SDKClusterService.class).toInstance(new SDKClusterService(this));
-
-            // create components
-            injectComponents(b);
-        });
         // TODO: put getactions in a MapBinder
         // Requires https://github.com/opensearch-project/opensearch-sdk-java/pull/434
     }
