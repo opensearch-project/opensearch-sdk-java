@@ -9,12 +9,16 @@
 
 package org.opensearch.sdk;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
+
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 /**
  * This class encapsulates the settings for an Extension.
@@ -96,12 +100,25 @@ public class ExtensionSettings {
      * @throws IOException if there is an error reading the file.
      */
     public static ExtensionSettings readSettingsFromYaml(String extensionSettingsPath) throws IOException {
+        Yaml yaml = new Yaml(new SafeConstructor());
         URL resource = Extension.class.getResource(extensionSettingsPath);
         if (resource == null) {
-            return null;
+            throw new IOException("extension.yml does not exist at path [" + extensionSettingsPath + "]");
         }
-        File file = new File(resource.getPath());
-        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        return objectMapper.readValue(file, ExtensionSettings.class);
+        try (InputStream inputStream = Files.newInputStream(Path.of(resource.toURI()))) {
+            Map<String, Object> extensionMap = yaml.load(inputStream);
+            if (extensionMap == null) {
+                throw new IOException("extension.yml is empty");
+            }
+            return new ExtensionSettings(
+                extensionMap.get("extensionName").toString(),
+                extensionMap.get("hostAddress").toString(),
+                extensionMap.get("hostPort").toString(),
+                extensionMap.get("opensearchAddress").toString(),
+                extensionMap.get("opensearchPort").toString()
+            );
+        } catch (URISyntaxException e) {
+            throw new IOException("Error reading from extension.yml");
+        }
     }
 }
