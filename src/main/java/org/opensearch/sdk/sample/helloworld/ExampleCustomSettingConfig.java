@@ -22,19 +22,11 @@ public class ExampleCustomSettingConfig {
     /**
      * A string setting, if the string setting match the FORBIDDEN_REGEX string, the validation will be fail.
      */
-    static final Setting<String> VALIDATED_SETTING = Setting.simpleString(
+    public static final Setting<String> VALIDATED_SETTING = Setting.simpleString(
         "custom.validated",
         new RegexValidator(FORBIDDEN_REGEX),
         Property.NodeScope,
         Property.Dynamic
     );
 
-    /**
-     * For testing
-     *
-     * @return the custom.validated value
-     */
-    public static Setting<String> getValidated() {
-        return VALIDATED_SETTING;
-    }
 }
