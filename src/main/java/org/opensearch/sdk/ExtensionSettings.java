@@ -107,7 +107,6 @@ public class ExtensionSettings {
         }
         try (InputStream inputStream = Files.newInputStream(Path.of(resource.toURI()))) {
             Map<String, Object> extensionMap = yaml.load(inputStream);
-            inputStream.close();
             if (extensionMap == null) {
                 throw new IOException("extension.yml is empty");
             }
