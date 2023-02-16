@@ -8,6 +8,10 @@
 build-idea/
 out/
 
+# eclipse files
+.classpath
+.project
+
 # gradle stuff
 .gradle/
 build/
