@@ -21,6 +21,7 @@ import org.opensearch.common.settings.Setting;
 import org.opensearch.common.xcontent.NamedXContentRegistry;
 import org.opensearch.threadpool.ExecutorBuilder;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.extensions.ExtensionsManager;;
 
 /**
  * This interface defines methods which an extension must provide. Extensions
@@ -82,6 +83,16 @@ public interface Extension {
      * @return executors builders for this Extension's custom thread pools
      */
     default List<ExecutorBuilder<?>> getExecutorBuilders(Settings settings) {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Provides the list of implimented interfaces by an extension, empty if
+     * none.
+     *
+     * @return list of Interfaces implimented by extension
+     */
+    default List<ExtensionsManager.ExtensionInterfaceType> getImplimentedInterfaces() {
         return Collections.emptyList();
     }
 }

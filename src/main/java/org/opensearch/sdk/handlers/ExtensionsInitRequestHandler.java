@@ -60,6 +60,7 @@ public class ExtensionsInitRequestHandler {
             extensionTransportService.connectToNode(extensionsRunner.opensearchNode);
             extensionsRunner.sendRegisterRestActionsRequest(extensionTransportService);
             extensionsRunner.sendRegisterCustomSettingsRequest(extensionTransportService);
+            extensionsRunner.sendRegisterImplimentedInterfacesRequest(extensionTransportService);
             extensionsRunner.transportActions.sendRegisterTransportActionsRequest(
                 extensionTransportService,
                 extensionsRunner.opensearchNode,
