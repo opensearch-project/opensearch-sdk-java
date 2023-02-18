@@ -16,7 +16,6 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
-import org.opensearch.extensions.settings.RegisterImplimentedInterfaceRequest;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.xcontent.NamedXContentRegistry;
@@ -96,10 +95,6 @@ public class ExtensionsRunner {
      * Custom settings from the extension's getSettings. This field is initialized in the constructor.
      */
     private final List<Setting<?>> customSettings;
-    /**
-     * Interfaces Implimented by Extension from getImplimentedInterfaces method . This field is initialized in the constructor.
-     */
-    private final List<ExtensionsManager.ExtensionInterfaceType> implimentedInterfaces;
     /**
      * Environment settings from OpenSearch. This field is initialized by a call from
      * {@link ExtensionsInitRequestHandler}.
@@ -183,9 +178,6 @@ public class ExtensionsRunner {
         this.customNamedXContent = extension.getNamedXContent();
         // save custom transport actions
         this.transportActions = new TransportActions(extension.getActionsMap());
-
-        //save the implimented interfaces here.
-        this.implimentedInterfaces = extension.getImplimentedInterfaces();
 
         // TODO: put getactions in a MapBinder
         // Requires https://github.com/opensearch-project/opensearch-sdk-java/pull/434
@@ -397,26 +389,6 @@ public class ExtensionsRunner {
             );
         } catch (Exception e) {
             logger.info("Failed to send Register Settings request to OpenSearch", e);
-        }
-    }
-
-    /**
-     * Requests that OpenSearch register all the Interfaces implimented by the extension.
-     *
-     * @param transportService  The TransportService defining the connection to OpenSearch.
-     */
-    public void sendRegisterImplimentedInterfacesRequest(TransportService transportService) {
-        logger.info("Sending Implimented interfaces by Extension");
-        AcknowledgedResponseHandler registerImplimentedInterfaceResponseHandler = new AcknowledgedResponseHandler();
-        try {
-            transportService.sendRequest(
-                opensearchNode,
-                ExtensionsManager.REQUEST_EXTENSION_REGISTER_IMPLIMENTED_INTERFACES,
-                new RegisterImplimentedInterfaceRequest(getUniqueId(),implimentedInterfaces),
-                registerImplimentedInterfaceResponseHandler
-            );
-        } catch (Exception e) {
-            logger.info("Failed to send Register Interfaces implimented by extension request to OpenSearch", e);
         }
     }
 

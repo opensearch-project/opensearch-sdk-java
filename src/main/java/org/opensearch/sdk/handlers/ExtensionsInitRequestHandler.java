@@ -17,9 +17,13 @@ import org.opensearch.discovery.InitializeExtensionRequest;
 import org.opensearch.discovery.InitializeExtensionResponse;
 import org.opensearch.sdk.ExtensionNamedXContentRegistry;
 import org.opensearch.sdk.ExtensionsRunner;
+import org.opensearch.sdk.Extension;
 import org.opensearch.transport.TransportService;
 
 import static org.opensearch.sdk.ExtensionsRunner.NODE_NAME_SETTING;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class handles the request from OpenSearch to a {@link ExtensionsRunner#startTransportService(TransportService transportService)} call.
@@ -49,9 +53,18 @@ public class ExtensionsInitRequestHandler {
         logger.info("Registering Extension Request received from OpenSearch");
         extensionsRunner.opensearchNode = extensionInitRequest.getSourceNode();
         extensionsRunner.setUniqueId(extensionInitRequest.getExtension().getId());
+
+        Extension extension = extensionsRunner.getExtension();
+        Class<?>[] interfaces = extension.getClass().getInterfaces();
+        List<String> interfacesOfOpenSearch = new ArrayList<String>();
+        for (Class<?> anInterface : interfaces) {
+            if (anInterface.getPackageName() == "org.opensearch.sdk") {
+                interfacesOfOpenSearch.add(anInterface.getSimpleName());
+            }
+        }
         // Successfully initialized. Send the response.
         try {
-            return new InitializeExtensionResponse(extensionsRunner.getSettings().get(NODE_NAME_SETTING));
+            return new InitializeExtensionResponse(extensionsRunner.getSettings().get(NODE_NAME_SETTING), interfacesOfOpenSearch);
         } finally {
             // After sending successful response to initialization, send the REST API and Settings
             extensionsRunner.setOpensearchNode(extensionsRunner.opensearchNode);
@@ -60,7 +73,6 @@ public class ExtensionsInitRequestHandler {
             extensionTransportService.connectToNode(extensionsRunner.opensearchNode);
             extensionsRunner.sendRegisterRestActionsRequest(extensionTransportService);
             extensionsRunner.sendRegisterCustomSettingsRequest(extensionTransportService);
-            extensionsRunner.sendRegisterImplimentedInterfacesRequest(extensionTransportService);
             extensionsRunner.transportActions.sendRegisterTransportActionsRequest(
                 extensionTransportService,
                 extensionsRunner.opensearchNode,
