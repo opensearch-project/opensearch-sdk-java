@@ -12,14 +12,20 @@ package org.opensearch.sdk.action;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.opensearch.action.ActionType;
 import org.opensearch.action.support.ActionFilters;
+import org.opensearch.action.support.TransportAction;
 import org.opensearch.common.NamedRegistry;
 import org.opensearch.sdk.ActionExtension.ActionHandler;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.MapBinder;
+
 import org.opensearch.sdk.ActionExtension;
 
 import static java.util.Collections.unmodifiableMap;
 
-public class SDKActionModule {
+public class SDKActionModule extends AbstractModule {
 
     private final Map<String, ActionHandler<?, ?>> actions;
     private final ActionFilters actionFilters;
@@ -60,4 +66,22 @@ public class SDKActionModule {
         return new ActionFilters(extension.getActionFilters().stream().collect(Collectors.toSet()));
     }
 
+    @Override
+    protected void configure() {
+        // Bind action filters
+        bind(ActionFilters.class).toInstance(actionFilters);
+
+        // bind ActionType -> transportAction Map used by Client
+        @SuppressWarnings("rawtypes")
+        MapBinder<ActionType, TransportAction> transportActionsBinder = MapBinder.newMapBinder(
+            binder(),
+            ActionType.class,
+            TransportAction.class
+        );
+        for (ActionHandler<?, ?> action : actions.values()) {
+            // bind the action as eager singleton, so the map binder one will reuse it
+            bind(action.getTransportAction()).asEagerSingleton();
+            transportActionsBinder.addBinding(action.getAction()).to(action.getTransportAction()).asEagerSingleton();
+        }
+    }
 }

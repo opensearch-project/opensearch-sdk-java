@@ -31,6 +31,7 @@ import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
+import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionDependencyResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionsIndicesModuleNameRequestHandler;
@@ -54,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * The primary class to run an extension.
@@ -119,14 +121,10 @@ public class ExtensionsRunner {
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
 
-    /*
-     * TODO: expose an interface for extension to register actions
-     * https://github.com/opensearch-project/opensearch-sdk-java/issues/119
-     */
     /**
      * Instantiates a new transportActions
      */
-    public TransportActions transportActions;
+    public final TransportActions transportActions;
 
     /**
      * Instantiates a new update settings request handler
@@ -149,19 +147,38 @@ public class ExtensionsRunner {
             .build();
         this.threadPool = new ThreadPool(settings);
 
-        Guice.createInjector(b -> {
+        List<com.google.inject.Module> modules = new ArrayList<>();
+        // Base bindings
+        modules.add(b -> {
             b.bind(ExtensionsRunner.class).toInstance(this);
             b.bind(Extension.class).toInstance(extension);
 
+            // FIXME: Change this to a provider interface
+            // https://github.com/opensearch-project/opensearch-sdk-java/issues/447
             b.bind(NamedXContentRegistry.class).toInstance(getNamedXContentRegistry().getRegistry());
             b.bind(ThreadPool.class).toInstance(getThreadPool());
 
             b.bind(SDKClient.class).toInstance(new SDKClient());
             b.bind(SDKClusterService.class).toInstance(new SDKClusterService(this));
-
-            // create components
-            injectComponents(b);
         });
+        // Bind the return values from create components
+        modules.add(this::injectComponents);
+        // Bind actions from getActions
+        if (extension instanceof ActionExtension) {
+            SDKActionModule sdkActionModule = new SDKActionModule((ActionExtension) extension);
+            modules.add(sdkActionModule);
+            // save custom transport actions
+            this.transportActions = new TransportActions(
+                sdkActionModule.getActions()
+                    .entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().getTransportAction()))
+            );
+        } else {
+            this.transportActions = new TransportActions(Collections.emptyMap());
+        }
+
+        Guice.createInjector((com.google.inject.Module[]) modules.toArray());
 
         if (extension instanceof ActionExtension) {
             // store REST handlers in the registry
@@ -170,17 +187,11 @@ public class ExtensionsRunner {
                     extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
                 }
             }
-            // TODO new getActions code will go here
         }
         // save custom settings
         this.customSettings = extension.getSettings();
         // save custom namedXContent
         this.customNamedXContent = extension.getNamedXContent();
-        // save custom transport actions
-        this.transportActions = new TransportActions(extension.getActionsMap());
-
-        // TODO: put getactions in a MapBinder
-        // Requires https://github.com/opensearch-project/opensearch-sdk-java/pull/434
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
