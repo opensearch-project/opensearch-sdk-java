@@ -39,6 +39,7 @@ import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
+import org.opensearch.tasks.TaskManager;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportResponse;
 import org.opensearch.transport.TransportResponseHandler;
@@ -110,6 +111,10 @@ public class ExtensionsRunner {
      * A thread pool for the extension.
      */
     private final ThreadPool threadPool;
+    /**
+     * A task manager for the extension
+     */
+    private final TaskManager taskManager;
 
     private ExtensionNamedXContentRegistry extensionNamedXContentRegistry = new ExtensionNamedXContentRegistry(
         Settings.EMPTY,
@@ -146,6 +151,7 @@ public class ExtensionsRunner {
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
             .build();
         this.threadPool = new ThreadPool(settings);
+        this.taskManager = new TaskManager(settings, threadPool, Collections.emptySet());
 
         List<com.google.inject.Module> modules = new ArrayList<>();
         // Base bindings
@@ -157,6 +163,7 @@ public class ExtensionsRunner {
             // https://github.com/opensearch-project/opensearch-sdk-java/issues/447
             b.bind(NamedXContentRegistry.class).toInstance(getNamedXContentRegistry().getRegistry());
             b.bind(ThreadPool.class).toInstance(getThreadPool());
+            b.bind(TaskManager.class).toInstance(taskManager);
 
             b.bind(SDKClient.class);
             b.bind(SDKClusterService.class).toInstance(new SDKClusterService(this));

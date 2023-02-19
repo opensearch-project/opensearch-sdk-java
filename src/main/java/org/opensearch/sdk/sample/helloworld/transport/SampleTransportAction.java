@@ -15,6 +15,8 @@ import org.opensearch.action.support.TransportAction;
 import org.opensearch.tasks.Task;
 import org.opensearch.tasks.TaskManager;
 
+import com.google.inject.Inject;
+
 /**
  * A sample {@link TransportAction} used as they value for the action map
  */
@@ -27,6 +29,7 @@ public class SampleTransportAction extends TransportAction<SampleRequest, Sample
      * @param actionFilters Action filters
      * @param taskManager The task manager
      */
+    @Inject
     protected SampleTransportAction(String actionName, ActionFilters actionFilters, TaskManager taskManager) {
         super(actionName, actionFilters, taskManager);
     }

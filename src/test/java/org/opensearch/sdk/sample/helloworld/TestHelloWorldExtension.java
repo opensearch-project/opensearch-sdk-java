@@ -9,26 +9,65 @@
 
 package org.opensearch.sdk.sample.helloworld;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opensearch.action.ActionListener;
+import org.opensearch.action.ActionRequest;
+import org.opensearch.action.ActionResponse;
+import org.opensearch.common.settings.Settings;
 import org.opensearch.rest.RestHandler.Route;
-import org.opensearch.sdk.ActionExtension;
-import org.opensearch.sdk.Extension;
+import org.opensearch.sdk.ActionExtension.ActionHandler;
+import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
+import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
+import org.opensearch.sdk.sample.helloworld.transport.SampleResponse;
+import org.opensearch.tasks.TaskManager;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionSettings;
+import org.opensearch.sdk.ExtensionsRunner;
+import org.opensearch.sdk.SDKClient;
+import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.test.OpenSearchTestCase;
+import org.opensearch.threadpool.ThreadPool;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 public class TestHelloWorldExtension extends OpenSearchTestCase {
 
-    private Extension extension;
+    private HelloWorldExtension extension;
+    private Injector injector;
+    private SDKClient sdkClient;
 
     @Override
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         this.extension = new HelloWorldExtension();
+
+        // Do portions of Guice injection needed for this test
+        Settings settings = Settings.builder().put(ExtensionsRunner.NODE_NAME_SETTING, "test").build();
+        ThreadPool threadPool = new ThreadPool(settings);
+        TaskManager taskManager = new TaskManager(settings, threadPool, Collections.emptySet());
+        this.injector = Guice.createInjector(new SDKActionModule(extension), b -> {
+            b.bind(ThreadPool.class).toInstance(threadPool);
+            b.bind(TaskManager.class).toInstance(taskManager);
+            b.bind(SDKClient.class);
+        });
+        this.sdkClient = injector.getInstance(SDKClient.class);
+    }
+
+    @Override
+    @AfterEach
+    public void tearDown() throws Exception {
+        super.tearDown();
+        this.injector = null;
     }
 
     @Test
@@ -43,10 +82,62 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
 
     @Test
     public void testExtensionRestHandlers() {
-        List<ExtensionRestHandler> extensionRestHandlers = ((ActionExtension) extension).getExtensionRestHandlers();
+        List<ExtensionRestHandler> extensionRestHandlers = extension.getExtensionRestHandlers();
         assertEquals(1, extensionRestHandlers.size());
         List<Route> routes = extensionRestHandlers.get(0).routes();
         assertEquals(4, routes.size());
     }
 
+    @Test
+    public void testGetActions() {
+        List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> actions = extension.getActions();
+        assertEquals(1, actions.size());
+    }
+
+    @Test
+    public void testClientExecuteSampleActions() throws Exception {
+        String expectedName = "world";
+        String expectedGreeting = "Hello, " + expectedName;
+        SampleRequest request = new SampleRequest(expectedName);
+        CompletableFuture<SampleResponse> responseFuture = new CompletableFuture<>();
+
+        sdkClient.execute(SampleAction.INSTANCE, request, new ActionListener<SampleResponse>() {
+            @Override
+            public void onResponse(SampleResponse response) {
+                responseFuture.complete(response);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                responseFuture.completeExceptionally(e);
+            }
+        });
+
+        SampleResponse response = responseFuture.get(1, TimeUnit.SECONDS);
+        assertEquals(expectedGreeting, response.getGreeting());
+    }
+
+    @Test
+    public void testExceptionalClientExecuteSampleActions() throws Exception {
+        String expectedName = "";
+        SampleRequest request = new SampleRequest(expectedName);
+        CompletableFuture<SampleResponse> responseFuture = new CompletableFuture<>();
+
+        sdkClient.execute(SampleAction.INSTANCE, request, new ActionListener<SampleResponse>() {
+            @Override
+            public void onResponse(SampleResponse response) {
+                responseFuture.complete(response);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                responseFuture.completeExceptionally(e);
+            }
+        });
+
+        ExecutionException ex = assertThrows(ExecutionException.class, () -> responseFuture.get(1, TimeUnit.SECONDS));
+        Throwable cause = ex.getCause();
+        assertTrue(cause instanceof IllegalArgumentException);
+        assertEquals("The request name is blank.", cause.getMessage());
+    }
 }

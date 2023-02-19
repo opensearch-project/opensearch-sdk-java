@@ -82,20 +82,13 @@ public class SDKClient implements Closeable {
 
     // Used by client.execute
     @SuppressWarnings("rawtypes")
+    @Inject
     private Map<ActionType, TransportAction> actions;
 
     /**
      * Instantiate this client.
-     * <p>
-     * This is injected via Guice.
-     *
-     * @param actions A map of ActionType to TransportAction
      */
-    @SuppressWarnings("rawtypes")
-    @Inject
-    public SDKClient(Map<ActionType, TransportAction> actions) {
-        this.actions = actions;
-    }
+    public SDKClient() {}
 
     /**
      * Create and configure a RestClientBuilder
