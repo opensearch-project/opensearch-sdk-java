@@ -94,7 +94,7 @@ public class SDKClient implements Closeable {
      * Create and configure a RestClientBuilder
      *
      * @param hostAddress The address the client should connect to
-     * @param port        The port the client should connect to
+     * @param port The port the client should connect to
      * @return An instance of the builder
      */
     private static RestClientBuilder builder(String hostAddress, int port) {
@@ -142,7 +142,7 @@ public class SDKClient implements Closeable {
      * Initializes an OpenSearchClient using OpenSearch JavaClient
      *
      * @param hostAddress The address of OpenSearch cluster, client can connect to
-     * @param port        The port of OpenSearch cluster
+     * @param port The port of OpenSearch cluster
      * @return The SDKClient implementation of OpenSearchClient. The user is responsible for calling
      *         {@link #doCloseJavaClient()} when finished with the client
      */
@@ -234,11 +234,11 @@ public class SDKClient implements Closeable {
     /**
      * Executes a Transport Action
      *
-     * @param <Request>  The Request type for the action
+     * @param <Request> The Request type for the action
      * @param <Response> The Response type for the action
-     * @param action     The registered action
-     * @param request    The Request
-     * @param listener   An action listener for the Response
+     * @param action The registered action
+     * @param request The Request
+     * @param listener An action listener for the Response
      */
     public final <Request extends ActionRequest, Response extends ActionResponse> void execute(
         ActionType<Response> action,
@@ -254,12 +254,9 @@ public class SDKClient implements Closeable {
     }
 
     /**
-     * Wraps an internal {@link RestHighLevelClient} using method signatures expected by {@link Client} and
-     * {@link org.opensearch.client.AdminClient} syntax, providing a drop-in replacement in existing plugins with a
-     * minimum of code changes.
+     * Wraps an internal {@link RestHighLevelClient} using method signatures expected by {@link Client} and {@link org.opensearch.client.AdminClient} syntax, providing a drop-in replacement in existing plugins with a minimum of code changes.
      * <p>
-     * While some {@link Client} interface methods are implemented here, the interface is intentionally not fully
-     * implemented as it is intended to be deprecated.
+     * While some {@link Client} interface methods are implemented here, the interface is intentionally not fully implemented as it is intended to be deprecated.
      * <p>
      * Do not use this client for new development.
      *
@@ -328,7 +325,7 @@ public class SDKClient implements Closeable {
         /**
          * Gets all the documents that match the criteria
          *
-         * @param request  The multiGet Request
+         * @param request The multiGet Request
          * @param listener A listener to be notified with a result
          */
         public void multiGet(MultiGetRequest request, ActionListener<MultiGetResponse> listener) {
@@ -338,7 +335,7 @@ public class SDKClient implements Closeable {
         /**
          * Deletes a document from the index based on the index, and id.
          *
-         * @param request  The delete request
+         * @param request The delete request
          * @param listener A listener to be notified with a result
          * @see Requests#deleteRequest(String)
          */
@@ -349,7 +346,7 @@ public class SDKClient implements Closeable {
         /**
          * Search across one or more indices with a query.
          *
-         * @param request  The search request
+         * @param request The search request
          * @param listener A listener to be notified of the result
          * @see Requests#searchRequest(String...)
          */
@@ -364,8 +361,7 @@ public class SDKClient implements Closeable {
     }
 
     /**
-     * Wraps an internal {@link ClusterAdminClient}, providing a drop-in replacement in existing plugins with a minimum
-     * of code changes.
+     * Wraps an internal {@link ClusterAdminClient}, providing a drop-in replacement in existing plugins with a minimum of code changes.
      * <p>
      * Do not use this client for new development.
      */
@@ -388,8 +384,7 @@ public class SDKClient implements Closeable {
     }
 
     /**
-     * Wraps an internal {@link IndicesClient}, providing a drop-in replacement in existing plugins with a minimum of
-     * code changes.
+     * Wraps an internal {@link IndicesClient}, providing a drop-in replacement in existing plugins with a minimum of code changes.
      * <p>
      * Do not use this client for new development.
      */
@@ -410,7 +405,7 @@ public class SDKClient implements Closeable {
          * Asynchronously creates an index using the Create Index API.
          *
          * @param createIndexRequest the request
-         * @param listener           the listener to be notified upon request completion
+         * @param listener the listener to be notified upon request completion
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable create(CreateIndexRequest createIndexRequest, ActionListener<CreateIndexResponse> listener) {
@@ -421,7 +416,7 @@ public class SDKClient implements Closeable {
          * Asynchronously deletes an index using the Delete Index API.
          *
          * @param deleteIndexRequest the request
-         * @param listener           the listener to be notified upon request completion
+         * @param listener the listener to be notified upon request completion
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable delete(DeleteIndexRequest deleteIndexRequest, ActionListener<AcknowledgedResponse> listener) {
@@ -432,7 +427,7 @@ public class SDKClient implements Closeable {
          * Asynchronously updates the mappings on an index using the Put Mapping API.
          *
          * @param putMappingRequest the request
-         * @param listener          the listener to be notified upon request completion
+         * @param listener the listener to be notified upon request completion
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable putMapping(PutMappingRequest putMappingRequest, ActionListener<AcknowledgedResponse> listener) {
@@ -443,7 +438,7 @@ public class SDKClient implements Closeable {
          * Asynchronously retrieves the mappings on an index on indices using the Get Mapping API.
          *
          * @param getMappingsRequest the request
-         * @param listener           the listener to be notified upon request completion
+         * @param listener the listener to be notified upon request completion
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable getMapping(GetMappingsRequest getMappingsRequest, ActionListener<GetMappingsResponse> listener) {
@@ -454,7 +449,7 @@ public class SDKClient implements Closeable {
          * Asynchronously rolls over an index using the Rollover Index API.
          *
          * @param rolloverRequest the request
-         * @param listener        the listener to be notified upon request completion
+         * @param listener the listener to be notified upon request completion
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable rolloverIndex(RolloverRequest rolloverRequest, ActionListener<RolloverResponse> listener) {
@@ -465,7 +460,7 @@ public class SDKClient implements Closeable {
          * Asynchronously gets one or more aliases using the Get Index Aliases API.
          *
          * @param getAliasesRequest the request
-         * @param listener          the listener to be notified upon request completion
+         * @param listener the listener to be notified upon request completion
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable getAliases(GetAliasesRequest getAliasesRequest, ActionListener<GetAliasesResponse> listener) {
