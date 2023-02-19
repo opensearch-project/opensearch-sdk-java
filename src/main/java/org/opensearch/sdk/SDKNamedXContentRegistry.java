@@ -20,6 +20,7 @@ import org.opensearch.cluster.ClusterModule;
 import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.xcontent.NamedXContentRegistry;
+import org.opensearch.common.xcontent.NamedXContentRegistry.Entry;
 import org.opensearch.indices.IndicesModule;
 import org.opensearch.search.SearchModule;
 
@@ -37,7 +38,11 @@ public class SDKNamedXContentRegistry {
      * @param extensionNamedXContent List of NamedXContentRegistry.Entry to be registered
      */
     public SDKNamedXContentRegistry(Settings settings, List<NamedXContentRegistry.Entry> extensionNamedXContent) {
-        this.namedXContentRegistry = new NamedXContentRegistry(
+        this.namedXContentRegistry = createRegistry(settings, extensionNamedXContent);
+    }
+
+    private NamedXContentRegistry createRegistry(Settings settings, List<Entry> extensionNamedXContent) {
+        return new NamedXContentRegistry(
             Stream.of(
                 extensionNamedXContent.stream(),
                 NetworkModule.getNamedXContents().stream(),
