@@ -11,12 +11,14 @@ package org.opensearch.sdk;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.inject.Inject;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import org.apache.hc.core5.function.Factory;
 import org.apache.hc.core5.http.HttpHost;
@@ -28,6 +30,9 @@ import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.reactor.ssl.TlsDetails;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.opensearch.action.ActionListener;
+import org.opensearch.action.ActionRequest;
+import org.opensearch.action.ActionResponse;
+import org.opensearch.action.ActionType;
 import org.opensearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.opensearch.action.delete.DeleteRequest;
@@ -40,6 +45,7 @@ import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.index.IndexResponse;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
+import org.opensearch.action.support.TransportAction;
 import org.opensearch.action.support.master.AcknowledgedResponse;
 import org.opensearch.client.Cancellable;
 import org.opensearch.client.Client;
@@ -74,11 +80,28 @@ public class SDKClient implements Closeable {
     private RestClient restClient;
     private RestHighLevelClient sdkRestClient;
 
+    // Used by client.execute
+    @SuppressWarnings("rawtypes")
+    private Map<ActionType, TransportAction> actions;
+
+    /**
+     * Instantiate this client.
+     * <p>
+     * This is injected via Guice.
+     *
+     * @param actions A map of ActionType to TransportAction
+     */
+    @SuppressWarnings("rawtypes")
+    @Inject
+    public SDKClient(Map<ActionType, TransportAction> actions) {
+        this.actions = actions;
+    }
+
     /**
      * Create and configure a RestClientBuilder
      *
      * @param hostAddress The address the client should connect to
-     * @param port The port the client should connect to
+     * @param port        The port the client should connect to
      * @return An instance of the builder
      */
     private static RestClientBuilder builder(String hostAddress, int port) {
@@ -216,9 +239,34 @@ public class SDKClient implements Closeable {
     }
 
     /**
-     * Wraps an internal {@link RestHighLevelClient} using method signatures expected by {@link Client} and {@link org.opensearch.client.AdminClient} syntax, providing a drop-in replacement in existing plugins with a minimum of code changes.
+     * Executes a Transport Action
+     *
+     * @param <Request>  The Request type for the action
+     * @param <Response> The Response type for the action
+     * @param action     The registered action
+     * @param request    The Request
+     * @param listener   An action listener for the Response
+     */
+    public final <Request extends ActionRequest, Response extends ActionResponse> void execute(
+        ActionType<Response> action,
+        Request request,
+        ActionListener<Response> listener
+    ) {
+        @SuppressWarnings("unchecked")
+        TransportAction<Request, Response> transportAction = actions.get(action);
+        if (transportAction == null) {
+            throw new IllegalStateException("failed to find action [" + action + "] to execute");
+        }
+        transportAction.execute(request, listener);
+    }
+
+    /**
+     * Wraps an internal {@link RestHighLevelClient} using method signatures expected by {@link Client} and
+     * {@link org.opensearch.client.AdminClient} syntax, providing a drop-in replacement in existing plugins with a
+     * minimum of code changes.
      * <p>
-     * While some {@link Client} interface methods are implemented here, the interface is intentionally not fully implemented as it is intended to be deprecated.
+     * While some {@link Client} interface methods are implemented here, the interface is intentionally not fully
+     * implemented as it is intended to be deprecated.
      * <p>
      * Do not use this client for new development.
      *
@@ -286,7 +334,8 @@ public class SDKClient implements Closeable {
 
         /**
          * Gets all the documents that match the criteria
-         * @param request The multiGet Request
+         *
+         * @param request  The multiGet Request
          * @param listener A listener to be notified with a result
          */
         public void multiGet(MultiGetRequest request, ActionListener<MultiGetResponse> listener) {
@@ -322,7 +371,8 @@ public class SDKClient implements Closeable {
     }
 
     /**
-     * Wraps an internal {@link ClusterAdminClient}, providing a drop-in replacement in existing plugins with a minimum of code changes.
+     * Wraps an internal {@link ClusterAdminClient}, providing a drop-in replacement in existing plugins with a minimum
+     * of code changes.
      * <p>
      * Do not use this client for new development.
      */
@@ -345,7 +395,8 @@ public class SDKClient implements Closeable {
     }
 
     /**
-     * Wraps an internal {@link IndicesClient}, providing a drop-in replacement in existing plugins with a minimum of code changes.
+     * Wraps an internal {@link IndicesClient}, providing a drop-in replacement in existing plugins with a minimum of
+     * code changes.
      * <p>
      * Do not use this client for new development.
      */
@@ -366,7 +417,7 @@ public class SDKClient implements Closeable {
          * Asynchronously creates an index using the Create Index API.
          *
          * @param createIndexRequest the request
-         * @param listener the listener to be notified upon request completion
+         * @param listener           the listener to be notified upon request completion
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable create(CreateIndexRequest createIndexRequest, ActionListener<CreateIndexResponse> listener) {
@@ -377,7 +428,7 @@ public class SDKClient implements Closeable {
          * Asynchronously deletes an index using the Delete Index API.
          *
          * @param deleteIndexRequest the request
-         * @param listener the listener to be notified upon request completion
+         * @param listener           the listener to be notified upon request completion
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable delete(DeleteIndexRequest deleteIndexRequest, ActionListener<AcknowledgedResponse> listener) {
@@ -388,7 +439,7 @@ public class SDKClient implements Closeable {
          * Asynchronously updates the mappings on an index using the Put Mapping API.
          *
          * @param putMappingRequest the request
-         * @param listener the listener to be notified upon request completion
+         * @param listener          the listener to be notified upon request completion
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable putMapping(PutMappingRequest putMappingRequest, ActionListener<AcknowledgedResponse> listener) {
@@ -399,7 +450,7 @@ public class SDKClient implements Closeable {
          * Asynchronously retrieves the mappings on an index on indices using the Get Mapping API.
          *
          * @param getMappingsRequest the request
-         * @param listener the listener to be notified upon request completion
+         * @param listener           the listener to be notified upon request completion
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable getMapping(GetMappingsRequest getMappingsRequest, ActionListener<GetMappingsResponse> listener) {
@@ -410,7 +461,7 @@ public class SDKClient implements Closeable {
          * Asynchronously rolls over an index using the Rollover Index API.
          *
          * @param rolloverRequest the request
-         * @param listener the listener to be notified upon request completion
+         * @param listener        the listener to be notified upon request completion
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable rolloverIndex(RolloverRequest rolloverRequest, ActionListener<RolloverResponse> listener) {
@@ -421,7 +472,7 @@ public class SDKClient implements Closeable {
          * Asynchronously gets one or more aliases using the Get Index Aliases API.
          *
          * @param getAliasesRequest the request
-         * @param listener the listener to be notified upon request completion
+         * @param listener          the listener to be notified upon request completion
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable getAliases(GetAliasesRequest getAliasesRequest, ActionListener<GetAliasesResponse> listener) {

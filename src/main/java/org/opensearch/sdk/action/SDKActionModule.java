@@ -25,11 +25,19 @@ import org.opensearch.sdk.ActionExtension;
 
 import static java.util.Collections.unmodifiableMap;
 
+/**
+ * A module for injecting getActions classes into Guice.
+ */
 public class SDKActionModule extends AbstractModule {
 
     private final Map<String, ActionHandler<?, ?>> actions;
     private final ActionFilters actionFilters;
 
+    /**
+     * Instantiate this module
+     *
+     * @param extension An instance of {@link ActionExtension}.
+     */
     public SDKActionModule(ActionExtension extension) {
         this.actions = setupActions(extension);
         this.actionFilters = setupActionFilters(extension);

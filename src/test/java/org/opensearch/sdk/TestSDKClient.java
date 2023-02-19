@@ -34,6 +34,8 @@ import org.opensearch.test.OpenSearchTestCase;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
+import java.util.Collections;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -46,7 +48,7 @@ public class TestSDKClient extends OpenSearchTestCase {
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        this.sdkClient = new SDKClient();
+        this.sdkClient = new SDKClient(Collections.emptyMap());
     }
 
     @Test

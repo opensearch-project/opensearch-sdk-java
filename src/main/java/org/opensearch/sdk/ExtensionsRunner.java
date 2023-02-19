@@ -158,7 +158,7 @@ public class ExtensionsRunner {
             b.bind(NamedXContentRegistry.class).toInstance(getNamedXContentRegistry().getRegistry());
             b.bind(ThreadPool.class).toInstance(getThreadPool());
 
-            b.bind(SDKClient.class).toInstance(new SDKClient());
+            b.bind(SDKClient.class);
             b.bind(SDKClusterService.class).toInstance(new SDKClusterService(this));
         });
         // Bind the return values from create components
@@ -178,7 +178,7 @@ public class ExtensionsRunner {
             this.transportActions = new TransportActions(Collections.emptyMap());
         }
 
-        Guice.createInjector((com.google.inject.Module[]) modules.toArray());
+        Guice.createInjector(modules);
 
         if (extension instanceof ActionExtension) {
             // store REST handlers in the registry
