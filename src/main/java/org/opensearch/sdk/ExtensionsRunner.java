@@ -11,6 +11,9 @@ package org.opensearch.sdk;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.opensearch.action.ActionRequest;
+import org.opensearch.action.ActionResponse;
+import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
@@ -52,11 +55,11 @@ import com.google.inject.Guice;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * The primary class to run an extension.
@@ -153,6 +156,12 @@ public class ExtensionsRunner {
         this.threadPool = new ThreadPool(settings);
         this.taskManager = new TaskManager(settings, threadPool, Collections.emptySet());
 
+        // TODO: Move this map instantiation inside TransportActions and provide register API
+        // to move logic from the module stream
+        // https://github.com/opensearch-project/opensearch-sdk-java/issues/467
+        Map<String, Class<? extends TransportAction<? extends ActionRequest, ? extends ActionResponse>>> transportActionsMap =
+            new HashMap<>();
+
         List<com.google.inject.Module> modules = new ArrayList<>();
         // Base bindings
         modules.add(b -> {
@@ -175,17 +184,15 @@ public class ExtensionsRunner {
             SDKActionModule sdkActionModule = new SDKActionModule((ActionExtension) extension);
             modules.add(sdkActionModule);
             // save custom transport actions
-            this.transportActions = new TransportActions(
-                sdkActionModule.getActions()
-                    .entrySet()
-                    .stream()
-                    .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().getTransportAction()))
-            );
-        } else {
-            this.transportActions = new TransportActions(Collections.emptyMap());
+            sdkActionModule.getActions()
+                .entrySet()
+                .stream()
+                .forEach(h -> { transportActionsMap.put(h.getKey(), h.getValue().getTransportAction()); });
         }
 
         Guice.createInjector(modules);
+
+        this.transportActions = new TransportActions(transportActionsMap);
 
         if (extension instanceof ActionExtension) {
             // store REST handlers in the registry
