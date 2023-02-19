@@ -29,7 +29,7 @@ import org.opensearch.sdk.sample.helloworld.rest.RestHelloAction;
  * <p>
  * To execute, pass an instatiated object of this class to {@link ExtensionsRunner#run(Extension)}.
  */
-public class HelloWorldExtension extends BaseExtension implements EngineExtension {
+public class HelloWorldExtension extends BaseExtension{
 
     /**
      * Optional classpath-relative path to a yml file containing extension settings.
