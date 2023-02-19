@@ -119,7 +119,7 @@ public class ExtensionsRunner {
      */
     private final TaskManager taskManager;
 
-    private SDKNamedXContentRegistry extensionNamedXContentRegistry = new SDKNamedXContentRegistry(Settings.EMPTY, Collections.emptyList());
+    private final SDKNamedXContentRegistry sdkNamedXContentRegistry;
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
     private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
@@ -152,6 +152,13 @@ public class ExtensionsRunner {
             .build();
         this.threadPool = new ThreadPool(settings);
         this.taskManager = new TaskManager(settings, threadPool, Collections.emptySet());
+
+        // save custom settings
+        this.customSettings = extension.getSettings();
+        // save custom namedXContent
+        this.customNamedXContent = extension.getNamedXContent();
+        // initialize NamedXContent Registry. Must happen after getting extension namedXContent
+        this.sdkNamedXContentRegistry = new SDKNamedXContentRegistry(this);
 
         // TODO: Move this map instantiation inside TransportActions and provide register API
         // to move logic from the module stream
@@ -199,10 +206,6 @@ public class ExtensionsRunner {
                 }
             }
         }
-        // save custom settings
-        this.customSettings = extension.getSettings();
-        // save custom namedXContent
-        this.customNamedXContent = extension.getNamedXContent();
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -263,12 +266,10 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Sets the NamedXContentRegistry. Called from {@link ExtensionsInitRequestHandler}.
-     *
-     * @param registry assign value for namedXContentRegistry
+     * Updates the NamedXContentRegistry. Called from {@link ExtensionsInitRequestHandler}.
      */
-    public void setNamedXContentRegistry(SDKNamedXContentRegistry registry) {
-        this.extensionNamedXContentRegistry = registry;
+    public void updateNamedXContentRegistry() {
+        this.sdkNamedXContentRegistry.updateNamedXContentRegistry(this);
     }
 
     /**
@@ -277,7 +278,7 @@ public class ExtensionsRunner {
      * @return the NamedXContentRegistry if initialized, an empty registry otherwise.
      */
     public SDKNamedXContentRegistry getNamedXContentRegistry() {
-        return this.extensionNamedXContentRegistry;
+        return this.sdkNamedXContentRegistry;
     }
 
     /**

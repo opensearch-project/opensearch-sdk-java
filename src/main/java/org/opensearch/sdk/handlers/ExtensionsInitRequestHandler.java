@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.discovery.InitializeExtensionRequest;
 import org.opensearch.discovery.InitializeExtensionResponse;
-import org.opensearch.sdk.SDKNamedXContentRegistry;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.transport.TransportService;
 
@@ -68,7 +67,7 @@ public class ExtensionsInitRequestHandler {
             // Get OpenSearch Settings and set values on ExtensionsRunner
             Settings settings = extensionsRunner.sendEnvironmentSettingsRequest(extensionTransportService);
             extensionsRunner.setEnvironmentSettings(settings);
-            extensionsRunner.setNamedXContentRegistry(new SDKNamedXContentRegistry(settings, extensionsRunner.getCustomNamedXContent()));
+            extensionsRunner.updateNamedXContentRegistry();
 
             // Last step of initialization
             extensionsRunner.setInitialized();

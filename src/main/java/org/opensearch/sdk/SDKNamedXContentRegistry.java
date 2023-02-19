@@ -28,23 +28,33 @@ import org.opensearch.search.SearchModule;
  * Combines Extension NamedXContent with core OpenSearch NamedXContent
  */
 public class SDKNamedXContentRegistry {
-    private final NamedXContentRegistry namedXContentRegistry;
+    private NamedXContentRegistry namedXContentRegistry;
 
     /**
-     * Creates and populates a NamedXContentRegistry with the given NamedXContentRegistry entries for this extension and
-     * locally defined content.
+     * Creates and populates a NamedXContentRegistry with the NamedXContentRegistry entries for this extension and locally defined content.
      *
-     * @param settings OpenSearch environment settings
-     * @param extensionNamedXContent List of NamedXContentRegistry.Entry to be registered
+     * @param runner The ExtensionsRunner instance.
      */
-    public SDKNamedXContentRegistry(Settings settings, List<NamedXContentRegistry.Entry> extensionNamedXContent) {
-        this.namedXContentRegistry = createRegistry(settings, extensionNamedXContent);
+    public SDKNamedXContentRegistry(ExtensionsRunner runner) {
+        this.namedXContentRegistry = createRegistry(runner.getEnvironmentSettings(), runner.getCustomNamedXContent());
+    }
+
+    /**
+     * Updates the NamedXContentRegistry with the NamedXContentRegistry entries for this extension and locally defined content.
+     * <p>
+     * Only necessary if environment settings have changed.
+     *
+     * @param runner The ExtensionsRunner instance.
+     */
+    public void updateNamedXContentRegistry(ExtensionsRunner runner) {
+        this.namedXContentRegistry = createRegistry(runner.getEnvironmentSettings(), runner.getCustomNamedXContent());
     }
 
     private NamedXContentRegistry createRegistry(Settings settings, List<Entry> extensionNamedXContent) {
+        Stream<Entry> extensionContent = extensionNamedXContent == null ? Stream.empty() : extensionNamedXContent.stream();
         return new NamedXContentRegistry(
             Stream.of(
-                extensionNamedXContent.stream(),
+                extensionContent,
                 NetworkModule.getNamedXContents().stream(),
                 IndicesModule.getNamedXContents().stream(),
                 new SearchModule(settings, Collections.emptyList()).getNamedXContents().stream(),
