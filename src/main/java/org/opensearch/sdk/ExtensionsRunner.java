@@ -119,10 +119,7 @@ public class ExtensionsRunner {
      */
     private final TaskManager taskManager;
 
-    private ExtensionNamedXContentRegistry extensionNamedXContentRegistry = new ExtensionNamedXContentRegistry(
-        Settings.EMPTY,
-        Collections.emptyList()
-    );
+    private SDKNamedXContentRegistry extensionNamedXContentRegistry = new SDKNamedXContentRegistry(Settings.EMPTY, Collections.emptyList());
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
     private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
@@ -270,7 +267,7 @@ public class ExtensionsRunner {
      *
      * @param registry assign value for namedXContentRegistry
      */
-    public void setNamedXContentRegistry(ExtensionNamedXContentRegistry registry) {
+    public void setNamedXContentRegistry(SDKNamedXContentRegistry registry) {
         this.extensionNamedXContentRegistry = registry;
     }
 
@@ -279,7 +276,7 @@ public class ExtensionsRunner {
      *
      * @return the NamedXContentRegistry if initialized, an empty registry otherwise.
      */
-    public ExtensionNamedXContentRegistry getNamedXContentRegistry() {
+    public SDKNamedXContentRegistry getNamedXContentRegistry() {
         return this.extensionNamedXContentRegistry;
     }
 

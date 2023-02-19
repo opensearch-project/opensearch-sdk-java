@@ -34,8 +34,8 @@ import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class TestExtensionNamedXContentRegistry extends OpenSearchTestCase {
-    private ExtensionNamedXContentRegistry extensionNamedXContentRegistry;
+public class TestSDKNamedXContentRegistry extends OpenSearchTestCase {
+    private SDKNamedXContentRegistry extensionNamedXContentRegistry;
 
     private static class Example implements ToXContentObject {
         public static final String NAME = "Example";
@@ -101,7 +101,7 @@ public class TestExtensionNamedXContentRegistry extends OpenSearchTestCase {
     @BeforeEach
     public void setUp() {
         List<NamedXContentRegistry.Entry> namedXContents = Collections.singletonList(Example.XCONTENT_REGISTRY);
-        this.extensionNamedXContentRegistry = new ExtensionNamedXContentRegistry(Settings.EMPTY, namedXContents);
+        this.extensionNamedXContentRegistry = new SDKNamedXContentRegistry(Settings.EMPTY, namedXContents);
     }
 
     @Test
@@ -123,24 +123,18 @@ public class TestExtensionNamedXContentRegistry extends OpenSearchTestCase {
     @Test
     public void testNamedXContentRegistryExceptions() {
         // Tests that the registry includes module contents and generates conflicts when adding
+        assertThrows(IllegalArgumentException.class, () -> new SDKNamedXContentRegistry(Settings.EMPTY, NetworkModule.getNamedXContents()));
+        assertThrows(IllegalArgumentException.class, () -> new SDKNamedXContentRegistry(Settings.EMPTY, IndicesModule.getNamedXContents()));
         assertThrows(
             IllegalArgumentException.class,
-            () -> new ExtensionNamedXContentRegistry(Settings.EMPTY, NetworkModule.getNamedXContents())
-        );
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> new ExtensionNamedXContentRegistry(Settings.EMPTY, IndicesModule.getNamedXContents())
-        );
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> new ExtensionNamedXContentRegistry(
+            () -> new SDKNamedXContentRegistry(
                 Settings.EMPTY,
                 new SearchModule(Settings.EMPTY, Collections.emptyList()).getNamedXContents()
             )
         );
         assertThrows(
             IllegalArgumentException.class,
-            () -> new ExtensionNamedXContentRegistry(Settings.EMPTY, ClusterModule.getNamedXWriteables())
+            () -> new SDKNamedXContentRegistry(Settings.EMPTY, ClusterModule.getNamedXWriteables())
         );
     }
 }

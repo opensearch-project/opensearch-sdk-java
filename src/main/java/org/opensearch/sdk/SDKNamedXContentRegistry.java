@@ -26,7 +26,7 @@ import org.opensearch.search.SearchModule;
 /**
  * Combines Extension NamedXContent with core OpenSearch NamedXContent
  */
-public class ExtensionNamedXContentRegistry {
+public class SDKNamedXContentRegistry {
     private final NamedXContentRegistry namedXContentRegistry;
 
     /**
@@ -36,7 +36,7 @@ public class ExtensionNamedXContentRegistry {
      * @param settings OpenSearch environment settings
      * @param extensionNamedXContent List of NamedXContentRegistry.Entry to be registered
      */
-    public ExtensionNamedXContentRegistry(Settings settings, List<NamedXContentRegistry.Entry> extensionNamedXContent) {
+    public SDKNamedXContentRegistry(Settings settings, List<NamedXContentRegistry.Entry> extensionNamedXContent) {
         this.namedXContentRegistry = new NamedXContentRegistry(
             Stream.of(
                 extensionNamedXContent.stream(),
