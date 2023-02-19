@@ -172,9 +172,7 @@ public class ExtensionsRunner {
             b.bind(ExtensionsRunner.class).toInstance(this);
             b.bind(Extension.class).toInstance(extension);
 
-            // FIXME: Change this to a provider interface
-            // https://github.com/opensearch-project/opensearch-sdk-java/issues/447
-            b.bind(NamedXContentRegistry.class).toInstance(getNamedXContentRegistry().getRegistry());
+            b.bind(SDKNamedXContentRegistry.class).toInstance(getNamedXContentRegistry());
             b.bind(ThreadPool.class).toInstance(getThreadPool());
             b.bind(TaskManager.class).toInstance(taskManager);
 
