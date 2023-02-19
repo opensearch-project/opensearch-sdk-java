@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.opensearch.action.ActionListener;
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
+import org.opensearch.action.ActionType;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.sdk.ActionExtension.ActionHandler;
@@ -44,6 +45,15 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
     private HelloWorldExtension extension;
     private Injector injector;
     private SDKClient sdkClient;
+
+    static class UnregisteredAction extends ActionType<SampleResponse> {
+        public static final String NAME = "helloworld/unregistered";
+        public static final UnregisteredAction INSTANCE = new UnregisteredAction();
+
+        private UnregisteredAction() {
+            super(NAME, SampleResponse::new);
+        }
+    }
 
     @Override
     @BeforeEach
@@ -139,5 +149,29 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         Throwable cause = ex.getCause();
         assertTrue(cause instanceof IllegalArgumentException);
         assertEquals("The request name is blank.", cause.getMessage());
+    }
+
+    @Test
+    public void testSampleActionDoesNotExist() throws Exception {
+        String expectedName = "";
+        SampleRequest request = new SampleRequest(expectedName);
+        CompletableFuture<SampleResponse> responseFuture = new CompletableFuture<>();
+
+        IllegalStateException ex = assertThrows(
+            IllegalStateException.class,
+            () -> sdkClient.execute(UnregisteredAction.INSTANCE, request, new ActionListener<SampleResponse>() {
+                @Override
+                public void onResponse(SampleResponse response) {
+                    responseFuture.complete(response);
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    responseFuture.completeExceptionally(e);
+                }
+            })
+        );
+
+        assertEquals("failed to find action [" + UnregisteredAction.INSTANCE + "] to execute", ex.getMessage());
     }
 }
