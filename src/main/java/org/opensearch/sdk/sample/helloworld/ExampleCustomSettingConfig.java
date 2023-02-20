@@ -20,10 +20,10 @@ public class ExampleCustomSettingConfig {
     private static final String FORBIDDEN_REGEX = "forbidden";
 
     /**
-     * A string setting, if the string setting match the FORBIDDEN_REGEX string, the validation will be fail.
+     * A string setting. If the string setting matches the FORBIDDEN_REGEX string, the validation will fail.
      */
     public static final Setting<String> VALIDATED_SETTING = Setting.simpleString(
-        "custom.validated",
+        "custom.validate",
         new RegexValidator(FORBIDDEN_REGEX),
         Property.NodeScope,
         Property.Dynamic
