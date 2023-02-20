@@ -37,7 +37,7 @@ mainClassName = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
 
 
 group 'org.opensearch.sdk'
-version '1.0.0-SNAPSHOT'
+version '2.0.0-SNAPSHOT'
 
 
 publishing {
