@@ -11,6 +11,9 @@ package org.opensearch.sdk;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.opensearch.action.ActionRequest;
+import org.opensearch.action.ActionResponse;
+import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
@@ -31,6 +34,7 @@ import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
+import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionDependencyResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionsIndicesModuleNameRequestHandler;
@@ -38,6 +42,7 @@ import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
+import org.opensearch.tasks.TaskManager;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportResponse;
 import org.opensearch.transport.TransportResponseHandler;
@@ -50,6 +55,7 @@ import com.google.inject.Guice;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -108,6 +114,10 @@ public class ExtensionsRunner {
      * A thread pool for the extension.
      */
     private final ThreadPool threadPool;
+    /**
+     * A task manager for the extension
+     */
+    private final TaskManager taskManager;
 
     private ExtensionNamedXContentRegistry extensionNamedXContentRegistry = new ExtensionNamedXContentRegistry(
         Settings.EMPTY,
@@ -119,14 +129,10 @@ public class ExtensionsRunner {
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
 
-    /*
-     * TODO: expose an interface for extension to register actions
-     * https://github.com/opensearch-project/opensearch-sdk-java/issues/119
-     */
     /**
      * Instantiates a new transportActions
      */
-    public TransportActions transportActions;
+    public final TransportActions transportActions;
 
     /**
      * Instantiates a new update settings request handler
@@ -148,20 +154,45 @@ public class ExtensionsRunner {
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
             .build();
         this.threadPool = new ThreadPool(settings);
+        this.taskManager = new TaskManager(settings, threadPool, Collections.emptySet());
 
-        Guice.createInjector(b -> {
+        // TODO: Move this map instantiation inside TransportActions and provide register API
+        // to move logic from the module stream
+        // https://github.com/opensearch-project/opensearch-sdk-java/issues/467
+        Map<String, Class<? extends TransportAction<? extends ActionRequest, ? extends ActionResponse>>> transportActionsMap =
+            new HashMap<>();
+
+        List<com.google.inject.Module> modules = new ArrayList<>();
+        // Base bindings
+        modules.add(b -> {
             b.bind(ExtensionsRunner.class).toInstance(this);
             b.bind(Extension.class).toInstance(extension);
 
+            // FIXME: Change this to a provider interface
+            // https://github.com/opensearch-project/opensearch-sdk-java/issues/447
             b.bind(NamedXContentRegistry.class).toInstance(getNamedXContentRegistry().getRegistry());
             b.bind(ThreadPool.class).toInstance(getThreadPool());
+            b.bind(TaskManager.class).toInstance(taskManager);
 
-            b.bind(SDKClient.class).toInstance(new SDKClient());
+            b.bind(SDKClient.class);
             b.bind(SDKClusterService.class).toInstance(new SDKClusterService(this));
-
-            // create components
-            injectComponents(b);
         });
+        // Bind the return values from create components
+        modules.add(this::injectComponents);
+        // Bind actions from getActions
+        if (extension instanceof ActionExtension) {
+            SDKActionModule sdkActionModule = new SDKActionModule((ActionExtension) extension);
+            modules.add(sdkActionModule);
+            // save custom transport actions
+            sdkActionModule.getActions()
+                .entrySet()
+                .stream()
+                .forEach(h -> { transportActionsMap.put(h.getKey(), h.getValue().getTransportAction()); });
+        }
+
+        Guice.createInjector(modules);
+
+        this.transportActions = new TransportActions(transportActionsMap);
 
         if (extension instanceof ActionExtension) {
             // store REST handlers in the registry
@@ -170,17 +201,11 @@ public class ExtensionsRunner {
                     extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
                 }
             }
-            // TODO new getActions code will go here
         }
         // save custom settings
         this.customSettings = extension.getSettings();
         // save custom namedXContent
         this.customNamedXContent = extension.getNamedXContent();
-        // save custom transport actions
-        this.transportActions = new TransportActions(extension.getActionsMap());
-
-        // TODO: put getactions in a MapBinder
-        // Requires https://github.com/opensearch-project/opensearch-sdk-java/pull/434
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
