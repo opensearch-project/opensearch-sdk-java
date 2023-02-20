@@ -2,7 +2,6 @@ name: Publish snapshots to maven
 
 on:
   workflow_dispatch:
-  schedule:
   push:
     branches:
     - 1.x
