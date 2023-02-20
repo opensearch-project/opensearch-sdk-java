@@ -95,24 +95,13 @@ public class TestSDKNamedXContentRegistry extends OpenSearchTestCase {
         }
     }
 
-    private static class ExampleRunnerForTest extends ExtensionsRunner {
+    private static class ExampleRunnerForTest extends ExtensionsRunnerForTest {
 
         private List<Entry> testNamedXContent = Collections.emptyList();
         private final SDKNamedXContentRegistry sdkNamedXContentRegistry = new SDKNamedXContentRegistry(this);
 
         public ExampleRunnerForTest() throws IOException {
-            super(
-                new BaseExtension(
-                    new ExtensionSettings(
-                        ExtensionsRunnerForTest.NODE_NAME,
-                        ExtensionsRunnerForTest.NODE_HOST,
-                        ExtensionsRunnerForTest.NODE_PORT,
-                        "127.0.0.1",
-                        "9200"
-                    )
-                ) {
-                }
-            );
+            super();
         }
 
         @Override
