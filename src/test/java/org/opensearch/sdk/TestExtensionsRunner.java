@@ -220,8 +220,8 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         assertTrue(extensionsRunner.getCustomNamedXContent().isEmpty());
         assertTrue(extensionsRunner.getNamedXContentRegistry().getRegistry() instanceof NamedXContentRegistry);
-        extensionsRunner.setNamedXContentRegistry(null);
-        assertNull(extensionsRunner.getNamedXContentRegistry());
+        extensionsRunner.updateNamedXContentRegistry();
+        assertTrue(extensionsRunner.getNamedXContentRegistry().getRegistry() instanceof NamedXContentRegistry);
         assertTrue(extensionsRunner.getExtension() instanceof BaseExtension);
         assertEquals(extensionsRunner, ((BaseExtension) extensionsRunner.getExtension()).extensionsRunner());
         assertTrue(extensionsRunner.getThreadPool() instanceof ThreadPool);
