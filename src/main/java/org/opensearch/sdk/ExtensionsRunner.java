@@ -119,10 +119,7 @@ public class ExtensionsRunner {
      */
     private final TaskManager taskManager;
 
-    private ExtensionNamedXContentRegistry extensionNamedXContentRegistry = new ExtensionNamedXContentRegistry(
-        Settings.EMPTY,
-        Collections.emptyList()
-    );
+    private final SDKNamedXContentRegistry sdkNamedXContentRegistry;
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
     private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
@@ -156,6 +153,13 @@ public class ExtensionsRunner {
         this.threadPool = new ThreadPool(settings);
         this.taskManager = new TaskManager(settings, threadPool, Collections.emptySet());
 
+        // save custom settings
+        this.customSettings = extension.getSettings();
+        // save custom namedXContent
+        this.customNamedXContent = extension.getNamedXContent();
+        // initialize NamedXContent Registry. Must happen after getting extension namedXContent
+        this.sdkNamedXContentRegistry = new SDKNamedXContentRegistry(this);
+
         // TODO: Move this map instantiation inside TransportActions and provide register API
         // to move logic from the module stream
         // https://github.com/opensearch-project/opensearch-sdk-java/issues/467
@@ -168,9 +172,7 @@ public class ExtensionsRunner {
             b.bind(ExtensionsRunner.class).toInstance(this);
             b.bind(Extension.class).toInstance(extension);
 
-            // FIXME: Change this to a provider interface
-            // https://github.com/opensearch-project/opensearch-sdk-java/issues/447
-            b.bind(NamedXContentRegistry.class).toInstance(getNamedXContentRegistry().getRegistry());
+            b.bind(SDKNamedXContentRegistry.class).toInstance(getNamedXContentRegistry());
             b.bind(ThreadPool.class).toInstance(getThreadPool());
             b.bind(TaskManager.class).toInstance(taskManager);
 
@@ -202,10 +204,6 @@ public class ExtensionsRunner {
                 }
             }
         }
-        // save custom settings
-        this.customSettings = extension.getSettings();
-        // save custom namedXContent
-        this.customNamedXContent = extension.getNamedXContent();
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -266,12 +264,10 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Sets the NamedXContentRegistry. Called from {@link ExtensionsInitRequestHandler}.
-     *
-     * @param registry assign value for namedXContentRegistry
+     * Updates the NamedXContentRegistry. Called from {@link ExtensionsInitRequestHandler}.
      */
-    public void setNamedXContentRegistry(ExtensionNamedXContentRegistry registry) {
-        this.extensionNamedXContentRegistry = registry;
+    public void updateNamedXContentRegistry() {
+        this.sdkNamedXContentRegistry.updateNamedXContentRegistry(this);
     }
 
     /**
@@ -279,8 +275,8 @@ public class ExtensionsRunner {
      *
      * @return the NamedXContentRegistry if initialized, an empty registry otherwise.
      */
-    public ExtensionNamedXContentRegistry getNamedXContentRegistry() {
-        return this.extensionNamedXContentRegistry;
+    public SDKNamedXContentRegistry getNamedXContentRegistry() {
+        return this.sdkNamedXContentRegistry;
     }
 
     /**

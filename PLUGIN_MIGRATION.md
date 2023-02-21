@@ -42,12 +42,20 @@ Change the transport action inheritance from HandledTransportAction to directly 
 
 Pass the `ExtensionsRunner` and `Extension` objects to the handler and access `createComponent` equivalents, such as:
 ```java
-this.namedXContentRegistry = extensionsRunner.getNamedXContentRegistry().getRegistry();
+this.sdkNamedXContentRegistry = extensionsRunner.getNamedXContentRegistry();
+```
+
+When a `NamedXContentRegistry` object is required, get the current one from `this.sdkNamedXContentRegistry.getRegistry()`.
+
+Other potential initialization values:
+```java
 this.environmentSettings = extensionsRunner.getEnvironmentSettings();
 this.transportService = extensionsRunner.getExtensionTransportService();
 this.restClient = anomalyDetectorExtension.getRestClient();
 this.sdkClusterService = new SDKClusterService(extensionsRunner);
 ```
+
+Many of these components are also available via Guice injection.
 
 Optionally change the `routes()` to `routeHandlers()`.  Change `prepareRequest()` to `handleRequest()`.
 
