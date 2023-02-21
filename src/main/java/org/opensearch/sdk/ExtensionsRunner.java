@@ -208,7 +208,7 @@ public class ExtensionsRunner {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private void injectComponents(Binder b) {
-        extension.createComponents().stream().forEach(p -> b.bind((Class) p.getClass()).toInstance(p));
+        extension.createComponents(this).stream().forEach(p -> b.bind((Class) p.getClass()).toInstance(p));
     }
 
     /**
