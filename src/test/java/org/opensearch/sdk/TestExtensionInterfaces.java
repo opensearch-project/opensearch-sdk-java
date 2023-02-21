@@ -28,7 +28,7 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
 
         assertTrue(extension.getSettings().isEmpty());
         assertTrue(extension.getNamedXContent().isEmpty());
-        assertTrue(extension.createComponents().isEmpty());
+        assertTrue(extension.createComponents(null).isEmpty());
         assertTrue(extension.getExecutorBuilders(Settings.EMPTY).isEmpty());
     }
 
