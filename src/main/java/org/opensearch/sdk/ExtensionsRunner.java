@@ -120,6 +120,9 @@ public class ExtensionsRunner {
     private final TaskManager taskManager;
 
     private final SDKNamedXContentRegistry sdkNamedXContentRegistry;
+    private final SDKClient sdkClient = new SDKClient();
+    private final SDKClusterService sdkClusterService = new SDKClusterService(this);
+
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
     private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
@@ -174,10 +177,10 @@ public class ExtensionsRunner {
 
             b.bind(SDKNamedXContentRegistry.class).toInstance(getNamedXContentRegistry());
             b.bind(ThreadPool.class).toInstance(getThreadPool());
-            b.bind(TaskManager.class).toInstance(taskManager);
+            b.bind(TaskManager.class).toInstance(getTaskManager());
 
-            b.bind(SDKClient.class);
-            b.bind(SDKClusterService.class).toInstance(new SDKClusterService(this));
+            b.bind(SDKClient.class).toInstance(getSdkClient());
+            b.bind(SDKClusterService.class).toInstance(getSdkClusterService());
         });
         // Bind the return values from create components
         modules.add(this::injectComponents);
@@ -566,6 +569,18 @@ public class ExtensionsRunner {
 
     public ThreadPool getThreadPool() {
         return threadPool;
+    }
+
+    public TaskManager getTaskManager() {
+        return taskManager;
+    }
+
+    public SDKClient getSdkClient() {
+        return sdkClient;
+    }
+
+    public SDKClusterService getSdkClusterService() {
+        return sdkClusterService;
     }
 
     public TransportService getExtensionTransportService() {
