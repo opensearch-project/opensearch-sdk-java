@@ -77,7 +77,7 @@ configurations {
 dependencies {
 
     def opensearchVersion = "3.0.0-SNAPSHOT"
-    def log4jVersion = "2.19.0"
+    def log4jVersion = "2.20.0"
     def nettyVersion = "4.1.89.Final"
     def jacksonDatabindVersion = "2.14.2"
     def guavaVersion = "31.1-jre"
