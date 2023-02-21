@@ -53,9 +53,10 @@ public interface Extension {
     /**
      * Returns components added by this extension.
      *
+     * @param runner the ExtensionsRunner instance. Use getters from this object as required to instantiate components to return.
      * @return A collection of objects which will be bound to themselves for dependency injection.
      */
-    default Collection<Object> createComponents() {
+    default Collection<Object> createComponents(ExtensionsRunner runner) {
         return Collections.emptyList();
     }
 

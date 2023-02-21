@@ -55,6 +55,7 @@ import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
+import org.opensearch.tasks.TaskManager;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.threadpool.ThreadPool;
@@ -225,6 +226,9 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         assertTrue(extensionsRunner.getExtension() instanceof BaseExtension);
         assertEquals(extensionsRunner, ((BaseExtension) extensionsRunner.getExtension()).extensionsRunner());
         assertTrue(extensionsRunner.getThreadPool() instanceof ThreadPool);
+        assertTrue(extensionsRunner.getTaskManager() instanceof TaskManager);
+        assertTrue(extensionsRunner.getSdkClient() instanceof SDKClient);
+        assertTrue(extensionsRunner.getSdkClusterService() instanceof SDKClusterService);
 
         settings = extensionsRunner.getSettings();
         assertEquals(ExtensionsRunnerForTest.NODE_NAME, settings.get(ExtensionsRunner.NODE_NAME_SETTING));
