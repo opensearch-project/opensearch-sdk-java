@@ -19,8 +19,8 @@ import java.util.stream.Stream;
 import org.opensearch.cluster.ClusterModule;
 import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.settings.Settings;
-import org.opensearch.common.xcontent.NamedXContentRegistry;
-import org.opensearch.common.xcontent.NamedXContentRegistry.Entry;
+import org.opensearch.core.xcontent.NamedXContentRegistry;
+import org.opensearch.core.xcontent.NamedXContentRegistry.Entry;
 import org.opensearch.indices.IndicesModule;
 import org.opensearch.search.SearchModule;
 
