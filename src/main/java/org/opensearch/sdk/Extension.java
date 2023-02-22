@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.opensearch.common.settings.Setting;
-import org.opensearch.common.xcontent.NamedXContentRegistry;
+import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.threadpool.ExecutorBuilder;
 import org.opensearch.common.settings.Settings;
 
