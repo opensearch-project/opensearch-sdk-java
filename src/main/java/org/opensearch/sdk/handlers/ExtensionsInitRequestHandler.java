@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.discovery.InitializeExtensionRequest;
 import org.opensearch.discovery.InitializeExtensionResponse;
+import org.opensearch.sdk.ActionExtension;
 import org.opensearch.sdk.ExtensionNamedXContentRegistry;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.Extension;
@@ -57,8 +58,10 @@ public class ExtensionsInitRequestHandler {
         Extension extension = extensionsRunner.getExtension();
         Class<?>[] interfaces = extension.getClass().getInterfaces();
         List<String> interfacesOfOpenSearch = new ArrayList<String>();
+        // we are making an assumption here that all the other Interfaces will be in the same package ( or will be in subpackage ) in which ActionExtension Interface belongs.
+        String packageNameOfActionExtension = ActionExtension.class.getPackageName();
         for (Class<?> anInterface : interfaces) {
-            if (anInterface.getPackageName() == "org.opensearch.sdk") {
+            if (anInterface.getPackageName().startsWith(packageNameOfActionExtension)) {
                 interfacesOfOpenSearch.add(anInterface.getSimpleName());
             }
         }
