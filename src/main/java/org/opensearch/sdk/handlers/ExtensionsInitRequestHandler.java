@@ -58,7 +58,8 @@ public class ExtensionsInitRequestHandler {
         Extension extension = extensionsRunner.getExtension();
         Class<?>[] interfaces = extension.getClass().getInterfaces();
         List<String> interfacesOfOpenSearch = new ArrayList<String>();
-        // we are making an assumption here that all the other Interfaces will be in the same package ( or will be in subpackage ) in which ActionExtension Interface belongs.
+        // we are making an assumption here that all the other Interfaces will be in the same package ( or will be in subpackage ) in which
+        // ActionExtension Interface belongs.
         String packageNameOfActionExtension = ActionExtension.class.getPackageName();
         for (Class<?> anInterface : interfaces) {
             if (anInterface.getPackageName().startsWith(packageNameOfActionExtension)) {
