@@ -20,7 +20,7 @@ import org.opensearch.action.support.TransportAction;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.xcontent.NamedXContentRegistry;
 import org.opensearch.threadpool.ExecutorBuilder;
-import org.opensearch.common.settings.Settings;;
+import org.opensearch.common.settings.Settings;
 
 /**
  * This interface defines methods which an extension must provide. Extensions
@@ -84,5 +84,4 @@ public interface Extension {
     default List<ExecutorBuilder<?>> getExecutorBuilders(Settings settings) {
         return Collections.emptyList();
     }
-
 }

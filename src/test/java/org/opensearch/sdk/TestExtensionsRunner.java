@@ -28,6 +28,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -230,5 +231,11 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         assertEquals(ExtensionsRunnerForTest.NODE_NAME, settings.get(ExtensionsRunner.NODE_NAME_SETTING));
         assertEquals(ExtensionsRunnerForTest.NODE_HOST, settings.get(TransportSettings.BIND_HOST.getKey()));
         assertEquals(ExtensionsRunnerForTest.NODE_PORT, settings.get(TransportSettings.PORT.getKey()));
+    }
+
+    @Test
+    public void testGetExtensionImplementedInterfaces() {
+        List<String> implementedInterfaces = extensionsRunner.getExtensionImplementedInterfaces();
+        assertTrue(implementedInterfaces.isEmpty());
     }
 }

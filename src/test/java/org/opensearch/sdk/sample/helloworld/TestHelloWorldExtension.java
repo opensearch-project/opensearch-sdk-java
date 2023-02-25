@@ -9,8 +9,6 @@
 
 package org.opensearch.sdk.sample.helloworld;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -49,19 +47,6 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         assertEquals(1, extensionRestHandlers.size());
         List<Route> routes = extensionRestHandlers.get(0).routes();
         assertEquals(4, routes.size());
-    }
-
-    @Test
-    public void testImplimentedInterfacesByExtension() {
-        Class<?>[] interfaces = extension.getClass().getInterfaces();
-        List<String> interfacesOfOpenSearch = new ArrayList<String>();
-        for (Class<?> anInterface : interfaces) {
-            if (anInterface.getPackageName() == "org.opensearch.sdk") {
-                interfacesOfOpenSearch.add(anInterface.getSimpleName());
-            }
-        }
-
-        assertEquals(interfacesOfOpenSearch, new ArrayList<String>(Arrays.asList("EngineExtension")));
     }
 
 }
