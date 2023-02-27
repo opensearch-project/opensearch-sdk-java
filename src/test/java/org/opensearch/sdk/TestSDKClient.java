@@ -18,6 +18,7 @@ import org.opensearch.action.get.GetRequest;
 import org.opensearch.action.get.MultiGetRequest;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.search.SearchRequest;
+import org.opensearch.action.update.UpdateRequest;
 import org.opensearch.client.Cancellable;
 import org.opensearch.client.indices.CreateIndexRequest;
 import org.opensearch.client.indices.GetMappingsRequest;
@@ -76,6 +77,7 @@ public class TestSDKClient extends OpenSearchTestCase {
         assertDoesNotThrow(() -> restClient.index(new IndexRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.get(new GetRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.multiGet(new MultiGetRequest(), ActionListener.wrap(r -> {}, e -> {})));
+        assertDoesNotThrow(() -> restClient.update(new UpdateRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.delete(new DeleteRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.search(new SearchRequest(), ActionListener.wrap(r -> {}, e -> {})));
 
