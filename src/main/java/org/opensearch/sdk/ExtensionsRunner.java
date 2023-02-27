@@ -303,6 +303,10 @@ public class ExtensionsRunner {
         this.extensionNode = extensionNode;
     }
 
+    public DiscoveryExtensionNode getExtensionNode() {
+        return this.extensionNode;
+    }
+
     public DiscoveryNode getOpensearchNode() {
         return this.opensearchNode;
     }

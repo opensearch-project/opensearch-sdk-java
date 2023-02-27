@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 
 import org.opensearch.cluster.ClusterState;
 import org.opensearch.common.settings.Setting;
+import org.opensearch.extensions.DiscoveryExtensionNode;
 
 /**
  * This class simulates methods normally called from OpenSearch ClusterService class.
@@ -40,6 +41,15 @@ public class SDKClusterService {
      */
     public ClusterState state() {
         return extensionsRunner.sendClusterStateRequest(extensionsRunner.getExtensionTransportService());
+    }
+
+    /**
+     *  Returns the local extension node
+     *
+     * @return the local extension node
+     */
+    public DiscoveryExtensionNode localNode() {
+        return extensionsRunner.getExtensionNode();
     }
 
     public SDKClusterSettings getClusterSettings() {
