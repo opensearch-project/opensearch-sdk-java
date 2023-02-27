@@ -47,6 +47,8 @@ import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.action.support.master.AcknowledgedResponse;
+import org.opensearch.action.update.UpdateRequest;
+import org.opensearch.action.update.UpdateResponse;
 import org.opensearch.client.Cancellable;
 import org.opensearch.client.Client;
 import org.opensearch.client.ClusterAdminClient;
@@ -330,6 +332,16 @@ public class SDKClient implements Closeable {
          */
         public void multiGet(MultiGetRequest request, ActionListener<MultiGetResponse> listener) {
             restHighLevelClient.mgetAsync(request, RequestOptions.DEFAULT, listener);
+        }
+
+        /**
+         * Updates a document based on a script.
+         *
+         * @param request  The update request
+         * @param listener A listener to be notified with a result
+         */
+        public void update(UpdateRequest request, ActionListener<UpdateResponse> listener) {
+            restHighLevelClient.updateAsync(request, RequestOptions.DEFAULT, listener);
         }
 
         /**
