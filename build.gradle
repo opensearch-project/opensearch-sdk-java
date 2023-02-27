@@ -37,7 +37,7 @@ mainClassName = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
 
 
 group 'org.opensearch.sdk'
-version '1.0.0-SNAPSHOT'
+version '2.0.0-SNAPSHOT'
 
 
 publishing {
@@ -77,9 +77,8 @@ configurations {
 dependencies {
 
     def opensearchVersion = "3.0.0-SNAPSHOT"
-    def log4jVersion = "2.19.0"
+    def log4jVersion = "2.20.0"
     def nettyVersion = "4.1.89.Final"
-    def luceneVersion = "9.4.2"
     def jacksonDatabindVersion = "2.14.2"
     def guavaVersion = "31.1-jre"
     def guiceVersion = "5.1.0"
@@ -96,7 +95,6 @@ dependencies {
     implementation("org.opensearch.client:opensearch-java:${opensearchVersion}")
     implementation("org.opensearch.plugin:transport-netty4-client:${opensearchVersion}")
     implementation("io.netty:netty-all:${nettyVersion}")
-    implementation("org.apache.lucene:lucene-core:${luceneVersion}")
     testCompileOnly("junit:junit:${junit4Version}") {
         exclude module : 'hamcrest'
         exclude module : 'hamcrest-core'

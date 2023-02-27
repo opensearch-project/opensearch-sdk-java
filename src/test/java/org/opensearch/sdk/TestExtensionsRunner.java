@@ -38,7 +38,7 @@ import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.settings.Setting.Property;
 import org.opensearch.common.transport.TransportAddress;
-import org.opensearch.common.xcontent.NamedXContentRegistry;
+import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.discovery.InitializeExtensionRequest;
 import org.opensearch.discovery.InitializeExtensionResponse;
 import org.opensearch.extensions.DiscoveryExtensionNode;
@@ -56,6 +56,7 @@ import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
+import org.opensearch.tasks.TaskManager;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.threadpool.ThreadPool;
@@ -221,11 +222,14 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         assertTrue(extensionsRunner.getCustomNamedXContent().isEmpty());
         assertTrue(extensionsRunner.getNamedXContentRegistry().getRegistry() instanceof NamedXContentRegistry);
-        extensionsRunner.setNamedXContentRegistry(null);
-        assertNull(extensionsRunner.getNamedXContentRegistry());
+        extensionsRunner.updateNamedXContentRegistry();
+        assertTrue(extensionsRunner.getNamedXContentRegistry().getRegistry() instanceof NamedXContentRegistry);
         assertTrue(extensionsRunner.getExtension() instanceof BaseExtension);
         assertEquals(extensionsRunner, ((BaseExtension) extensionsRunner.getExtension()).extensionsRunner());
         assertTrue(extensionsRunner.getThreadPool() instanceof ThreadPool);
+        assertTrue(extensionsRunner.getTaskManager() instanceof TaskManager);
+        assertTrue(extensionsRunner.getSdkClient() instanceof SDKClient);
+        assertTrue(extensionsRunner.getSdkClusterService() instanceof SDKClusterService);
 
         settings = extensionsRunner.getSettings();
         assertEquals(ExtensionsRunnerForTest.NODE_NAME, settings.get(ExtensionsRunner.NODE_NAME_SETTING));

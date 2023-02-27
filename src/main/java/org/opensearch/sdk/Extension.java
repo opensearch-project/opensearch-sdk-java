@@ -12,13 +12,9 @@ package org.opensearch.sdk;
 import java.util.Collections;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
-import org.opensearch.action.ActionRequest;
-import org.opensearch.action.ActionResponse;
-import org.opensearch.action.support.TransportAction;
 import org.opensearch.common.settings.Setting;
-import org.opensearch.common.xcontent.NamedXContentRegistry;
+import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.threadpool.ExecutorBuilder;
 import org.opensearch.common.settings.Settings;
 
@@ -57,21 +53,11 @@ public interface Extension {
     /**
      * Returns components added by this extension.
      *
+     * @param runner the ExtensionsRunner instance. Use getters from this object as required to instantiate components to return.
      * @return A collection of objects which will be bound to themselves for dependency injection.
      */
-    default Collection<Object> createComponents() {
+    default Collection<Object> createComponents(ExtensionsRunner runner) {
         return Collections.emptyList();
-    }
-
-    /**
-     * Gets an optional list of custom {@link TransportAction} for the extension to register with OpenSearch.
-     * <p>
-     * TODO: ActionExtension#getActions will replace this: https://github.com/opensearch-project/opensearch-sdk-java/issues/368
-     *
-     * @return a list of custom transport actions this extension uses.
-     */
-    default Map<String, Class<? extends TransportAction<? extends ActionRequest, ? extends ActionResponse>>> getActionsMap() {
-        return Collections.emptyMap();
     }
 
     /**

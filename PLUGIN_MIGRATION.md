@@ -34,22 +34,28 @@ The [Java Client for OpenSearch](https://github.com/opensearch-project/opensearc
 The `SDKRestClient` provides wrapper methods matching the `Client` API (but not implementing it), implemented internally with the (soon to be deprecated) `RestHighLevelClient`.  While this speeds migration efforts, it should be considered a temporary "bridge" with follow up migration efforts to the `OpenSearchClient` planned.
  - While the class names and method parameters are the same, the `Request` and `Response` classes are often in different packages. In most cases, other than changing `import` statements, no additional code changes are required. In a few cases, there are minor changes required to interface with the new response class API.
 
-The `client.execute(action, request, responseListener)` method is not yet implemented. Instead:
- - Instantiate an instance of the corresponding transport action
- - Pass the `request` and `responseListener` to the action's `doExecute()` method.
+The `client.execute(action, request, responseListener)` method is implemented on the SDKClient.
 
-Remove the transport action inheritance from HandledTransportAction. This may change to direct inheritance of `TransportAction` and implementation of `execute()`.
+Change the transport action inheritance from HandledTransportAction to directly inherit from `TransportAction`.
 
 ### Replace RestHandler with ExtensionRestHandler
 
 Pass the `ExtensionsRunner` and `Extension` objects to the handler and access `createComponent` equivalents, such as:
 ```java
-this.namedXContentRegistry = extensionsRunner.getNamedXContentRegistry().getRegistry();
+this.sdkNamedXContentRegistry = extensionsRunner.getNamedXContentRegistry();
+```
+
+When a `NamedXContentRegistry` object is required, get the current one from `this.sdkNamedXContentRegistry.getRegistry()`.
+
+Other potential initialization values:
+```java
 this.environmentSettings = extensionsRunner.getEnvironmentSettings();
 this.transportService = extensionsRunner.getExtensionTransportService();
 this.restClient = anomalyDetectorExtension.getRestClient();
 this.sdkClusterService = new SDKClusterService(extensionsRunner);
 ```
+
+Many of these components are also available via Guice injection.
 
 Optionally change the `routes()` to `routeHandlers()`.  Change `prepareRequest()` to `handleRequest()`.
 

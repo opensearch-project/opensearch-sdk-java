@@ -11,12 +11,14 @@ package org.opensearch.sdk;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.inject.Inject;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import org.apache.hc.core5.function.Factory;
 import org.apache.hc.core5.http.HttpHost;
@@ -28,6 +30,9 @@ import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.reactor.ssl.TlsDetails;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.opensearch.action.ActionListener;
+import org.opensearch.action.ActionRequest;
+import org.opensearch.action.ActionResponse;
+import org.opensearch.action.ActionType;
 import org.opensearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.opensearch.action.delete.DeleteRequest;
@@ -40,6 +45,7 @@ import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.index.IndexResponse;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
+import org.opensearch.action.support.TransportAction;
 import org.opensearch.action.support.master.AcknowledgedResponse;
 import org.opensearch.client.Cancellable;
 import org.opensearch.client.Client;
@@ -73,6 +79,16 @@ public class SDKClient implements Closeable {
     private OpenSearchClient javaClient;
     private RestClient restClient;
     private RestHighLevelClient sdkRestClient;
+
+    // Used by client.execute
+    @SuppressWarnings("rawtypes")
+    @Inject
+    private Map<ActionType, TransportAction> actions;
+
+    /**
+     * Instantiate this client.
+     */
+    public SDKClient() {}
 
     /**
      * Create and configure a RestClientBuilder
@@ -126,7 +142,7 @@ public class SDKClient implements Closeable {
      * Initializes an OpenSearchClient using OpenSearch JavaClient
      *
      * @param hostAddress The address of OpenSearch cluster, client can connect to
-     * @param port        The port of OpenSearch cluster
+     * @param port The port of OpenSearch cluster
      * @return The SDKClient implementation of OpenSearchClient. The user is responsible for calling
      *         {@link #doCloseJavaClient()} when finished with the client
      */
@@ -216,6 +232,28 @@ public class SDKClient implements Closeable {
     }
 
     /**
+     * Executes a Transport Action
+     *
+     * @param <Request> The Request type for the action
+     * @param <Response> The Response type for the action
+     * @param action The registered action
+     * @param request The Request
+     * @param listener An action listener for the Response
+     */
+    public final <Request extends ActionRequest, Response extends ActionResponse> void execute(
+        ActionType<Response> action,
+        Request request,
+        ActionListener<Response> listener
+    ) {
+        @SuppressWarnings("unchecked")
+        TransportAction<Request, Response> transportAction = actions.get(action);
+        if (transportAction == null) {
+            throw new IllegalStateException("failed to find action [" + action + "] to execute");
+        }
+        transportAction.execute(request, listener);
+    }
+
+    /**
      * Wraps an internal {@link RestHighLevelClient} using method signatures expected by {@link Client} and {@link org.opensearch.client.AdminClient} syntax, providing a drop-in replacement in existing plugins with a minimum of code changes.
      * <p>
      * While some {@link Client} interface methods are implemented here, the interface is intentionally not fully implemented as it is intended to be deprecated.
@@ -286,6 +324,7 @@ public class SDKClient implements Closeable {
 
         /**
          * Gets all the documents that match the criteria
+         *
          * @param request The multiGet Request
          * @param listener A listener to be notified with a result
          */
@@ -296,7 +335,7 @@ public class SDKClient implements Closeable {
         /**
          * Deletes a document from the index based on the index, and id.
          *
-         * @param request  The delete request
+         * @param request The delete request
          * @param listener A listener to be notified with a result
          * @see Requests#deleteRequest(String)
          */
@@ -307,7 +346,7 @@ public class SDKClient implements Closeable {
         /**
          * Search across one or more indices with a query.
          *
-         * @param request  The search request
+         * @param request The search request
          * @param listener A listener to be notified of the result
          * @see Requests#searchRequest(String...)
          */

@@ -10,14 +10,20 @@
 package org.opensearch.sdk.sample.helloworld;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
+import org.opensearch.action.ActionRequest;
+import org.opensearch.action.ActionResponse;
 import org.opensearch.sdk.BaseExtension;
 import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionSettings;
 import org.opensearch.sdk.ExtensionsRunner;
+import org.opensearch.sdk.ActionExtension.ActionHandler;
 import org.opensearch.sdk.sample.helloworld.rest.RestHelloAction;
+import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
+import org.opensearch.sdk.sample.helloworld.transport.SampleTransportAction;
 
 /**
  * Sample class to demonstrate how to use the OpenSearch SDK for Java to create
@@ -49,6 +55,11 @@ public class HelloWorldExtension extends BaseExtension {
     @Override
     public List<ExtensionRestHandler> getExtensionRestHandlers() {
         return List.of(new RestHelloAction());
+    }
+
+    @Override
+    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+        return Arrays.asList(new ActionHandler<>(SampleAction.INSTANCE, SampleTransportAction.class));
     }
 
     /**
