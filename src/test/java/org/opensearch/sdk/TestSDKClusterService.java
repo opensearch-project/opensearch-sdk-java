@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.opensearch.common.settings.Setting;
+import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.sdk.SDKClusterService.SDKClusterSettings;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.TransportService;
@@ -45,6 +46,13 @@ public class TestSDKClusterService extends OpenSearchTestCase {
         ArgumentCaptor<TransportService> argumentCaptor = ArgumentCaptor.forClass(TransportService.class);
         verify(extensionsRunner, times(1)).sendClusterStateRequest(argumentCaptor.capture());
         assertNull(argumentCaptor.getValue());
+    }
+
+    @Test
+    public void testLocalNode() {
+        DiscoveryExtensionNode expectedLocalNode = extensionsRunner.getExtensionNode();
+        DiscoveryExtensionNode localNode = sdkClusterService.localNode();
+        assertEquals(expectedLocalNode, localNode);
     }
 
     @Test
