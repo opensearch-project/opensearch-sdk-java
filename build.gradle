@@ -137,6 +137,7 @@ task javadocStrict(type: Javadoc) {
   source = sourceSets.main.allJava
   classpath = sourceSets.main.runtimeClasspath
   options.addStringOption('Xdoclint:all', '-quiet')
+  options.addStringOption('Xwerror', '-quiet')
   options.memberLevel = JavadocMemberLevel.PRIVATE
 }
 check.dependsOn javadocStrict
