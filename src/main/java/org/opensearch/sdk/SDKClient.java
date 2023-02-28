@@ -51,6 +51,8 @@ import org.opensearch.client.Requests;
 import org.apache.http.HttpHost;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.opensearch.client.RestClient;
+import org.opensearch.client.Request;
+import org.opensearch.client.Response;
 import org.opensearch.client.RestClientBuilder;
 import org.opensearch.client.RestHighLevelClient;
 import org.opensearch.client.indices.CreateIndexRequest;
@@ -358,6 +360,17 @@ public class SDKClient implements Closeable {
          */
         public void search(SearchRequest request, ActionListener<SearchResponse> listener) {
             restHighLevelClient.searchAsync(request, RequestOptions.DEFAULT, listener);
+        }
+
+        /**
+         * Sends a request to the OpenSearch cluster that the client points to.
+         *
+         * @param request the request to perform
+         * @return the response returned by OpenSearch
+         * @throws IOException in case of a problem or the connection was aborted
+         */
+        public Response performRequest(Request request) throws IOException {
+            return restHighLevelClient.getLowLevelClient().performRequest(request);
         }
 
         @Override
