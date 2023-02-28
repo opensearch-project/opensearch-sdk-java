@@ -33,6 +33,7 @@ import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionSettings;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.SDKClient;
+import org.opensearch.sdk.SDKClient.SDKRestClient;
 import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.threadpool.ThreadPool;
@@ -45,6 +46,7 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
     private HelloWorldExtension extension;
     private Injector injector;
     private SDKClient sdkClient;
+    private SDKRestClient sdkRestClient;
 
     static class UnregisteredAction extends ActionType<SampleResponse> {
         public static final String NAME = "helloworld/unregistered";
@@ -71,12 +73,14 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
             b.bind(SDKClient.class);
         });
         this.sdkClient = injector.getInstance(SDKClient.class);
+        this.sdkRestClient = sdkClient.initializeRestClient("localhost", 9200);
     }
 
     @Override
     @AfterEach
     public void tearDown() throws Exception {
         super.tearDown();
+        this.sdkRestClient.close();
         this.injector = null;
     }
 
@@ -127,6 +131,30 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         assertEquals(expectedGreeting, response.getGreeting());
     }
 
+    @SuppressWarnings("deprecation")
+    @Test
+    public void testRestClientExecuteSampleActions() throws Exception {
+        String expectedName = "world";
+        String expectedGreeting = "Hello, " + expectedName;
+        SampleRequest request = new SampleRequest(expectedName);
+        CompletableFuture<SampleResponse> responseFuture = new CompletableFuture<>();
+
+        sdkRestClient.execute(SampleAction.INSTANCE, request, new ActionListener<SampleResponse>() {
+            @Override
+            public void onResponse(SampleResponse response) {
+                responseFuture.complete(response);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                responseFuture.completeExceptionally(e);
+            }
+        });
+
+        SampleResponse response = responseFuture.get(1, TimeUnit.SECONDS);
+        assertEquals(expectedGreeting, response.getGreeting());
+    }
+
     @Test
     public void testExceptionalClientExecuteSampleActions() throws Exception {
         String expectedName = "";
@@ -134,6 +162,31 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         CompletableFuture<SampleResponse> responseFuture = new CompletableFuture<>();
 
         sdkClient.execute(SampleAction.INSTANCE, request, new ActionListener<SampleResponse>() {
+            @Override
+            public void onResponse(SampleResponse response) {
+                responseFuture.complete(response);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                responseFuture.completeExceptionally(e);
+            }
+        });
+
+        ExecutionException ex = assertThrows(ExecutionException.class, () -> responseFuture.get(1, TimeUnit.SECONDS));
+        Throwable cause = ex.getCause();
+        assertTrue(cause instanceof IllegalArgumentException);
+        assertEquals("The request name is blank.", cause.getMessage());
+    }
+
+    @SuppressWarnings("deprecation")
+    @Test
+    public void testExceptionalRestClientExecuteSampleActions() throws Exception {
+        String expectedName = "";
+        SampleRequest request = new SampleRequest(expectedName);
+        CompletableFuture<SampleResponse> responseFuture = new CompletableFuture<>();
+
+        sdkRestClient.execute(SampleAction.INSTANCE, request, new ActionListener<SampleResponse>() {
             @Override
             public void onResponse(SampleResponse response) {
                 responseFuture.complete(response);

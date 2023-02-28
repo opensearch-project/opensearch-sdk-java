@@ -303,6 +303,15 @@ public class ExtensionsRunner {
         this.extensionNode = extensionNode;
     }
 
+    /**
+     * Returns the discovery extension node set during extension initialization
+     *
+     * @return the extensionNode
+     */
+    public DiscoveryExtensionNode getExtensionNode() {
+        return this.extensionNode;
+    }
+
     public DiscoveryNode getOpensearchNode() {
         return this.opensearchNode;
     }
