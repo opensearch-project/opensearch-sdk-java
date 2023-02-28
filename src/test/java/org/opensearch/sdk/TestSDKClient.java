@@ -20,6 +20,7 @@ import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.update.UpdateRequest;
 import org.opensearch.client.Cancellable;
+import org.opensearch.client.Request;
 import org.opensearch.client.indices.CreateIndexRequest;
 import org.opensearch.client.indices.GetMappingsRequest;
 import org.opensearch.client.indices.PutMappingRequest;
@@ -37,6 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+
+import java.net.ConnectException;
 
 @SuppressWarnings("deprecation")
 public class TestSDKClient extends OpenSearchTestCase {
@@ -80,6 +83,7 @@ public class TestSDKClient extends OpenSearchTestCase {
         assertDoesNotThrow(() -> restClient.update(new UpdateRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.delete(new DeleteRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.search(new SearchRequest(), ActionListener.wrap(r -> {}, e -> {})));
+        expectThrows(ConnectException.class, () -> restClient.performRequest(new Request("GET", "/")));
 
         sdkClient.doCloseHighLevelClient();
     }
