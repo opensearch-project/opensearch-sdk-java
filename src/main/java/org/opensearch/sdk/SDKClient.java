@@ -176,7 +176,7 @@ public class SDKClient implements Closeable {
      */
     @Deprecated
     public SDKRestClient initializeRestClient(String hostAddress, int port) {
-        return new SDKRestClient(new RestHighLevelClient(builder(hostAddress, port)));
+        return new SDKRestClient(this, new RestHighLevelClient(builder(hostAddress, port)));
     }
 
     /**
@@ -208,13 +208,13 @@ public class SDKClient implements Closeable {
     }
 
     /**
-     * Executes a Transport Action
+     * Executes a generic action, denoted by an {@link ActionType}.
      *
-     * @param <Request> The Request type for the action
-     * @param <Response> The Response type for the action
-     * @param action The registered action
-     * @param request The Request
-     * @param listener An action listener for the Response
+     * @param action The action type to execute.
+     * @param request The action request.
+     * @param listener The listener to receive the response back.
+     * @param <Request> The request type.
+     * @param <Response> The response type.
      */
     public final <Request extends ActionRequest, Response extends ActionResponse> void execute(
         ActionType<Response> action,
@@ -242,14 +242,17 @@ public class SDKClient implements Closeable {
     @Deprecated
     public static class SDKRestClient implements Closeable {
 
+        private final SDKClient sdkClient;
         private final RestHighLevelClient restHighLevelClient;
 
         /**
          * Instantiate this class wrapping a {@link RestHighLevelClient}.
          *
+         * @param sdkClient The SDKClient instance.
          * @param restHighLevelClient The client to wrap.
          */
-        public SDKRestClient(RestHighLevelClient restHighLevelClient) {
+        public SDKRestClient(SDKClient sdkClient, RestHighLevelClient restHighLevelClient) {
+            this.sdkClient = sdkClient;
             this.restHighLevelClient = restHighLevelClient;
         }
 
@@ -265,6 +268,23 @@ public class SDKClient implements Closeable {
          */
         public SDKClusterAdminClient cluster() {
             return new SDKClusterAdminClient(restHighLevelClient.cluster());
+        }
+
+        /**
+         * Executes a generic action, denoted by an {@link ActionType}.
+         *
+         * @param action The action type to execute.
+         * @param request The action request.
+         * @param listener The listener to receive the response back.
+         * @param <Request> The request type.
+         * @param <Response> The response type.
+         */
+        public final <Request extends ActionRequest, Response extends ActionResponse> void execute(
+            ActionType<Response> action,
+            Request request,
+            ActionListener<Response> listener
+        ) {
+            this.sdkClient.execute(action, request, listener);
         }
 
         /**
