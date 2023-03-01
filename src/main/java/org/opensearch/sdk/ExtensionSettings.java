@@ -18,7 +18,6 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 /**
  * This class encapsulates the settings for an Extension.
@@ -100,7 +99,7 @@ public class ExtensionSettings {
      * @throws IOException if there is an error reading the file.
      */
     public static ExtensionSettings readSettingsFromYaml(String extensionSettingsPath) throws IOException {
-        Yaml yaml = new Yaml(new SafeConstructor());
+        Yaml yaml = new Yaml();
         URL resource = Extension.class.getResource(extensionSettingsPath);
         if (resource == null) {
             throw new IOException("extension.yml does not exist at path [" + extensionSettingsPath + "]");
