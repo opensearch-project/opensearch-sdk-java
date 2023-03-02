@@ -47,6 +47,13 @@ this.sdkNamedXContentRegistry = extensionsRunner.getNamedXContentRegistry();
 
 When a `NamedXContentRegistry` object is required, get the current one from `this.sdkNamedXContentRegistry.getRegistry()`.
 
+When initializing objects for `createComponents`, the `SDKNamedXContentRegistry` should be passed to the component constructors. In the objects that are instantiated for `createComponents`, whenever there is an `NamedXContentRegistry` object required, call `getRegistry()` from the `SDKNamedXContentRegistry` object passed from the constructor. For example :
+```java
+XContentParser parser = XContentType.JSON
+                    .xContent()
+                    .createParser(sdkNamedXContentRegistry.getRegistry(), LoggingDeprecationHandler.INSTANCE, value);
+```
+
 Other potential initialization values:
 ```java
 this.environmentSettings = extensionsRunner.getEnvironmentSettings();
