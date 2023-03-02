@@ -397,10 +397,10 @@ public class ExtensionsRunner {
 
         Set<Class<?>> interfaceSet = new HashSet<>();
         Class<?> extensionClass = extension.getClass();
-        do{
+        do {
             interfaceSet.addAll(Arrays.stream(extensionClass.getInterfaces()).collect(Collectors.toSet()));
             extensionClass = extensionClass.getSuperclass();
-        } while(extensionClass!=null);
+        } while (extensionClass != null);
 
         List<String> interfacesOfOpenSearch = new ArrayList<String>();
         // we are making an assumption here that all the other Interfaces will be in the same package ( or will be in subpackage ) in which
