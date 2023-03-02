@@ -10,6 +10,7 @@
 package org.opensearch.sdk;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import org.opensearch.cluster.ClusterState;
@@ -40,7 +41,10 @@ public class SDKClusterService {
      * @return the cluster state of OpenSearch
      */
     public ClusterState state() {
-        return extensionsRunner.sendClusterStateRequest(extensionsRunner.getExtensionTransportService());
+        if (extensionsRunner.isInitialized()) {
+            return extensionsRunner.sendClusterStateRequest(extensionsRunner.getExtensionTransportService());
+        }
+        throw new IllegalStateException("The Extensions Runner has not been initialized.");
     }
 
     /**
@@ -62,23 +66,46 @@ public class SDKClusterService {
     public class SDKClusterSettings {
 
         /**
-         * Add a single settings update consumer to OpenSearch
-         * @param <T> The Type of the setting.
-         *
-         * @param setting The setting for which to consume updates.
-         * @param consumer The consumer of the updates
+         * Thread-safe map to hold pending updates until initialization completes
          */
-        public <T> void addSettingsUpdateConsumer(Setting<T> setting, Consumer<T> consumer) {
-            addSettingsUpdateConsumer(Map.of(setting, consumer));
+        private Map<Setting<?>, Consumer<?>> pendingSettingsUpdateConsumers = new ConcurrentHashMap<>();
+
+        /**
+         * Add a single settings update consumer to OpenSearch. Before initialization the update will be stored in a pending state.
+         *
+         * @param <T> The Type of the setting.
+         * @param setting The setting for which to consume updates.
+         * @param settingsUpdateConsumer The consumer of the updates.
+         */
+        public synchronized <T> void addSettingsUpdateConsumer(Setting<T> setting, Consumer<T> settingsUpdateConsumer) {
+            pendingSettingsUpdateConsumers.put(setting, settingsUpdateConsumer);
+            sendPendingSettingsUpdateConsumers();
         }
 
         /**
-         * Add multiple settings update consumers to OpenSearch
+         * Add multiple settings update consumers to OpenSearch. Before initialization the updates will be stored in a pending state.
          *
-         * @param settingUpdateConsumers A map of Setting to Consumer.
+         * @param settingsUpdateConsumers A map of Setting to update Consumer.
          */
-        public void addSettingsUpdateConsumer(Map<Setting<?>, Consumer<?>> settingUpdateConsumers) {
-            extensionsRunner.sendAddSettingsUpdateConsumerRequest(extensionsRunner.getExtensionTransportService(), settingUpdateConsumers);
+        public synchronized void addSettingsUpdateConsumer(Map<Setting<?>, Consumer<?>> settingsUpdateConsumers) {
+            settingsUpdateConsumers.entrySet().stream().forEach(e -> pendingSettingsUpdateConsumers.put(e.getKey(), e.getValue()));
+            sendPendingSettingsUpdateConsumers();
+        }
+
+        /**
+         * If the ExtensionRunner has been initialized, send pending updates to OpenSearch, otherwise do nothing.
+         * <p>
+         * This method should be called from ExtensionsRunner after initialization, to clear the pending updates.
+         */
+        public synchronized void sendPendingSettingsUpdateConsumers() {
+            // Do nothing until ExtensionsRunner initialized
+            if (extensionsRunner.isInitialized() && !pendingSettingsUpdateConsumers.isEmpty()) {
+                extensionsRunner.sendAddSettingsUpdateConsumerRequest(
+                    extensionsRunner.getExtensionTransportService(),
+                    pendingSettingsUpdateConsumers
+                );
+                pendingSettingsUpdateConsumers.clear();
+            }
         }
     }
 }

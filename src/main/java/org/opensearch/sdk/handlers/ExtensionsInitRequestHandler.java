@@ -70,7 +70,12 @@ public class ExtensionsInitRequestHandler {
             extensionsRunner.updateNamedXContentRegistry();
 
             // Last step of initialization
+            // TODO: make sure all the other sendX methods have completed
+            // https://github.com/opensearch-project/opensearch-sdk-java/issues/17
             extensionsRunner.setInitialized();
+
+            // Trigger pending updates requiring completion of the above actions
+            extensionsRunner.getSdkClusterService().getClusterSettings().sendPendingSettingsUpdateConsumers();
         }
     }
 }
