@@ -35,6 +35,7 @@ import org.opensearch.action.ActionResponse;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.opensearch.action.delete.DeleteRequest;
 import org.opensearch.action.delete.DeleteResponse;
 import org.opensearch.action.get.GetRequest;
@@ -466,6 +467,17 @@ public class SDKClient implements Closeable {
          */
         public Cancellable delete(DeleteIndexRequest deleteIndexRequest, ActionListener<AcknowledgedResponse> listener) {
             return indicesClient.deleteAsync(deleteIndexRequest, RequestOptions.DEFAULT, listener);
+        }
+
+        /**
+         * Asynchronously updates specific index level settings using the Update Indices Settings API.
+         *
+         * @param updateSettingsRequest the request
+         * @param listener the listener to be notified upon request completion
+         * @return cancellable that may be used to cancel the request
+         */
+        public Cancellable putSettings(UpdateSettingsRequest updateSettingsRequest, ActionListener<AcknowledgedResponse> listener) {
+            return indicesClient.putSettingsAsync(updateSettingsRequest, RequestOptions.DEFAULT, listener);
         }
 
         /**

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.opensearch.action.ActionListener;
 import org.opensearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.opensearch.action.delete.DeleteRequest;
 import org.opensearch.action.get.GetRequest;
 import org.opensearch.action.get.MultiGetRequest;
@@ -96,6 +97,7 @@ public class TestSDKClient extends OpenSearchTestCase {
         // Would really prefer to mock/verify the method calls but the IndicesClient class is final
         assertInstanceOf(Cancellable.class, indicesClient.create(new CreateIndexRequest(""), ActionListener.wrap(r -> {}, e -> {})));
         assertInstanceOf(Cancellable.class, indicesClient.delete(new DeleteIndexRequest(), ActionListener.wrap(r -> {}, e -> {})));
+        assertInstanceOf(Cancellable.class, indicesClient.putSettings(new UpdateSettingsRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertInstanceOf(Cancellable.class, indicesClient.getMapping(new GetMappingsRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertInstanceOf(Cancellable.class, indicesClient.putMapping(new PutMappingRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertInstanceOf(
