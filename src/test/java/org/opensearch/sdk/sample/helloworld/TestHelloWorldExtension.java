@@ -11,6 +11,7 @@ package org.opensearch.sdk.sample.helloworld;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -22,6 +23,7 @@ import org.opensearch.action.ActionListener;
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
 import org.opensearch.action.ActionType;
+import org.opensearch.action.support.TransportAction;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.sdk.ActionExtension.ActionHandler;
@@ -40,6 +42,7 @@ import org.opensearch.threadpool.ThreadPool;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 
 public class TestHelloWorldExtension extends OpenSearchTestCase {
 
@@ -72,8 +75,15 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
             b.bind(TaskManager.class).toInstance(taskManager);
             b.bind(SDKClient.class);
         });
-        this.sdkClient = injector.getInstance(SDKClient.class);
+        this.sdkClient = new SDKClient();
+        initializeSdkClient();
         this.sdkRestClient = sdkClient.initializeRestClient("localhost", 9200);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private void initializeSdkClient() {
+        sdkClient.initialize(this.injector.getInstance(new Key<Map<ActionType, TransportAction>>() {
+        }));
     }
 
     @Override
@@ -226,5 +236,30 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         );
 
         assertEquals("failed to find action [" + UnregisteredAction.INSTANCE + "] to execute", ex.getMessage());
+    }
+
+    @Test
+    public void testSdkClientNotInitialized() throws Exception {
+        String expectedName = "";
+        SampleRequest request = new SampleRequest(expectedName);
+        CompletableFuture<SampleResponse> responseFuture = new CompletableFuture<>();
+        SDKClient uninitializedSdkClient = new SDKClient();
+
+        IllegalStateException ex = assertThrows(
+            IllegalStateException.class,
+            () -> uninitializedSdkClient.execute(SampleAction.INSTANCE, request, new ActionListener<SampleResponse>() {
+                @Override
+                public void onResponse(SampleResponse response) {
+                    responseFuture.complete(response);
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    responseFuture.completeExceptionally(e);
+                }
+            })
+        );
+
+        assertEquals("SDKClient was not initialized because the Extension does not implement ActionExtension.", ex.getMessage());
     }
 }
