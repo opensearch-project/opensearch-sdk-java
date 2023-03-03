@@ -18,7 +18,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.inject.Inject;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import org.opensearch.action.ActionListener;
 import org.opensearch.action.ActionRequest;
@@ -76,15 +75,19 @@ public class SDKClient implements Closeable {
     private RestClient restClient;
     private RestHighLevelClient sdkRestClient;
 
-    // Used by client.execute
+    // Used by client.execute, populated by initialize method
     @SuppressWarnings("rawtypes")
-    @Inject
     private Map<ActionType, TransportAction> actions;
 
     /**
-     * Instantiate this client.
+     * Initialize this client.
+     *
+     * @param actions The injected map of ActionType instances to TransportAction.
      */
-    public SDKClient() {}
+    @SuppressWarnings("rawtypes")
+    public void initialize(Map<ActionType, TransportAction> actions) {
+        this.actions = actions;
+    }
 
     /**
      * Create and configure a RestClientBuilder
@@ -224,6 +227,9 @@ public class SDKClient implements Closeable {
         Request request,
         ActionListener<Response> listener
     ) {
+        if (actions == null) {
+            throw new IllegalStateException("SDKClient was not initialized because the Extension does not implement ActionExtension.");
+        }
         @SuppressWarnings("unchecked")
         TransportAction<Request, Response> transportAction = actions.get(action);
         if (transportAction == null) {
