@@ -260,6 +260,6 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
             })
         );
 
-        assertEquals("SDKClient was not initialized because the Extension does not implement ActionExtession.", ex.getMessage());
+        assertEquals("SDKClient was not initialized because the Extension does not implement ActionExtension.", ex.getMessage());
     }
 }

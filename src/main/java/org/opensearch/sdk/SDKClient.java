@@ -254,7 +254,7 @@ public class SDKClient implements Closeable {
         ActionListener<Response> listener
     ) {
         if (actions == null) {
-            throw new IllegalStateException("SDKClient was not initialized because the Extension does not implement ActionExtession.");
+            throw new IllegalStateException("SDKClient was not initialized because the Extension does not implement ActionExtension.");
         }
         @SuppressWarnings("unchecked")
         TransportAction<Request, Response> transportAction = actions.get(action);
