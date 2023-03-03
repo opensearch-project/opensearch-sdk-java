@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
+import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.node.DiscoveryNode;
@@ -51,6 +52,8 @@ import org.opensearch.transport.TransportSettings;
 
 import com.google.inject.Binder;
 import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -118,6 +121,10 @@ public class ExtensionsRunner {
      * A task manager for the extension
      */
     private final TaskManager taskManager;
+    /**
+     * The Guice injector
+     */
+    private final Injector injector;
 
     private final SDKNamedXContentRegistry sdkNamedXContentRegistry;
     private final SDKClient sdkClient = new SDKClient();
@@ -195,11 +202,13 @@ public class ExtensionsRunner {
                 .forEach(h -> { transportActionsMap.put(h.getKey(), h.getValue().getTransportAction()); });
         }
 
-        Guice.createInjector(modules);
+        this.injector = Guice.createInjector(modules);
 
         this.transportActions = new TransportActions(transportActionsMap);
 
         if (extension instanceof ActionExtension) {
+            // initialize SDKClient action map
+            initializeSdkClient();
             // store REST handlers in the registry
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
                 for (Route route : extensionRestHandler.routes()) {
@@ -212,6 +221,12 @@ public class ExtensionsRunner {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private void injectComponents(Binder b) {
         extension.createComponents(this).stream().forEach(p -> b.bind((Class) p.getClass()).toInstance(p));
+    }
+
+    @SuppressWarnings("rawtypes")
+    private void initializeSdkClient() {
+        sdkClient.initialize(this.injector.getInstance(new Key<Map<ActionType, TransportAction>>() {
+        }));
     }
 
     /**
