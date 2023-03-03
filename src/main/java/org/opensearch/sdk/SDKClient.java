@@ -18,7 +18,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.inject.Inject;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import org.apache.hc.core5.function.Factory;
 import org.apache.hc.core5.http.HttpHost;
@@ -85,15 +84,19 @@ public class SDKClient implements Closeable {
     private RestClient restClient;
     private RestHighLevelClient sdkRestClient;
 
-    // Used by client.execute
+    // Used by client.execute, populated by initialize method
     @SuppressWarnings("rawtypes")
-    @Inject
     private Map<ActionType, TransportAction> actions;
 
     /**
-     * Instantiate this client.
+     * Initialize this client.
+     *
+     * @param actions The injected map of ActionType instances to TransportAction.
      */
-    public SDKClient() {}
+    @SuppressWarnings("rawtypes")
+    public void initialize(Map<ActionType, TransportAction> actions) {
+        this.actions = actions;
+    }
 
     /**
      * Create and configure a RestClientBuilder
