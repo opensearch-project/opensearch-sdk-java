@@ -101,38 +101,4 @@ public class TestSDKClusterService extends OpenSearchTestCase {
         // Map will be cleared following this call
         assertTrue(updateConsumerArgumentCaptor.getValue().isEmpty());
     }
-
-    @Test
-    public void testAddSettingsUpdateConsumerMap() throws Exception {
-        Setting<Boolean> boolSetting = Setting.boolSetting("test", false);
-        Consumer<Boolean> boolConsumer = b -> {};
-
-        // Before initialization should store pending update but do nothing
-        sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(boolSetting, boolConsumer);
-        verify(extensionsRunner, times(0)).getExtensionTransportService();
-
-        // After initialization should be able to send pending updates
-        when(extensionsRunner.isInitialized()).thenReturn(true);
-        sdkClusterService.getClusterSettings().sendPendingSettingsUpdateConsumers();
-        verify(extensionsRunner, times(1)).getExtensionTransportService();
-
-        // Once updates sent, map is empty, shouldn't send on retry (keep cumulative 1)
-        sdkClusterService.getClusterSettings().sendPendingSettingsUpdateConsumers();
-        verify(extensionsRunner, times(1)).getExtensionTransportService();
-
-        // Sending a new update should send immediately (cumulative now 2)
-        sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(boolSetting, boolConsumer);
-        verify(extensionsRunner, times(2)).getExtensionTransportService();
-
-        ArgumentCaptor<TransportService> transportServiceArgumentCaptor = ArgumentCaptor.forClass(TransportService.class);
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<Map<Setting<?>, Consumer<?>>> updateConsumerArgumentCaptor = ArgumentCaptor.forClass(Map.class);
-        verify(extensionsRunner, times(2)).sendAddSettingsUpdateConsumerRequest(
-            transportServiceArgumentCaptor.capture(),
-            updateConsumerArgumentCaptor.capture()
-        );
-        assertNull(transportServiceArgumentCaptor.getValue());
-        // Map will be cleared following this call
-        assertTrue(updateConsumerArgumentCaptor.getValue().isEmpty());
-    }
 }
