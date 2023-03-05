@@ -106,11 +106,9 @@ public class TestSDKClusterService extends OpenSearchTestCase {
     public void testAddSettingsUpdateConsumerMap() throws Exception {
         Setting<Boolean> boolSetting = Setting.boolSetting("test", false);
         Consumer<Boolean> boolConsumer = b -> {};
-        Map<Setting<?>, Consumer<?>> settingsUpdateConsumersMap = new HashMap<>();
-        settingsUpdateConsumersMap.put(boolSetting, boolConsumer);
 
         // Before initialization should store pending update but do nothing
-        sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(settingsUpdateConsumersMap);
+        sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(boolSetting, boolConsumer);
         verify(extensionsRunner, times(0)).getExtensionTransportService();
 
         // After initialization should be able to send pending updates
@@ -123,7 +121,7 @@ public class TestSDKClusterService extends OpenSearchTestCase {
         verify(extensionsRunner, times(1)).getExtensionTransportService();
 
         // Sending a new update should send immediately (cumulative now 2)
-        sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(settingsUpdateConsumersMap);
+        sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(boolSetting, boolConsumer);
         verify(extensionsRunner, times(2)).getExtensionTransportService();
 
         ArgumentCaptor<TransportService> transportServiceArgumentCaptor = ArgumentCaptor.forClass(TransportService.class);
