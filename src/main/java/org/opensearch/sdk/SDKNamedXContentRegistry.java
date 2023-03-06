@@ -20,6 +20,7 @@ import org.opensearch.cluster.ClusterModule;
 import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.core.xcontent.NamedXContentRegistry;
+import org.opensearch.core.xcontent.XContentParser;
 import org.opensearch.core.xcontent.NamedXContentRegistry.Entry;
 import org.opensearch.indices.IndicesModule;
 import org.opensearch.search.SearchModule;
@@ -28,7 +29,23 @@ import org.opensearch.search.SearchModule;
  * Combines Extension NamedXContent with core OpenSearch NamedXContent
  */
 public class SDKNamedXContentRegistry {
+    /**
+     * The empty {@link SDKNamedXContentRegistry} for use when you are sure that you aren't going to call
+     * {@link XContentParser#namedObject(Class, String, Object)}. Be *very* careful with this singleton because a parser using it will fail
+     * every call to {@linkplain XContentParser#namedObject(Class, String, Object)}. Every non-test usage really should be checked
+     * thoroughly and marked with a comment about how it was checked. That way anyone that sees code that uses it knows that it is
+     * potentially dangerous.
+     */
+    public static final SDKNamedXContentRegistry EMPTY = new SDKNamedXContentRegistry();
+
     private NamedXContentRegistry namedXContentRegistry;
+
+    /**
+     * Creates an empty registry.
+     */
+    private SDKNamedXContentRegistry() {
+        this.namedXContentRegistry = NamedXContentRegistry.EMPTY;
+    }
 
     /**
      * Creates and populates a NamedXContentRegistry with the NamedXContentRegistry entries for this extension and locally defined content.
