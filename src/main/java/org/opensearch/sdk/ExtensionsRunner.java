@@ -11,8 +11,6 @@ package org.opensearch.sdk;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opensearch.action.ActionRequest;
-import org.opensearch.action.ActionResponse;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.ClusterState;
@@ -20,6 +18,7 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
+import org.opensearch.common.Nullable;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.core.xcontent.NamedXContentRegistry;
@@ -58,7 +57,6 @@ import com.google.inject.Key;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -67,7 +65,9 @@ import java.util.function.Consumer;
 /**
  * The primary class to run an extension.
  * <p>
- * This class Javadoc will eventually be expanded with a full description/tutorial for users.
+ * During instantiation, this class reads extension points from the extension based on its implemented interfaces and registers necessary information with the {@link ExtensionsManager} or other OpenSearch classes.
+ * <p>
+ * Extensions initialize by passing an instance of themselves to the {@link #run(Extension)} method.
  */
 public class ExtensionsRunner {
 
@@ -129,17 +129,14 @@ public class ExtensionsRunner {
     private final SDKNamedXContentRegistry sdkNamedXContentRegistry;
     private final SDKClient sdkClient = new SDKClient();
     private final SDKClusterService sdkClusterService = new SDKClusterService(this);
+    @Nullable
+    private SDKActionModule sdkActionModule = null;
 
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
     private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
-
-    /**
-     * Instantiates a new transportActions
-     */
-    public final TransportActions transportActions;
 
     /**
      * Instantiates a new update settings request handler
@@ -154,6 +151,9 @@ public class ExtensionsRunner {
      */
     protected ExtensionsRunner(Extension extension) throws IOException {
         this.extension = extension;
+        // Initialize concrete classes needed by extensions
+        // These must have getters from this class to be accessible via createComponents
+        // If they require later initialization, create a concrete wrapper class and update the internals
         ExtensionSettings extensionSettings = extension.getExtensionSettings();
         this.settings = Settings.builder()
             .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
@@ -170,14 +170,9 @@ public class ExtensionsRunner {
         // initialize NamedXContent Registry. Must happen after getting extension namedXContent
         this.sdkNamedXContentRegistry = new SDKNamedXContentRegistry(this);
 
-        // TODO: Move this map instantiation inside TransportActions and provide register API
-        // to move logic from the module stream
-        // https://github.com/opensearch-project/opensearch-sdk-java/issues/467
-        Map<String, Class<? extends TransportAction<? extends ActionRequest, ? extends ActionResponse>>> transportActionsMap =
-            new HashMap<>();
-
+        // Create Guice modules for injection
         List<com.google.inject.Module> modules = new ArrayList<>();
-        // Base bindings
+        // Bind the concrete classes defined above, via getter
         modules.add(b -> {
             b.bind(ExtensionsRunner.class).toInstance(this);
             b.bind(Extension.class).toInstance(extension);
@@ -193,19 +188,13 @@ public class ExtensionsRunner {
         modules.add(this::injectComponents);
         // Bind actions from getActions
         if (extension instanceof ActionExtension) {
-            SDKActionModule sdkActionModule = new SDKActionModule((ActionExtension) extension);
-            modules.add(sdkActionModule);
-            // save custom transport actions
-            sdkActionModule.getActions()
-                .entrySet()
-                .stream()
-                .forEach(h -> { transportActionsMap.put(h.getKey(), h.getValue().getTransportAction()); });
+            this.sdkActionModule = new SDKActionModule((ActionExtension) extension);
+            modules.add(this.sdkActionModule);
         }
-
+        // Finally, perform the injection
         this.injector = Guice.createInjector(modules);
 
-        this.transportActions = new TransportActions(transportActionsMap);
-
+        // Perform other initialization. These should have access to injected classes.
         if (extension instanceof ActionExtension) {
             // initialize SDKClient action map
             initializeSdkClient();
@@ -607,6 +596,16 @@ public class ExtensionsRunner {
         return sdkClusterService;
     }
 
+    /**
+     * Returns the {@link SDKActionModule} if actions have been registered
+     *
+     * @return The SDKActionModule instance if it exists, null otherwise.
+     */
+    @Nullable
+    public SDKActionModule getSdkActionModule() {
+        return sdkActionModule;
+    }
+
     public TransportService getExtensionTransportService() {
         return extensionTransportService;
     }
@@ -635,4 +634,5 @@ public class ExtensionsRunner {
         runner.extensionTransportService = nettyTransport.initializeExtensionTransportService(runner.getSettings(), runner.getThreadPool());
         runner.startActionListener(0);
     }
+
 }
