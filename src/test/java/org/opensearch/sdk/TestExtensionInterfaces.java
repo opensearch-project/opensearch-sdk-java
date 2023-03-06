@@ -10,6 +10,7 @@
 package org.opensearch.sdk;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.Test;
 import org.opensearch.common.settings.Settings;
@@ -34,13 +35,15 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
 
     @Test
     void testActionExtension() {
+
+        ExtensionsRunner extensionsRunner = mock(ExtensionsRunner.class);
         ActionExtension actionExtension = new ActionExtension() {
         };
 
         assertTrue(actionExtension.getActions().isEmpty());
         assertTrue(actionExtension.getClientActions().isEmpty());
         assertTrue(actionExtension.getActionFilters().isEmpty());
-        assertTrue(actionExtension.getExtensionRestHandlers().isEmpty());
+        assertTrue(actionExtension.getExtensionRestHandlers(extensionsRunner).isEmpty());
         assertTrue(actionExtension.getRestHeaders().isEmpty());
         assertTrue(actionExtension.getTaskHeaders().isEmpty());
         assertDoesNotThrow(() -> actionExtension.getRestHandlerWrapper(null));

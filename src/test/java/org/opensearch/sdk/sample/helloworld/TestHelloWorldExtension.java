@@ -34,6 +34,7 @@ import org.opensearch.tasks.TaskManager;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionSettings;
 import org.opensearch.sdk.ExtensionsRunner;
+import org.opensearch.sdk.ExtensionsRunnerForTest;
 import org.opensearch.sdk.SDKClient;
 import org.opensearch.sdk.SDKClient.SDKRestClient;
 import org.opensearch.sdk.action.SDKActionModule;
@@ -48,6 +49,7 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
 
     private HelloWorldExtension extension;
     private Injector injector;
+    private ExtensionsRunner extensionsRunner;
     private SDKClient sdkClient;
     private SDKRestClient sdkRestClient;
 
@@ -70,10 +72,12 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         Settings settings = Settings.builder().put(ExtensionsRunner.NODE_NAME_SETTING, "test").build();
         ThreadPool threadPool = new ThreadPool(settings);
         TaskManager taskManager = new TaskManager(settings, threadPool, Collections.emptySet());
+        ExtensionsRunner extensionsRunner = new ExtensionsRunnerForTest();
         this.injector = Guice.createInjector(new SDKActionModule(extension), b -> {
             b.bind(ThreadPool.class).toInstance(threadPool);
             b.bind(TaskManager.class).toInstance(taskManager);
             b.bind(SDKClient.class);
+            b.bind(ExtensionsRunner.class).toInstance(extensionsRunner);
         });
         this.sdkClient = new SDKClient();
         initializeSdkClient();
@@ -106,7 +110,7 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
 
     @Test
     public void testExtensionRestHandlers() {
-        List<ExtensionRestHandler> extensionRestHandlers = extension.getExtensionRestHandlers();
+        List<ExtensionRestHandler> extensionRestHandlers = extension.getExtensionRestHandlers(injector.getInstance(ExtensionsRunner.class));
         assertEquals(1, extensionRestHandlers.size());
         List<Route> routes = extensionRestHandlers.get(0).routes();
         assertEquals(4, routes.size());

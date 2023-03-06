@@ -69,7 +69,7 @@ public interface ActionExtension {
      *
      * @return a list of REST handlers (REST actions) this extension handles.
      */
-    default List<ExtensionRestHandler> getExtensionRestHandlers() {
+    default List<ExtensionRestHandler> getExtensionRestHandlers(ExtensionsRunner extensionsRunner) {
         return Collections.emptyList();
     }
 

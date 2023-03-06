@@ -199,7 +199,9 @@ public class ExtensionsRunner {
             // initialize SDKClient action map
             initializeSdkClient();
             // store REST handlers in the registry
-            for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
+            for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers(
+                injector.getInstance(ExtensionsRunner.class)
+            )) {
                 for (Route route : extensionRestHandler.routes()) {
                     extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
                 }
