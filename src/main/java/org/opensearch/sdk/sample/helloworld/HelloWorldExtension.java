@@ -29,7 +29,7 @@ import org.opensearch.sdk.sample.helloworld.transport.SampleTransportAction;
  * Sample class to demonstrate how to use the OpenSearch SDK for Java to create
  * an extension.
  * <p>
- * To create your own extension, implement the {@link #getExtensionSettings()} and {@link #getExtensionRestHandlers(ExtensionRunner)} methods.
+ * To create your own extension, implement the {@link #getExtensionSettings()} and {@link #getExtensionRestHandlers(ExtensionsRunner)} methods.
  * You may either create an {@link ExtensionSettings} object directly with the constructor, or read it from a YAML file on your class path.
  * <p>
  * To execute, pass an instatiated object of this class to {@link ExtensionsRunner#run(Extension)}.
