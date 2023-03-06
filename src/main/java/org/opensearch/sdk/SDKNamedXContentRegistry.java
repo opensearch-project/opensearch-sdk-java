@@ -88,4 +88,13 @@ public class SDKNamedXContentRegistry {
     public NamedXContentRegistry getRegistry() {
         return this.namedXContentRegistry;
     }
+
+    /**
+     * Sets the NamedXContentRegistry. Used primarily for tests.
+     *
+     * @param namedXContentRegistry The registry to set.
+     */
+    public void setRegistry(NamedXContentRegistry namedXContentRegistry) {
+        this.namedXContentRegistry = namedXContentRegistry;
+    }
 }

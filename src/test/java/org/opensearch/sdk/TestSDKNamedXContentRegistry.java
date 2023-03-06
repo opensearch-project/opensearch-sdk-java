@@ -168,4 +168,10 @@ public class TestSDKNamedXContentRegistry extends OpenSearchTestCase {
     public void testEmptyRegistry() {
         assertEquals(NamedXContentRegistry.EMPTY, SDKNamedXContentRegistry.EMPTY.getRegistry());
     }
+
+    @Test
+    public void testSetRegistry() {
+        runner.sdkNamedXContentRegistry.setRegistry(NamedXContentRegistry.EMPTY);
+        assertEquals(NamedXContentRegistry.EMPTY, runner.sdkNamedXContentRegistry.getRegistry());
+    }
 }
