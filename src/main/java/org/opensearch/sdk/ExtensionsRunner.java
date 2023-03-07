@@ -392,6 +392,11 @@ public class ExtensionsRunner {
 
     }
 
+    /**
+     * Returns a list of interfaces implemented by the corresponding {@link Extension}.
+     *
+     * @return A list of strings matching the interface name.
+     */
     public List<String> getExtensionImplementedInterfaces() {
         Extension extension = getExtension();
 
