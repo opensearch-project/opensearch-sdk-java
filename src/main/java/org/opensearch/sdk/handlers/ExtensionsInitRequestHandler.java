@@ -50,7 +50,10 @@ public class ExtensionsInitRequestHandler {
         extensionsRunner.setUniqueId(extensionInitRequest.getExtension().getId());
         // Successfully initialized. Send the response.
         try {
-            return new InitializeExtensionResponse(extensionsRunner.getSettings().get(NODE_NAME_SETTING));
+            return new InitializeExtensionResponse(
+                extensionsRunner.getSettings().get(NODE_NAME_SETTING),
+                extensionsRunner.getExtensionImplementedInterfaces()
+            );
         } finally {
             // After sending successful response to initialization, send the REST API and Settings
             extensionsRunner.setOpensearchNode(extensionsRunner.opensearchNode);
