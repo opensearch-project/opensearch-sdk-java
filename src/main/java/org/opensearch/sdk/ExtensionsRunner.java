@@ -56,11 +56,15 @@ import com.google.inject.Key;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * The primary class to run an extension.
@@ -386,6 +390,33 @@ public class ExtensionsRunner {
             ((request, channel, task) -> channel.sendResponse(updateSettingsRequestHandler.handleUpdateSettingsRequest(request)))
         );
 
+    }
+
+    /**
+     * Returns a list of interfaces implemented by the corresponding {@link Extension}.
+     *
+     * @return A list of strings matching the interface name.
+     */
+    public List<String> getExtensionImplementedInterfaces() {
+        Extension extension = getExtension();
+
+        Set<Class<?>> interfaceSet = new HashSet<>();
+        Class<?> extensionClass = extension.getClass();
+        do {
+            interfaceSet.addAll(Arrays.stream(extensionClass.getInterfaces()).collect(Collectors.toSet()));
+            extensionClass = extensionClass.getSuperclass();
+        } while (extensionClass != null);
+
+        List<String> interfacesOfOpenSearch = new ArrayList<String>();
+        // we are making an assumption here that all the other Interfaces will be in the same package ( or will be in subpackage ) in which
+        // ActionExtension Interface belongs.
+        String packageNameOfActionExtension = ActionExtension.class.getPackageName();
+        for (Class<?> anInterface : interfaceSet) {
+            if (anInterface.getPackageName().startsWith(packageNameOfActionExtension)) {
+                interfacesOfOpenSearch.add(anInterface.getSimpleName());
+            }
+        }
+        return interfacesOfOpenSearch;
     }
 
     /**
