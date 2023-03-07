@@ -163,4 +163,15 @@ public class TestSDKNamedXContentRegistry extends OpenSearchTestCase {
         Example example = registry.parseNamedObject(Example.class, Example.NAME, parser, null);
         assertEquals(Example.NAME, example.getName());
     }
+
+    @Test
+    public void testEmptyRegistry() {
+        assertEquals(NamedXContentRegistry.EMPTY, SDKNamedXContentRegistry.EMPTY.getRegistry());
+    }
+
+    @Test
+    public void testSetRegistry() {
+        runner.sdkNamedXContentRegistry.setRegistry(NamedXContentRegistry.EMPTY);
+        assertEquals(NamedXContentRegistry.EMPTY, runner.sdkNamedXContentRegistry.getRegistry());
+    }
 }
