@@ -237,29 +237,4 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
 
         assertEquals("failed to find action [" + UnregisteredAction.INSTANCE + "] to execute", ex.getMessage());
     }
-
-    @Test
-    public void testSdkClientNotInitialized() throws Exception {
-        String expectedName = "";
-        SampleRequest request = new SampleRequest(expectedName);
-        CompletableFuture<SampleResponse> responseFuture = new CompletableFuture<>();
-        SDKClient uninitializedSdkClient = new SDKClient();
-
-        IllegalStateException ex = assertThrows(
-            IllegalStateException.class,
-            () -> uninitializedSdkClient.execute(SampleAction.INSTANCE, request, new ActionListener<SampleResponse>() {
-                @Override
-                public void onResponse(SampleResponse response) {
-                    responseFuture.complete(response);
-                }
-
-                @Override
-                public void onFailure(Exception e) {
-                    responseFuture.completeExceptionally(e);
-                }
-            })
-        );
-
-        assertEquals("SDKClient was not initialized because the Extension does not implement ActionExtension.", ex.getMessage());
-    }
 }

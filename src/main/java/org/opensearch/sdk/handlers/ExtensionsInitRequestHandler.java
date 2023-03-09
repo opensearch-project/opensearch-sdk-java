@@ -62,14 +62,12 @@ public class ExtensionsInitRequestHandler {
             extensionTransportService.connectToNode(extensionsRunner.opensearchNode);
             extensionsRunner.sendRegisterRestActionsRequest(extensionTransportService);
             extensionsRunner.sendRegisterCustomSettingsRequest(extensionTransportService);
-            if (extensionsRunner.getSdkActionModule() != null) {
-                extensionsRunner.getSdkActionModule()
-                    .sendRegisterTransportActionsRequest(
-                        extensionTransportService,
-                        extensionsRunner.opensearchNode,
-                        extensionsRunner.getUniqueId()
-                    );
-            }
+            extensionsRunner.getSdkActionModule()
+                .sendRegisterTransportActionsRequest(
+                    extensionTransportService,
+                    extensionsRunner.opensearchNode,
+                    extensionsRunner.getUniqueId()
+                );
             // Get OpenSearch Settings and set values on ExtensionsRunner
             Settings settings = extensionsRunner.sendEnvironmentSettingsRequest(extensionTransportService);
             extensionsRunner.setEnvironmentSettings(settings);

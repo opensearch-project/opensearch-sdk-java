@@ -20,6 +20,7 @@ import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionSettings;
 import org.opensearch.sdk.ExtensionsRunner;
+import org.opensearch.sdk.ActionExtension;
 import org.opensearch.sdk.ActionExtension.ActionHandler;
 import org.opensearch.sdk.sample.helloworld.rest.RestHelloAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
@@ -34,7 +35,7 @@ import org.opensearch.sdk.sample.helloworld.transport.SampleTransportAction;
  * <p>
  * To execute, pass an instatiated object of this class to {@link ExtensionsRunner#run(Extension)}.
  */
-public class HelloWorldExtension extends BaseExtension {
+public class HelloWorldExtension extends BaseExtension implements ActionExtension {
 
     /**
      * Optional classpath-relative path to a yml file containing extension settings.
