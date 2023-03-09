@@ -22,6 +22,8 @@ import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.RegisterTransportActionsRequest;
 import org.opensearch.sdk.ActionExtension;
+import org.opensearch.sdk.Extension;
+import org.opensearch.sdk.ExtensionSettings;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.Transport;
@@ -51,7 +53,12 @@ public class TestSDKActionModule extends OpenSearchTestCase {
     private TransportService transportService;
     private DiscoveryNode opensearchNode;
 
-    private SDKActionModule sdkActionModule = new SDKActionModule(new ActionExtension() {
+    private static class TestActionExtension implements Extension, ActionExtension {
+        @Override
+        public ExtensionSettings getExtensionSettings() {
+            return null;
+        }
+
         @Override
         public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
             @SuppressWarnings("unchecked")
@@ -60,7 +67,9 @@ public class TestSDKActionModule extends OpenSearchTestCase {
 
             return Arrays.asList(new ActionHandler<ActionRequest, ActionResponse>(testAction, null));
         }
-    });
+    }
+
+    private SDKActionModule sdkActionModule = new SDKActionModule(new TestActionExtension());
 
     @Override
     @BeforeEach
