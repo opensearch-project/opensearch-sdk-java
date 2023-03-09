@@ -1,3 +1,12 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ */
+
 package org.opensearch.sdk;
 
 import org.apache.lucene.store.Directory;
@@ -13,9 +22,9 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * A plugin that provides alternative directory implementations.
+ * A extension that provides alternative directory implementations.
  *
- * @opensearch.api
+ * 
  */
 public interface IndexStoreExtension {
 
@@ -51,9 +60,9 @@ public interface IndexStoreExtension {
     }
 
     /**
-     * The {@link DirectoryFactory} mappings for this plugin. When an index is created the store type setting
+     * The {@link DirectoryFactory} mappings for this extension. When an index is created the store type setting
      * {@link org.opensearch.index.IndexModule#INDEX_STORE_TYPE_SETTING} on the index will be examined and either use the default or a
-     * built-in type, or looked up among all the directory factories from {@link IndexStorePlugin} plugins.
+     * built-in type, or looked up among all the directory factories from {@link IndexStoreExtension} extensions.
      *
      * @return a map from store type to an directory factory
      */
@@ -72,9 +81,9 @@ public interface IndexStoreExtension {
     }
 
     /**
-     * The {@link RecoveryStateFactory} mappings for this plugin. When an index is created the recovery type setting
+     * The {@link RecoveryStateFactory} mappings for this extension. When an index is created the recovery type setting
      * {@link org.opensearch.index.IndexModule#INDEX_RECOVERY_TYPE_SETTING} on the index will be examined and either use the default
-     * or looked up among all the recovery state factories from {@link IndexStorePlugin} plugins.
+     * or looked up among all the recovery state factories from {@link IndexStoreExtension} extensions.
      *
      * @return a map from recovery type to an recovery state factory
      */
