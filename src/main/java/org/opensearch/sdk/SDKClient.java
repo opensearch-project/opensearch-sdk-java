@@ -11,6 +11,7 @@ package org.opensearch.sdk;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -77,7 +78,7 @@ public class SDKClient implements Closeable {
 
     // Used by client.execute, populated by initialize method
     @SuppressWarnings("rawtypes")
-    private Map<ActionType, TransportAction> actions;
+    private Map<ActionType, TransportAction> actions = Collections.emptyMap();
 
     /**
      * Initialize this client.
