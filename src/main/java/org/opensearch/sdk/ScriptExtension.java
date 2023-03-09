@@ -20,8 +20,6 @@ import java.util.Map;
 
 /**
  * An additional extension point for {@link Extension}s that extends OpenSearch's scripting functionality.
- *
- * @opensearch.api
  */
 public interface ScriptExtension {
 
