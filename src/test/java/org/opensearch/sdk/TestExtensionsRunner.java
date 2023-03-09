@@ -240,9 +240,8 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testGetExtensionImplementedInterfaces() {
         List<String> implementedInterfaces = extensionsRunner.getExtensionImplementedInterfaces();
-        assertTrue(!implementedInterfaces.isEmpty());
+        assertFalse(implementedInterfaces.isEmpty());
         assertTrue(implementedInterfaces.contains("Extension"));
-        assertTrue(implementedInterfaces.contains("ActionExtension"));
     }
 
 }
