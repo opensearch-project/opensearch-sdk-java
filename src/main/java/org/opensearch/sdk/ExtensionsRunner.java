@@ -18,7 +18,6 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
-import org.opensearch.common.Nullable;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.core.xcontent.NamedXContentRegistry;
@@ -133,8 +132,7 @@ public class ExtensionsRunner {
     private final SDKNamedXContentRegistry sdkNamedXContentRegistry;
     private final SDKClient sdkClient = new SDKClient();
     private final SDKClusterService sdkClusterService = new SDKClusterService(this);
-    @Nullable
-    private SDKActionModule sdkActionModule = null;
+    private final SDKActionModule sdkActionModule;
 
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
     private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
@@ -191,17 +189,16 @@ public class ExtensionsRunner {
         // Bind the return values from create components
         modules.add(this::injectComponents);
         // Bind actions from getActions
-        if (extension instanceof ActionExtension) {
-            this.sdkActionModule = new SDKActionModule((ActionExtension) extension);
-            modules.add(this.sdkActionModule);
-        }
+        this.sdkActionModule = new SDKActionModule(extension);
+        modules.add(this.sdkActionModule);
         // Finally, perform the injection
         this.injector = Guice.createInjector(modules);
 
         // Perform other initialization. These should have access to injected classes.
+        // initialize SDKClient action map
+        initializeSdkClient();
+
         if (extension instanceof ActionExtension) {
-            // initialize SDKClient action map
-            initializeSdkClient();
             // store REST handlers in the registry
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
                 for (Route route : extensionRestHandler.routes()) {
@@ -398,25 +395,20 @@ public class ExtensionsRunner {
      * @return A list of strings matching the interface name.
      */
     public List<String> getExtensionImplementedInterfaces() {
-        Extension extension = getExtension();
-
         Set<Class<?>> interfaceSet = new HashSet<>();
-        Class<?> extensionClass = extension.getClass();
+        Class<?> extensionClass = getExtension().getClass();
         do {
             interfaceSet.addAll(Arrays.stream(extensionClass.getInterfaces()).collect(Collectors.toSet()));
             extensionClass = extensionClass.getSuperclass();
         } while (extensionClass != null);
 
-        List<String> interfacesOfOpenSearch = new ArrayList<String>();
         // we are making an assumption here that all the other Interfaces will be in the same package ( or will be in subpackage ) in which
-        // ActionExtension Interface belongs.
-        String packageNameOfActionExtension = ActionExtension.class.getPackageName();
-        for (Class<?> anInterface : interfaceSet) {
-            if (anInterface.getPackageName().startsWith(packageNameOfActionExtension)) {
-                interfacesOfOpenSearch.add(anInterface.getSimpleName());
-            }
-        }
-        return interfacesOfOpenSearch;
+        // Extension Interface belongs.
+        String extensionInterfacePackageName = Extension.class.getPackageName();
+        return interfaceSet.stream()
+            .filter(i -> i.getPackageName().startsWith(extensionInterfacePackageName))
+            .map(Class::getSimpleName)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -627,12 +619,6 @@ public class ExtensionsRunner {
         return sdkClusterService;
     }
 
-    /**
-     * Returns the {@link SDKActionModule} if actions have been registered
-     *
-     * @return The SDKActionModule instance if it exists, null otherwise.
-     */
-    @Nullable
     public SDKActionModule getSdkActionModule() {
         return sdkActionModule;
     }
