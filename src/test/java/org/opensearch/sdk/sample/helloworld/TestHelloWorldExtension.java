@@ -44,6 +44,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 
+import static org.opensearch.sdk.sample.helloworld.ExampleCustomSettingConfig.VALIDATED_SETTING;
+
 public class TestHelloWorldExtension extends OpenSearchTestCase {
 
     private HelloWorldExtension extension;
@@ -236,5 +238,17 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         );
 
         assertEquals("failed to find action [" + UnregisteredAction.INSTANCE + "] to execute", ex.getMessage());
+    }
+
+    public void testValidatedSettings() {
+        final String expected = randomAlphaOfLengthBetween(1, 5);
+        final String actual = VALIDATED_SETTING.get(Settings.builder().put(VALIDATED_SETTING.getKey(), expected).build());
+        assertEquals(expected, actual);
+
+        final IllegalArgumentException exception = expectThrows(
+            IllegalArgumentException.class,
+            () -> VALIDATED_SETTING.get(Settings.builder().put("custom.validated", "it's forbidden").build())
+        );
+        assertEquals("Setting must not contain [forbidden]", exception.getMessage());
     }
 }
