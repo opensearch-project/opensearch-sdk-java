@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
+import org.opensearch.common.settings.Setting;
 import org.opensearch.sdk.BaseExtension;
 import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionRestHandler;
@@ -61,6 +62,13 @@ public class HelloWorldExtension extends BaseExtension implements ActionExtensio
     @Override
     public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
         return Arrays.asList(new ActionHandler<>(SampleAction.INSTANCE, SampleTransportAction.class));
+    }
+
+    /**
+     * A list of object that includes a single instance of Validator for Custom Setting
+     */
+    public List<Setting<?>> getSettings() {
+        return Arrays.asList(ExampleCustomSettingConfig.VALIDATED_SETTING);
     }
 
     /**
