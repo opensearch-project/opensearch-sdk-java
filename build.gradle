@@ -17,6 +17,8 @@ plugins {
     id "com.diffplug.spotless" version "6.16.0" apply false
     id 'jacoco'
     id "com.form.diff-coverage" version "0.9.5"
+    // for javadocs and checks spotless doesn't do
+    id 'checkstyle'
 }
 
 
@@ -71,10 +73,6 @@ repositories {
     maven { url "https://d1nvenhzbhpy0q.cloudfront.net/snapshots/lucene/"}
 }
 
-configurations {
-  requireJavadoc
-}
-
 dependencies {
 
     def opensearchVersion = "3.0.0-SNAPSHOT"
@@ -87,7 +85,6 @@ dependencies {
     def junit5Version = "5.9.2"
     def junitPlatform = "1.9.2"
     def jaxbVersion = "2.3.1"
-    def requireJavadocVersion = "1.0.6"
 
     implementation("org.opensearch:opensearch:${opensearchVersion}")
     implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
@@ -117,33 +114,7 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junit5Version}")
     testImplementation("org.opensearch.test:framework:${opensearchVersion}")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:${junitPlatform}")
-    requireJavadoc("org.plumelib:require-javadoc:${requireJavadocVersion}")
 }
-
-// this task tests for the presence of javadocs but not the content/tags
-task requireJavadoc(type: JavaExec) {
-  group = 'Documentation'
-  description = 'Ensures that Javadoc documentation exists.'
-  mainClass = "org.plumelib.javadoc.RequireJavadoc"
-  classpath = configurations.requireJavadoc
-  args "src/main/java"
-  // javadocs on private methods optional
-  args "--dont-require-private=true"
-  // javadocs on trivial getters/setters optional
-  args "--dont-require-trivial-properties"
-}
-check.dependsOn requireJavadoc
-
-// this task checks the content/tags of existing javadocs
-task javadocStrict(type: Javadoc) {
-  group = 'Documentation'
-  description = 'Run Javadoc in strict mode: with -Xdoclint:all, on all members.'
-  source = sourceSets.main.allJava
-  classpath = sourceSets.main.runtimeClasspath
-  options.addStringOption('Xdoclint:all', '-quiet')
-  options.memberLevel = JavadocMemberLevel.PRIVATE
-}
-check.dependsOn javadocStrict
 
 // this task runs the helloworld sample extension
 task helloWorld(type: JavaExec) {
