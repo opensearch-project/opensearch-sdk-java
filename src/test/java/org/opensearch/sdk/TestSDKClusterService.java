@@ -37,6 +37,7 @@ public class TestSDKClusterService extends OpenSearchTestCase {
     public void setUp() throws Exception {
         super.setUp();
         this.extensionsRunner = mock(ExtensionsRunner.class);
+        when(extensionsRunner.getExtension()).thenReturn(new ExtensionsRunnerForTest().getExtension());
         this.sdkClusterService = new SDKClusterService(extensionsRunner);
     }
 
