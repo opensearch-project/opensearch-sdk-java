@@ -14,7 +14,10 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import java.util.Collections;
 import java.util.Map;
 
+<<<<<<< HEAD
 import org.junit.jupiter.api.Assertions;
+=======
+>>>>>>> 2420d90 (Tests for IndexStoreExtension added.)
 import org.junit.jupiter.api.Test;
 import org.opensearch.common.breaker.CircuitBreaker;
 import org.opensearch.common.settings.Settings;
@@ -119,6 +122,7 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
     }
 
     @Test
+<<<<<<< HEAD
     public void testGetMappers() {
         MapperExtension mapperExtension = new MapperExtension() {
         };
@@ -152,6 +156,8 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
     }
 
     @Test
+=======
+>>>>>>> 2420d90 (Tests for IndexStoreExtension added.)
     void testIndexStoreExtension() {
         IndexStoreExtension indexStoreExtension = new IndexStoreExtension() {
             @Override
@@ -162,6 +168,7 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         assertTrue(indexStoreExtension.getDirectoryFactories().isEmpty());
         assertTrue(indexStoreExtension.getRecoveryStateFactories().isEmpty());
     }
+<<<<<<< HEAD
 
     @Test
     void testSystemIndexExtension() {
@@ -222,4 +229,6 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         assertTrue(analysisExtension.getHunspellDictionaries().isEmpty());
         assertTrue(analysisProvider.requiresAnalysisSettings());
     }
+=======
+>>>>>>> 2420d90 (Tests for IndexStoreExtension added.)
 }
