@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * A extension that provides alternative directory implementations.
  *
- * 
+ *
  */
 public interface IndexStoreExtension {
 

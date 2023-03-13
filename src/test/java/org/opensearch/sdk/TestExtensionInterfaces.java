@@ -11,6 +11,9 @@ package org.opensearch.sdk;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.test.OpenSearchTestCase;
@@ -79,5 +82,17 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         assertTrue(searchExtension.getRescorers().isEmpty());
         assertTrue(searchExtension.getQueryPhaseSearcher().isEmpty());
         assertTrue(searchExtension.getIndexSearcherExecutorProvider().isEmpty());
+    }
+
+    @Test
+    void testIndexStoreExtension() {
+        IndexStoreExtension indexStoreExtension = new IndexStoreExtension() {
+            @Override
+            public Map<String, DirectoryFactory> getDirectoryFactories() {
+                return Collections.emptyMap();
+            }
+        };
+        assertTrue(indexStoreExtension.getDirectoryFactories().isEmpty());
+        assertTrue(indexStoreExtension.getRecoveryStateFactories().isEmpty());
     }
 }
