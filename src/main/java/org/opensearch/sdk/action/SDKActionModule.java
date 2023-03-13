@@ -9,6 +9,7 @@
 
 package org.opensearch.sdk.action;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -22,6 +23,7 @@ import org.opensearch.common.NamedRegistry;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.RegisterTransportActionsRequest;
 import org.opensearch.sdk.ActionExtension.ActionHandler;
+import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.transport.TransportService;
 
@@ -46,10 +48,9 @@ public class SDKActionModule extends AbstractModule {
      *
      * @param extension An instance of {@link ActionExtension}.
      */
-    public SDKActionModule(ActionExtension extension) {
+    public SDKActionModule(Extension extension) {
         this.actions = setupActions(extension);
         this.actionFilters = setupActionFilters(extension);
-        // TODO: consider moving Rest Handler registration here
     }
 
     public Map<String, ActionHandler<?, ?>> getActions() {
@@ -60,26 +61,33 @@ public class SDKActionModule extends AbstractModule {
         return actionFilters;
     }
 
-    private static Map<String, ActionHandler<?, ?>> setupActions(ActionExtension extension) {
-        // Subclass NamedRegistry for easy registration
-        class ActionRegistry extends NamedRegistry<ActionHandler<?, ?>> {
-            ActionRegistry() {
-                super("action");
-            }
+    private static Map<String, ActionHandler<?, ?>> setupActions(Extension extension) {
+        if (extension instanceof ActionExtension) {
+            // Subclass NamedRegistry for easy registration
+            class ActionRegistry extends NamedRegistry<ActionHandler<?, ?>> {
+                ActionRegistry() {
+                    super("action");
+                }
 
-            public void register(ActionHandler<?, ?> handler) {
-                register(handler.getAction().name(), handler);
+                public void register(ActionHandler<?, ?> handler) {
+                    register(handler.getAction().name(), handler);
+                }
             }
+            ActionRegistry actions = new ActionRegistry();
+            // Register getActions in it
+            ((ActionExtension) extension).getActions().stream().forEach(actions::register);
+
+            return unmodifiableMap(actions.getRegistry());
         }
-        ActionRegistry actions = new ActionRegistry();
-        // Register getActions in it
-        extension.getActions().stream().forEach(actions::register);
-
-        return unmodifiableMap(actions.getRegistry());
+        return Collections.emptyMap();
     }
 
-    private static ActionFilters setupActionFilters(ActionExtension extension) {
-        return new ActionFilters(extension.getActionFilters().stream().collect(Collectors.toSet()));
+    private static ActionFilters setupActionFilters(Extension extension) {
+        return new ActionFilters(
+            extension instanceof ActionExtension
+                ? ((ActionExtension) extension).getActionFilters().stream().collect(Collectors.toSet())
+                : Collections.emptySet()
+        );
     }
 
     @Override
