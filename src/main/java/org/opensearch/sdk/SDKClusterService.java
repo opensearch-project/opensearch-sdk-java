@@ -71,6 +71,7 @@ public class SDKClusterService {
      */
     public void updateSdkClusterSettings() {
         this.clusterSettings.applySettings(extensionsRunner.getEnvironmentSettings());
+        extensionsRunner.getExtension().getSettings().stream().forEach(clusterSettings::registerSetting);
     }
 
     public SDKClusterSettings getClusterSettings() {

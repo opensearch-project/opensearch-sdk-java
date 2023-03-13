@@ -13,18 +13,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.opensearch.common.settings.Setting;
+import org.opensearch.common.settings.Setting.Property;
+import org.opensearch.common.settings.Settings;
 import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.sdk.SDKClusterService.SDKClusterSettings;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.TransportService;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -36,8 +42,7 @@ public class TestSDKClusterService extends OpenSearchTestCase {
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        this.extensionsRunner = mock(ExtensionsRunner.class);
-        when(extensionsRunner.getExtension()).thenReturn(new ExtensionsRunnerForTest().getExtension());
+        this.extensionsRunner = spy(new ExtensionsRunnerForTest());
         this.sdkClusterService = new SDKClusterService(extensionsRunner);
     }
 
@@ -70,16 +75,45 @@ public class TestSDKClusterService extends OpenSearchTestCase {
     }
 
     @Test
+    public void testUpdateSdkClusterSettings() {
+        ExtensionsRunner mockRunner = mock(ExtensionsRunner.class);
+        Extension mockExtension = mock(Extension.class);
+        when(mockRunner.getExtension()).thenReturn(mockExtension);
+        when(mockRunner.getEnvironmentSettings()).thenReturn(Settings.EMPTY);
+        when(mockExtension.getSettings()).thenReturn(Collections.emptyList());
+        SDKClusterService clusterService = new SDKClusterService(mockRunner);
+
+        SDKClusterSettings sdkClusterSettings = clusterService.getClusterSettings();
+        assertEquals(Property.NodeScope, sdkClusterSettings.getScope());
+
+        String testKey = "test.setting";
+        String testValue = "test.setting.value";
+        Setting<String> testSetting = Setting.simpleString(testKey, testValue);
+        when(mockExtension.getSettings()).thenReturn(List.of(testSetting));
+
+        // Before settings set
+        assertNull(sdkClusterSettings.get(testKey));
+
+        assertDoesNotThrow(() -> clusterService.updateSdkClusterSettings());
+        // After settings set
+        assertNotNull(sdkClusterSettings.get(testKey));
+        assertEquals(testSetting.toString(), sdkClusterSettings.get(testKey).toString());
+    }
+
+    @Test
     public void testAddSettingsUpdateConsumer() throws Exception {
         Setting<Boolean> boolSetting = Setting.boolSetting("test", false);
         Consumer<Boolean> boolConsumer = b -> {};
+
+        TransportService mockTransportService = mock(TransportService.class);
+        extensionsRunner.setExtensionTransportService(mockTransportService);
 
         // Before initialization should store pending update but do nothing
         sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(boolSetting, boolConsumer);
         verify(extensionsRunner, times(0)).getExtensionTransportService();
 
         // After initialization should be able to send pending updates
-        when(extensionsRunner.isInitialized()).thenReturn(true);
+        extensionsRunner.setInitialized();
         sdkClusterService.getClusterSettings().sendPendingSettingsUpdateConsumers();
         verify(extensionsRunner, times(1)).getExtensionTransportService();
 
@@ -98,7 +132,7 @@ public class TestSDKClusterService extends OpenSearchTestCase {
             transportServiceArgumentCaptor.capture(),
             updateConsumerArgumentCaptor.capture()
         );
-        assertNull(transportServiceArgumentCaptor.getValue());
+        assertEquals(mockTransportService, transportServiceArgumentCaptor.getValue());
         // Map will be cleared following this call
         assertTrue(updateConsumerArgumentCaptor.getValue().isEmpty());
     }
@@ -110,6 +144,9 @@ public class TestSDKClusterService extends OpenSearchTestCase {
         Map<Setting<?>, Consumer<?>> settingsUpdateConsumersMap = new HashMap<>();
         settingsUpdateConsumersMap.put(boolSetting, boolConsumer);
 
+        TransportService mockTransportService = mock(TransportService.class);
+        extensionsRunner.setExtensionTransportService(mockTransportService);
+
         // Before initialization should store pending update but do nothing
         sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(settingsUpdateConsumersMap);
         verify(extensionsRunner, times(0)).getExtensionTransportService();
@@ -134,7 +171,7 @@ public class TestSDKClusterService extends OpenSearchTestCase {
             transportServiceArgumentCaptor.capture(),
             updateConsumerArgumentCaptor.capture()
         );
-        assertNull(transportServiceArgumentCaptor.getValue());
+        assertEquals(mockTransportService, transportServiceArgumentCaptor.getValue());
         // Map will be cleared following this call
         assertTrue(updateConsumerArgumentCaptor.getValue().isEmpty());
     }
