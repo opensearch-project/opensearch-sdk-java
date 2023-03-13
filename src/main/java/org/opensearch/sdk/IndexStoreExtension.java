@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * A extension that provides alternative directory implementations.
+ * An extension that provides alternative directory implementations.
  *
  *
  */
