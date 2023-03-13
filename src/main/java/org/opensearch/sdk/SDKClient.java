@@ -71,6 +71,7 @@ import org.opensearch.client.indices.PutMappingRequest;
 import org.opensearch.client.indices.rollover.RolloverRequest;
 import org.opensearch.client.indices.rollover.RolloverResponse;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
+import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
@@ -84,6 +85,7 @@ public class SDKClient implements Closeable {
     private OpenSearchClient javaClient;
     private RestClient restClient;
     private RestHighLevelClient sdkRestClient;
+    private OpenSearchAsyncClient javaAsyncClient;
 
     // Used by client.execute, populated by initialize method
     @SuppressWarnings("rawtypes")
@@ -137,6 +139,29 @@ public class SDKClient implements Closeable {
     }
 
     /**
+     * Initializes an OpenSearchTransport using RestClientTransport. This is required for JavaClient and JavaAsyncClient
+     *
+     * @param hostAddress The address of OpenSearch cluster, client can connect to
+     * @param port The port of OpenSearch cluster
+     * @return The OpenSearchTransport implementation of RestClientTransport.
+     */
+    private OpenSearchTransport initializeTransport(String hostAddress, int port) {
+        RestClientBuilder builder = builder(hostAddress, port);
+
+        restClient = builder.build();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.registerModule(new GuavaModule());
+        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE, JsonTypeInfo.As.PROPERTY);
+        mapper.configure(MapperFeature.USE_GETTERS_AS_SETTERS, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        // Create Client
+        OpenSearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper(mapper));
+        return transport;
+    }
+
+    /**
      * Initializes an OpenSearchClient using OpenSearch JavaClient
      *
      * @param settings The Extension settings
@@ -148,6 +173,17 @@ public class SDKClient implements Closeable {
     }
 
     /**
+     * Initializes an OpenAsyncSearchClient using OpenSearch JavaClient
+     *
+     * @param settings The Extension settings
+     * @return The SDKClient implementation of OpenSearchAsyncClient. The user is responsible for calling
+     *         {@link #doCloseJavaClient()} when finished with the client
+     */
+    public OpenSearchAsyncClient initializeJavaAsyncClient(ExtensionSettings settings) {
+        return initalizeJavaAsyncClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
+    }
+
+    /**
      * Initializes an OpenSearchClient using OpenSearch JavaClient
      *
      * @param hostAddress The address of OpenSearch cluster, client can connect to
@@ -156,21 +192,23 @@ public class SDKClient implements Closeable {
      *         {@link #doCloseJavaClient()} when finished with the client
      */
     public OpenSearchClient initializeJavaClient(String hostAddress, int port) {
-        RestClientBuilder builder = builder(hostAddress, port);
-
-        restClient = builder.build();
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.registerModule(new GuavaModule());
-        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE, JsonTypeInfo.As.PROPERTY);
-        mapper.configure(MapperFeature.USE_GETTERS_AS_SETTERS, false);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        // Create Client
-        OpenSearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper(mapper));
+        OpenSearchTransport transport = initializeTransport(hostAddress, port);
         javaClient = new OpenSearchClient(transport);
         return javaClient;
+    }
+
+    /**
+     * Initializes an OpenAsyncSearchClient using OpenSearch JavaClient
+     *
+     * @param hostAddress The address of OpenSearch cluster, client can connect to
+     * @param port The port of OpenSearch cluster
+     * @return The SDKClient implementation of OpenSearchAsyncClient. The user is responsible for calling
+     *         {@link #doCloseJavaClient()} when finished with the client
+     */
+    public OpenSearchAsyncClient initalizeJavaAsyncClient(String hostAddress, int port) {
+        OpenSearchTransport transport = initializeTransport(hostAddress, port);
+        javaAsyncClient = new OpenSearchAsyncClient(transport);
+        return javaAsyncClient;
     }
 
     /**
