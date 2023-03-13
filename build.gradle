@@ -14,7 +14,7 @@ import org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestFram
 
 plugins {
     id 'java'
-    id "com.diffplug.spotless" version "6.16.0" apply false
+    id "com.diffplug.spotless" version "6.17.0" apply false
     id 'jacoco'
     id "com.form.diff-coverage" version "0.9.5"
 }
