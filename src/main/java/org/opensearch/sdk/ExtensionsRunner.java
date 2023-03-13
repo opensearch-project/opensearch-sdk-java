@@ -17,6 +17,7 @@ import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.node.DiscoveryNode;
+import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
@@ -101,6 +102,11 @@ public class ExtensionsRunner {
      */
     private final List<NamedXContentRegistry.Entry> customNamedXContent;
     /**
+     * Custom namedWriteable from the extension's getNamedWriteable;. This field is initialized in the constructor.
+     */
+    private final List<NamedWriteableRegistry.Entry> customNamedWriteable;
+
+    /**
      * Custom settings from the extension's getSettings. This field is initialized in the constructor.
      */
     private final List<Setting<?>> customSettings;
@@ -127,6 +133,7 @@ public class ExtensionsRunner {
     private final Injector injector;
 
     private final SDKNamedXContentRegistry sdkNamedXContentRegistry;
+    private final SDKNamedWriteableRegistry sdkNamedWriteableRegistry;
     private final SDKClient sdkClient = new SDKClient();
     private final SDKClusterService sdkClusterService = new SDKClusterService(this);
 
@@ -167,8 +174,12 @@ public class ExtensionsRunner {
         this.customSettings = extension.getSettings();
         // save custom namedXContent
         this.customNamedXContent = extension.getNamedXContent();
+        // save custom namedWriteable
+        this.customNamedWriteable = extension.getNamedWriteable();
         // initialize NamedXContent Registry. Must happen after getting extension namedXContent
         this.sdkNamedXContentRegistry = new SDKNamedXContentRegistry(this);
+        // initialize NamedWriteable Registry. Must happen after getting extension namedWriteable
+        this.sdkNamedWriteableRegistry = new SDKNamedWriteableRegistry(this);
 
         // TODO: Move this map instantiation inside TransportActions and provide register API
         // to move logic from the module stream
@@ -298,6 +309,15 @@ public class ExtensionsRunner {
     }
 
     /**
+     * Gets the NamedXContentRegistry. Only valid if {@link #isInitialized()} returns true.
+     *
+     * @return the NamedXContentRegistry if initialized, an empty registry otherwise.
+     */
+    public SDKNamedWriteableRegistry getNamedWriteableRegistry() {
+        return this.sdkNamedWriteableRegistry;
+    }
+
+    /**
      * Sets the Unique ID, used in REST requests to uniquely identify this extension
      *
      * @param id assign value for id
@@ -333,6 +353,10 @@ public class ExtensionsRunner {
 
     public List<NamedXContentRegistry.Entry> getCustomNamedXContent() {
         return this.customNamedXContent;
+    }
+
+    public List<NamedWriteableRegistry.Entry> getCustomNamedWriteable() {
+        return this.customNamedWriteable;
     }
 
     /**

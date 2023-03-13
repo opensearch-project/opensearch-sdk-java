@@ -10,23 +10,15 @@
 package org.opensearch.sdk;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.opensearch.Version;
-import org.opensearch.cluster.ClusterModule;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
-import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.PageCacheRecycler;
-import org.opensearch.indices.IndicesModule;
 import org.opensearch.indices.breaker.CircuitBreakerService;
 import org.opensearch.indices.breaker.NoneCircuitBreakerService;
-import org.opensearch.search.SearchModule;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.transport.TransportInterceptor;
@@ -60,20 +52,9 @@ public class NettyTransport {
      * @param threadPool  A thread pool to use.
      * @return The configured Netty4Transport object.
      */
-    public Netty4Transport getNetty4Transport(Settings settings, ThreadPool threadPool) {
+    public Netty4Transport getNetty4Transport(Settings settings, ThreadPool threadPool, NamedWriteableRegistry namedWriteableRegistry) {
         NetworkService networkService = new NetworkService(Collections.emptyList());
         PageCacheRecycler pageCacheRecycler = new PageCacheRecycler(settings);
-        IndicesModule indicesModule = new IndicesModule(Collections.emptyList());
-        SearchModule searchModule = new SearchModule(settings, Collections.emptyList());
-
-        List<NamedWriteableRegistry.Entry> namedWriteables = Stream.of(
-            NetworkModule.getNamedWriteables().stream(),
-            indicesModule.getNamedWriteables().stream(),
-            searchModule.getNamedWriteables().stream(),
-            ClusterModule.getNamedWriteables().stream()
-        ).flatMap(Function.identity()).collect(Collectors.toList());
-
-        final NamedWriteableRegistry namedWriteableRegistry = new NamedWriteableRegistry(namedWriteables);
 
         final CircuitBreakerService circuitBreakerService = new NoneCircuitBreakerService();
 
@@ -100,7 +81,7 @@ public class NettyTransport {
      */
     public TransportService initializeExtensionTransportService(Settings settings, ThreadPool threadPool) {
 
-        Netty4Transport transport = getNetty4Transport(settings, threadPool);
+        Netty4Transport transport = getNetty4Transport(settings, threadPool, extensionsRunner.getNamedWriteableRegistry().getRegistry());
 
         // create transport service
         TransportService transportService = new TransportService(
