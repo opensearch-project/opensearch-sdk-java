@@ -173,17 +173,6 @@ public class SDKClient implements Closeable {
     }
 
     /**
-     * Initializes an OpenAsyncSearchClient using OpenSearch JavaClient
-     *
-     * @param settings The Extension settings
-     * @return The SDKClient implementation of OpenSearchAsyncClient. The user is responsible for calling
-     *         {@link #doCloseJavaClient()} when finished with the client
-     */
-    public OpenSearchAsyncClient initializeJavaAsyncClient(ExtensionSettings settings) {
-        return initalizeJavaAsyncClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
-    }
-
-    /**
      * Initializes an OpenSearchClient using OpenSearch JavaClient
      *
      * @param hostAddress The address of OpenSearch cluster, client can connect to
@@ -195,6 +184,17 @@ public class SDKClient implements Closeable {
         OpenSearchTransport transport = initializeTransport(hostAddress, port);
         javaClient = new OpenSearchClient(transport);
         return javaClient;
+    }
+
+    /**
+     * Initializes an OpenAsyncSearchClient using OpenSearch JavaClient
+     *
+     * @param settings The Extension settings
+     * @return The SDKClient implementation of OpenSearchAsyncClient. The user is responsible for calling
+     *         {@link #doCloseJavaClient()} when finished with the client
+     */
+    public OpenSearchAsyncClient initializeJavaAsyncClient(ExtensionSettings settings) {
+        return initalizeJavaAsyncClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
     }
 
     /**
