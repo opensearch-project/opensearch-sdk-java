@@ -31,6 +31,7 @@ public interface EngineExtension {
      * {@link Optional#empty()}. If multiple Extensions return an engine factory for a given index the index will not be created and an
      * {@link IllegalStateException} will be thrown during index creation.
      *
+     * @param indexSettings the index settings to inspect
      * @return an optional engine factory
      */
     default Optional<EngineFactory> getEngineFactory(IndexSettings indexSettings) {
@@ -43,6 +44,9 @@ public interface EngineExtension {
      * to determine if a custom {@link CodecServiceFactory} should be provided for the given index. A Extension that is not overriding
      * the {@link CodecServiceFactory} through the Extension can ignore this method and the default Codec specified in the
      * {@link IndexSettings} will be used.
+     *
+     * @param indexSettings the index settings to inspect
+     * @return an optional engine factory
      */
     default Optional<CodecServiceFactory> getCustomCodecServiceFactory(IndexSettings indexSettings) {
         return Optional.empty();
