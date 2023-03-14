@@ -93,6 +93,8 @@ public interface SearchExtension {
 
     /**
      * The new {@link FetchSubPhase}s defined by this Extension.
+     *
+     * @param context The context for which to fetch the subphases.
      */
     default List<FetchSubPhase> getFetchSubPhases(FetchPhaseConstructionContext context) {
         return emptyList();
