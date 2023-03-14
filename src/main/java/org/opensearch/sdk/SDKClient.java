@@ -11,6 +11,7 @@ package org.opensearch.sdk;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -86,7 +87,7 @@ public class SDKClient implements Closeable {
 
     // Used by client.execute, populated by initialize method
     @SuppressWarnings("rawtypes")
-    private Map<ActionType, TransportAction> actions;
+    private Map<ActionType, TransportAction> actions = Collections.emptyMap();
 
     /**
      * Initialize this client.
@@ -293,6 +294,8 @@ public class SDKClient implements Closeable {
 
         /**
          * The admin client that can be used to perform administrative operations.
+         *
+         * @return An instance of this client. Method provided for backwards compatibility.
          */
         public SDKRestClient admin() {
             return this;
@@ -300,6 +303,8 @@ public class SDKClient implements Closeable {
 
         /**
          * A client allowing to perform actions/operations against the cluster.
+         *
+         * @return An instance of a cluster admin client.
          */
         public SDKClusterAdminClient cluster() {
             return new SDKClusterAdminClient(restHighLevelClient.cluster());
@@ -324,6 +329,8 @@ public class SDKClient implements Closeable {
 
         /**
          * A client allowing to perform actions/operations against the indices.
+         *
+         * @return An instance of an indices client.
          */
         public SDKIndicesClient indices() {
             return new SDKIndicesClient(restHighLevelClient.indices());

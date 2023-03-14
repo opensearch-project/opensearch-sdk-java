@@ -50,7 +50,10 @@ public class ExtensionsInitRequestHandler {
         extensionsRunner.setUniqueId(extensionInitRequest.getExtension().getId());
         // Successfully initialized. Send the response.
         try {
-            return new InitializeExtensionResponse(extensionsRunner.getSettings().get(NODE_NAME_SETTING));
+            return new InitializeExtensionResponse(
+                extensionsRunner.getSettings().get(NODE_NAME_SETTING),
+                extensionsRunner.getExtensionImplementedInterfaces()
+            );
         } finally {
             // After sending successful response to initialization, send the REST API and Settings
             extensionsRunner.setOpensearchNode(extensionsRunner.opensearchNode);
@@ -59,11 +62,12 @@ public class ExtensionsInitRequestHandler {
             extensionTransportService.connectToNode(extensionsRunner.opensearchNode);
             extensionsRunner.sendRegisterRestActionsRequest(extensionTransportService);
             extensionsRunner.sendRegisterCustomSettingsRequest(extensionTransportService);
-            extensionsRunner.transportActions.sendRegisterTransportActionsRequest(
-                extensionTransportService,
-                extensionsRunner.opensearchNode,
-                extensionsRunner.getUniqueId()
-            );
+            extensionsRunner.getSdkActionModule()
+                .sendRegisterTransportActionsRequest(
+                    extensionTransportService,
+                    extensionsRunner.opensearchNode,
+                    extensionsRunner.getUniqueId()
+                );
             // Get OpenSearch Settings and set values on ExtensionsRunner
             Settings settings = extensionsRunner.sendEnvironmentSettingsRequest(extensionTransportService);
             extensionsRunner.setEnvironmentSettings(settings);

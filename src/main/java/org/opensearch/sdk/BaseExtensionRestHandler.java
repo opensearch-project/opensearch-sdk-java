@@ -98,6 +98,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
      * Returns a default response when a request handler throws an exception.
      *
      * @param request The request that caused the exception
+     * @param e The exception
      * @return an ExtensionRestResponse identifying the exception
      */
     protected ExtensionRestResponse exceptionalRequest(ExtensionRestRequest request, Exception e) {
