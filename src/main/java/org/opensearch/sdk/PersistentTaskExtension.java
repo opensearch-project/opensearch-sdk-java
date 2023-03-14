@@ -7,7 +7,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk.sample.helloworld;
+package org.opensearch.sdk;
 
 import org.opensearch.client.Client;
 import org.opensearch.cluster.metadata.IndexNameExpressionResolver;

@@ -80,4 +80,13 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         assertTrue(searchExtension.getQueryPhaseSearcher().isEmpty());
         assertTrue(searchExtension.getIndexSearcherExecutorProvider().isEmpty());
     }
+
+    @Test
+    void getPersistentTaskExecutorEmptyList() {
+        PersistentTaskExtension extension = new PersistentTaskExtension() {
+        };
+
+        var result = extension.getPersistentTasksExecutor(null, null, null, null, null);
+        assertTrue(result.isEmpty());
+    }
 }
