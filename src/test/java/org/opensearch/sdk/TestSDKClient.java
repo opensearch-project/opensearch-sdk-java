@@ -26,8 +26,11 @@ import org.opensearch.client.indices.CreateIndexRequest;
 import org.opensearch.client.indices.GetMappingsRequest;
 import org.opensearch.client.indices.PutMappingRequest;
 import org.opensearch.client.indices.rollover.RolloverRequest;
+import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch.cluster.OpenSearchClusterAsyncClient;
 import org.opensearch.client.opensearch.cluster.OpenSearchClusterClient;
+import org.opensearch.client.opensearch.indices.OpenSearchIndicesAsyncClient;
 import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
 import org.opensearch.sdk.SDKClient.SDKClusterAdminClient;
 import org.opensearch.sdk.SDKClient.SDKIndicesClient;
@@ -60,7 +63,16 @@ public class TestSDKClient extends OpenSearchTestCase {
         assertInstanceOf(OpenSearchIndicesClient.class, javaClient.indices());
         assertInstanceOf(OpenSearchClusterClient.class, javaClient.cluster());
 
-        sdkClient.doCloseJavaClient();
+        sdkClient.doCloseJavaClients();
+    }
+
+    @Test
+    public void testCreateJavaAsyncClient() throws Exception {
+        OpenSearchAsyncClient javaAsyncClient = sdkClient.initializeJavaAsyncClient(settings);
+        assertInstanceOf(OpenSearchIndicesAsyncClient.class, javaAsyncClient.indices());
+        assertInstanceOf(OpenSearchClusterAsyncClient.class, javaAsyncClient.cluster());
+
+        sdkClient.doCloseJavaClients();
     }
 
     @Test
