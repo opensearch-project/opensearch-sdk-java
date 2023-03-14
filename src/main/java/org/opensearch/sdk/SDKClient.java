@@ -166,7 +166,7 @@ public class SDKClient implements Closeable {
      *
      * @param settings The Extension settings
      * @return The SDKClient implementation of OpenSearchClient. The user is responsible for calling
-     *         {@link #doCloseJavaClient()} when finished with the client
+     *         {@link #doCloseJavaClients()} when finished with the client
      */
     public OpenSearchClient initializeJavaClient(ExtensionSettings settings) {
         return initializeJavaClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
@@ -178,7 +178,7 @@ public class SDKClient implements Closeable {
      * @param hostAddress The address of OpenSearch cluster, client can connect to
      * @param port The port of OpenSearch cluster
      * @return The SDKClient implementation of OpenSearchClient. The user is responsible for calling
-     *         {@link #doCloseJavaClient()} when finished with the client
+     *         {@link #doCloseJavaClients()} when finished with the client
      */
     public OpenSearchClient initializeJavaClient(String hostAddress, int port) {
         OpenSearchTransport transport = initializeTransport(hostAddress, port);
@@ -191,7 +191,7 @@ public class SDKClient implements Closeable {
      *
      * @param settings The Extension settings
      * @return The SDKClient implementation of OpenSearchAsyncClient. The user is responsible for calling
-     *         {@link #doCloseJavaClient()} when finished with the client
+     *         {@link #doCloseJavaClients()} when finished with the client as JavaClient and JavaAsyncClient uses the same close method
      */
     public OpenSearchAsyncClient initializeJavaAsyncClient(ExtensionSettings settings) {
         return initalizeJavaAsyncClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
@@ -203,7 +203,7 @@ public class SDKClient implements Closeable {
      * @param hostAddress The address of OpenSearch cluster, client can connect to
      * @param port The port of OpenSearch cluster
      * @return The SDKClient implementation of OpenSearchAsyncClient. The user is responsible for calling
-     *         {@link #doCloseJavaClient()} when finished with the client
+     *         {@link #doCloseJavaClients()} when finished with the client
      */
     public OpenSearchAsyncClient initalizeJavaAsyncClient(String hostAddress, int port) {
         OpenSearchTransport transport = initializeTransport(hostAddress, port);
@@ -255,7 +255,7 @@ public class SDKClient implements Closeable {
      *
      * @throws IOException if closing the restClient fails
      */
-    public void doCloseJavaClient() throws IOException {
+    public void doCloseJavaClients() throws IOException {
         if (restClient != null) {
             restClient.close();
         }
@@ -274,7 +274,7 @@ public class SDKClient implements Closeable {
 
     @Override
     public void close() throws IOException {
-        doCloseJavaClient();
+        doCloseJavaClients();
         doCloseHighLevelClient();
     }
 

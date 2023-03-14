@@ -63,7 +63,7 @@ public class TestSDKClient extends OpenSearchTestCase {
         assertInstanceOf(OpenSearchIndicesClient.class, javaClient.indices());
         assertInstanceOf(OpenSearchClusterClient.class, javaClient.cluster());
 
-        sdkClient.doCloseJavaClient();
+        sdkClient.doCloseJavaClients();
     }
 
     @Test
@@ -72,7 +72,7 @@ public class TestSDKClient extends OpenSearchTestCase {
         assertInstanceOf(OpenSearchIndicesAsyncClient.class, javaAsyncClient.indices());
         assertInstanceOf(OpenSearchClusterAsyncClient.class, javaAsyncClient.cluster());
 
-        sdkClient.doCloseJavaClient();
+        sdkClient.doCloseJavaClients();
     }
 
     @Test
