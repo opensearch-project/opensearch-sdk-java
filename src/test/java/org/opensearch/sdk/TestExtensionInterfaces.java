@@ -122,6 +122,7 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
     }
 
 <<<<<<< Upstream, based on a0bf257df9f470d22a5b10a9eeb7f42706b46f83
+<<<<<<< Upstream, based on a0bf257df9f470d22a5b10a9eeb7f42706b46f83
     @Test
 <<<<<<< HEAD
     public void testGetMappers() {
@@ -233,6 +234,9 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
 =======
 >>>>>>> 2420d90 (Tests for IndexStoreExtension added.)
 =======
+=======
+    @Test
+>>>>>>> 4b10f3b returned @Test annotation
     public void testGetMappers() {
         MapperExtension mapperExtension = new MapperExtension() {
         };
