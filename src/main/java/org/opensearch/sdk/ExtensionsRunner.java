@@ -130,8 +130,8 @@ public class ExtensionsRunner {
     private final Injector injector;
 
     private final SDKNamedXContentRegistry sdkNamedXContentRegistry;
-    private final SDKClient sdkClient = new SDKClient();
-    private final SDKClusterService sdkClusterService = new SDKClusterService(this);
+    private final SDKClient sdkClient;
+    private final SDKClusterService sdkClusterService;
     private final SDKActionModule sdkActionModule;
 
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
@@ -171,6 +171,12 @@ public class ExtensionsRunner {
         this.customNamedXContent = extension.getNamedXContent();
         // initialize NamedXContent Registry. Must happen after getting extension namedXContent
         this.sdkNamedXContentRegistry = new SDKNamedXContentRegistry(this);
+        // initialize SDKClient. Must happen after getting extensionSettings
+        // TODO add a parameter to pass extensionSettings to the client to use for host/port settings
+        // https://github.com/opensearch-project/opensearch-sdk-java/issues/556
+        this.sdkClient = new SDKClient();
+        // initialize SDKClusterService. Must happen after extension field assigned
+        this.sdkClusterService = new SDKClusterService(this);
 
         // Create Guice modules for injection
         List<com.google.inject.Module> modules = new ArrayList<>();
@@ -617,6 +623,13 @@ public class ExtensionsRunner {
 
     public SDKClusterService getSdkClusterService() {
         return sdkClusterService;
+    }
+
+    /**
+     * Updates the SDKClusterService. Called from {@link ExtensionsInitRequestHandler}.
+     */
+    public void updateSdkClusterService() {
+        this.sdkClusterService.updateSdkClusterSettings();
     }
 
     public SDKActionModule getSdkActionModule() {

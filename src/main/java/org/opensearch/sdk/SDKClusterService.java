@@ -9,12 +9,19 @@
 
 package org.opensearch.sdk;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import org.opensearch.cluster.ClusterState;
 import org.opensearch.common.settings.Setting;
+import org.opensearch.common.settings.SettingUpgrader;
+import org.opensearch.common.settings.Settings;
+import org.opensearch.common.settings.AbstractScopedSettings;
+import org.opensearch.common.settings.Setting.Property;
 import org.opensearch.extensions.DiscoveryExtensionNode;
 
 /**
@@ -32,7 +39,10 @@ public class SDKClusterService {
      */
     public SDKClusterService(ExtensionsRunner extensionsRunner) {
         this.extensionsRunner = extensionsRunner;
-        this.clusterSettings = new SDKClusterSettings();
+        // This will be empty on initialization, but updated later via apply()
+        Settings nodeSettings = extensionsRunner.getEnvironmentSettings();
+        Set<Setting<?>> settingsSet = new HashSet<>(extensionsRunner.getExtension().getSettings());
+        this.clusterSettings = new SDKClusterSettings(nodeSettings, settingsSet);
     }
 
     /**
@@ -56,6 +66,14 @@ public class SDKClusterService {
         return extensionsRunner.getExtensionNode();
     }
 
+    /**
+     * Updates cluster settings with current environment settings on the extensions runner.
+     */
+    public void updateSdkClusterSettings() {
+        this.clusterSettings.applySettings(extensionsRunner.getEnvironmentSettings());
+        extensionsRunner.getExtension().getSettings().stream().forEach(clusterSettings::registerSetting);
+    }
+
     public SDKClusterSettings getClusterSettings() {
         return clusterSettings;
     }
@@ -63,12 +81,37 @@ public class SDKClusterService {
     /**
      * This class simulates methods normally called from OpenSearch ClusterSettings class.
      */
-    public class SDKClusterSettings {
+    public class SDKClusterSettings extends AbstractScopedSettings {
 
         /**
          * Thread-safe map to hold pending updates until initialization completes
          */
-        private Map<Setting<?>, Consumer<?>> pendingSettingsUpdateConsumers = new ConcurrentHashMap<>();
+        private final Map<Setting<?>, Consumer<?>> pendingSettingsUpdateConsumers = new ConcurrentHashMap<>();
+
+        /**
+         * Instantiate a new ClusterSettings instance.
+         *
+         * @param nodeSettings Environment settings associated with the node. Currently unused on extensions, provided for code compatibility.
+         * @param settingsSet The extension's settings.
+         */
+        public SDKClusterSettings(final Settings nodeSettings, final Set<Setting<?>> settingsSet) {
+            this(nodeSettings, settingsSet, Collections.emptySet());
+        }
+
+        /**
+         * Instantiate a new ClusterSettings instance.
+         *
+         * @param nodeSettings Environment settings associated with the node. Currently unused on extensions, provided for code compatibility.
+         * @param settingsSet The extension's settings.
+         * @param settingUpgraders The extension's setting upgraders.
+         */
+        public SDKClusterSettings(
+            final Settings nodeSettings,
+            final Set<Setting<?>> settingsSet,
+            final Set<SettingUpgrader<?>> settingUpgraders
+        ) {
+            super(nodeSettings, settingsSet, settingUpgraders, Property.NodeScope);
+        }
 
         /**
          * Add a single settings update consumer to OpenSearch. Before initialization the update will be stored in a pending state.
