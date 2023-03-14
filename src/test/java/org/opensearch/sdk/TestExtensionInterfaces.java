@@ -98,4 +98,39 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         assertTrue(searchExtension.getQueryPhaseSearcher().isEmpty());
         assertTrue(searchExtension.getIndexSearcherExecutorProvider().isEmpty());
     }
+
+    public void testGetMappers() {
+        MapperExtension mapperExtension = new MapperExtension() {
+        };
+        Map<String, Mapper.TypeParser> mappers = mapperExtension.getMappers();
+        Assertions.assertTrue(mappers.isEmpty());
+    }
+
+    @Test
+    public void testGetMetadataMappers() {
+        MapperExtension mapperExtension = new MapperExtension() {
+        };
+        Map<String, MetadataFieldMapper.TypeParser> metadataMappers = mapperExtension.getMetadataMappers();
+        Assertions.assertTrue(metadataMappers.isEmpty());
+    }
+
+    @Test
+    public void testGetFieldFilter() {
+        MapperExtension extension = new MapperExtension() {
+        };
+        Predicate<String> predicate = extension.getFieldFilter().apply("myIndex");
+        Assertions.assertNotNull(predicate);
+    }
+
+    @Test
+    void testIndexStoreExtension() {
+        IndexStoreExtension indexStoreExtension = new IndexStoreExtension() {
+            @Override
+            public Map<String, DirectoryFactory> getDirectoryFactories() {
+                return Collections.emptyMap();
+            }
+        };
+        assertTrue(indexStoreExtension.getDirectoryFactories().isEmpty());
+        assertTrue(indexStoreExtension.getRecoveryStateFactories().isEmpty());
+    }
 }
