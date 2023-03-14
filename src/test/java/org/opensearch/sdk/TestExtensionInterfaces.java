@@ -99,6 +99,7 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         assertTrue(searchExtension.getIndexSearcherExecutorProvider().isEmpty());
     }
 
+    @Test
     public void testGetMappers() {
         MapperExtension mapperExtension = new MapperExtension() {
         };
