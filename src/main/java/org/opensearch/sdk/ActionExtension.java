@@ -105,6 +105,8 @@ public interface ActionExtension {
      *    }
      * }
      * </pre>
+     *
+     * @param threadContext The Thread Context which can be used by the operator
      */
     default UnaryOperator<ExtensionRestHandler> getRestHandlerWrapper(ThreadContext threadContext) {
         return null;
