@@ -121,6 +121,7 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         assertTrue(searchExtension.getIndexSearcherExecutorProvider().isEmpty());
     }
 
+<<<<<<< Upstream, based on a0bf257df9f470d22a5b10a9eeb7f42706b46f83
     @Test
 <<<<<<< HEAD
     public void testGetMappers() {
@@ -231,4 +232,40 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
     }
 =======
 >>>>>>> 2420d90 (Tests for IndexStoreExtension added.)
+=======
+    public void testGetMappers() {
+        MapperExtension mapperExtension = new MapperExtension() {
+        };
+        Map<String, Mapper.TypeParser> mappers = mapperExtension.getMappers();
+        Assertions.assertTrue(mappers.isEmpty());
+    }
+
+    @Test
+    public void testGetMetadataMappers() {
+        MapperExtension mapperExtension = new MapperExtension() {
+        };
+        Map<String, MetadataFieldMapper.TypeParser> metadataMappers = mapperExtension.getMetadataMappers();
+        Assertions.assertTrue(metadataMappers.isEmpty());
+    }
+
+    @Test
+    public void testGetFieldFilter() {
+        MapperExtension extension = new MapperExtension() {
+        };
+        Predicate<String> predicate = extension.getFieldFilter().apply("myIndex");
+        Assertions.assertNotNull(predicate);
+    }
+
+    @Test
+    void testIndexStoreExtension() {
+        IndexStoreExtension indexStoreExtension = new IndexStoreExtension() {
+            @Override
+            public Map<String, DirectoryFactory> getDirectoryFactories() {
+                return Collections.emptyMap();
+            }
+        };
+        assertTrue(indexStoreExtension.getDirectoryFactories().isEmpty());
+        assertTrue(indexStoreExtension.getRecoveryStateFactories().isEmpty());
+    }
+>>>>>>> 8cefe79 merge conflicts with MapperExtension fixed
 }
