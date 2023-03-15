@@ -11,9 +11,18 @@ package org.opensearch.sdk;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import java.util.Collections;
+import java.util.Map;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.index.mapper.Mapper;
+import org.opensearch.index.mapper.MetadataFieldMapper;
 import org.opensearch.test.OpenSearchTestCase;
+
+import java.util.Map;
+import java.util.function.Predicate;
 
 public class TestExtensionInterfaces extends OpenSearchTestCase {
 
@@ -88,5 +97,41 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         assertTrue(searchExtension.getRescorers().isEmpty());
         assertTrue(searchExtension.getQueryPhaseSearcher().isEmpty());
         assertTrue(searchExtension.getIndexSearcherExecutorProvider().isEmpty());
+    }
+
+    @Test
+    public void testGetMappers() {
+        MapperExtension mapperExtension = new MapperExtension() {
+        };
+        Map<String, Mapper.TypeParser> mappers = mapperExtension.getMappers();
+        Assertions.assertTrue(mappers.isEmpty());
+    }
+
+    @Test
+    public void testGetMetadataMappers() {
+        MapperExtension mapperExtension = new MapperExtension() {
+        };
+        Map<String, MetadataFieldMapper.TypeParser> metadataMappers = mapperExtension.getMetadataMappers();
+        Assertions.assertTrue(metadataMappers.isEmpty());
+    }
+
+    @Test
+    public void testGetFieldFilter() {
+        MapperExtension extension = new MapperExtension() {
+        };
+        Predicate<String> predicate = extension.getFieldFilter().apply("myIndex");
+        Assertions.assertNotNull(predicate);
+    }
+
+    @Test
+    void testIndexStoreExtension() {
+        IndexStoreExtension indexStoreExtension = new IndexStoreExtension() {
+            @Override
+            public Map<String, DirectoryFactory> getDirectoryFactories() {
+                return Collections.emptyMap();
+            }
+        };
+        assertTrue(indexStoreExtension.getDirectoryFactories().isEmpty());
+        assertTrue(indexStoreExtension.getRecoveryStateFactories().isEmpty());
     }
 }
