@@ -27,11 +27,11 @@ public interface PersistentTaskExtension {
 
     /**
      * Returns additional persistent tasks executors added by this extension.
-     * @param clusterService empty value.
-     * @param threadPool empty value.
-     * @param client empty value.
-     * @param settingsModule empty value.
-     * @param expressionResolver empty value.
+     * @param clusterService the cluster service used to coordinate actions across the cluster.
+     * @param threadPool the thread pool used to execute tasks.
+     * @param client the client used to interact with the Elasticsearch cluster.
+     * @param settingsModule the module containing Elasticsearch settings.
+     * @param expressionResolver the resolver used to parse index name expressions.
      * @return an empty List.
      */
     default List<PersistentTasksExecutor<?>> getPersistentTasksExecutor(
