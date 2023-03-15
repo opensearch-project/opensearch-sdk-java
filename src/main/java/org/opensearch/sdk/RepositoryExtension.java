@@ -20,7 +20,9 @@ public interface RepositoryExtension {
      * Returns repository types added by this extension.
      *
      * @param env The environment for the local node, which may be used for the local settings and path. repo
-     *
+     * @param namedXContentRegistry register named objects.
+     * @param clusterService  service for operating cluster state.
+     * @param recoverySettings settings related to cluster recovery.
      * The key of the returned {@link Map} is the type name of the repository and
      * the value is a factory to construct the {@link Repository} interface.
      */
@@ -38,7 +40,9 @@ public interface RepositoryExtension {
      * through the external API.
      *
      * @param env The environment for the local node, which may be used for the local settings and path.repo
-     *
+     * @param namedXContentRegistry register named objects.
+     * @param clusterService  service for operating cluster state.
+     * @param recoverySettings settings related to cluster recovery.
      * The key of the returned {@link Map} is the type name of the repository and
      * the value is a factory to construct the {@link Repository} interface.
      */
@@ -51,4 +55,5 @@ public interface RepositoryExtension {
         return Collections.emptyMap();
     }
 
+    Map<String, Object> getEmptyMap();
 }
