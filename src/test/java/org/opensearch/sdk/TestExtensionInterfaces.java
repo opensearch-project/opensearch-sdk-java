@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.test.OpenSearchTestCase;
 
+import java.util.Map;
+
 public class TestExtensionInterfaces extends OpenSearchTestCase {
 
     @Test
@@ -89,4 +91,21 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         assertTrue(searchExtension.getQueryPhaseSearcher().isEmpty());
         assertTrue(searchExtension.getIndexSearcherExecutorProvider().isEmpty());
     }
+    @Test
+    public void testGetEmptyMap() {
+        // Create an instance of the class that implements the interface being tested
+        RepositoryExtension extension = new RepositoryExtension() {
+            @Override
+            public Map<String, Object> getEmptyMap() {
+                return null;
+            }
+        };
+
+        // Call the method that returns an empty map
+        Map<String, Object> result = extension.getEmptyMap();
+
+        // Verify that the map is empty
+        assertTrue(result == null || result.isEmpty());
+    }
+
 }
