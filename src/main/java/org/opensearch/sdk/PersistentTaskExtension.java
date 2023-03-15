@@ -27,6 +27,12 @@ public interface PersistentTaskExtension {
 
     /**
      * Returns additional persistent tasks executors added by this extension.
+     * @param clusterService empty value.
+     * @param threadPool empty value.
+     * @param client empty value.
+     * @param settingsModule empty value.
+     * @param expressionResolver empty value.
+     * @return an empty List.
      */
     default List<PersistentTasksExecutor<?>> getPersistentTasksExecutor(
         ClusterService clusterService,
