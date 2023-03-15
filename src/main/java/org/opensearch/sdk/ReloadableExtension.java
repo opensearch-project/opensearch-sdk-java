@@ -10,16 +10,16 @@
 package org.opensearch.sdk;
 
 import org.opensearch.common.settings.Settings;
- 
+  
 /**
-* An extension point for {@link Plugin}s that can be reloaded. There is no
-* clear definition about what reloading a plugin actually means. When a plugin
-* is reloaded it might rebuild any internal members. Plugins usually implement
-* this interface in order to reread the values of {@code SecureSetting}s and
-* then rebuild any dependent internal members.
-*/
+ * An extension point for {@link Plugin}s that can be reloaded. There is no
+ * clear definition about what reloading a plugin actually means. When a plugin
+ * is reloaded it might rebuild any internal members. Plugins usually implement
+ * this interface in order to reread the values of {@code SecureSetting}s and
+ * then rebuild any dependent internal members.
+ */
 public interface ReloadableExtension {
-     
+      
     /**
      * Called to trigger the rebuilt of the plugin's internal members. The reload
      * operation <b>is required to have been completed</b> when the method returns.
@@ -41,6 +41,6 @@ public interface ReloadableExtension {
      *             if the operation failed. The plugin should continue to operate as
      *             if the offending call didn't happen.
      */
- 
+  
     void reload(Settings settings) throws Exception;
-}
+ }
