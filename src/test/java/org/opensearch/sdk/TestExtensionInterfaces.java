@@ -134,4 +134,11 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         assertTrue(indexStoreExtension.getDirectoryFactories().isEmpty());
         assertTrue(indexStoreExtension.getRecoveryStateFactories().isEmpty());
     }
+
+    @Test
+    void testSystemIndexExtension() {
+        SystemIndexExtension systemIndexExtension = new SystemIndexExtension() {
+        };
+        assertTrue(systemIndexExtension.getSystemIndexDescriptors(null).isEmpty());
+    }
 }
