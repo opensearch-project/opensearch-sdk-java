@@ -1,3 +1,12 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ */
+
 package org.opensearch.sdk;
 
 import org.opensearch.common.settings.Settings;
@@ -10,7 +19,7 @@ import java.util.Collections;
  * Extension for defining system indices. Extends {@link ActionExtension} because system indices must be accessed via APIs
  * added by the extension that owns the system index, rather than standard APIs.
  *
- * 
+ *
  */
 public interface SystemIndexExtension extends ActionExtension {
 
