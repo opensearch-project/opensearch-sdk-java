@@ -10,12 +10,26 @@
 package org.opensearch.sdk;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.Mockito.mock;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.opensearch.cluster.service.ClusterService;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.core.xcontent.NamedXContentRegistry;
+import org.opensearch.env.Environment;
+import org.opensearch.index.mapper.Mapper;
+import org.opensearch.index.mapper.MetadataFieldMapper;
+import org.opensearch.indices.recovery.RecoverySettings;
+import org.opensearch.repositories.Repository;
 import org.opensearch.test.OpenSearchTestCase;
 
+
 import java.util.Map;
+
+import java.util.Collections;
+import java.util.function.Predicate;
+
 
 public class TestExtensionInterfaces extends OpenSearchTestCase {
 
@@ -91,21 +105,74 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         assertTrue(searchExtension.getQueryPhaseSearcher().isEmpty());
         assertTrue(searchExtension.getIndexSearcherExecutorProvider().isEmpty());
     }
+
+
+
+
+
     @Test
-    public void testGetEmptyMap() {
-        // Create an instance of the class that implements the interface being tested
-        RepositoryExtension extension = new RepositoryExtension() {
+    public void testGetMappers() {
+        MapperExtension mapperExtension = new MapperExtension() {
+        };
+        Map<String, Mapper.TypeParser> mappers = mapperExtension.getMappers();
+        Assertions.assertTrue(mappers.isEmpty());
+    }
+
+    @Test
+    public void testGetMetadataMappers() {
+        MapperExtension mapperExtension = new MapperExtension() {
+        };
+        Map<String, MetadataFieldMapper.TypeParser> metadataMappers = mapperExtension.getMetadataMappers();
+        Assertions.assertTrue(metadataMappers.isEmpty());
+    }
+
+    @Test
+    public void testGetFieldFilter() {
+        MapperExtension extension = new MapperExtension() {
+        };
+        Predicate<String> predicate = extension.getFieldFilter().apply("myIndex");
+        Assertions.assertNotNull(predicate);
+    }
+    @Test
+    void getRepositoriesReturnsEmptyMapByDefault() {
+
+        Environment env = mock(Environment.class);
+        NamedXContentRegistry namedXContentRegistry = mock(NamedXContentRegistry.class);
+        ClusterService clusterService = mock(ClusterService.class);
+        RecoverySettings recoverySettings = mock(RecoverySettings.class);
+
+
+        RepositoryExtension repositoryExtension = new RepositoryExtension() {
             @Override
-            public Map<String, Object> getEmptyMap() {
-                return null;
+            public Map<String, Repository.Factory> getRepositories(Environment env, NamedXContentRegistry namedXContentRegistry, ClusterService clusterService, RecoverySettings recoverySettings) {
+                return RepositoryExtension.super.getRepositories(env, namedXContentRegistry, clusterService, recoverySettings);
+            }
+
+            @Override
+            public Map<String, Repository.Factory> getInternalRepositories(Environment env, NamedXContentRegistry namedXContentRegistry, ClusterService clusterService, RecoverySettings recoverySettings) {
+                return RepositoryExtension.super.getInternalRepositories(env, namedXContentRegistry, clusterService, recoverySettings);
             }
         };
 
-        // Call the method that returns an empty map
-        Map<String, Object> result = extension.getEmptyMap();
 
-        // Verify that the map is empty
-        assertTrue(result == null || result.isEmpty());
+        Map<String, Repository.Factory> repositories = repositoryExtension.getRepositories(env, namedXContentRegistry, clusterService, recoverySettings);
+        assertEquals(Collections.emptyMap(), repositories);
     }
+    @Test
+    void getInternalRepositoriesReturnsEmptyMapByDefault() {
+
+        Environment env = mock(Environment.class);
+        NamedXContentRegistry namedXContentRegistry = mock(NamedXContentRegistry.class);
+        ClusterService clusterService = mock(ClusterService.class);
+        RecoverySettings recoverySettings = mock(RecoverySettings.class);
+
+
+        RepositoryExtension repositoryExtension = new RepositoryExtension() {};
+
+
+        Map<String, Repository.Factory> repositories = repositoryExtension.getInternalRepositories(env, namedXContentRegistry, clusterService, recoverySettings);
+        assertEquals(Collections.emptyMap(), repositories);
+    }
+
 
 }
