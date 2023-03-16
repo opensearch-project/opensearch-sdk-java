@@ -174,7 +174,7 @@ public class ExtensionsRunner {
         // initialize SDKClient. Must happen after getting extensionSettings
         // TODO add a parameter to pass extensionSettings to the client to use for host/port settings
         // https://github.com/opensearch-project/opensearch-sdk-java/issues/556
-        this.sdkClient = new SDKClient();
+        this.sdkClient = new SDKClient(extensionSettings);
         // initialize SDKClusterService. Must happen after extension field assigned
         this.sdkClusterService = new SDKClusterService(this);
 
