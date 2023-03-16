@@ -55,5 +55,5 @@ public interface RepositoryExtension {
         return Collections.emptyMap();
     }
 
-    Map<String, Object> getEmptyMap();
+
 }

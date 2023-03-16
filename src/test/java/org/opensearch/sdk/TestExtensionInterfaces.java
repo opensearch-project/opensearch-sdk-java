@@ -24,9 +24,12 @@ import org.opensearch.indices.recovery.RecoverySettings;
 import org.opensearch.repositories.Repository;
 import org.opensearch.test.OpenSearchTestCase;
 
-import java.util.Collections;
+
 import java.util.Map;
+
+import java.util.Collections;
 import java.util.function.Predicate;
+
 
 public class TestExtensionInterfaces extends OpenSearchTestCase {
 
@@ -103,6 +106,10 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         assertTrue(searchExtension.getIndexSearcherExecutorProvider().isEmpty());
     }
 
+
+
+
+
     @Test
     public void testGetMappers() {
         MapperExtension mapperExtension = new MapperExtension() {
@@ -166,20 +173,6 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         Map<String, Repository.Factory> repositories = repositoryExtension.getInternalRepositories(env, namedXContentRegistry, clusterService, recoverySettings);
         assertEquals(Collections.emptyMap(), repositories);
     }
-//    @Test
-//    public void testGetEmptyMap() {
-//        // Create an instance of the class that implements the interface being tested
-//        RepositoryExtension extension = new RepositoryExtension() {
-//            @Override
-//            public Map<String, Repository.Factory> getEmptyMap() {
-//                return null;
-//            }
-//        };
-//
-//        // Call the method that returns an empty map
-//        Map<String, Repository.Factory> result = extension.getEmptyMap();
-//
-//        // Verify that the map is empty
-//        assertTrue(result == null || result.isEmpty());
-//    }
+
+
 }
