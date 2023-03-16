@@ -88,7 +88,7 @@ public class SDKClient implements Closeable {
     private OpenSearchAsyncClient javaAsyncClient;
     private final ExtensionSettings settings;
 
-    public SDKClient(ExtensionSettings settings){
+    public SDKClient(ExtensionSettings settings) {
         this.settings = settings;
     }
 
