@@ -12,6 +12,9 @@ package org.opensearch.sdk;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opensearch.cluster.service.ClusterService;
@@ -109,7 +112,6 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
 
 
 
-
     @Test
     public void testGetMappers() {
         MapperExtension mapperExtension = new MapperExtension() {
@@ -174,5 +176,35 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         assertEquals(Collections.emptyMap(), repositories);
     }
 
+
+
+
+    @Test
+    void testPersistentTaskExtension() {
+        PersistentTaskExtension extension = new PersistentTaskExtension() {
+        };
+
+        var result = extension.getPersistentTasksExecutor(null, null, null, null, null);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testIndexStoreExtension() {
+        IndexStoreExtension indexStoreExtension = new IndexStoreExtension() {
+            @Override
+            public Map<String, DirectoryFactory> getDirectoryFactories() {
+                return Collections.emptyMap();
+            }
+        };
+        assertTrue(indexStoreExtension.getDirectoryFactories().isEmpty());
+        assertTrue(indexStoreExtension.getRecoveryStateFactories().isEmpty());
+    }
+
+    @Test
+    void testSystemIndexExtension() {
+        SystemIndexExtension systemIndexExtension = new SystemIndexExtension() {
+        };
+        assertTrue(systemIndexExtension.getSystemIndexDescriptors(null).isEmpty());
+    }
 
 }
