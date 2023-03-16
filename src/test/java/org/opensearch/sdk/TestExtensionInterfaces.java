@@ -124,6 +124,15 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
     }
 
     @Test
+    void testPersistentTaskExtension() {
+        PersistentTaskExtension extension = new PersistentTaskExtension() {
+        };
+
+        var result = extension.getPersistentTasksExecutor(null, null, null, null, null);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
     void testIndexStoreExtension() {
         IndexStoreExtension indexStoreExtension = new IndexStoreExtension() {
             @Override
