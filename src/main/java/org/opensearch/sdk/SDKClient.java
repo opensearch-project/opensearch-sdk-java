@@ -86,13 +86,15 @@ public class SDKClient implements Closeable {
     private RestClient restClient;
     private RestHighLevelClient sdkRestClient;
     private OpenSearchAsyncClient javaAsyncClient;
-    private final ExtensionSettings settings;
+    private final ExtensionSettings extensionSettings;
 
     /**
-    * @param settings The Extension settings
+    * Instantiates this class with a copy of the extension settings.
+    *
+    * @param extensionSettings The Extension settings
     */
-    public SDKClient(ExtensionSettings settings) {
-        this.settings = settings;
+    public SDKClient(ExtensionSettings extensionSettings) {
+        this.extensionSettings = extensionSettings;
     }
 
     // Used by client.execute, populated by initialize method
@@ -176,7 +178,7 @@ public class SDKClient implements Closeable {
      *         {@link #doCloseJavaClients()} when finished with the client
      */
     public OpenSearchClient initializeJavaClient() {
-        return initializeJavaClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
+        return initializeJavaClient(extensionSettings.getOpensearchAddress(), Integer.parseInt(extensionSettings.getOpensearchPort()));
     }
 
     /**
@@ -200,7 +202,7 @@ public class SDKClient implements Closeable {
      *         {@link #doCloseJavaClients()} when finished with the client as JavaClient and JavaAsyncClient uses the same close method
      */
     public OpenSearchAsyncClient initializeJavaAsyncClient() {
-        return initalizeJavaAsyncClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
+        return initalizeJavaAsyncClient(extensionSettings.getOpensearchAddress(), Integer.parseInt(extensionSettings.getOpensearchPort()));
     }
 
     /**
@@ -232,7 +234,7 @@ public class SDKClient implements Closeable {
      */
     @Deprecated
     public SDKRestClient initializeRestClient() {
-        return initializeRestClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
+        return initializeRestClient(extensionSettings.getOpensearchAddress(), Integer.parseInt(extensionSettings.getOpensearchPort()));
     }
 
     /**
