@@ -87,6 +87,12 @@ public class SDKClient implements Closeable {
     private RestHighLevelClient sdkRestClient;
     private OpenSearchAsyncClient javaAsyncClient;
 
+    private final ExtensionSettings settings;
+
+    public SDKClient(ExtensionSettings settings){
+        this.settings = settings;
+    }
+
     // Used by client.execute, populated by initialize method
     @SuppressWarnings("rawtypes")
     private Map<ActionType, TransportAction> actions = Collections.emptyMap();
@@ -164,11 +170,10 @@ public class SDKClient implements Closeable {
     /**
      * Initializes an OpenSearchClient using OpenSearch JavaClient
      *
-     * @param settings The Extension settings
      * @return The SDKClient implementation of OpenSearchClient. The user is responsible for calling
      *         {@link #doCloseJavaClients()} when finished with the client
      */
-    public OpenSearchClient initializeJavaClient(ExtensionSettings settings) {
+    public OpenSearchClient initializeJavaClient() {
         return initializeJavaClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
     }
 
@@ -189,11 +194,10 @@ public class SDKClient implements Closeable {
     /**
      * Initializes an OpenAsyncSearchClient using OpenSearch JavaClient
      *
-     * @param settings The Extension settings
      * @return The SDKClient implementation of OpenSearchAsyncClient. The user is responsible for calling
      *         {@link #doCloseJavaClients()} when finished with the client as JavaClient and JavaAsyncClient uses the same close method
      */
-    public OpenSearchAsyncClient initializeJavaAsyncClient(ExtensionSettings settings) {
+    public OpenSearchAsyncClient initializeJavaAsyncClient() {
         return initalizeJavaAsyncClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
     }
 
@@ -219,14 +223,13 @@ public class SDKClient implements Closeable {
      * <p>
      * Do not use this client for new development.
      *
-     * @param settings The Extension settings
      * @return The SDKClient implementation of RestHighLevelClient. The user is responsible for calling
      *         {@link #doCloseHighLevelClient()} when finished with the client
      * @deprecated Provided for compatibility with existing plugins to permit migration. Use
      *             {@link #initializeJavaClient} for new development.
      */
     @Deprecated
-    public SDKRestClient initializeRestClient(ExtensionSettings settings) {
+    public SDKRestClient initializeRestClient() {
         return initializeRestClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
     }
 

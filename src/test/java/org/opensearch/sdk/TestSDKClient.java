@@ -54,12 +54,12 @@ public class TestSDKClient extends OpenSearchTestCase {
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        this.sdkClient = new SDKClient();
+        this.sdkClient = new SDKClient(settings);
     }
 
     @Test
     public void testCreateJavaClient() throws Exception {
-        OpenSearchClient javaClient = sdkClient.initializeJavaClient(settings);
+        OpenSearchClient javaClient = sdkClient.initializeJavaClient();
         assertInstanceOf(OpenSearchIndicesClient.class, javaClient.indices());
         assertInstanceOf(OpenSearchClusterClient.class, javaClient.cluster());
 
@@ -68,7 +68,7 @@ public class TestSDKClient extends OpenSearchTestCase {
 
     @Test
     public void testCreateJavaAsyncClient() throws Exception {
-        OpenSearchAsyncClient javaAsyncClient = sdkClient.initializeJavaAsyncClient(settings);
+        OpenSearchAsyncClient javaAsyncClient = sdkClient.initializeJavaAsyncClient();
         assertInstanceOf(OpenSearchIndicesAsyncClient.class, javaAsyncClient.indices());
         assertInstanceOf(OpenSearchClusterAsyncClient.class, javaAsyncClient.cluster());
 
@@ -77,7 +77,7 @@ public class TestSDKClient extends OpenSearchTestCase {
 
     @Test
     public void testCreateRestClient() throws Exception {
-        SDKRestClient restClient = sdkClient.initializeRestClient(settings);
+        SDKRestClient restClient = sdkClient.initializeRestClient();
         assertInstanceOf(SDKIndicesClient.class, restClient.indices());
         assertInstanceOf(SDKClusterAdminClient.class, restClient.cluster());
         assertEquals(restClient, restClient.admin());
@@ -87,7 +87,7 @@ public class TestSDKClient extends OpenSearchTestCase {
 
     @Test
     public void testSDKRestClient() throws Exception {
-        SDKRestClient restClient = sdkClient.initializeRestClient(settings);
+        SDKRestClient restClient = sdkClient.initializeRestClient();
 
         // Would really prefer to mock/verify the method calls but they are final
         assertDoesNotThrow(() -> restClient.index(new IndexRequest(), ActionListener.wrap(r -> {}, e -> {})));
@@ -103,7 +103,7 @@ public class TestSDKClient extends OpenSearchTestCase {
 
     @Test
     public void testSDKIndicesClient() throws Exception {
-        SDKRestClient restClient = sdkClient.initializeRestClient(settings);
+        SDKRestClient restClient = sdkClient.initializeRestClient();
         SDKIndicesClient indicesClient = restClient.indices();
 
         // Would really prefer to mock/verify the method calls but the IndicesClient class is final
