@@ -63,18 +63,6 @@ public class NettyTransport {
     public Netty4Transport getNetty4Transport(Settings settings, ThreadPool threadPool) {
         NetworkService networkService = new NetworkService(Collections.emptyList());
         PageCacheRecycler pageCacheRecycler = new PageCacheRecycler(settings);
-        IndicesModule indicesModule = new IndicesModule(Collections.emptyList());
-        SearchModule searchModule = new SearchModule(settings, Collections.emptyList());
-
-        List<NamedWriteableRegistry.Entry> namedWriteables = Stream.of(
-            NetworkModule.getNamedWriteables().stream(),
-            indicesModule.getNamedWriteables().stream(),
-            searchModule.getNamedWriteables().stream(),
-            ClusterModule.getNamedWriteables().stream()
-        ).flatMap(Function.identity()).collect(Collectors.toList());
-
-        final NamedWriteableRegistry namedWriteableRegistry = new NamedWriteableRegistry(namedWriteables);
-
         final CircuitBreakerService circuitBreakerService = new NoneCircuitBreakerService();
 
         Netty4Transport transport = new Netty4Transport(
@@ -83,7 +71,7 @@ public class NettyTransport {
             threadPool,
             networkService,
             pageCacheRecycler,
-            namedWriteableRegistry,
+            extensionsRunner.getNamedWriteableRegistry().getRegistry(),
             circuitBreakerService,
             new SharedGroupFactory(settings)
         );

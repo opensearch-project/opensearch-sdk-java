@@ -49,6 +49,16 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
     }
 
     @Test
+    void testScriptExtension(){
+        ScriptExtension scriptExtension = new ScriptExtension() {
+        };
+        assertDoesNotThrow(() -> scriptExtension.getScriptEngine(null, null));
+        assertTrue(scriptExtension.getScriptEngine(null, null) == null);
+        assertTrue(scriptExtension.getContexts().isEmpty());
+
+    }
+
+    @Test
     void testEngineExtension() {
         EngineExtension engineExtension = new EngineExtension() {
         };

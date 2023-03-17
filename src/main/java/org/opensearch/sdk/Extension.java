@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Collection;
 import java.util.List;
 
+import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.threadpool.ExecutorBuilder;
@@ -42,11 +43,20 @@ public interface Extension {
     }
 
     /**
-     * Gets an optional list of custom {@link NamedXContentRegistry.Entry} for the extension to combine with OpenSearch NamedXConent.
+     * Gets an optional list of custom {@link NamedXContentRegistry.Entry} for the extension to combine with OpenSearch NamedWriteable.
      *
      * @return a list of custom NamedXConent this extension uses.
      */
     default List<NamedXContentRegistry.Entry> getNamedXContent() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Gets an optional list of custom {@link NamedWriteableRegistry.Entry} for the extension to combine with OpenSearch NamedXWriteable.
+     *
+     * @return a list of custom NamedWriteable this extension uses.
+     */
+    default List<NamedWriteableRegistry.Entry> getNamedWriteables() {
         return Collections.emptyList();
     }
 
