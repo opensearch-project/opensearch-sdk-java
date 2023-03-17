@@ -11,6 +11,7 @@ package org.opensearch.sdk;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -70,6 +71,7 @@ import org.opensearch.client.indices.PutMappingRequest;
 import org.opensearch.client.indices.rollover.RolloverRequest;
 import org.opensearch.client.indices.rollover.RolloverResponse;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
+import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
@@ -83,10 +85,11 @@ public class SDKClient implements Closeable {
     private OpenSearchClient javaClient;
     private RestClient restClient;
     private RestHighLevelClient sdkRestClient;
+    private OpenSearchAsyncClient javaAsyncClient;
 
     // Used by client.execute, populated by initialize method
     @SuppressWarnings("rawtypes")
-    private Map<ActionType, TransportAction> actions;
+    private Map<ActionType, TransportAction> actions = Collections.emptyMap();
 
     /**
      * Initialize this client.
@@ -136,11 +139,34 @@ public class SDKClient implements Closeable {
     }
 
     /**
+     * Initializes an OpenSearchTransport using RestClientTransport. This is required for JavaClient and JavaAsyncClient
+     *
+     * @param hostAddress The address of OpenSearch cluster, client can connect to
+     * @param port The port of OpenSearch cluster
+     * @return The OpenSearchTransport implementation of RestClientTransport.
+     */
+    private OpenSearchTransport initializeTransport(String hostAddress, int port) {
+        RestClientBuilder builder = builder(hostAddress, port);
+
+        restClient = builder.build();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.registerModule(new GuavaModule());
+        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE, JsonTypeInfo.As.PROPERTY);
+        mapper.configure(MapperFeature.USE_GETTERS_AS_SETTERS, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        // Create Client
+        OpenSearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper(mapper));
+        return transport;
+    }
+
+    /**
      * Initializes an OpenSearchClient using OpenSearch JavaClient
      *
      * @param settings The Extension settings
      * @return The SDKClient implementation of OpenSearchClient. The user is responsible for calling
-     *         {@link #doCloseJavaClient()} when finished with the client
+     *         {@link #doCloseJavaClients()} when finished with the client
      */
     public OpenSearchClient initializeJavaClient(ExtensionSettings settings) {
         return initializeJavaClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
@@ -152,24 +178,37 @@ public class SDKClient implements Closeable {
      * @param hostAddress The address of OpenSearch cluster, client can connect to
      * @param port The port of OpenSearch cluster
      * @return The SDKClient implementation of OpenSearchClient. The user is responsible for calling
-     *         {@link #doCloseJavaClient()} when finished with the client
+     *         {@link #doCloseJavaClients()} when finished with the client
      */
     public OpenSearchClient initializeJavaClient(String hostAddress, int port) {
-        RestClientBuilder builder = builder(hostAddress, port);
-
-        restClient = builder.build();
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.registerModule(new GuavaModule());
-        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE, JsonTypeInfo.As.PROPERTY);
-        mapper.configure(MapperFeature.USE_GETTERS_AS_SETTERS, false);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        // Create Client
-        OpenSearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper(mapper));
+        OpenSearchTransport transport = initializeTransport(hostAddress, port);
         javaClient = new OpenSearchClient(transport);
         return javaClient;
+    }
+
+    /**
+     * Initializes an OpenAsyncSearchClient using OpenSearch JavaClient
+     *
+     * @param settings The Extension settings
+     * @return The SDKClient implementation of OpenSearchAsyncClient. The user is responsible for calling
+     *         {@link #doCloseJavaClients()} when finished with the client as JavaClient and JavaAsyncClient uses the same close method
+     */
+    public OpenSearchAsyncClient initializeJavaAsyncClient(ExtensionSettings settings) {
+        return initalizeJavaAsyncClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
+    }
+
+    /**
+     * Initializes an OpenAsyncSearchClient using OpenSearch JavaClient
+     *
+     * @param hostAddress The address of OpenSearch cluster, client can connect to
+     * @param port The port of OpenSearch cluster
+     * @return The SDKClient implementation of OpenSearchAsyncClient. The user is responsible for calling
+     *         {@link #doCloseJavaClients()} when finished with the client
+     */
+    public OpenSearchAsyncClient initalizeJavaAsyncClient(String hostAddress, int port) {
+        OpenSearchTransport transport = initializeTransport(hostAddress, port);
+        javaAsyncClient = new OpenSearchAsyncClient(transport);
+        return javaAsyncClient;
     }
 
     /**
@@ -216,7 +255,7 @@ public class SDKClient implements Closeable {
      *
      * @throws IOException if closing the restClient fails
      */
-    public void doCloseJavaClient() throws IOException {
+    public void doCloseJavaClients() throws IOException {
         if (restClient != null) {
             restClient.close();
         }
@@ -235,7 +274,7 @@ public class SDKClient implements Closeable {
 
     @Override
     public void close() throws IOException {
-        doCloseJavaClient();
+        doCloseJavaClients();
         doCloseHighLevelClient();
     }
 
@@ -293,6 +332,8 @@ public class SDKClient implements Closeable {
 
         /**
          * The admin client that can be used to perform administrative operations.
+         *
+         * @return An instance of this client. Method provided for backwards compatibility.
          */
         public SDKRestClient admin() {
             return this;
@@ -300,6 +341,8 @@ public class SDKClient implements Closeable {
 
         /**
          * A client allowing to perform actions/operations against the cluster.
+         *
+         * @return An instance of a cluster admin client.
          */
         public SDKClusterAdminClient cluster() {
             return new SDKClusterAdminClient(restHighLevelClient.cluster());
@@ -324,6 +367,8 @@ public class SDKClient implements Closeable {
 
         /**
          * A client allowing to perform actions/operations against the indices.
+         *
+         * @return An instance of an indices client.
          */
         public SDKIndicesClient indices() {
             return new SDKIndicesClient(restHighLevelClient.indices());

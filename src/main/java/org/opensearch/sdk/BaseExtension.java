@@ -16,7 +16,8 @@ import com.google.inject.Inject;
 /**
  * An abstract class that simplifies extension initialization and provides an instance of the runner.
  */
-public abstract class BaseExtension implements Extension, ActionExtension, ScriptExtension {
+public abstract class BaseExtension implements Extension {
+
     /**
      * The {@link ExtensionsRunner} instance running this extension
      */
