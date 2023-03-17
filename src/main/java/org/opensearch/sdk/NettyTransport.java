@@ -10,23 +10,15 @@
 package org.opensearch.sdk;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.opensearch.Version;
-import org.opensearch.cluster.ClusterModule;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
-import org.opensearch.common.network.NetworkModule;
 import org.opensearch.common.network.NetworkService;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.PageCacheRecycler;
-import org.opensearch.indices.IndicesModule;
 import org.opensearch.indices.breaker.CircuitBreakerService;
 import org.opensearch.indices.breaker.NoneCircuitBreakerService;
-import org.opensearch.search.SearchModule;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.transport.TransportInterceptor;
@@ -63,6 +55,7 @@ public class NettyTransport {
     public Netty4Transport getNetty4Transport(Settings settings, ThreadPool threadPool) {
         NetworkService networkService = new NetworkService(Collections.emptyList());
         PageCacheRecycler pageCacheRecycler = new PageCacheRecycler(settings);
+
         final CircuitBreakerService circuitBreakerService = new NoneCircuitBreakerService();
 
         Netty4Transport transport = new Netty4Transport(

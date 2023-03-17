@@ -1,7 +1,15 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ */
+
 package org.opensearch.sdk;
 
 import org.opensearch.common.settings.Settings;
-import org.opensearch.plugins.Plugin;
 import org.opensearch.script.ScriptContext;
 import org.opensearch.script.ScriptEngine;
 
@@ -9,7 +17,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 
 /**
  * An additional extension point for {@link Extension}s that extends OpenSearch's scripting functionality.
@@ -32,4 +39,3 @@ public interface ScriptExtension {
         return Collections.emptyList();
     }
 }
-

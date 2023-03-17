@@ -11,8 +11,6 @@ package org.opensearch.sdk;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opensearch.action.ActionRequest;
-import org.opensearch.action.ActionResponse;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.ClusterState;
@@ -58,17 +56,22 @@ import com.google.inject.Key;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * The primary class to run an extension.
  * <p>
- * This class Javadoc will eventually be expanded with a full description/tutorial for users.
+ * During instantiation, this class reads extension points from the extension based on its implemented interfaces and registers necessary information with the {@link ExtensionsManager} or other OpenSearch classes.
+ * <p>
+ * Extensions initialize by passing an instance of themselves to the {@link #run(Extension)} method.
  */
 public class ExtensionsRunner {
 
@@ -134,19 +137,15 @@ public class ExtensionsRunner {
 
     private final SDKNamedXContentRegistry sdkNamedXContentRegistry;
     private final SDKNamedWriteableRegistry sdkNamedWriteableRegistry;
-    private final SDKClient sdkClient = new SDKClient();
-    private final SDKClusterService sdkClusterService = new SDKClusterService(this);
+    private final SDKClient sdkClient;
+    private final SDKClusterService sdkClusterService;
+    private final SDKActionModule sdkActionModule;
 
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
     private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
-
-    /**
-     * Instantiates a new transportActions
-     */
-    public final TransportActions transportActions;
 
     /**
      * Instantiates a new update settings request handler
@@ -161,6 +160,9 @@ public class ExtensionsRunner {
      */
     protected ExtensionsRunner(Extension extension) throws IOException {
         this.extension = extension;
+        // Initialize concrete classes needed by extensions
+        // These must have getters from this class to be accessible via createComponents
+        // If they require later initialization, create a concrete wrapper class and update the internals
         ExtensionSettings extensionSettings = extension.getExtensionSettings();
         this.settings = Settings.builder()
             .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
@@ -181,20 +183,21 @@ public class ExtensionsRunner {
         // initialize NamedWriteable Registry. Must happen after getting extension namedWriteable
         this.sdkNamedWriteableRegistry = new SDKNamedWriteableRegistry(this);
 
-        // TODO: Move this map instantiation inside TransportActions and provide register API
-        // to move logic from the module stream
-        // https://github.com/opensearch-project/opensearch-sdk-java/issues/467
-        Map<String, Class<? extends TransportAction<? extends ActionRequest, ? extends ActionResponse>>> transportActionsMap =
-            new HashMap<>();
+        // initialize SDKClient. Must happen after getting extensionSettings
+        // TODO add a parameter to pass extensionSettings to the client to use for host/port settings
+        // https://github.com/opensearch-project/opensearch-sdk-java/issues/556
+        this.sdkClient = new SDKClient();
+        // initialize SDKClusterService. Must happen after extension field assigned
+        this.sdkClusterService = new SDKClusterService(this);
 
+        // Create Guice modules for injection
         List<com.google.inject.Module> modules = new ArrayList<>();
-        // Base bindings
+        // Bind the concrete classes defined above, via getter
         modules.add(b -> {
             b.bind(ExtensionsRunner.class).toInstance(this);
             b.bind(Extension.class).toInstance(extension);
 
             b.bind(SDKNamedXContentRegistry.class).toInstance(getNamedXContentRegistry());
-            b.bind(SDKNamedWriteableRegistry.class).toInstance(getNamedWriteableRegistry());
             b.bind(ThreadPool.class).toInstance(getThreadPool());
             b.bind(TaskManager.class).toInstance(getTaskManager());
 
@@ -204,23 +207,16 @@ public class ExtensionsRunner {
         // Bind the return values from create components
         modules.add(this::injectComponents);
         // Bind actions from getActions
-        if (extension instanceof ActionExtension) {
-            SDKActionModule sdkActionModule = new SDKActionModule((ActionExtension) extension);
-            modules.add(sdkActionModule);
-            // save custom transport actions
-            sdkActionModule.getActions()
-                .entrySet()
-                .stream()
-                .forEach(h -> { transportActionsMap.put(h.getKey(), h.getValue().getTransportAction()); });
-        }
-
+        this.sdkActionModule = new SDKActionModule(extension);
+        modules.add(this.sdkActionModule);
+        // Finally, perform the injection
         this.injector = Guice.createInjector(modules);
 
-        this.transportActions = new TransportActions(transportActionsMap);
+        // Perform other initialization. These should have access to injected classes.
+        // initialize SDKClient action map
+        initializeSdkClient();
 
         if (extension instanceof ActionExtension) {
-            // initialize SDKClient action map
-            initializeSdkClient();
             // store REST handlers in the registry
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
                 for (Route route : extensionRestHandler.routes()) {
@@ -318,9 +314,9 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Gets the NamedXContentRegistry. Only valid if {@link #isInitialized()} returns true.
+     * Gets the SDKNamedWriteableRegistry. Only valid if {@link #isInitialized()} returns true.
      *
-     * @return the NamedXContentRegistry if initialized, an empty registry otherwise.
+     * @return the NamedWriteableRegistry if initialized, an empty registry otherwise.
      */
     public SDKNamedWriteableRegistry getNamedWriteableRegistry() {
         return this.sdkNamedWriteableRegistry;
@@ -430,6 +426,28 @@ public class ExtensionsRunner {
             ((request, channel, task) -> channel.sendResponse(updateSettingsRequestHandler.handleUpdateSettingsRequest(request)))
         );
 
+    }
+
+    /**
+     * Returns a list of interfaces implemented by the corresponding {@link Extension}.
+     *
+     * @return A list of strings matching the interface name.
+     */
+    public List<String> getExtensionImplementedInterfaces() {
+        Set<Class<?>> interfaceSet = new HashSet<>();
+        Class<?> extensionClass = getExtension().getClass();
+        do {
+            interfaceSet.addAll(Arrays.stream(extensionClass.getInterfaces()).collect(Collectors.toSet()));
+            extensionClass = extensionClass.getSuperclass();
+        } while (extensionClass != null);
+
+        // we are making an assumption here that all the other Interfaces will be in the same package ( or will be in subpackage ) in which
+        // Extension Interface belongs.
+        String extensionInterfacePackageName = Extension.class.getPackageName();
+        return interfaceSet.stream()
+            .filter(i -> i.getPackageName().startsWith(extensionInterfacePackageName))
+            .map(Class::getSimpleName)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -640,6 +658,17 @@ public class ExtensionsRunner {
         return sdkClusterService;
     }
 
+    /**
+     * Updates the SDKClusterService. Called from {@link ExtensionsInitRequestHandler}.
+     */
+    public void updateSdkClusterService() {
+        this.sdkClusterService.updateSdkClusterSettings();
+    }
+
+    public SDKActionModule getSdkActionModule() {
+        return sdkActionModule;
+    }
+
     public TransportService getExtensionTransportService() {
         return extensionTransportService;
     }
@@ -668,4 +697,5 @@ public class ExtensionsRunner {
         runner.extensionTransportService = nettyTransport.initializeExtensionTransportService(runner.getSettings(), runner.getThreadPool());
         runner.startActionListener(0);
     }
+
 }

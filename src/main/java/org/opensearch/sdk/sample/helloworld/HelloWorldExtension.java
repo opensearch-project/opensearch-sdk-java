@@ -15,11 +15,13 @@ import java.util.List;
 
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
+import org.opensearch.common.settings.Setting;
 import org.opensearch.sdk.BaseExtension;
 import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionSettings;
 import org.opensearch.sdk.ExtensionsRunner;
+import org.opensearch.sdk.ActionExtension;
 import org.opensearch.sdk.ActionExtension.ActionHandler;
 import org.opensearch.sdk.sample.helloworld.rest.RestHelloAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
@@ -34,7 +36,7 @@ import org.opensearch.sdk.sample.helloworld.transport.SampleTransportAction;
  * <p>
  * To execute, pass an instatiated object of this class to {@link ExtensionsRunner#run(Extension)}.
  */
-public class HelloWorldExtension extends BaseExtension {
+public class HelloWorldExtension extends BaseExtension implements ActionExtension {
 
     /**
      * Optional classpath-relative path to a yml file containing extension settings.
@@ -60,6 +62,13 @@ public class HelloWorldExtension extends BaseExtension {
     @Override
     public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
         return Arrays.asList(new ActionHandler<>(SampleAction.INSTANCE, SampleTransportAction.class));
+    }
+
+    /**
+     * A list of object that includes a single instance of Validator for Custom Setting
+     */
+    public List<Setting<?>> getSettings() {
+        return Arrays.asList(ExampleCustomSettingConfig.VALIDATED_SETTING);
     }
 
     /**
