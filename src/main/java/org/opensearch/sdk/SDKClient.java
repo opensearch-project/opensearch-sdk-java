@@ -345,7 +345,9 @@ public class SDKClient implements Closeable {
          * @return An instance of a cluster admin client.
          */
         public SDKClusterAdminClient cluster() {
-            return new SDKClusterAdminClient(restHighLevelClient.cluster());
+            var sdkClusterAdminClient = new SDKClusterAdminClient();
+            sdkClusterAdminClient.setClusterClient(restHighLevelClient.cluster());
+            return sdkClusterAdminClient;
         }
 
         /**
@@ -371,7 +373,9 @@ public class SDKClient implements Closeable {
          * @return An instance of an indices client.
          */
         public SDKIndicesClient indices() {
-            return new SDKIndicesClient(restHighLevelClient.indices());
+            var sdkIndicesClient = new SDKIndicesClient();
+            sdkIndicesClient.setIndicesClient(restHighLevelClient.indices());
+            return sdkIndicesClient;
         }
 
         /**
@@ -464,14 +468,19 @@ public class SDKClient implements Closeable {
      */
     public static class SDKClusterAdminClient {
 
-        private final ClusterClient clusterClient;
+        private ClusterClient clusterClient;
 
         /**
-         * Instantiate this class using a {@link ClusterClient}.
-         *
-         * @param clusterClient The client to wrap
+         * @return  a field of the ClusterClient class.
          */
-        public SDKClusterAdminClient(ClusterClient clusterClient) {
+        private ClusterClient getClusterClient() {
+            return clusterClient;
+        }
+
+        /**
+        * @param clusterClient The client to wrap
+        */
+        private void setClusterClient(ClusterClient clusterClient) {
             this.clusterClient = clusterClient;
         }
 
@@ -487,14 +496,19 @@ public class SDKClient implements Closeable {
      */
     public static class SDKIndicesClient {
 
-        private final IndicesClient indicesClient;
+        private IndicesClient indicesClient;
 
         /**
-         * Instantiate this class wrapping an {@link IndicesClient}.
-         *
-         * @param indicesClient The client to wrap
+         * @return an instance of the IndicesClient class.
          */
-        public SDKIndicesClient(IndicesClient indicesClient) {
+        private IndicesClient getIndicesClient() {
+            return indicesClient;
+        }
+
+        /**
+         * @param indicesClient The client to wrap.
+         */
+        private void setIndicesClient(IndicesClient indicesClient) {
             this.indicesClient = indicesClient;
         }
 
