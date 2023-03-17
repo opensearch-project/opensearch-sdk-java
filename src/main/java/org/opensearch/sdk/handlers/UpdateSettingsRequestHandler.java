@@ -99,11 +99,11 @@ public class UpdateSettingsRequestHandler {
                 case Version:
                     Consumer<Version> versionConsumer = (Consumer<Version>) this.settingUpdateConsumers.get(componentSetting);
                     versionConsumer.accept((Version) data);
-                default:
-                    throw new UnsupportedOperationException("Setting Update Consumer type does not exist and is not handled here");
             }
+        } catch (UnsupportedOperationException e) {
+            logger.error("Setting Update Consumer type does not exist and is not handled here");
         } catch (Exception e) {
-            logger.info(e.getMessage());
+            logger.error(e.getMessage());
             settingUpdateStatus = false;
         }
 

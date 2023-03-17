@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class TransportCommunicationIT extends OpenSearchIntegTestCase {
 
@@ -63,13 +64,13 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
 
             // check bound addresses
             for (TransportAddress transportAddress : transport.boundAddress().boundAddresses()) {
-                assert (transportAddress instanceof TransportAddress);
+                assert (transportAddress != null);
                 assertEquals(host, transportAddress.getAddress());
                 assertEquals(port, transportAddress.getPort());
             }
 
             // check publish addresses
-            assert (transport.boundAddress().publishAddress() instanceof TransportAddress);
+            assert (transport.boundAddress().publishAddress() != null);
             TransportAddress publishAddress = transport.boundAddress().publishAddress();
             assertEquals(host, NetworkAddress.format(publishAddress.address().getAddress()));
             assertEquals(port, publishAddress.address().getPort());
@@ -94,8 +95,8 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
                     Socket socket = new Socket(host, port);
 
                     // Create input/output stream to read/write to server
-                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    PrintStream out = new PrintStream(socket.getOutputStream());
+                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+                    PrintStream out = new PrintStream(socket.getOutputStream(), true, StandardCharsets.UTF_8.name());
 
                     // note : message validation is only done if message length >= 6 bytes
                     out.println("TRANSPORT_TEST");

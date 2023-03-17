@@ -19,6 +19,7 @@ plugins {
     id "com.form.diff-coverage" version "0.9.5"
     // for javadocs and checks spotless doesn't do
     id 'checkstyle'
+    id "com.github.spotbugs" version "5.0.13"
 }
 
 

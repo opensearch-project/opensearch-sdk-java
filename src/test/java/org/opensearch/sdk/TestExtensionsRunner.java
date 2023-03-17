@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,7 +37,6 @@ import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.settings.Setting.Property;
 import org.opensearch.common.transport.TransportAddress;
-import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.discovery.InitializeExtensionRequest;
 import org.opensearch.discovery.InitializeExtensionResponse;
 import org.opensearch.extensions.DiscoveryExtensionNode;
@@ -56,10 +54,8 @@ import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
-import org.opensearch.tasks.TaskManager;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
-import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.Transport;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
@@ -69,7 +65,9 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
     private static final String EXTENSION_NAME = "sample-extension";
     private ExtensionsInitRequestHandler extensionsInitRequestHandler;
-    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(new ExtensionRestPathRegistry());
+    private final ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(
+        new ExtensionRestPathRegistry()
+    );
     private ExtensionsRunner extensionsRunner;
     private TransportService transportService;
 
@@ -141,7 +139,6 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         String ext = "token_placeholder";
         @SuppressWarnings("unused") // placeholder to test the token when identity features merged
-        Principal userPrincipal = () -> "user1";
         ExtensionRestRequest request = new ExtensionRestRequest(
             Method.GET,
             "/foo",
@@ -221,15 +218,15 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         assertEquals("test.value", extensionsRunner.getEnvironmentSettings().get("test.key"));
 
         assertTrue(extensionsRunner.getCustomNamedXContent().isEmpty());
-        assertTrue(extensionsRunner.getNamedXContentRegistry().getRegistry() instanceof NamedXContentRegistry);
+        assertNotNull(extensionsRunner.getNamedXContentRegistry().getRegistry());
         extensionsRunner.updateNamedXContentRegistry();
-        assertTrue(extensionsRunner.getNamedXContentRegistry().getRegistry() instanceof NamedXContentRegistry);
+        assertNotNull(extensionsRunner.getNamedXContentRegistry().getRegistry());
         assertTrue(extensionsRunner.getExtension() instanceof BaseExtension);
         assertEquals(extensionsRunner, ((BaseExtension) extensionsRunner.getExtension()).extensionsRunner());
-        assertTrue(extensionsRunner.getThreadPool() instanceof ThreadPool);
-        assertTrue(extensionsRunner.getTaskManager() instanceof TaskManager);
-        assertTrue(extensionsRunner.getSdkClient() instanceof SDKClient);
-        assertTrue(extensionsRunner.getSdkClusterService() instanceof SDKClusterService);
+        assertNotNull(extensionsRunner.getThreadPool());
+        assertNotNull(extensionsRunner.getTaskManager());
+        assertNotNull(extensionsRunner.getSdkClient());
+        assertNotNull(extensionsRunner.getSdkClusterService());
 
         settings = extensionsRunner.getSettings();
         assertEquals(ExtensionsRunnerForTest.NODE_NAME, settings.get(ExtensionsRunner.NODE_NAME_SETTING));
