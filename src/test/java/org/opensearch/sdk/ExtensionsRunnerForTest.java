@@ -16,9 +16,9 @@ import java.io.IOException;
  */
 public class ExtensionsRunnerForTest extends ExtensionsRunner {
 
-    public static final String NODE_NAME = "sample-extension";
-    public static final String NODE_HOST = "127.0.0.1";
-    public static final String NODE_PORT = "4532";
+    public static String NODE_NAME = "sample-extension";
+    public static String NODE_HOST = "127.0.0.1";
+    public static String NODE_PORT = "4532";
 
     /**
      * Instantiates a new Extensions Runner using test settings.

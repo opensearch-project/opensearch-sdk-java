@@ -23,7 +23,7 @@ public class TestBaseExtension extends OpenSearchTestCase {
     private static final String UNPARSEABLE_EXTENSION_CONFIG = "/bad-extension.yml";
     private static final String EXTENSION_DESCRIPTOR_FILEPATH = "src/test/resources" + UNPARSEABLE_EXTENSION_CONFIG;
 
-    public static class TestExtension extends BaseExtension {
+    public class TestExtension extends BaseExtension {
 
         public TestExtension(String path) {
             super(path);

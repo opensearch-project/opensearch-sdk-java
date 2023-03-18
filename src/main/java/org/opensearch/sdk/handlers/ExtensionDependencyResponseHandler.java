@@ -39,6 +39,7 @@ public class ExtensionDependencyResponseHandler implements TransportResponseHand
      */
     public ExtensionDependencyResponseHandler() {
         this.inProgressFuture = new CompletableFuture<>();
+        this.extensions = extensions;
     }
 
     @Override

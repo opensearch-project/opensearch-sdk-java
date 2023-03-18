@@ -55,6 +55,7 @@ public class TestSDKClusterService extends OpenSearchTestCase {
         // After initialization should be successful
         when(extensionsRunner.isInitialized()).thenReturn(true);
         sdkClusterService.state();
+        verify(extensionsRunner, times(1)).getExtensionTransportService();
 
         ArgumentCaptor<TransportService> argumentCaptor = ArgumentCaptor.forClass(TransportService.class);
         verify(extensionsRunner, times(1)).sendClusterStateRequest(argumentCaptor.capture());
@@ -109,16 +110,20 @@ public class TestSDKClusterService extends OpenSearchTestCase {
 
         // Before initialization should store pending update but do nothing
         sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(boolSetting, boolConsumer);
+        verify(extensionsRunner, times(0)).getExtensionTransportService();
 
         // After initialization should be able to send pending updates
         extensionsRunner.setInitialized();
         sdkClusterService.getClusterSettings().sendPendingSettingsUpdateConsumers();
+        verify(extensionsRunner, times(1)).getExtensionTransportService();
 
         // Once updates sent, map is empty, shouldn't send on retry (keep cumulative 1)
         sdkClusterService.getClusterSettings().sendPendingSettingsUpdateConsumers();
+        verify(extensionsRunner, times(1)).getExtensionTransportService();
 
         // Sending a new update should send immediately (cumulative now 2)
         sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(boolSetting, boolConsumer);
+        verify(extensionsRunner, times(2)).getExtensionTransportService();
 
         ArgumentCaptor<TransportService> transportServiceArgumentCaptor = ArgumentCaptor.forClass(TransportService.class);
         @SuppressWarnings("unchecked")
@@ -144,16 +149,20 @@ public class TestSDKClusterService extends OpenSearchTestCase {
 
         // Before initialization should store pending update but do nothing
         sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(settingsUpdateConsumersMap);
+        verify(extensionsRunner, times(0)).getExtensionTransportService();
 
         // After initialization should be able to send pending updates
         when(extensionsRunner.isInitialized()).thenReturn(true);
         sdkClusterService.getClusterSettings().sendPendingSettingsUpdateConsumers();
+        verify(extensionsRunner, times(1)).getExtensionTransportService();
 
         // Once updates sent, map is empty, shouldn't send on retry (keep cumulative 1)
         sdkClusterService.getClusterSettings().sendPendingSettingsUpdateConsumers();
+        verify(extensionsRunner, times(1)).getExtensionTransportService();
 
         // Sending a new update should send immediately (cumulative now 2)
         sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(settingsUpdateConsumersMap);
+        verify(extensionsRunner, times(2)).getExtensionTransportService();
 
         ArgumentCaptor<TransportService> transportServiceArgumentCaptor = ArgumentCaptor.forClass(TransportService.class);
         @SuppressWarnings("unchecked")
