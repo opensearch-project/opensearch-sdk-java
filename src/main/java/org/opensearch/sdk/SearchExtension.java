@@ -843,25 +843,18 @@ public interface SearchExtension {
      * Context available during fetch phase construction.
      */
     class FetchPhaseConstructionContext {
-
-        private Map<String, Highlighter> highlighters;
-
-        /**
-         * Instantiates this object with the specified highlighters.
-         *
-         * @return an instance of the Map<String, Highlighter> class.
-         */
-        private Map<String, Highlighter> getHighlighters() {
-            return highlighters;
-        }
+        private final Map<String, Highlighter> highlighters;
 
         /**
          * Instantiates this object with the specified highlighters
-         *
          * @param highlighters
          */
-        private void setHighlighters(Map<String, Highlighter> highlighters) {
+        public FetchPhaseConstructionContext(Map<String, Highlighter> highlighters) {
             this.highlighters = highlighters;
+        }
+
+        public Map<String, Highlighter> getHighlighters() {
+            return highlighters;
         }
     }
 }

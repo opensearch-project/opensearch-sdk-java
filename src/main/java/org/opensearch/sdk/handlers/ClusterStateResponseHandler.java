@@ -76,6 +76,6 @@ public class ClusterStateResponseHandler implements TransportResponseHandler<Clu
     }
 
     public ClusterState getClusterState() {
-        return new ClusterState.Builder(this.clusterState).build();
+        return this.clusterState;
     }
 }

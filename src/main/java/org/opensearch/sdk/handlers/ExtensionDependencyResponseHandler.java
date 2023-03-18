@@ -10,7 +10,6 @@
 package org.opensearch.sdk.handlers;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -82,6 +81,6 @@ public class ExtensionDependencyResponseHandler implements TransportResponseHand
      * @return dependency information
      */
     public List<DiscoveryExtensionNode> getExtensionDependencies() {
-        return new ArrayList<>(this.extensions);
+        return this.extensions;
     }
 }
