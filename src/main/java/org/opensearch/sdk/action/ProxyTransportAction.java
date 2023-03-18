@@ -38,7 +38,7 @@ public class ProxyTransportAction extends TransportAction<TransportActionRequest
 
     @Override
     protected void doExecute(Task task, TransportActionRequestFromExtension request, ActionListener<ExtensionActionResponse> listener) {
-        // TODO: Invoke ActionModule.sendProxyAction and handle the response
+        // SDKActionModule.sendProxyActionRequest();
         if (request == null) {
             listener.onFailure(new IllegalArgumentException("The request is null."));
         } else {

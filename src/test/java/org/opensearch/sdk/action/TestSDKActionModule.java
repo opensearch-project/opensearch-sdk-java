@@ -24,6 +24,7 @@ import org.opensearch.extensions.action.RegisterTransportActionsRequest;
 import org.opensearch.sdk.ActionExtension;
 import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionSettings;
+import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.Transport;
@@ -49,8 +50,10 @@ public class TestSDKActionModule extends OpenSearchTestCase {
     private static final String TEST_UNIQUE_ID = "test-extension";
     private static final String TEST_ACTION_NAME = "testAction";
 
+    private ExtensionsRunner extensionsRunner;
     private TransportService transportService;
     private DiscoveryNode opensearchNode;
+    private SDKActionModule sdkActionModule;
 
     private static class TestActionExtension implements Extension, ActionExtension {
         @Override
@@ -67,8 +70,6 @@ public class TestSDKActionModule extends OpenSearchTestCase {
             return Arrays.asList(new ActionHandler<ActionRequest, ActionResponse>(testAction, null));
         }
     }
-
-    private SDKActionModule sdkActionModule = new SDKActionModule(new TestActionExtension());
 
     @Override
     @BeforeEach
@@ -92,6 +93,11 @@ public class TestSDKActionModule extends OpenSearchTestCase {
             emptySet(),
             Version.CURRENT
         );
+        extensionsRunner = mock(ExtensionsRunner.class);
+        when(extensionsRunner.getExtensionTransportService()).thenReturn(transportService);
+        when(extensionsRunner.getOpensearchNode()).thenReturn(opensearchNode);
+        when(extensionsRunner.getUniqueId()).thenReturn(TEST_UNIQUE_ID);
+        sdkActionModule = new SDKActionModule(extensionsRunner, new TestActionExtension());
     }
 
     @Test
@@ -99,7 +105,7 @@ public class TestSDKActionModule extends OpenSearchTestCase {
         ArgumentCaptor<RegisterTransportActionsRequest> registerTransportActionsRequestCaptor = ArgumentCaptor.forClass(
             RegisterTransportActionsRequest.class
         );
-        sdkActionModule.sendRegisterTransportActionsRequest(transportService, opensearchNode, TEST_UNIQUE_ID);
+        sdkActionModule.sendRegisterTransportActionsRequest();
         verify(transportService, times(1)).sendRequest(
             any(),
             eq(ExtensionsManager.REQUEST_EXTENSION_REGISTER_TRANSPORT_ACTIONS),

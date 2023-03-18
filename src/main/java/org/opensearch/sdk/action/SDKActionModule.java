@@ -26,6 +26,7 @@ import org.opensearch.extensions.action.RegisterTransportActionsRequest;
 import org.opensearch.extensions.action.TransportActionRequestFromExtension;
 import org.opensearch.sdk.ActionExtension.ActionHandler;
 import org.opensearch.sdk.Extension;
+import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.sdk.handlers.TransportActionResponseToExtensionResponseHandler;
 import org.opensearch.transport.TransportService;
@@ -43,15 +44,18 @@ import static java.util.Collections.unmodifiableMap;
 public class SDKActionModule extends AbstractModule {
     private final Logger logger = LogManager.getLogger(SDKActionModule.class);
 
+    private ExtensionsRunner extensionsRunner;
     private final Map<String, ActionHandler<?, ?>> actions;
     private final ActionFilters actionFilters;
 
     /**
      * Instantiate this module
      *
-     * @param extension An instance of {@link ActionExtension}.
+     * @param extensionsRunner The ExtensionsRunner instance
+     * @param extension The extension
      */
-    public SDKActionModule(Extension extension) {
+    public SDKActionModule(ExtensionsRunner extensionsRunner, Extension extension) {
+        this.extensionsRunner = extensionsRunner;
         this.actions = setupActions(extension);
         this.actionFilters = setupActionFilters(extension);
     }
@@ -125,13 +129,12 @@ public class SDKActionModule extends AbstractModule {
 
     /**
      * Requests that OpenSearch register the Transport Actions for this extension.
-     *
-     * @param transportService  The TransportService defining the connection to OpenSearch.
-     * @param opensearchNode The OpenSearch node where transport actions being registered.
-     * @param uniqueId The uniqueId defining the extension which runs this action
      */
-    public void sendRegisterTransportActionsRequest(TransportService transportService, DiscoveryNode opensearchNode, String uniqueId) {
+    public void sendRegisterTransportActionsRequest() {
         logger.info("Sending Register Transport Actions request to OpenSearch");
+        TransportService transportService = extensionsRunner.getExtensionTransportService();
+        DiscoveryNode opensearchNode = extensionsRunner.getOpensearchNode();
+        String uniqueId = extensionsRunner.getUniqueId();
         AcknowledgedResponseHandler registerTransportActionsResponseHandler = new AcknowledgedResponseHandler();
         try {
             transportService.sendRequest(
@@ -148,21 +151,15 @@ public class SDKActionModule extends AbstractModule {
     /**
      * Requests that OpenSearch execute a Transport Actions on another extension.
      *
-     * @param transportService  The TransportService defining the connection to OpenSearch.
-     * @param opensearchNode The OpenSearch node where transport actions being registered.
      * @param action The fully qualified class name of the action to execute
      * @param requestBytes A buffer containing serialized parameters to be understood by the remote action
-     * @param uniqueId The uniqueId defining the extension which is requesting this action
      * @return A buffer serializing the response from the remote action if successful, otherwise empty
      */
-    public byte[] sendProxyActionRequest(
-        TransportService transportService,
-        DiscoveryNode opensearchNode,
-        String action,
-        byte[] requestBytes,
-        String uniqueId
-    ) {
+    public byte[] sendProxyActionRequest(String action, byte[] requestBytes) {
         logger.info("Sending ProxyAction request to OpenSearch for [" + action + "]");
+        TransportService transportService = extensionsRunner.getExtensionTransportService();
+        DiscoveryNode opensearchNode = extensionsRunner.getOpensearchNode();
+        String uniqueId = extensionsRunner.getUniqueId();
         TransportActionResponseToExtensionResponseHandler handleTransportActionResponseHandler =
             new TransportActionResponseToExtensionResponseHandler();
         try {

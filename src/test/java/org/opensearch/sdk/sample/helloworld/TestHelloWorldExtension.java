@@ -44,10 +44,12 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 
+import static org.mockito.Mockito.mock;
 import static org.opensearch.sdk.sample.helloworld.ExampleCustomSettingConfig.VALIDATED_SETTING;
 
 public class TestHelloWorldExtension extends OpenSearchTestCase {
 
+    private ExtensionsRunner extensionsRunner;
     private HelloWorldExtension extension;
     private Injector injector;
     private SDKClient sdkClient;
@@ -67,6 +69,7 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
+        this.extensionsRunner = mock(ExtensionsRunner.class);
         this.extension = new HelloWorldExtension();
 
         // Do portions of Guice injection needed for this test
@@ -74,7 +77,7 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         ThreadPool threadPool = new ThreadPool(settings);
         TaskManager taskManager = new TaskManager(settings, threadPool, Collections.emptySet());
         this.sdkClient = new SDKClient(extensionSettings);
-        this.injector = Guice.createInjector(new SDKActionModule(extension), b -> {
+        this.injector = Guice.createInjector(new SDKActionModule(extensionsRunner, extension), b -> {
             b.bind(ThreadPool.class).toInstance(threadPool);
             b.bind(TaskManager.class).toInstance(taskManager);
             b.bind(SDKClient.class).toInstance(sdkClient);
