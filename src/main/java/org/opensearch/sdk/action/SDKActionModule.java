@@ -11,6 +11,7 @@ package org.opensearch.sdk.action;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -21,10 +22,12 @@ import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.NamedRegistry;
 import org.opensearch.extensions.ExtensionsManager;
-import org.opensearch.extensions.RegisterTransportActionsRequest;
+import org.opensearch.extensions.action.RegisterTransportActionsRequest;
+import org.opensearch.extensions.action.TransportActionRequestFromExtension;
 import org.opensearch.sdk.ActionExtension.ActionHandler;
 import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
+import org.opensearch.sdk.handlers.TransportActionResponseToExtensionResponseHandler;
 import org.opensearch.transport.TransportService;
 
 import com.google.inject.AbstractModule;
@@ -62,24 +65,33 @@ public class SDKActionModule extends AbstractModule {
     }
 
     private static Map<String, ActionHandler<?, ?>> setupActions(Extension extension) {
-        if (extension instanceof ActionExtension) {
-            // Subclass NamedRegistry for easy registration
-            class ActionRegistry extends NamedRegistry<ActionHandler<?, ?>> {
-                ActionRegistry() {
-                    super("action");
-                }
-
-                public void register(ActionHandler<?, ?> handler) {
-                    register(handler.getAction().name(), handler);
-                }
+        /**
+         * Subclass of NamedRegistry permitting easier action registration
+         */
+        class ActionRegistry extends NamedRegistry<ActionHandler<?, ?>> {
+            ActionRegistry() {
+                super("sdkaction");
             }
-            ActionRegistry actions = new ActionRegistry();
-            // Register getActions in it
-            ((ActionExtension) extension).getActions().stream().forEach(actions::register);
 
-            return unmodifiableMap(actions.getRegistry());
+            /**
+             * Register an action handler pairing an ActionType and TransportAction
+             *
+             * @param handler The ActionHandler to register
+             */
+            public void register(ActionHandler<?, ?> handler) {
+                register(handler.getAction().name(), handler);
+            }
         }
-        return Collections.emptyMap();
+        ActionRegistry actions = new ActionRegistry();
+
+        // Register SDK actions
+        actions.register(new ActionHandler<>(ProxyAction.INSTANCE, ProxyTransportAction.class));
+
+        // Register actions from getActions extension point
+        if (extension instanceof ActionExtension) {
+            ((ActionExtension) extension).getActions().stream().forEach(actions::register);
+        }
+        return unmodifiableMap(actions.getRegistry());
     }
 
     private static ActionFilters setupActionFilters(Extension extension) {
@@ -94,6 +106,8 @@ public class SDKActionModule extends AbstractModule {
     protected void configure() {
         // Bind action filters
         bind(ActionFilters.class).toInstance(actionFilters);
+
+        // Bind local actions
 
         // bind ActionType -> transportAction Map used by Client
         @SuppressWarnings("rawtypes")
@@ -114,7 +128,7 @@ public class SDKActionModule extends AbstractModule {
      *
      * @param transportService  The TransportService defining the connection to OpenSearch.
      * @param opensearchNode The OpenSearch node where transport actions being registered.
-     * @param uniqueId The identity used to
+     * @param uniqueId The uniqueId defining the extension which runs this action
      */
     public void sendRegisterTransportActionsRequest(TransportService transportService, DiscoveryNode opensearchNode, String uniqueId) {
         logger.info("Sending Register Transport Actions request to OpenSearch");
@@ -129,5 +143,43 @@ public class SDKActionModule extends AbstractModule {
         } catch (Exception e) {
             logger.info("Failed to send Register Transport Actions request to OpenSearch", e);
         }
+    }
+
+    /**
+     * Requests that OpenSearch execute a Transport Actions on another extension.
+     *
+     * @param transportService  The TransportService defining the connection to OpenSearch.
+     * @param opensearchNode The OpenSearch node where transport actions being registered.
+     * @param action The fully qualified class name of the action to execute
+     * @param requestBytes A buffer containing serialized parameters to be understood by the remote action
+     * @param uniqueId The uniqueId defining the extension which is requesting this action
+     * @return A buffer serializing the response from the remote action if successful, otherwise empty
+     */
+    public byte[] sendProxyActionRequest(
+        TransportService transportService,
+        DiscoveryNode opensearchNode,
+        String action,
+        byte[] requestBytes,
+        String uniqueId
+    ) {
+        logger.info("Sending ProxyAction request to OpenSearch for [" + action + "]");
+        TransportActionResponseToExtensionResponseHandler handleTransportActionResponseHandler =
+            new TransportActionResponseToExtensionResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsManager.REQUEST_EXTENSION_HANDLE_TRANSPORT_ACTION,
+                new TransportActionRequestFromExtension(action, requestBytes, uniqueId),
+                handleTransportActionResponseHandler
+            );
+            // Wait on response
+            handleTransportActionResponseHandler.awaitResponse();
+        } catch (TimeoutException e) {
+            logger.info("Failed to receive ProxyAction response from OpenSearch", e);
+        } catch (Exception e) {
+            logger.info("Failed to send ProxyAction request to OpenSearch", e);
+        }
+        // At this point, response handler has read in the response bytes
+        return handleTransportActionResponseHandler.getResponseBytes();
     }
 }

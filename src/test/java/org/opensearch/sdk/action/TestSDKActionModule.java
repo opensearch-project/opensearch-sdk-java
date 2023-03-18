@@ -20,7 +20,7 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.extensions.ExtensionsManager;
-import org.opensearch.extensions.RegisterTransportActionsRequest;
+import org.opensearch.extensions.action.RegisterTransportActionsRequest;
 import org.opensearch.sdk.ActionExtension;
 import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionSettings;
@@ -33,7 +33,6 @@ import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
@@ -108,6 +107,7 @@ public class TestSDKActionModule extends OpenSearchTestCase {
             any(AcknowledgedResponseHandler.class)
         );
         assertEquals(TEST_UNIQUE_ID, registerTransportActionsRequestCaptor.getValue().getUniqueId());
-        assertEquals(Set.of(TEST_ACTION_NAME), registerTransportActionsRequestCaptor.getValue().getTransportActions());
+        assertTrue(registerTransportActionsRequestCaptor.getValue().getTransportActions().contains(ProxyAction.NAME));
+        assertTrue(registerTransportActionsRequestCaptor.getValue().getTransportActions().contains(TEST_ACTION_NAME));
     }
 }
