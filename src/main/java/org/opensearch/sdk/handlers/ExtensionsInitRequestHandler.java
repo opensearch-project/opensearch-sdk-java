@@ -72,6 +72,7 @@ public class ExtensionsInitRequestHandler {
             Settings settings = extensionsRunner.sendEnvironmentSettingsRequest(extensionTransportService);
             extensionsRunner.setEnvironmentSettings(settings);
             extensionsRunner.updateNamedXContentRegistry();
+            extensionsRunner.updateSdkClusterService();
 
             // Last step of initialization
             // TODO: make sure all the other sendX methods have completed

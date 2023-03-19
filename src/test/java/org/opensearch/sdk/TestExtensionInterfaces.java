@@ -124,6 +124,15 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
     }
 
     @Test
+    void testPersistentTaskExtension() {
+        PersistentTaskExtension extension = new PersistentTaskExtension() {
+        };
+
+        var result = extension.getPersistentTasksExecutor(null, null, null, null, null);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
     void testIndexStoreExtension() {
         IndexStoreExtension indexStoreExtension = new IndexStoreExtension() {
             @Override
@@ -133,5 +142,12 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         };
         assertTrue(indexStoreExtension.getDirectoryFactories().isEmpty());
         assertTrue(indexStoreExtension.getRecoveryStateFactories().isEmpty());
+    }
+
+    @Test
+    void testSystemIndexExtension() {
+        SystemIndexExtension systemIndexExtension = new SystemIndexExtension() {
+        };
+        assertTrue(systemIndexExtension.getSystemIndexDescriptors(null).isEmpty());
     }
 }
