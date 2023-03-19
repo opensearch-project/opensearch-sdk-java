@@ -22,7 +22,6 @@ import org.opensearch.index.mapper.MetadataFieldMapper;
 import org.opensearch.ingest.Processor;
 import org.opensearch.test.OpenSearchTestCase;
 
-import java.util.Map;
 import java.util.function.Predicate;
 
 public class TestExtensionInterfaces extends OpenSearchTestCase {

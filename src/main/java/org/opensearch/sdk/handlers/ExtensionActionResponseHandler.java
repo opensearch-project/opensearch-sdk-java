@@ -12,7 +12,7 @@ package org.opensearch.sdk.handlers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.extensions.ExtensionsManager;
-import org.opensearch.extensions.action.TransportActionResponseToExtension;
+import org.opensearch.extensions.action.ExtensionActionResponse;
 import org.opensearch.common.Nullable;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.sdk.action.SDKActionModule;
@@ -27,31 +27,31 @@ import java.util.concurrent.TimeUnit;
 /**
  * This class handles the response from OpenSearch to a {@link SDKActionModule#sendProxyActionRequest()} call.
  */
-public class ExtensionActionResponseHandler implements TransportResponseHandler<TransportActionResponseToExtension> {
+public class ExtensionActionResponseHandler implements TransportResponseHandler<ExtensionActionResponse> {
 
     private static final Logger logger = LogManager.getLogger(ExtensionActionResponseHandler.class);
-    private final CompletableFuture<TransportActionResponseToExtension> inProgressFuture;
+    private final CompletableFuture<ExtensionActionResponse> inProgressFuture;
     private byte[] responseBytes = null;
 
     /**
-    * Instantiates a new TransportActionResponseToExtensionHandler
+    * Instantiates a new ExtensionActionResponseHandler
     */
     public ExtensionActionResponseHandler() {
         this.inProgressFuture = new CompletableFuture<>();
     }
 
     @Override
-    public void handleResponse(TransportActionResponseToExtension response) {
+    public void handleResponse(ExtensionActionResponse response) {
         logger.info("received {}", response);
 
-        // Set TransportActionResponseToExtension from response
+        // Set ExtensionActionResponse from response
         this.responseBytes = response.getResponseBytes();
         inProgressFuture.complete(response);
     }
 
     @Override
     public void handleException(TransportException exp) {
-        logger.info("TransportActionResponseToExtensionRequest failed", exp);
+        logger.info("ExtensionActionResponseRequest failed", exp);
         inProgressFuture.completeExceptionally(exp);
     }
 
@@ -61,12 +61,12 @@ public class ExtensionActionResponseHandler implements TransportResponseHandler<
     }
 
     @Override
-    public TransportActionResponseToExtension read(StreamInput in) throws IOException {
-        return new TransportActionResponseToExtension(in);
+    public ExtensionActionResponse read(StreamInput in) throws IOException {
+        return new ExtensionActionResponse(in);
     }
 
     /**
-     * Waits for the TransportActionResponseToExtensionHandler future to complete
+     * Waits for the ExtensionActionResponseHandler future to complete
      * @throws Exception
      *        if the response times out
      */

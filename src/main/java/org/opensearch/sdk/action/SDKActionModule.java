@@ -13,20 +13,12 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.support.ActionFilters;
 import org.opensearch.action.support.TransportAction;
-import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.NamedRegistry;
-import org.opensearch.extensions.ExtensionsManager;
-import org.opensearch.extensions.action.RegisterTransportActionsRequest;
 import org.opensearch.sdk.ActionExtension.ActionHandler;
 import org.opensearch.sdk.Extension;
-import org.opensearch.sdk.ExtensionsRunner;
-import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
-import org.opensearch.transport.TransportService;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.MapBinder;
@@ -39,20 +31,15 @@ import static java.util.Collections.unmodifiableMap;
  * A module for injecting getActions classes into Guice.
  */
 public class SDKActionModule extends AbstractModule {
-    private final Logger logger = LogManager.getLogger(SDKActionModule.class);
-
-    private ExtensionsRunner extensionsRunner;
     private final Map<String, ActionHandler<?, ?>> actions;
     private final ActionFilters actionFilters;
 
     /**
      * Instantiate this module
      *
-     * @param extensionsRunner The ExtensionsRunner instance
      * @param extension The extension
      */
-    public SDKActionModule(ExtensionsRunner extensionsRunner, Extension extension) {
-        this.extensionsRunner = extensionsRunner;
+    public SDKActionModule(Extension extension) {
         this.actions = setupActions(extension);
         this.actionFilters = setupActionFilters(extension);
     }
@@ -108,8 +95,6 @@ public class SDKActionModule extends AbstractModule {
         // Bind action filters
         bind(ActionFilters.class).toInstance(actionFilters);
 
-        // Bind local actions
-
         // bind ActionType -> transportAction Map used by Client
         @SuppressWarnings("rawtypes")
         MapBinder<ActionType, TransportAction> transportActionsBinder = MapBinder.newMapBinder(
@@ -121,27 +106,6 @@ public class SDKActionModule extends AbstractModule {
             // bind the action as eager singleton, so the map binder one will reuse it
             bind(action.getTransportAction()).asEagerSingleton();
             transportActionsBinder.addBinding(action.getAction()).to(action.getTransportAction()).asEagerSingleton();
-        }
-    }
-
-    /**
-     * Requests that OpenSearch register the Transport Actions for this extension.
-     */
-    public void sendRegisterTransportActionsRequest() {
-        logger.info("Sending Register Transport Actions request to OpenSearch");
-        TransportService transportService = extensionsRunner.getExtensionTransportService();
-        DiscoveryNode opensearchNode = extensionsRunner.getOpensearchNode();
-        String uniqueId = extensionsRunner.getUniqueId();
-        AcknowledgedResponseHandler registerTransportActionsResponseHandler = new AcknowledgedResponseHandler();
-        try {
-            transportService.sendRequest(
-                opensearchNode,
-                ExtensionsManager.REQUEST_EXTENSION_REGISTER_TRANSPORT_ACTIONS,
-                new RegisterTransportActionsRequest(uniqueId, getActions().keySet()),
-                registerTransportActionsResponseHandler
-            );
-        } catch (Exception e) {
-            logger.info("Failed to send Register Transport Actions request to OpenSearch", e);
         }
     }
 }

@@ -51,7 +51,7 @@ public class ProxyTransportAction extends TransportAction<ProxyActionRequest, Ex
         if (responseBytes == null) {
             listener.onFailure(new RuntimeException("No response received from remote extension."));
         } else {
-            listener.onResponse(new ExtensionActionResponse(responseBytes));
+            listener.onResponse(new ExtensionActionResponse(true, responseBytes));
         }
     }
 }

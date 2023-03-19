@@ -14,6 +14,8 @@ import java.util.Objects;
 
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionRequestValidationException;
+import org.opensearch.action.ActionResponse;
+import org.opensearch.action.ActionType;
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.io.stream.BytesStreamOutput;
 import org.opensearch.common.io.stream.StreamInput;
@@ -36,7 +38,7 @@ public class ProxyActionRequest extends ActionRequest {
     /**
      * ProxyActionRequest constructor.
      *
-     * @param action is the transport action intended to be invoked which is registered by an extension via {@link ExtensionTransportActionsHandler}.
+     * @param action is the ActionType class name intended to be invoked which is registered by an extension via {@link ExtensionTransportActionsHandler}.
      * @param requestBytes is the raw bytes being transported between extensions.
      */
     public ProxyActionRequest(String action, byte[] requestBytes) {
@@ -45,12 +47,13 @@ public class ProxyActionRequest extends ActionRequest {
     }
 
     /**
-     * ProxyAcctionRequest constructor with a request class
+     * ProxyAcctionRequest constructor with an ActionType and Request class
      *
+     * @param instance An instance of {@link ActionType} registered with the remote extension's getActions registry
      * @param request A class extending {@link ActionRequest} associated with an action to be executed on another extension.
      */
-    public ProxyActionRequest(ActionRequest request) {
-        this.action = request.getClass().getName();
+    public ProxyActionRequest(ActionType<? extends ActionResponse> instance, ActionRequest request) {
+        this.action = instance.getClass().getName();
         byte[] bytes = new byte[0];
         try (BytesStreamOutput out = new BytesStreamOutput()) {
             request.writeTo(out);

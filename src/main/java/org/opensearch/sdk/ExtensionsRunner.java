@@ -200,7 +200,7 @@ public class ExtensionsRunner {
         // Bind the return values from create components
         modules.add(this::injectComponents);
         // Bind actions from getActions
-        this.sdkActionModule = new SDKActionModule(this, extension);
+        this.sdkActionModule = new SDKActionModule(extension);
         modules.add(this.sdkActionModule);
         // Finally, perform the injection
         this.injector = Guice.createInjector(modules);

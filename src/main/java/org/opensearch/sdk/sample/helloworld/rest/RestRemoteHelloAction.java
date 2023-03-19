@@ -20,8 +20,10 @@ import org.opensearch.sdk.RouteHandler;
 import org.opensearch.sdk.SDKClient;
 import org.opensearch.sdk.action.ProxyAction;
 import org.opensearch.sdk.action.ProxyActionRequest;
+import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -59,7 +61,8 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
         // This class happens to be local for simplicity but this should be from a dependency
         SampleRequest sampleRequest = new SampleRequest(name);
         // Serialize this request in a proxy action request
-        ProxyActionRequest proxyActionRequest = new ProxyActionRequest(sampleRequest);
+        // This requires that the remote extension has a corresponding action registered
+        ProxyActionRequest proxyActionRequest = new ProxyActionRequest(SampleAction.INSTANCE, sampleRequest);
 
         // TODO: We need async client.execute to hide these action listener details and return the future directly
         // https://github.com/opensearch-project/opensearch-sdk-java/issues/584
@@ -70,11 +73,16 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
             ActionListener.wrap(r -> futureResponse.complete(r), e -> futureResponse.completeExceptionally(e))
         );
         try {
+            byte[] responseBytes = futureResponse.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS)
+                .get()
+                .getResponseBytes();
+            if (responseBytes == null) {
+                return new ExtensionRestResponse(request, OK, "Received null remote extension reponse: ");
+            }
             return new ExtensionRestResponse(
                 request,
                 OK,
-                "Received remote extension reponse: "
-                    + futureResponse.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS).get().toString()
+                "Received remote extension reponse: " + new String(responseBytes, StandardCharsets.UTF_8)
             );
         } catch (Exception e) {
             return exceptionalRequest(request, e);

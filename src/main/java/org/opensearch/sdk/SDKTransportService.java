@@ -9,15 +9,22 @@
 
 package org.opensearch.sdk;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.Nullable;
 import org.opensearch.extensions.ExtensionsManager;
+import org.opensearch.extensions.action.RegisterTransportActionsRequest;
 import org.opensearch.extensions.action.TransportActionRequestFromExtension;
+import org.opensearch.sdk.ActionExtension.ActionHandler;
 import org.opensearch.sdk.action.ProxyActionRequest;
+import org.opensearch.sdk.action.SDKActionModule;
+import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionActionResponseHandler;
 import org.opensearch.transport.TransportService;
 
@@ -34,6 +41,27 @@ public class SDKTransportService {
     private TransportService transportService;
     private DiscoveryNode opensearchNode;
     private String uniqueId;
+
+    /**
+     * Requests that OpenSearch register the Transport Actions for this extension.
+     *
+     * @param actions The map of registered actions from {@link SDKActionModule#getActions()}
+     */
+    public void sendRegisterTransportActionsRequest(Map<String, ActionHandler<?, ?>> actions) {
+        logger.info("Sending Register Transport Actions request to OpenSearch");
+        Set<String> actionNameSet = actions.values().stream().map(h -> h.getAction().getClass().getName()).collect(Collectors.toSet());
+        AcknowledgedResponseHandler registerTransportActionsResponseHandler = new AcknowledgedResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsManager.REQUEST_EXTENSION_REGISTER_TRANSPORT_ACTIONS,
+                new RegisterTransportActionsRequest(uniqueId, actionNameSet),
+                registerTransportActionsResponseHandler
+            );
+        } catch (Exception e) {
+            logger.info("Failed to send Register Transport Actions request to OpenSearch", e);
+        }
+    }
 
     /**
      * Requests that OpenSearch execute a Transport Actions on another extension.
