@@ -10,21 +10,15 @@
 package org.opensearch.sdk;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.opensearch.cluster.service.ClusterService;
 import org.opensearch.common.settings.Settings;
-import org.opensearch.core.xcontent.NamedXContentRegistry;
-import org.opensearch.env.Environment;
 import org.opensearch.index.mapper.Mapper;
 import org.opensearch.index.mapper.MetadataFieldMapper;
-import org.opensearch.indices.recovery.RecoverySettings;
-import org.opensearch.repositories.Repository;
 import org.opensearch.test.OpenSearchTestCase;
 
 import java.util.Map;
@@ -130,6 +124,15 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
     }
 
     @Test
+    void testPersistentTaskExtension() {
+        PersistentTaskExtension extension = new PersistentTaskExtension() {
+        };
+
+        var result = extension.getPersistentTasksExecutor(null, null, null, null, null);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
     void testIndexStoreExtension() {
         IndexStoreExtension indexStoreExtension = new IndexStoreExtension() {
             @Override
@@ -149,62 +152,10 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
     }
 
     @Test
-    void testRepositoryExtension() {
-
-        Environment env = mock(Environment.class);
-        NamedXContentRegistry namedXContentRegistry = mock(NamedXContentRegistry.class);
-        ClusterService clusterService = mock(ClusterService.class);
-        RecoverySettings recoverySettings = mock(RecoverySettings.class);
-
-        RepositoryExtension repositoryExtension = new RepositoryExtension() {
-            @Override
-            public Map<String, Repository.Factory> getRepositories(
-                Environment env,
-                NamedXContentRegistry namedXContentRegistry,
-                ClusterService clusterService,
-                RecoverySettings recoverySettings
-            ) {
-                return RepositoryExtension.super.getRepositories(env, namedXContentRegistry, clusterService, recoverySettings);
-            }
-
-            @Override
-            public Map<String, Repository.Factory> getInternalRepositories(
-                Environment env,
-                NamedXContentRegistry namedXContentRegistry,
-                ClusterService clusterService,
-                RecoverySettings recoverySettings
-            ) {
-                return RepositoryExtension.super.getInternalRepositories(env, namedXContentRegistry, clusterService, recoverySettings);
-            }
-        };
-
-        Map<String, Repository.Factory> repositories = repositoryExtension.getRepositories(
-            env,
-            namedXContentRegistry,
-            clusterService,
-            recoverySettings
-        );
-        assertEquals(Collections.emptyMap(), repositories);
-    }
-
-    @Test
-    void testRepositoryInternalExtension() {
-
-        Environment env = mock(Environment.class);
-        NamedXContentRegistry namedXContentRegistry = mock(NamedXContentRegistry.class);
-        ClusterService clusterService = mock(ClusterService.class);
-        RecoverySettings recoverySettings = mock(RecoverySettings.class);
-
+    public void testRepositoryExtension() {
         RepositoryExtension repositoryExtension = new RepositoryExtension() {
         };
-
-        Map<String, Repository.Factory> repositories = repositoryExtension.getInternalRepositories(
-            env,
-            namedXContentRegistry,
-            clusterService,
-            recoverySettings
-        );
-        assertTrue(repositories.isEmpty());
+        assertTrue(repositoryExtension.getRepositories(null, null, null, null).isEmpty());
+        assertTrue(repositoryExtension.getInternalRepositories(null, null, null, null).isEmpty());
     }
-
 }
