@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.TransportActionResponseToExtension;
+import org.opensearch.common.Nullable;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.threadpool.ThreadPool;
@@ -30,14 +31,13 @@ public class TransportActionResponseToExtensionResponseHandler implements Transp
 
     private static final Logger logger = LogManager.getLogger(TransportActionResponseToExtensionResponseHandler.class);
     private final CompletableFuture<TransportActionResponseToExtension> inProgressFuture;
-    private byte[] responseBytes;
+    private byte[] responseBytes = null;
 
     /**
     * Instantiates a new TransportActionResponseToExtensionHandler with a count down latch and an empty Settings object
     */
     public TransportActionResponseToExtensionResponseHandler() {
         this.inProgressFuture = new CompletableFuture<>();
-        this.responseBytes = new byte[0];
     }
 
     @Override
@@ -74,6 +74,7 @@ public class TransportActionResponseToExtensionResponseHandler implements Transp
         inProgressFuture.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS).get();
     }
 
+    @Nullable
     public byte[] getResponseBytes() {
         return this.responseBytes;
     }
