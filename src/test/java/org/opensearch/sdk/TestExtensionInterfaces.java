@@ -206,4 +206,5 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         );
         assertTrue(repositories.isEmpty());
     }
+
 }
