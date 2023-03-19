@@ -1,3 +1,12 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ */
+
 package org.opensearch.sdk;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -12,8 +21,6 @@ import org.opensearch.test.OpenSearchTestCase;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-
 
 public class TestSDKNamedWriteableRegistry extends OpenSearchTestCase {
     private TestSDKNamedWriteableRegistry.ExampleRunnerForTest runner;
@@ -21,9 +28,9 @@ public class TestSDKNamedWriteableRegistry extends OpenSearchTestCase {
     private static class Example implements NamedWriteable {
         public static final String NAME = "Example";
         public static final NamedWriteableRegistry.Entry WRITEABLE_REGISTRY = new NamedWriteableRegistry.Entry(
-                TestSDKNamedWriteableRegistry.Example.class,
-                NAME,
-                null
+            TestSDKNamedWriteableRegistry.Example.class,
+            NAME,
+            null
         );
 
         private final String name;
@@ -32,29 +39,13 @@ public class TestSDKNamedWriteableRegistry extends OpenSearchTestCase {
             this.name = name;
         }
 
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            TestSDKNamedWriteableRegistry.Example that = (TestSDKNamedWriteableRegistry.Example) o;
-            return Objects.equals(name, that.name);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(name);
-        }
-
         @Override
         public String getWriteableName() {
-            return null;
+            return name;
         }
 
         @Override
-        public void writeTo(StreamOutput out) throws IOException {
-        }
+        public void writeTo(StreamOutput out) throws IOException {}
     }
 
     private static class ExampleRunnerForTest extends ExtensionsRunnerForTest {
@@ -94,10 +85,19 @@ public class TestSDKNamedWriteableRegistry extends OpenSearchTestCase {
         NamedWriteableRegistry registry = runner.sdkNamedWriteableRegistry.getRegistry();
 
         XContentParseException ex = assertThrows(
-                XContentParseException.class,
-                () -> registry.getReader(TestSDKNamedWriteableRegistry.Example.class, TestSDKNamedWriteableRegistry.Example.NAME)
+            XContentParseException.class,
+            () -> registry.getReader(TestSDKNamedWriteableRegistry.Example.class, TestSDKNamedWriteableRegistry.Example.NAME)
         );
-        assertEquals("unknown named object category [" + TestSDKNamedWriteableRegistry.Example.class.getName() + "]", ex.getMessage());
+        assertEquals("Unknown NamedWriteable category [" + TestSDKNamedWriteableRegistry.Example.class.getName() + "]", ex.getMessage());
     }
 
+    @Test
+    public void testCustomNamedWriteableRegistryParse() throws IOException {
+        // Update the runner before testing
+        runner.updateNamedWriteableRegistry();
+        NamedWriteableRegistry registry = runner.sdkNamedWriteableRegistry.getRegistry();
+
+        TestSDKNamedWriteableRegistry.Example example = (Example) registry.getReader(Example.class, Example.NAME);
+        assertEquals(TestSDKNamedWriteableRegistry.Example.NAME, example.getWriteableName());
+    }
 }

@@ -303,7 +303,6 @@ public class ExtensionsRunner {
         this.sdkNamedWriteableRegistry.updateNamedWriteableRegistry(this);
     }
 
-
     /**
      * Gets the NamedXContentRegistry. Only valid if {@link #isInitialized()} returns true.
      *
