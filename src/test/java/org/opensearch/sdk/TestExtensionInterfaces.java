@@ -150,4 +150,12 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         };
         assertTrue(systemIndexExtension.getSystemIndexDescriptors(null).isEmpty());
     }
+
+    @Test
+    public void testRepositoryExtension() {
+        RepositoryExtension repositoryExtension = new RepositoryExtension() {
+        };
+        assertTrue(repositoryExtension.getRepositories(null, null, null, null).isEmpty());
+        assertTrue(repositoryExtension.getInternalRepositories(null, null, null, null).isEmpty());
+    }
 }
