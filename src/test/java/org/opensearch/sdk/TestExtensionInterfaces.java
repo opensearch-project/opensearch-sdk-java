@@ -149,7 +149,7 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
     }
 
     @Test
-    void getRepositoriesReturnsEmptyMapByDefault() {
+    void testRepositoryExtension() {
 
         Environment env = mock(Environment.class);
         NamedXContentRegistry namedXContentRegistry = mock(NamedXContentRegistry.class);
@@ -188,7 +188,7 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
     }
 
     @Test
-    void getInternalRepositoriesReturnsEmptyMapByDefault() {
+    void testRepositoryInternalExtension() {
 
         Environment env = mock(Environment.class);
         NamedXContentRegistry namedXContentRegistry = mock(NamedXContentRegistry.class);
@@ -204,6 +204,6 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
             clusterService,
             recoverySettings
         );
-        assertEquals(Collections.emptyMap(), repositories);
+        assertTrue(repositories.isEmpty());
     }
 }
