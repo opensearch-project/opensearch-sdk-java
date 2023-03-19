@@ -14,8 +14,10 @@ import java.util.concurrent.TimeoutException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.cluster.node.DiscoveryNode;
+import org.opensearch.common.Nullable;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.TransportActionRequestFromExtension;
+import org.opensearch.sdk.action.ProxyActionRequest;
 import org.opensearch.sdk.handlers.TransportActionResponseToExtensionResponseHandler;
 import org.opensearch.transport.TransportService;
 
@@ -35,19 +37,19 @@ public class SDKTransportService {
     /**
      * Requests that OpenSearch execute a Transport Actions on another extension.
      *
-     * @param action The fully qualified class name of the action to execute
-     * @param requestBytes A buffer containing serialized parameters to be understood by the remote action
-     * @return A buffer serializing the response from the remote action if successful, otherwise empty
+     * @param request The request to send
+     * @return A buffer serializing the response from the remote action if successful, otherwise null
      */
-    public byte[] sendProxyActionRequest(String action, byte[] requestBytes) {
-        logger.info("Sending ProxyAction request to OpenSearch for [" + action + "]");
+    @Nullable
+    public byte[] sendProxyActionRequest(ProxyActionRequest request) {
+        logger.info("Sending ProxyAction request to OpenSearch for [" + request.getAction() + "]");
         TransportActionResponseToExtensionResponseHandler handleTransportActionResponseHandler =
             new TransportActionResponseToExtensionResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsManager.REQUEST_EXTENSION_HANDLE_TRANSPORT_ACTION,
-                new TransportActionRequestFromExtension(action, requestBytes, uniqueId),
+                new TransportActionRequestFromExtension(request.getAction(), request.getRequestBytes(), uniqueId),
                 handleTransportActionResponseHandler
             );
             // Wait on response
