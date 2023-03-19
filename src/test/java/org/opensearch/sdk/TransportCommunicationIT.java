@@ -64,7 +64,7 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
 
             // check bound addresses
             for (TransportAddress transportAddress : transport.boundAddress().boundAddresses()) {
-                assert (transportAddress != null);
+                assertNotNull(transportAddress);
                 assertEquals(host, transportAddress.getAddress());
                 assertEquals(port, transportAddress.getPort());
             }
