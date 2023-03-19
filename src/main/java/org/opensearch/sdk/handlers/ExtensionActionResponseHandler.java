@@ -27,16 +27,16 @@ import java.util.concurrent.TimeUnit;
 /**
  * This class handles the response from OpenSearch to a {@link SDKActionModule#sendProxyActionRequest()} call.
  */
-public class TransportActionResponseToExtensionResponseHandler implements TransportResponseHandler<TransportActionResponseToExtension> {
+public class ExtensionActionResponseHandler implements TransportResponseHandler<TransportActionResponseToExtension> {
 
-    private static final Logger logger = LogManager.getLogger(TransportActionResponseToExtensionResponseHandler.class);
+    private static final Logger logger = LogManager.getLogger(ExtensionActionResponseHandler.class);
     private final CompletableFuture<TransportActionResponseToExtension> inProgressFuture;
     private byte[] responseBytes = null;
 
     /**
     * Instantiates a new TransportActionResponseToExtensionHandler
     */
-    public TransportActionResponseToExtensionResponseHandler() {
+    public ExtensionActionResponseHandler() {
         this.inProgressFuture = new CompletableFuture<>();
     }
 

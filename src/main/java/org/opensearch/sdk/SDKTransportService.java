@@ -18,7 +18,7 @@ import org.opensearch.common.Nullable;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.TransportActionRequestFromExtension;
 import org.opensearch.sdk.action.ProxyActionRequest;
-import org.opensearch.sdk.handlers.TransportActionResponseToExtensionResponseHandler;
+import org.opensearch.sdk.handlers.ExtensionActionResponseHandler;
 import org.opensearch.transport.TransportService;
 
 /**
@@ -44,24 +44,23 @@ public class SDKTransportService {
     @Nullable
     public byte[] sendProxyActionRequest(ProxyActionRequest request) {
         logger.info("Sending ProxyAction request to OpenSearch for [" + request.getAction() + "]");
-        TransportActionResponseToExtensionResponseHandler handleTransportActionResponseHandler =
-            new TransportActionResponseToExtensionResponseHandler();
+        ExtensionActionResponseHandler extensionActionResponseHandler = new ExtensionActionResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
-                ExtensionsManager.REQUEST_EXTENSION_HANDLE_TRANSPORT_ACTION,
+                ExtensionsManager.TRANSPORT_ACTION_REQUEST_FROM_EXTENSION,
                 new TransportActionRequestFromExtension(request.getAction(), request.getRequestBytes(), uniqueId),
-                handleTransportActionResponseHandler
+                extensionActionResponseHandler
             );
             // Wait on response
-            handleTransportActionResponseHandler.awaitResponse();
+            extensionActionResponseHandler.awaitResponse();
         } catch (TimeoutException e) {
             logger.info("Failed to receive ProxyAction response from OpenSearch", e);
         } catch (Exception e) {
             logger.info("Failed to send ProxyAction request to OpenSearch", e);
         }
         // At this point, response handler has read in the response bytes
-        return handleTransportActionResponseHandler.getResponseBytes();
+        return extensionActionResponseHandler.getResponseBytes();
     }
 
     public TransportService getTransportService() {
