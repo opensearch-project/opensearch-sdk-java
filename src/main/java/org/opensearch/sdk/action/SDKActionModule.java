@@ -11,7 +11,6 @@ package org.opensearch.sdk.action;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -23,12 +22,10 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.NamedRegistry;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RegisterTransportActionsRequest;
-import org.opensearch.extensions.action.TransportActionRequestFromExtension;
 import org.opensearch.sdk.ActionExtension.ActionHandler;
 import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
-import org.opensearch.sdk.handlers.TransportActionResponseToExtensionResponseHandler;
 import org.opensearch.transport.TransportService;
 
 import com.google.inject.AbstractModule;
@@ -146,37 +143,5 @@ public class SDKActionModule extends AbstractModule {
         } catch (Exception e) {
             logger.info("Failed to send Register Transport Actions request to OpenSearch", e);
         }
-    }
-
-    /**
-     * Requests that OpenSearch execute a Transport Actions on another extension.
-     *
-     * @param action The fully qualified class name of the action to execute
-     * @param requestBytes A buffer containing serialized parameters to be understood by the remote action
-     * @return A buffer serializing the response from the remote action if successful, otherwise empty
-     */
-    public byte[] sendProxyActionRequest(String action, byte[] requestBytes) {
-        logger.info("Sending ProxyAction request to OpenSearch for [" + action + "]");
-        TransportService transportService = extensionsRunner.getExtensionTransportService();
-        DiscoveryNode opensearchNode = extensionsRunner.getOpensearchNode();
-        String uniqueId = extensionsRunner.getUniqueId();
-        TransportActionResponseToExtensionResponseHandler handleTransportActionResponseHandler =
-            new TransportActionResponseToExtensionResponseHandler();
-        try {
-            transportService.sendRequest(
-                opensearchNode,
-                ExtensionsManager.REQUEST_EXTENSION_HANDLE_TRANSPORT_ACTION,
-                new TransportActionRequestFromExtension(action, requestBytes, uniqueId),
-                handleTransportActionResponseHandler
-            );
-            // Wait on response
-            handleTransportActionResponseHandler.awaitResponse();
-        } catch (TimeoutException e) {
-            logger.info("Failed to receive ProxyAction response from OpenSearch", e);
-        } catch (Exception e) {
-            logger.info("Failed to send ProxyAction request to OpenSearch", e);
-        }
-        // At this point, response handler has read in the response bytes
-        return handleTransportActionResponseHandler.getResponseBytes();
     }
 }

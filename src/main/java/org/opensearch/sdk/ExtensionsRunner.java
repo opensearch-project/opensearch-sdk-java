@@ -132,6 +132,7 @@ public class ExtensionsRunner {
     private final SDKNamedXContentRegistry sdkNamedXContentRegistry;
     private final SDKClient sdkClient;
     private final SDKClusterService sdkClusterService;
+    private final SDKTransportService sdkTransportService;
     private final SDKActionModule sdkActionModule;
 
     private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
@@ -175,6 +176,8 @@ public class ExtensionsRunner {
         this.sdkClient = new SDKClient(extensionSettings);
         // initialize SDKClusterService. Must happen after extension field assigned
         this.sdkClusterService = new SDKClusterService(this);
+        // initialize SDKTransportService. Must happen after extension field assigned
+        this.sdkTransportService = new SDKTransportService();
 
         // Create Guice modules for injection
         List<com.google.inject.Module> modules = new ArrayList<>();
@@ -189,6 +192,7 @@ public class ExtensionsRunner {
 
             b.bind(SDKClient.class).toInstance(getSdkClient());
             b.bind(SDKClusterService.class).toInstance(getSdkClusterService());
+            b.bind(SDKTransportService.class).toInstance(getSdkTransportService());
         });
         // Bind the return values from create components
         modules.add(this::injectComponents);
@@ -638,6 +642,10 @@ public class ExtensionsRunner {
         return extensionTransportService;
     }
 
+    public SDKTransportService getSdkTransportService() {
+        return sdkTransportService;
+    }
+
     /**
      * Starts an ActionListener.
      *
@@ -660,6 +668,8 @@ public class ExtensionsRunner {
         // initialize the transport service
         NettyTransport nettyTransport = new NettyTransport(runner);
         runner.extensionTransportService = nettyTransport.initializeExtensionTransportService(runner.getSettings(), runner.getThreadPool());
+        // TODO: merge above line with below line when refactoring out extensionTransportService
+        runner.getSdkTransportService().setTransportService(runner.extensionTransportService);
         runner.startActionListener(0);
     }
 
