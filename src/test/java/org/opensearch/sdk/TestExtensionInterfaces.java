@@ -34,6 +34,9 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
             public ExtensionSettings getExtensionSettings() {
                 return null;
             }
+
+            @Override
+            public void setExtensionsRunner(ExtensionsRunner runner) {}
         };
 
         assertTrue(extension.getSettings().isEmpty());

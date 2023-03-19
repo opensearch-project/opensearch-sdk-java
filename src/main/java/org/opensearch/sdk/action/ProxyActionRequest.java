@@ -14,6 +14,8 @@ import java.util.Objects;
 
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionRequestValidationException;
+import org.opensearch.common.bytes.BytesReference;
+import org.opensearch.common.io.stream.BytesStreamOutput;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.common.io.stream.StreamOutput;
 import org.opensearch.extensions.action.ExtensionTransportActionsHandler;
@@ -40,6 +42,25 @@ public class ProxyActionRequest extends ActionRequest {
     public ProxyActionRequest(String action, byte[] requestBytes) {
         this.action = action;
         this.requestBytes = requestBytes;
+    }
+
+    /**
+     * ProxyAcctionRequest constructor with a request class
+     *
+     * @param request A class extending {@link ActionRequest} associated with an action to be executed on another extension.
+     */
+    public ProxyActionRequest(ActionRequest request) {
+        this.action = request.getClass().getName();
+        byte[] bytes = new byte[0];
+        try (BytesStreamOutput out = new BytesStreamOutput()) {
+            request.writeTo(out);
+            out.flush();
+            bytes = BytesReference.toBytes(out.bytes());
+        } catch (IOException e) {
+            // This Should Never Happen (TM)
+            // Won't get an IOException locally
+        }
+        this.requestBytes = bytes;
     }
 
     /**

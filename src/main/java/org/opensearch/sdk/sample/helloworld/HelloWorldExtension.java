@@ -24,6 +24,7 @@ import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.ActionExtension;
 import org.opensearch.sdk.ActionExtension.ActionHandler;
 import org.opensearch.sdk.sample.helloworld.rest.RestHelloAction;
+import org.opensearch.sdk.sample.helloworld.rest.RestRemoteHelloAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleTransportAction;
 
@@ -56,7 +57,7 @@ public class HelloWorldExtension extends BaseExtension implements ActionExtensio
 
     @Override
     public List<ExtensionRestHandler> getExtensionRestHandlers() {
-        return List.of(new RestHelloAction());
+        return List.of(new RestHelloAction(), new RestRemoteHelloAction(extensionsRunner()));
     }
 
     @Override

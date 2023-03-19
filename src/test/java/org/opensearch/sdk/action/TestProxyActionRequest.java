@@ -9,11 +9,15 @@
 
 package org.opensearch.sdk.action;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import org.opensearch.action.ActionRequest;
+import org.opensearch.action.ActionRequestValidationException;
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.io.stream.BytesStreamInput;
 import org.opensearch.common.io.stream.BytesStreamOutput;
+import org.opensearch.common.io.stream.StreamOutput;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestProxyActionRequest extends OpenSearchTestCase {
@@ -35,5 +39,35 @@ public class TestProxyActionRequest extends OpenSearchTestCase {
                 assertArrayEquals(expectedRequestBytes, request.getRequestBytes());
             }
         }
+    }
+
+    public void testProxyActionRequestWithClass() throws Exception {
+        class TestRequest extends ActionRequest {
+
+            private String data;
+
+            public TestRequest(String data) {
+                this.data = data;
+            }
+
+            @Override
+            public void writeTo(StreamOutput out) throws IOException {
+                super.writeTo(out);
+                out.writeString(data);
+            }
+
+            @Override
+            public ActionRequestValidationException validate() {
+                return null;
+            }
+        }
+
+        ProxyActionRequest request = new ProxyActionRequest(new TestRequest("test-action"));
+
+        String expectedAction = request.getClass().getName();
+        byte[] expectedRequestBytes = "test-action".getBytes(StandardCharsets.UTF_8);
+
+        assertEquals(expectedAction, request.getAction());
+        assertEquals(expectedRequestBytes, request.getRequestBytes());
     }
 }

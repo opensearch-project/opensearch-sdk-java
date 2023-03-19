@@ -153,7 +153,10 @@ public class ExtensionsRunner {
      * @throws IOException if the runner failed to read settings or API.
      */
     protected ExtensionsRunner(Extension extension) throws IOException {
+        // Link these classes together
         this.extension = extension;
+        extension.setExtensionsRunner(this);
+
         // Initialize concrete classes needed by extensions
         // These must have getters from this class to be accessible via createComponents
         // If they require later initialization, create a concrete wrapper class and update the internals

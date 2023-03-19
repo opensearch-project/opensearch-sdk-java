@@ -26,6 +26,7 @@ import org.opensearch.transport.TransportService;
  *
  * TODO: Move all the sendFooRequest() methods here
  * TODO: Replace usages of getExtensionTransportService with this class
+ * https://github.com/opensearch-project/opensearch-sdk-java/issues/585
  */
 public class SDKTransportService {
     private final Logger logger = LogManager.getLogger(SDKTransportService.class);

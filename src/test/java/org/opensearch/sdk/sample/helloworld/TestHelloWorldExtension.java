@@ -25,7 +25,6 @@ import org.opensearch.action.ActionResponse;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.common.settings.Settings;
-import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.sdk.ActionExtension.ActionHandler;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
@@ -113,9 +112,9 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
     @Test
     public void testExtensionRestHandlers() {
         List<ExtensionRestHandler> extensionRestHandlers = extension.getExtensionRestHandlers();
-        assertEquals(1, extensionRestHandlers.size());
-        List<Route> routes = extensionRestHandlers.get(0).routes();
-        assertEquals(4, routes.size());
+        assertEquals(2, extensionRestHandlers.size());
+        assertEquals(4, extensionRestHandlers.get(0).routes().size());
+        assertEquals(1, extensionRestHandlers.get(1).routes().size());
     }
 
     @Test

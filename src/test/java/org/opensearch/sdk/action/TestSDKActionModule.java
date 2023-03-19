@@ -22,7 +22,7 @@ import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RegisterTransportActionsRequest;
 import org.opensearch.sdk.ActionExtension;
-import org.opensearch.sdk.Extension;
+import org.opensearch.sdk.BaseExtension;
 import org.opensearch.sdk.ExtensionSettings;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
@@ -55,10 +55,9 @@ public class TestSDKActionModule extends OpenSearchTestCase {
     private DiscoveryNode opensearchNode;
     private SDKActionModule sdkActionModule;
 
-    private static class TestActionExtension implements Extension, ActionExtension {
-        @Override
-        public ExtensionSettings getExtensionSettings() {
-            return null;
+    private static class TestActionExtension extends BaseExtension implements ActionExtension {
+        public TestActionExtension() {
+            super(mock(ExtensionSettings.class));
         }
 
         @Override

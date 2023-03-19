@@ -34,7 +34,7 @@ public class TransportActionResponseToExtensionResponseHandler implements Transp
     private byte[] responseBytes = null;
 
     /**
-    * Instantiates a new TransportActionResponseToExtensionHandler with a count down latch and an empty Settings object
+    * Instantiates a new TransportActionResponseToExtensionHandler
     */
     public TransportActionResponseToExtensionResponseHandler() {
         this.inProgressFuture = new CompletableFuture<>();
