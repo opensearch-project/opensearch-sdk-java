@@ -100,7 +100,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         verify(transportService, times(1)).start();
         // cannot verify acceptIncomingRequests as it is a final method
         // test registerRequestHandlers
-        verify(transportService, times(5)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
+        verify(transportService, times(6)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
     }
 
     @Test

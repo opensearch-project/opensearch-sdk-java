@@ -25,6 +25,7 @@ import org.opensearch.discovery.InitializeExtensionRequest;
 import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
 import org.opensearch.extensions.UpdateSettingsRequest;
+import org.opensearch.extensions.action.ExtensionActionRequest;
 import org.opensearch.extensions.ExtensionsManager.RequestType;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsManager;
@@ -33,6 +34,7 @@ import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
+import org.opensearch.sdk.handlers.ExtensionsActionRequestHandler;
 import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionDependencyResponseHandler;
@@ -140,6 +142,7 @@ public class ExtensionsRunner {
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
+    private ExtensionsActionRequestHandler extensionsActionRequestHandler;
 
     /**
      * Instantiates a new update settings request handler
@@ -208,6 +211,8 @@ public class ExtensionsRunner {
         // Perform other initialization. These should have access to injected classes.
         // initialize SDKClient action map
         initializeSdkClient();
+
+        extensionsActionRequestHandler = new ExtensionsActionRequestHandler(getSdkClient(), getSdkActionModule());
 
         if (extension instanceof ActionExtension) {
             // store REST handlers in the registry
@@ -398,6 +403,14 @@ public class ExtensionsRunner {
             ((request, channel, task) -> channel.sendResponse(updateSettingsRequestHandler.handleUpdateSettingsRequest(request)))
         );
 
+        transportService.registerRequestHandler(
+            ExtensionsManager.REQUEST_EXTENSION_HANDLE_TRANSPORT_ACTION,
+            ThreadPool.Names.GENERIC,
+            false,
+            false,
+            ExtensionActionRequest::new,
+            ((request, channel, task) -> channel.sendResponse(extensionsActionRequestHandler.handleExtensionActionRequest(request)))
+        );
     }
 
     /**

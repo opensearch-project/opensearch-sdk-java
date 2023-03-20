@@ -13,9 +13,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.ExtensionActionResponse;
+import org.opensearch.sdk.SDKTransportService;
 import org.opensearch.common.Nullable;
 import org.opensearch.common.io.stream.StreamInput;
-import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportException;
 import org.opensearch.transport.TransportResponseHandler;
@@ -25,7 +25,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * This class handles the response from OpenSearch to a {@link SDKActionModule#sendProxyActionRequest()} call.
+ * This class handles the response from OpenSearch to a {@link SDKTransportService#sendProxyActionRequest()} call.
  */
 public class ExtensionActionResponseHandler implements TransportResponseHandler<ExtensionActionResponse> {
 

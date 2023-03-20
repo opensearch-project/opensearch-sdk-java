@@ -57,7 +57,6 @@ public class ProxyActionRequest extends ActionRequest {
         byte[] bytes = new byte[0];
         try (BytesStreamOutput out = new BytesStreamOutput()) {
             request.writeTo(out);
-            out.flush();
             bytes = BytesReference.toBytes(out.bytes());
         } catch (IOException e) {
             // This Should Never Happen (TM)
