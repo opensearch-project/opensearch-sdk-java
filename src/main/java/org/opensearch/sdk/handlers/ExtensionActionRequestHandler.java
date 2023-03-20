@@ -36,8 +36,8 @@ import org.opensearch.sdk.action.SDKActionModule;
 /**
  * This class handles a request from OpenSearch from another extension's {@link SDKTransportService#sendProxyActionRequest()} call.
  */
-public class ExtensionsActionRequestHandler {
-    private static final Logger logger = LogManager.getLogger(ExtensionsActionRequestHandler.class);
+public class ExtensionActionRequestHandler {
+    private static final Logger logger = LogManager.getLogger(ExtensionActionRequestHandler.class);
 
     final SDKActionModule sdkActionModule;
     final SDKClient client;
@@ -48,7 +48,7 @@ public class ExtensionsActionRequestHandler {
      * @param sdkClient An initialized SDKClient with the registered actions
      * @param sdkActionModule An initialized SDKActionModule with the registered actions
      */
-    public ExtensionsActionRequestHandler(SDKClient sdkClient, SDKActionModule sdkActionModule) {
+    public ExtensionActionRequestHandler(SDKClient sdkClient, SDKActionModule sdkActionModule) {
         this.sdkActionModule = sdkActionModule;
         this.client = sdkClient;
     }
@@ -86,11 +86,11 @@ public class ExtensionsActionRequestHandler {
             Class<?> clazz = Class.forName(requestClassName);
             Constructor<?> constructor = clazz.getConstructor(StreamInput.class);
             StreamInput requestByteStream = StreamInput.wrap(
-                Arrays.copyOfRange(request.getRequestBytes(), nullPos + 1, request.getRequestBytes().length - nullPos)
+                Arrays.copyOfRange(request.getRequestBytes(), nullPos + 1, request.getRequestBytes().length)
             );
             actionRequest = (ActionRequest) constructor.newInstance(requestByteStream);
         } catch (Exception e) {
-            response.setResponseBytesAsString("No request class [" + requestClassName + "] is available.");
+            response.setResponseBytesAsString("No request class [" + requestClassName + "] is available: " + e.getMessage());
             return response;
         }
 

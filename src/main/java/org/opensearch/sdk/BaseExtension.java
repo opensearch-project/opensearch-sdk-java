@@ -59,10 +59,10 @@ public abstract class BaseExtension implements Extension {
     }
 
     /**
-    * Gets the {@link ExtensionsRunner} of this extension.
-    *
-    * @return the extension runner.
-    */
+     * Gets the {@link ExtensionsRunner} of this extension.
+     *
+     * @return the extension runner.
+     */
     public ExtensionsRunner extensionsRunner() {
         return this.extensionsRunner;
     }

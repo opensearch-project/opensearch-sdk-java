@@ -23,7 +23,6 @@ import org.opensearch.sdk.action.ProxyActionRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -61,7 +60,8 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
         // This class happens to be local for simplicity but this should be from a dependency
         SampleRequest sampleRequest = new SampleRequest(name);
         // Serialize this request in a proxy action request
-        // This requires that the remote extension has a corresponding action registered
+        // This requires that the remote extension has a corresponding transport action registered
+        // This Action class happens to be local for simplicity but this should be from a dependency
         ProxyActionRequest proxyActionRequest = new ProxyActionRequest(SampleAction.INSTANCE, sampleRequest);
 
         // TODO: We need async client.execute to hide these action listener details and return the future directly
@@ -73,17 +73,13 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
             ActionListener.wrap(r -> futureResponse.complete(r), e -> futureResponse.completeExceptionally(e))
         );
         try {
-            byte[] responseBytes = futureResponse.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS)
-                .get()
-                .getResponseBytes();
-            if (responseBytes == null) {
-                return new ExtensionRestResponse(request, OK, "Received null remote extension reponse: ");
+
+            ExtensionActionResponse response = futureResponse.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS)
+                .get();
+            if (!response.isSuccess()) {
+                return new ExtensionRestResponse(request, OK, "Remote extension reponse failed: " + response.getResponseBytesAsString());
             }
-            return new ExtensionRestResponse(
-                request,
-                OK,
-                "Received remote extension reponse: " + new String(responseBytes, StandardCharsets.UTF_8)
-            );
+            return new ExtensionRestResponse(request, OK, "Received remote extension reponse: " + response.getResponseBytesAsString());
         } catch (Exception e) {
             return exceptionalRequest(request, e);
         }

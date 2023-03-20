@@ -34,7 +34,7 @@ import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
-import org.opensearch.sdk.handlers.ExtensionsActionRequestHandler;
+import org.opensearch.sdk.handlers.ExtensionActionRequestHandler;
 import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionDependencyResponseHandler;
@@ -142,7 +142,7 @@ public class ExtensionsRunner {
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
-    private ExtensionsActionRequestHandler extensionsActionRequestHandler;
+    private ExtensionActionRequestHandler extensionsActionRequestHandler;
 
     /**
      * Instantiates a new update settings request handler
@@ -212,7 +212,7 @@ public class ExtensionsRunner {
         // initialize SDKClient action map
         initializeSdkClient();
 
-        extensionsActionRequestHandler = new ExtensionsActionRequestHandler(getSdkClient(), getSdkActionModule());
+        extensionsActionRequestHandler = new ExtensionActionRequestHandler(getSdkClient(), getSdkActionModule());
 
         if (extension instanceof ActionExtension) {
             // store REST handlers in the registry
