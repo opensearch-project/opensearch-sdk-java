@@ -119,6 +119,12 @@ The `ExtensionsManager` reads a list of extensions present in `extensions.yml`. 
 
 (27) The User receives the response.
 
+#### Remote Action Execution on another Extension
+
+Extensions may invoke actions on other extensions using the `ProxyAction` and `ProxyActionRequest`. The code sequence is shown below.
+
+![](Docs/RemoteActionExecution.svg)
+
 #### Extension Point Implementation Walk Through
 
 An example of a more complex extension point, `getNamedXContent()` is shown below. A similar pattern can be followed for most extension points.
