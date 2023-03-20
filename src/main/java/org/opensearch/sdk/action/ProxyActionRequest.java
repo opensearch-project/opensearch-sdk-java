@@ -40,7 +40,7 @@ public class ProxyActionRequest extends ActionRequest {
     private final byte[] requestBytes;
 
     /**
-     * ProxyAcctionRequest constructor with an ActionType and Request class
+     * ProxyActionRequest constructor with an ActionType and Request class. Requires a dependency on the remote extension code.
      *
      * @param instance An instance of {@link ActionType} registered with the remote extension's getActions registry
      * @param request A class extending {@link ActionRequest} associated with an action to be executed on another extension.
@@ -57,6 +57,19 @@ public class ProxyActionRequest extends ActionRequest {
             // Won't get an IOException locally
         }
         this.requestBytes = bytes;
+    }
+
+    /**
+     * ProxyActionRequest constructor with class names and request bytes. Does not require a dependency on the remote extension code.
+     *
+     * @param action A string representing the fully qualified class name of the remote ActionType instance
+     * @param requestClass A string representing the fully qualified class name of the remote ActionRequest class
+     * @param requestBytes Bytes representing the serialized parameters to be used in the ActionRequest class StreamInput constructor
+     */
+    public ProxyActionRequest(String action, String requestClass, byte[] requestBytes) {
+        this.action = action;
+        this.requestClass = requestClass;
+        this.requestBytes = requestBytes;
     }
 
     /**

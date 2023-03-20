@@ -10,8 +10,8 @@
 package org.opensearch.sdk.action;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
+import org.junit.jupiter.api.Test;
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionRequestValidationException;
 import org.opensearch.action.ActionResponse;
@@ -24,17 +24,25 @@ import org.opensearch.common.io.stream.StreamOutput;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestProxyActionRequest extends OpenSearchTestCase {
+
+    @Test
     public void testProxyActionRequest() throws Exception {
         TestRequest testRequest = new TestRequest("test-action");
-        ProxyActionRequest request = new ProxyActionRequest(TestAction.INSTANCE, testRequest);
 
-        String expectedAction = request.getClass().getName();
+        String expectedAction = TestAction.class.getName();
         String expectedRequestClass = testRequest.getClass().getName();
-        byte[] expectedRequestBytes = "test-action".getBytes(StandardCharsets.UTF_8);
+        byte[] expectedRequestBytes;
+        try (BytesStreamOutput out = new BytesStreamOutput()) {
+            testRequest.writeTo(out);
+            expectedRequestBytes = BytesReference.toBytes(out.bytes());
+        }
 
+        ProxyActionRequest request = new ProxyActionRequest(TestAction.INSTANCE, testRequest);
         assertEquals(expectedAction, request.getAction());
         assertEquals(expectedRequestClass, request.getRequestClass());
         assertArrayEquals(expectedRequestBytes, request.getRequestBytes());
+
+        request = new ProxyActionRequest(expectedAction, expectedRequestClass, expectedRequestBytes);
 
         try (BytesStreamOutput out = new BytesStreamOutput()) {
             request.writeTo(out);
@@ -78,7 +86,7 @@ public class TestProxyActionRequest extends OpenSearchTestCase {
 
     static class TestAction extends ActionType<TestResponse> {
 
-        public static final String NAME = "helloworld/sample";
+        public static final String NAME = "test";
         public static final TestAction INSTANCE = new TestAction();
 
         private TestAction() {

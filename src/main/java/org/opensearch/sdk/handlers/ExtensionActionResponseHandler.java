@@ -42,8 +42,9 @@ public class ExtensionActionResponseHandler implements TransportResponseHandler<
 
     @Override
     public void handleResponse(ExtensionActionResponse response) {
-        logger.info("received {}", response);
+        logger.info("Received response bytes: " + response.getResponseBytes().length + " bytes");
 
+        logger.debug("Received response bytes: " + response.getResponseBytesAsString());
         // Set ExtensionActionResponse from response
         this.responseBytes = response.getResponseBytes();
         inProgressFuture.complete(response);

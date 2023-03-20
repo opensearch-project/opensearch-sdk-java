@@ -125,7 +125,7 @@ public class ExtensionActionRequestHandler {
             response.setResponseBytesAsString("Action failed: " + e.getMessage());
             logger.debug("Response failed to [" + request.getAction() + "]");
         }
-        logger.debug("Sending action response to OpenSearch: " + response.getResponseBytesAsString());
+        logger.debug("Sending action response to OpenSearch: " + response.getResponseBytes().length + " bytes");
         return response;
     }
 
