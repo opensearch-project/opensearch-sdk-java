@@ -9,6 +9,8 @@
 
 package org.opensearch.sdk;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
@@ -72,12 +74,19 @@ public class SDKTransportService {
     @Nullable
     public byte[] sendProxyActionRequest(ProxyActionRequest request) {
         logger.info("Sending ProxyAction request to OpenSearch for [" + request.getAction() + "]");
+        // Combine class name string and request bytes
+        byte[] requestClassBytes = request.getRequestClass().getBytes(StandardCharsets.UTF_8);
+        byte[] proxyRequestBytes = ByteBuffer.allocate(requestClassBytes.length + 1 + request.getRequestBytes().length)
+            .put(requestClassBytes)
+            .put((byte) 0)
+            .put(request.getRequestBytes())
+            .array();
         ExtensionActionResponseHandler extensionActionResponseHandler = new ExtensionActionResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsManager.TRANSPORT_ACTION_REQUEST_FROM_EXTENSION,
-                new TransportActionRequestFromExtension(request.getAction(), request.getRequestBytes(), uniqueId),
+                new TransportActionRequestFromExtension(request.getAction(), proxyRequestBytes, uniqueId),
                 extensionActionResponseHandler
             );
             // Wait on response

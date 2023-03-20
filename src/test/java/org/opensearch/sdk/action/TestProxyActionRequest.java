@@ -25,12 +25,16 @@ import org.opensearch.test.OpenSearchTestCase;
 
 public class TestProxyActionRequest extends OpenSearchTestCase {
     public void testProxyActionRequest() throws Exception {
-        String expectedAction = "test-action";
-        byte[] expectedRequestBytes = "request-bytes".getBytes(StandardCharsets.UTF_8);
-        ProxyActionRequest request = new ProxyActionRequest(expectedAction, expectedRequestBytes);
+        TestRequest testRequest = new TestRequest("test-action");
+        ProxyActionRequest request = new ProxyActionRequest(TestAction.INSTANCE, testRequest);
+
+        String expectedAction = request.getClass().getName();
+        String expectedRequestClass = testRequest.getClass().getName();
+        byte[] expectedRequestBytes = "test-action".getBytes(StandardCharsets.UTF_8);
 
         assertEquals(expectedAction, request.getAction());
-        assertEquals(expectedRequestBytes, request.getRequestBytes());
+        assertEquals(expectedRequestClass, request.getRequestClass());
+        assertArrayEquals(expectedRequestBytes, request.getRequestBytes());
 
         try (BytesStreamOutput out = new BytesStreamOutput()) {
             request.writeTo(out);
@@ -39,20 +43,10 @@ public class TestProxyActionRequest extends OpenSearchTestCase {
                 request = new ProxyActionRequest(in);
 
                 assertEquals(expectedAction, request.getAction());
+                assertEquals(expectedRequestClass, request.getRequestClass());
                 assertArrayEquals(expectedRequestBytes, request.getRequestBytes());
             }
         }
-    }
-
-    public void testProxyActionRequestWithClass() throws Exception {
-
-        ProxyActionRequest request = new ProxyActionRequest(TestAction.INSTANCE, new TestRequest("test-action"));
-
-        String expectedAction = request.getClass().getName();
-        byte[] expectedRequestBytes = "test-action".getBytes(StandardCharsets.UTF_8);
-
-        assertEquals(expectedAction, request.getAction());
-        assertEquals(expectedRequestBytes, request.getRequestBytes());
     }
 
     static class TestRequest extends ActionRequest {

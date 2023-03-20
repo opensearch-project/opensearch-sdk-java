@@ -27,24 +27,17 @@ import org.opensearch.extensions.action.ExtensionTransportActionsHandler;
  */
 public class ProxyActionRequest extends ActionRequest {
     /**
-     * action is the transport action intended to be invoked which is registered by an extension via {@link ExtensionTransportActionsHandler}.
+     * action is the TransportAction intended to be invoked which is registered by an extension via {@link ExtensionTransportActionsHandler}.
      */
     private final String action;
+    /**
+     * requestClass is the ActionRequest class associated with the TransportAction
+     */
+    private final String requestClass;
     /**
      * requestBytes is the raw bytes being transported between extensions.
      */
     private final byte[] requestBytes;
-
-    /**
-     * ProxyActionRequest constructor.
-     *
-     * @param action is the ActionType class name intended to be invoked which is registered by an extension via {@link ExtensionTransportActionsHandler}.
-     * @param requestBytes is the raw bytes being transported between extensions.
-     */
-    public ProxyActionRequest(String action, byte[] requestBytes) {
-        this.action = action;
-        this.requestBytes = requestBytes;
-    }
 
     /**
      * ProxyAcctionRequest constructor with an ActionType and Request class
@@ -54,6 +47,7 @@ public class ProxyActionRequest extends ActionRequest {
      */
     public ProxyActionRequest(ActionType<? extends ActionResponse> instance, ActionRequest request) {
         this.action = instance.getClass().getName();
+        this.requestClass = request.getClass().getName();
         byte[] bytes = new byte[0];
         try (BytesStreamOutput out = new BytesStreamOutput()) {
             request.writeTo(out);
@@ -74,6 +68,7 @@ public class ProxyActionRequest extends ActionRequest {
     public ProxyActionRequest(StreamInput in) throws IOException {
         super(in);
         this.action = in.readString();
+        this.requestClass = in.readString();
         this.requestBytes = in.readByteArray();
     }
 
@@ -81,11 +76,16 @@ public class ProxyActionRequest extends ActionRequest {
     public void writeTo(StreamOutput out) throws IOException {
         super.writeTo(out);
         out.writeString(action);
+        out.writeString(requestClass);
         out.writeByteArray(requestBytes);
     }
 
     public String getAction() {
         return this.action;
+    }
+
+    public String getRequestClass() {
+        return this.requestClass;
     }
 
     public byte[] getRequestBytes() {
@@ -99,7 +99,7 @@ public class ProxyActionRequest extends ActionRequest {
 
     @Override
     public String toString() {
-        return "ProxyActionRequest{action=" + action + ", requestBytes=" + requestBytes + "}";
+        return "ProxyActionRequest{action=" + action + ", requestClass=" + requestClass + ", requestBytes=" + requestBytes + "}";
     }
 
     @Override
@@ -107,11 +107,13 @@ public class ProxyActionRequest extends ActionRequest {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         ProxyActionRequest that = (ProxyActionRequest) obj;
-        return Objects.equals(action, that.action) && Objects.equals(requestBytes, that.requestBytes);
+        return Objects.equals(action, that.action)
+            && Objects.equals(requestClass, that.requestClass)
+            && Objects.equals(requestBytes, that.requestBytes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(action, requestBytes);
+        return Objects.hash(action, requestClass, requestBytes);
     }
 }

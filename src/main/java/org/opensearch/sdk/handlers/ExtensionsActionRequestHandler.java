@@ -10,6 +10,9 @@
 package org.opensearch.sdk.handlers;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -17,10 +20,12 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionListener;
+import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
 import org.opensearch.action.ActionType;
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.io.stream.BytesStreamOutput;
+import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.ExtensionActionRequest;
 import org.opensearch.extensions.action.ExtensionActionResponse;
@@ -55,7 +60,7 @@ public class ExtensionsActionRequestHandler {
      * @return The response from the TransportAction
      */
     public ExtensionActionResponse handleExtensionActionRequest(ExtensionActionRequest request) {
-        logger.info("Received request to execute action [" + request.getAction() + "]");
+        logger.debug("Received request to execute action [" + request.getAction() + "]");
         final ExtensionActionResponse response = new ExtensionActionResponse(false, new byte[0]);
 
         // Find matching ActionType instance
@@ -70,13 +75,30 @@ public class ExtensionsActionRequestHandler {
             return response;
         }
 
-        // Execute the action
-        logger.info("Executing action [" + request.getAction() + "]");
         ActionType<? extends ActionResponse> action = optionalAction.get();
+        logger.debug("Found matching action [" + action.name() + "], an instance of [" + action.getClass().getName() + "]");
+
+        // Extract request class name from bytes and instantiate request
+        int nullPos = indexOf(request.getRequestBytes(), (byte) 0);
+        String requestClassName = new String(Arrays.copyOfRange(request.getRequestBytes(), 0, nullPos), StandardCharsets.UTF_8);
+        ActionRequest actionRequest = null;
+        try {
+            Class<?> clazz = Class.forName(requestClassName);
+            Constructor<?> constructor = clazz.getConstructor(StreamInput.class);
+            StreamInput requestByteStream = StreamInput.wrap(
+                Arrays.copyOfRange(request.getRequestBytes(), nullPos + 1, request.getRequestBytes().length - nullPos)
+            );
+            actionRequest = (ActionRequest) constructor.newInstance(requestByteStream);
+        } catch (Exception e) {
+            response.setResponseBytesAsString("No request class [" + requestClassName + "] is available.");
+            return response;
+        }
+
+        // Execute the action
         // TODO: We need async client.execute to hide these action listener details and return the future directly
         // https://github.com/opensearch-project/opensearch-sdk-java/issues/584
         CompletableFuture<ExtensionActionResponse> futureResponse = new CompletableFuture<>();
-        client.execute(action, request, ActionListener.wrap(r -> {
+        client.execute(action, actionRequest, ActionListener.wrap(r -> {
             byte[] bytes = new byte[0];
             try (BytesStreamOutput out = new BytesStreamOutput()) {
                 ((ActionResponse) r).writeTo(out);
@@ -90,7 +112,7 @@ public class ExtensionsActionRequestHandler {
             futureResponse.complete(response);
         }, e -> futureResponse.completeExceptionally(e)));
 
-        logger.info("Waiting for response to action [" + request.getAction() + "]");
+        logger.debug("Waiting for response to action [" + request.getAction() + "]");
         try {
             ExtensionActionResponse actionResponse = futureResponse.orTimeout(
                 ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT,
@@ -98,13 +120,21 @@ public class ExtensionsActionRequestHandler {
             ).get();
             response.setSuccess(true);
             response.setResponseBytes(actionResponse.getResponseBytes());
-            logger.info("Response successful to [" + request.getAction() + "]");
+            logger.debug("Response successful to [" + request.getAction() + "]");
         } catch (Exception e) {
             response.setResponseBytesAsString("Action failed: " + e.getMessage());
-            logger.info("Response failed to [" + request.getAction() + "]");
+            logger.debug("Response failed to [" + request.getAction() + "]");
         }
-        logger.info("Sending action response to OpenSearch: " + response.getResponseBytesAsString());
+        logger.debug("Sending action response to OpenSearch: " + response.getResponseBytesAsString());
         return response;
     }
 
+    private static int indexOf(byte[] bytes, byte value) {
+        for (int offset = 0; offset < bytes.length; ++offset) {
+            if (bytes[offset] == value) {
+                return offset;
+            }
+        }
+        return -1;
+    }
 }
