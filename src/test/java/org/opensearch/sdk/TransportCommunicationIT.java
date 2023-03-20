@@ -54,11 +54,7 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
     public void testSocketSetup() throws IOException {
 
         ThreadPool threadPool = new TestThreadPool("test");
-        Netty4Transport transport = nettyTransport.getNetty4Transport(
-            settings,
-            threadPool,
-            extensionsRunner.getNamedWriteableRegistry().getRegistry()
-        );
+        Netty4Transport transport = nettyTransport.getNetty4Transport(settings, threadPool);
 
         // start netty transport and ensure that address info is exposed
         try {
