@@ -31,7 +31,7 @@ import org.opensearch.sdk.handlers.ExtensionActionResponseHandler;
 import org.opensearch.transport.TransportService;
 
 /**
- * Wrapper class for {@link TranspoortService} and associated methods.
+ * Wrapper class for {@link TransportService} and associated methods.
  *
  * TODO: Move all the sendFooRequest() methods here
  * TODO: Replace usages of getExtensionTransportService with this class
