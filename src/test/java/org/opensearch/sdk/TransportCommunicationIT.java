@@ -70,7 +70,7 @@ public class TransportCommunicationIT extends OpenSearchIntegTestCase {
             }
 
             // check publish addresses
-            assert (transport.boundAddress().publishAddress() != null);
+            assertNotNull(transport.boundAddress().publishAddress());
             TransportAddress publishAddress = transport.boundAddress().publishAddress();
             assertEquals(host, NetworkAddress.format(publishAddress.address().getAddress()));
             assertEquals(port, publishAddress.address().getPort());
