@@ -179,4 +179,12 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         };
         assertNull(circuitBreakerExtension.getCircuitBreaker(null));
     }
+    
+    @Test
+    public void testRepositoryExtension() {
+        RepositoryExtension repositoryExtension = new RepositoryExtension() {
+        };
+        assertTrue(repositoryExtension.getRepositories(null, null, null, null).isEmpty());
+        assertTrue(repositoryExtension.getInternalRepositories(null, null, null, null).isEmpty());
+    }
 }
