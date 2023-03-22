@@ -46,7 +46,7 @@ public interface RepositoryExtension {
     }
 
     /**
-     * Returns internal repository types added by this plugin. Internal repositories cannot be registered
+     * Returns internal repository types added by this extension. Internal repositories cannot be registered
      * through the external API.
      *
      * @param env The environment for the local node, which may be used for the local settings and path.repo
