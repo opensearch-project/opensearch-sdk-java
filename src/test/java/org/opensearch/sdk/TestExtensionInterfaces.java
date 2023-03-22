@@ -159,4 +159,12 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         Processor.Parameters parameters = new Processor.Parameters(null, null, null, null, null, null, null, null, null);
         assertTrue(ingestExtension.getProcessors(parameters).isEmpty());
     }
+
+    @Test
+    public void testRepositoryExtension() {
+        RepositoryExtension repositoryExtension = new RepositoryExtension() {
+        };
+        assertTrue(repositoryExtension.getRepositories(null, null, null, null).isEmpty());
+        assertTrue(repositoryExtension.getInternalRepositories(null, null, null, null).isEmpty());
+    }
 }
