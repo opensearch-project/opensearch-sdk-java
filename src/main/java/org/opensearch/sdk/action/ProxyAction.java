@@ -11,11 +11,12 @@ package org.opensearch.sdk.action;
 
 import org.opensearch.action.ActionType;
 import org.opensearch.extensions.action.ExtensionActionResponse;
+import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 
 /**
  * The {@link ActionType} used as they key for the {@link ProxyTransportAction}.
  */
-public class ProxyAction extends ActionType<ExtensionActionResponse> {
+public class ProxyAction extends ActionType<RemoteExtensionActionResponse> {
 
     /**
      * The name to look up this action with
@@ -27,6 +28,6 @@ public class ProxyAction extends ActionType<ExtensionActionResponse> {
     public static final ProxyAction INSTANCE = new ProxyAction();
 
     private ProxyAction() {
-        super(NAME, ExtensionActionResponse::new);
+        super(NAME, RemoteExtensionActionResponse::new);
     }
 }

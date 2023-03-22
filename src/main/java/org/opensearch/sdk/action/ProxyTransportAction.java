@@ -13,6 +13,7 @@ import org.opensearch.action.ActionListener;
 import org.opensearch.action.support.ActionFilters;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.extensions.action.ExtensionActionResponse;
+import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 import org.opensearch.sdk.SDKTransportService;
 import org.opensearch.tasks.Task;
 import org.opensearch.tasks.TaskManager;
@@ -22,7 +23,7 @@ import com.google.inject.Inject;
 /**
  * Sends a request to OpenSearch for a remote extension to execute an action.
  */
-public class ProxyTransportAction extends TransportAction<ProxyActionRequest, ExtensionActionResponse> {
+public class ProxyTransportAction extends TransportAction<ProxyActionRequest, RemoteExtensionActionResponse> {
 
     private SDKTransportService sdkTransportService;
 
@@ -46,12 +47,12 @@ public class ProxyTransportAction extends TransportAction<ProxyActionRequest, Ex
     }
 
     @Override
-    protected void doExecute(Task task, ProxyActionRequest request, ActionListener<ExtensionActionResponse> listener) {
+    protected void doExecute(Task task, ProxyActionRequest request, ActionListener<RemoteExtensionActionResponse> listener) {
         byte[] responseBytes = sdkTransportService.sendProxyActionRequest(request);
         if (responseBytes == null) {
             listener.onFailure(new RuntimeException("No response received from remote extension."));
         } else {
-            listener.onResponse(new ExtensionActionResponse(true, responseBytes));
+            listener.onResponse(new RemoteExtensionActionResponse(true, responseBytes));
         }
     }
 }

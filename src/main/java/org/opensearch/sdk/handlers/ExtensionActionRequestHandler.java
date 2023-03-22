@@ -29,6 +29,7 @@ import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.ExtensionActionRequest;
 import org.opensearch.extensions.action.ExtensionActionResponse;
+import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 import org.opensearch.sdk.SDKClient;
 import org.opensearch.sdk.SDKTransportService;
 import org.opensearch.sdk.action.SDKActionModule;
@@ -59,9 +60,9 @@ public class ExtensionActionRequestHandler {
      * @param request The request to execute
      * @return The response from the TransportAction
      */
-    public ExtensionActionResponse handleExtensionActionRequest(ExtensionActionRequest request) {
+    public RemoteExtensionActionResponse handleExtensionActionRequest(ExtensionActionRequest request) {
         logger.debug("Received request to execute action [" + request.getAction() + "]");
-        final ExtensionActionResponse response = new ExtensionActionResponse(false, new byte[0]);
+        final RemoteExtensionActionResponse response = new RemoteExtensionActionResponse(false, new byte[0]);
 
         // Find matching ActionType instance
         Optional<? extends ActionType<? extends ActionResponse>> optionalAction = sdkActionModule.getActions()
@@ -97,7 +98,7 @@ public class ExtensionActionRequestHandler {
         // Execute the action
         // TODO: We need async client.execute to hide these action listener details and return the future directly
         // https://github.com/opensearch-project/opensearch-sdk-java/issues/584
-        CompletableFuture<ExtensionActionResponse> futureResponse = new CompletableFuture<>();
+        CompletableFuture<RemoteExtensionActionResponse> futureResponse = new CompletableFuture<>();
         client.execute(action, actionRequest, ActionListener.wrap(r -> {
             byte[] bytes = new byte[0];
             try (BytesStreamOutput out = new BytesStreamOutput()) {
@@ -114,7 +115,7 @@ public class ExtensionActionRequestHandler {
 
         logger.debug("Waiting for response to action [" + request.getAction() + "]");
         try {
-            ExtensionActionResponse actionResponse = futureResponse.orTimeout(
+            RemoteExtensionActionResponse actionResponse = futureResponse.orTimeout(
                 ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT,
                 TimeUnit.SECONDS
             ).get();

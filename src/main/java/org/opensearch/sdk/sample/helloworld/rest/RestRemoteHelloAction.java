@@ -13,6 +13,7 @@ import org.opensearch.action.ActionListener;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.ExtensionActionResponse;
+import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.sdk.BaseExtensionRestHandler;
@@ -69,14 +70,14 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
 
         // TODO: We need async client.execute to hide these action listener details and return the future directly
         // https://github.com/opensearch-project/opensearch-sdk-java/issues/584
-        CompletableFuture<ExtensionActionResponse> futureResponse = new CompletableFuture<>();
+        CompletableFuture<RemoteExtensionActionResponse> futureResponse = new CompletableFuture<>();
         client.execute(
             ProxyAction.INSTANCE,
             proxyActionRequest,
             ActionListener.wrap(r -> futureResponse.complete(r), e -> futureResponse.completeExceptionally(e))
         );
         try {
-            ExtensionActionResponse response = futureResponse.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS)
+            RemoteExtensionActionResponse response = futureResponse.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS)
                 .get();
             if (!response.isSuccess()) {
                 return new ExtensionRestResponse(request, OK, "Remote extension reponse failed: " + response.getResponseBytesAsString());

@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.ExtensionActionResponse;
+import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 import org.opensearch.sdk.SDKTransportService;
 import org.opensearch.common.Nullable;
 import org.opensearch.common.io.stream.StreamInput;
@@ -27,10 +28,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * This class handles the response from OpenSearch to a {@link SDKTransportService#sendProxyActionRequest()} call.
  */
-public class ExtensionActionResponseHandler implements TransportResponseHandler<ExtensionActionResponse> {
+public class ExtensionActionResponseHandler implements TransportResponseHandler<RemoteExtensionActionResponse> {
 
     private static final Logger logger = LogManager.getLogger(ExtensionActionResponseHandler.class);
-    private final CompletableFuture<ExtensionActionResponse> inProgressFuture;
+    private final CompletableFuture<RemoteExtensionActionResponse> inProgressFuture;
     private byte[] responseBytes = null;
 
     /**
@@ -41,7 +42,7 @@ public class ExtensionActionResponseHandler implements TransportResponseHandler<
     }
 
     @Override
-    public void handleResponse(ExtensionActionResponse response) {
+    public void handleResponse(RemoteExtensionActionResponse response) {
         logger.info("Received response bytes: " + response.getResponseBytes().length + " bytes");
 
         logger.debug("Received response bytes: " + response.getResponseBytesAsString());
@@ -62,8 +63,8 @@ public class ExtensionActionResponseHandler implements TransportResponseHandler<
     }
 
     @Override
-    public ExtensionActionResponse read(StreamInput in) throws IOException {
-        return new ExtensionActionResponse(in);
+    public RemoteExtensionActionResponse read(StreamInput in) throws IOException {
+        return new RemoteExtensionActionResponse(in);
     }
 
     /**
