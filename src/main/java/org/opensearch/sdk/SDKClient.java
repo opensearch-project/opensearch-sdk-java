@@ -86,6 +86,16 @@ public class SDKClient implements Closeable {
     private RestClient restClient;
     private RestHighLevelClient sdkRestClient;
     private OpenSearchAsyncClient javaAsyncClient;
+    private final ExtensionSettings extensionSettings;
+
+    /**
+    * Instantiates this class with a copy of the extension settings.
+    *
+    * @param extensionSettings The Extension settings
+    */
+    public SDKClient(ExtensionSettings extensionSettings) {
+        this.extensionSettings = extensionSettings;
+    }
 
     // Used by client.execute, populated by initialize method
     @SuppressWarnings("rawtypes")
@@ -164,12 +174,11 @@ public class SDKClient implements Closeable {
     /**
      * Initializes an OpenSearchClient using OpenSearch JavaClient
      *
-     * @param settings The Extension settings
      * @return The SDKClient implementation of OpenSearchClient. The user is responsible for calling
      *         {@link #doCloseJavaClients()} when finished with the client
      */
-    public OpenSearchClient initializeJavaClient(ExtensionSettings settings) {
-        return initializeJavaClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
+    public OpenSearchClient initializeJavaClient() {
+        return initializeJavaClient(extensionSettings.getOpensearchAddress(), Integer.parseInt(extensionSettings.getOpensearchPort()));
     }
 
     /**
@@ -189,12 +198,11 @@ public class SDKClient implements Closeable {
     /**
      * Initializes an OpenAsyncSearchClient using OpenSearch JavaClient
      *
-     * @param settings The Extension settings
      * @return The SDKClient implementation of OpenSearchAsyncClient. The user is responsible for calling
      *         {@link #doCloseJavaClients()} when finished with the client as JavaClient and JavaAsyncClient uses the same close method
      */
-    public OpenSearchAsyncClient initializeJavaAsyncClient(ExtensionSettings settings) {
-        return initalizeJavaAsyncClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
+    public OpenSearchAsyncClient initializeJavaAsyncClient() {
+        return initalizeJavaAsyncClient(extensionSettings.getOpensearchAddress(), Integer.parseInt(extensionSettings.getOpensearchPort()));
     }
 
     /**
@@ -219,15 +227,14 @@ public class SDKClient implements Closeable {
      * <p>
      * Do not use this client for new development.
      *
-     * @param settings The Extension settings
      * @return The SDKClient implementation of RestHighLevelClient. The user is responsible for calling
      *         {@link #doCloseHighLevelClient()} when finished with the client
      * @deprecated Provided for compatibility with existing plugins to permit migration. Use
      *             {@link #initializeJavaClient} for new development.
      */
     @Deprecated
-    public SDKRestClient initializeRestClient(ExtensionSettings settings) {
-        return initializeRestClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
+    public SDKRestClient initializeRestClient() {
+        return initializeRestClient(extensionSettings.getOpensearchAddress(), Integer.parseInt(extensionSettings.getOpensearchPort()));
     }
 
     /**
