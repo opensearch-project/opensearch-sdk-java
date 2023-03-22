@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.index.mapper.Mapper;
 import org.opensearch.index.mapper.MetadataFieldMapper;
+import org.opensearch.ingest.Processor;
 import org.opensearch.test.OpenSearchTestCase;
 
 import java.util.Map;
@@ -152,10 +153,10 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
     }
 
     @Test
-    public void testRepositoryExtension() {
-        RepositoryExtension repositoryExtension = new RepositoryExtension() {
+    void testIngestExtension() {
+        IngestExtension ingestExtension = new IngestExtension() {
         };
-        assertTrue(repositoryExtension.getRepositories(null, null, null, null).isEmpty());
-        assertTrue(repositoryExtension.getInternalRepositories(null, null, null, null).isEmpty());
+        Processor.Parameters parameters = new Processor.Parameters(null, null, null, null, null, null, null, null, null);
+        assertTrue(ingestExtension.getProcessors(parameters).isEmpty());
     }
 }
