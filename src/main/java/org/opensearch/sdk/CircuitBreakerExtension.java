@@ -34,6 +34,7 @@ public interface CircuitBreakerExtension {
      *
      * The `limit` and `overhead` settings will be dynamically updated in the circuit breaker service iff a {@link BreakerSettings}
      * object with the same name is provided at node startup.
+     * @param settings The constructed {@link Settings} object
      */
     BreakerSettings getCircuitBreaker(Settings settings);
 
