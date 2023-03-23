@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.cluster.node.DiscoveryNode;
-import org.opensearch.common.Nullable;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RegisterTransportActionsRequest;
+import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 import org.opensearch.extensions.action.TransportActionRequestFromExtension;
 import org.opensearch.sdk.ActionExtension.ActionHandler;
 import org.opensearch.sdk.action.RemoteExtensionActionRequest;
@@ -75,9 +75,8 @@ public class SDKTransportService {
      * @param request The request to send
      * @return A buffer serializing the response from the remote action if successful, otherwise null
      */
-    @Nullable
-    public byte[] sendProxyActionRequest(RemoteExtensionActionRequest request) {
-        logger.info("Sending ProxyAction request to OpenSearch for [" + request.getAction() + "]");
+    public RemoteExtensionActionResponse sendRemoteExtensionActionRequest(RemoteExtensionActionRequest request) {
+        logger.info("Sending Remote Extension Action request to OpenSearch for [" + request.getAction() + "]");
         // Combine class name string and request bytes
         byte[] requestClassBytes = request.getRequestClass().getBytes(StandardCharsets.UTF_8);
         byte[] proxyRequestBytes = ByteBuffer.allocate(requestClassBytes.length + 1 + request.getRequestBytes().length)
@@ -96,12 +95,15 @@ public class SDKTransportService {
             // Wait on response
             extensionActionResponseHandler.awaitResponse();
         } catch (TimeoutException e) {
-            logger.info("Failed to receive ProxyAction response from OpenSearch", e);
+            logger.info("Failed to receive Remote Extension Action response from OpenSearch", e);
         } catch (Exception e) {
-            logger.info("Failed to send ProxyAction request to OpenSearch", e);
+            logger.info("Failed to send Remote Extension Action request to OpenSearch", e);
         }
         // At this point, response handler has read in the response bytes
-        return extensionActionResponseHandler.getResponseBytes();
+        return new RemoteExtensionActionResponse(
+            extensionActionResponseHandler.isSuccess(),
+            extensionActionResponseHandler.getResponseBytes()
+        );
     }
 
     public TransportService getTransportService() {

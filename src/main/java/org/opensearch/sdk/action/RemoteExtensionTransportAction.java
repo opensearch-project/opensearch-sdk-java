@@ -47,11 +47,11 @@ public class RemoteExtensionTransportAction extends TransportAction<RemoteExtens
 
     @Override
     protected void doExecute(Task task, RemoteExtensionActionRequest request, ActionListener<RemoteExtensionActionResponse> listener) {
-        byte[] responseBytes = sdkTransportService.sendProxyActionRequest(request);
-        if (responseBytes == null) {
-            listener.onFailure(new RuntimeException("No response received from remote extension."));
+        RemoteExtensionActionResponse response = sdkTransportService.sendRemoteExtensionActionRequest(request);
+        if (response.getResponseBytes().length > 0) {
+            listener.onResponse(response);
         } else {
-            listener.onResponse(new RemoteExtensionActionResponse(true, responseBytes));
+            listener.onFailure(new RuntimeException("No response received from remote extension."));
         }
     }
 }

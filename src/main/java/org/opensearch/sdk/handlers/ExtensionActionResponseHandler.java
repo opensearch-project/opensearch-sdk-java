@@ -14,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 import org.opensearch.sdk.SDKTransportService;
-import org.opensearch.common.Nullable;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportException;
@@ -31,7 +30,8 @@ public class ExtensionActionResponseHandler implements TransportResponseHandler<
 
     private static final Logger logger = LogManager.getLogger(ExtensionActionResponseHandler.class);
     private final CompletableFuture<RemoteExtensionActionResponse> inProgressFuture;
-    private byte[] responseBytes = null;
+    private boolean success = false;
+    private byte[] responseBytes = new byte[0];
 
     /**
     * Instantiates a new ExtensionActionResponseHandler
@@ -43,9 +43,8 @@ public class ExtensionActionResponseHandler implements TransportResponseHandler<
     @Override
     public void handleResponse(RemoteExtensionActionResponse response) {
         logger.info("Received response bytes: " + response.getResponseBytes().length + " bytes");
-
-        logger.debug("Received response bytes: " + response.getResponseBytesAsString());
         // Set ExtensionActionResponse from response
+        this.success = response.isSuccess();
         this.responseBytes = response.getResponseBytes();
         inProgressFuture.complete(response);
     }
@@ -75,7 +74,10 @@ public class ExtensionActionResponseHandler implements TransportResponseHandler<
         inProgressFuture.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS).get();
     }
 
-    @Nullable
+    public boolean isSuccess() {
+        return success;
+    }
+
     public byte[] getResponseBytes() {
         return this.responseBytes;
     }
