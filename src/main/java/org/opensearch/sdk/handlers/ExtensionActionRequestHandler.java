@@ -28,6 +28,7 @@ import org.opensearch.common.io.stream.BytesStreamOutput;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.ExtensionActionRequest;
+import org.opensearch.extensions.action.ExtensionActionResponse;
 import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 import org.opensearch.sdk.SDKClient;
 import org.opensearch.sdk.SDKTransportService;
@@ -54,12 +55,26 @@ public class ExtensionActionRequestHandler {
     }
 
     /**
-     * Handles a request from OpenSearch to execute a TransportAction on the extension.
+     * Handles a request from OpenSearch to execute a TransportAction on the extension. These requests originated from OpenSearch or a plugin.
      *
      * @param request The request to execute
      * @return The response from the TransportAction
      */
-    public RemoteExtensionActionResponse handleExtensionActionRequest(ExtensionActionRequest request) {
+    public ExtensionActionResponse handleExtensionActionRequest(ExtensionActionRequest request) {
+        // For now we just delegate to the remote actions.
+        // There is potential in the future for handling these requests differently
+        RemoteExtensionActionResponse response = handleRemoteExtensionActionRequest(request);
+        // Discard the success bit and just return the bytes
+        return new ExtensionActionResponse(response.getResponseBytes());
+    }
+
+    /**
+     * Handles a request from OpenSearch to execute a TransportAction on the extension. These requests originated from another extension.
+     *
+     * @param request The request to execute
+     * @return The response from the TransportAction
+     */
+    public RemoteExtensionActionResponse handleRemoteExtensionActionRequest(ExtensionActionRequest request) {
         logger.debug("Received request to execute action [" + request.getAction() + "]");
         final RemoteExtensionActionResponse response = new RemoteExtensionActionResponse(false, new byte[0]);
 

@@ -41,7 +41,6 @@ import static org.mockito.Mockito.verify;
 public class TestSDKTransportService extends OpenSearchTestCase {
 
     private static final String TEST_UNIQUE_ID = "test-extension";
-    private static final String TEST_ACTION_NAME = "testAction";
 
     private TransportService transportService;
     private DiscoveryNode opensearchNode;
@@ -92,6 +91,14 @@ public class TestSDKTransportService extends OpenSearchTestCase {
             any(AcknowledgedResponseHandler.class)
         );
         assertEquals(TEST_UNIQUE_ID, registerTransportActionsRequestCaptor.getValue().getUniqueId());
-        assertTrue(registerTransportActionsRequestCaptor.getValue().getTransportActions().contains(RemoteExtensionAction.class.getName()));
+        // Should contain the TestAction, but since it's mocked the name may change
+        assertTrue(
+            registerTransportActionsRequestCaptor.getValue()
+                .getTransportActions()
+                .stream()
+                .anyMatch(s -> s.startsWith("org.opensearch.action.ActionType$MockitoMock$"))
+        );
+        // Internal action should be filtered out
+        assertFalse(registerTransportActionsRequestCaptor.getValue().getTransportActions().contains(RemoteExtensionAction.class.getName()));
     }
 }
