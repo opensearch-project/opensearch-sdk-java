@@ -129,7 +129,7 @@ public class ExtensionsRunner {
      */
     private final Injector injector;
 
-    private final SDKNamedXContentRegistry sdkNamedXContentRegistry;
+    private SDKNamedXContentRegistry sdkNamedXContentRegistry;
     private final SDKClient sdkClient;
     private final SDKClusterService sdkClusterService;
     private final SDKActionModule sdkActionModule;
@@ -138,7 +138,10 @@ public class ExtensionsRunner {
     private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
-    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
+    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(
+        extensionRestPathRegistry,
+        sdkNamedXContentRegistry
+    );
 
     /**
      * Instantiates a new update settings request handler

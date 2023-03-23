@@ -12,12 +12,20 @@ package org.opensearch.sdk.handlers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.bytes.BytesReference;
+import org.opensearch.common.xcontent.XContentType;
+import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
-import org.opensearch.sdk.ExtensionRestHandler;
-import org.opensearch.sdk.ExtensionsRunner;
+import org.opensearch.rest.RestRequest;
 import org.opensearch.sdk.ExtensionRestPathRegistry;
+import org.opensearch.sdk.ExtensionsRunner;
+import org.opensearch.sdk.ExtensionRestHandler;
+import org.opensearch.sdk.SDKNamedXContentRegistry;
+import org.opensearch.sdk.SDKHttpRequest;
+
+import java.util.List;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
@@ -32,13 +40,15 @@ import static org.opensearch.rest.RestStatus.NOT_FOUND;
 public class ExtensionsRestRequestHandler {
     private static final Logger logger = LogManager.getLogger(ExtensionsRestRequestHandler.class);
     private final ExtensionRestPathRegistry extensionRestPathRegistry;
+    private NamedXContentRegistry namedXContentRegistry;
 
     /**
      * Instantiate this class with an existing registry
      *
      * @param restPathRegistry The ExtensionsRunnerer's REST path registry
      */
-    public ExtensionsRestRequestHandler(ExtensionRestPathRegistry restPathRegistry) {
+    public ExtensionsRestRequestHandler(ExtensionRestPathRegistry restPathRegistry, SDKNamedXContentRegistry sdkNamedXContentRegistry) {
+        this.namedXContentRegistry = sdkNamedXContentRegistry.getRegistry();
         this.extensionRestPathRegistry = restPathRegistry;
     }
 
@@ -49,6 +59,15 @@ public class ExtensionsRestRequestHandler {
      * @return A response acknowledging the request.
      */
     public RestExecuteOnExtensionResponse handleRestExecuteOnExtensionRequest(ExtensionRestRequest request) {
+
+        RestRequest.Method method = request.method();
+        String path = request.path();
+        Map<String, String> params = request.params();
+        Map<String, List<String>> headers = request.headers();
+        XContentType contentType = request.getXContentType();
+        BytesReference content = request.content();
+        SDKHttpRequest sdkHttpRequest = new SDKHttpRequest(request);
+        RestRequest restRequest = new RestRequest(namedXContentRegistry, params, path, headers, sdkHttpRequest, null);
 
         ExtensionRestHandler restHandler = extensionRestPathRegistry.getHandler(request.method(), request.path());
         if (restHandler == null) {

@@ -43,7 +43,7 @@ public class SDKNamedXContentRegistry {
     /**
      * Creates an empty registry.
      */
-    private SDKNamedXContentRegistry() {
+    SDKNamedXContentRegistry() {
         this.namedXContentRegistry = NamedXContentRegistry.EMPTY;
     }
 
