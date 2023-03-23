@@ -24,7 +24,7 @@ import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RegisterTransportActionsRequest;
 import org.opensearch.extensions.action.TransportActionRequestFromExtension;
 import org.opensearch.sdk.ActionExtension.ActionHandler;
-import org.opensearch.sdk.action.ProxyActionRequest;
+import org.opensearch.sdk.action.RemoteExtensionActionRequest;
 import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionActionResponseHandler;
@@ -51,7 +51,11 @@ public class SDKTransportService {
      */
     public void sendRegisterTransportActionsRequest(Map<String, ActionHandler<?, ?>> actions) {
         logger.info("Sending Register Transport Actions request to OpenSearch");
-        Set<String> actionNameSet = actions.values().stream().map(h -> h.getAction().getClass().getName()).collect(Collectors.toSet());
+        Set<String> actionNameSet = actions.values()
+            .stream()
+            .filter(h -> !h.getAction().name().startsWith("internal"))
+            .map(h -> h.getAction().getClass().getName())
+            .collect(Collectors.toSet());
         AcknowledgedResponseHandler registerTransportActionsResponseHandler = new AcknowledgedResponseHandler();
         try {
             transportService.sendRequest(
@@ -72,7 +76,7 @@ public class SDKTransportService {
      * @return A buffer serializing the response from the remote action if successful, otherwise null
      */
     @Nullable
-    public byte[] sendProxyActionRequest(ProxyActionRequest request) {
+    public byte[] sendProxyActionRequest(RemoteExtensionActionRequest request) {
         logger.info("Sending ProxyAction request to OpenSearch for [" + request.getAction() + "]");
         // Combine class name string and request bytes
         byte[] requestClassBytes = request.getRequestClass().getBytes(StandardCharsets.UTF_8);

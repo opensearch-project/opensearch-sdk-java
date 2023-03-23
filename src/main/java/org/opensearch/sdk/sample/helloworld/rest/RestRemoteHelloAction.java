@@ -12,7 +12,6 @@ package org.opensearch.sdk.sample.helloworld.rest;
 import org.opensearch.action.ActionListener;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.extensions.ExtensionsManager;
-import org.opensearch.extensions.action.ExtensionActionResponse;
 import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
@@ -20,8 +19,8 @@ import org.opensearch.sdk.BaseExtensionRestHandler;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.RouteHandler;
 import org.opensearch.sdk.SDKClient;
-import org.opensearch.sdk.action.ProxyAction;
-import org.opensearch.sdk.action.ProxyActionRequest;
+import org.opensearch.sdk.action.RemoteExtensionAction;
+import org.opensearch.sdk.action.RemoteExtensionActionRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleResponse;
@@ -66,19 +65,21 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
         // Serialize this request in a proxy action request
         // This requires that the remote extension has a corresponding transport action registered
         // This Action class happens to be local for simplicity but is a class on the remote extension
-        ProxyActionRequest proxyActionRequest = new ProxyActionRequest(SampleAction.INSTANCE, sampleRequest);
+        RemoteExtensionActionRequest proxyActionRequest = new RemoteExtensionActionRequest(SampleAction.INSTANCE, sampleRequest);
 
         // TODO: We need async client.execute to hide these action listener details and return the future directly
         // https://github.com/opensearch-project/opensearch-sdk-java/issues/584
         CompletableFuture<RemoteExtensionActionResponse> futureResponse = new CompletableFuture<>();
         client.execute(
-            ProxyAction.INSTANCE,
+            RemoteExtensionAction.INSTANCE,
             proxyActionRequest,
             ActionListener.wrap(r -> futureResponse.complete(r), e -> futureResponse.completeExceptionally(e))
         );
         try {
-            RemoteExtensionActionResponse response = futureResponse.orTimeout(ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT, TimeUnit.SECONDS)
-                .get();
+            RemoteExtensionActionResponse response = futureResponse.orTimeout(
+                ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT,
+                TimeUnit.SECONDS
+            ).get();
             if (!response.isSuccess()) {
                 return new ExtensionRestResponse(request, OK, "Remote extension reponse failed: " + response.getResponseBytesAsString());
             }

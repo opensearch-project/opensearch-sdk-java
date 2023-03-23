@@ -401,8 +401,8 @@ public class ExtensionsRunner {
             false,
             UpdateSettingsRequest::new,
             ((request, channel, task) -> channel.sendResponse(updateSettingsRequestHandler.handleUpdateSettingsRequest(request)))
-        );       
-        
+        );
+
         // TODO: This handles a remote extension request sending a RemoteExtensionActionResponse
         // For actions sent from OpenSearch or a plugin using ProxyAction need to write a new request handler
         // for ExtensionsManager.REQUEST_EXTENSION_HANDLE_TRANSPORT_ACTION that sends an ExtensionActionResponse

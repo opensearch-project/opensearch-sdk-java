@@ -56,7 +56,7 @@ public class TestSDKActionModule extends OpenSearchTestCase {
     @Test
     public void testGetActions() {
         assertEquals(2, sdkActionModule.getActions().size());
-        assertTrue(sdkActionModule.getActions().containsKey(ProxyAction.NAME));
+        assertTrue(sdkActionModule.getActions().containsKey(RemoteExtensionAction.NAME));
         assertTrue(sdkActionModule.getActions().containsKey(TEST_ACTION_NAME));
     }
 }

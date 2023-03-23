@@ -25,7 +25,7 @@ import org.opensearch.extensions.action.ExtensionTransportActionsHandler;
 /**
  * A request class to request an action be executed on another extension
  */
-public class ProxyActionRequest extends ActionRequest {
+public class RemoteExtensionActionRequest extends ActionRequest {
     /**
      * action is the TransportAction intended to be invoked which is registered by an extension via {@link ExtensionTransportActionsHandler}.
      */
@@ -45,7 +45,7 @@ public class ProxyActionRequest extends ActionRequest {
      * @param instance An instance of {@link ActionType} registered with the remote extension's getActions registry
      * @param request A class extending {@link ActionRequest} associated with an action to be executed on another extension.
      */
-    public ProxyActionRequest(ActionType<? extends ActionResponse> instance, ActionRequest request) {
+    public RemoteExtensionActionRequest(ActionType<? extends ActionResponse> instance, ActionRequest request) {
         this.action = instance.getClass().getName();
         this.requestClass = request.getClass().getName();
         byte[] bytes = new byte[0];
@@ -66,7 +66,7 @@ public class ProxyActionRequest extends ActionRequest {
      * @param requestClass A string representing the fully qualified class name of the remote ActionRequest class
      * @param requestBytes Bytes representing the serialized parameters to be used in the ActionRequest class StreamInput constructor
      */
-    public ProxyActionRequest(String action, String requestClass, byte[] requestBytes) {
+    public RemoteExtensionActionRequest(String action, String requestClass, byte[] requestBytes) {
         this.action = action;
         this.requestClass = requestClass;
         this.requestBytes = requestBytes;
@@ -78,7 +78,7 @@ public class ProxyActionRequest extends ActionRequest {
      * @param in bytes stream input used to de-serialize the message.
      * @throws IOException when message de-serialization fails.
      */
-    public ProxyActionRequest(StreamInput in) throws IOException {
+    public RemoteExtensionActionRequest(StreamInput in) throws IOException {
         super(in);
         this.action = in.readString();
         this.requestClass = in.readString();
@@ -119,7 +119,7 @@ public class ProxyActionRequest extends ActionRequest {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        ProxyActionRequest that = (ProxyActionRequest) obj;
+        RemoteExtensionActionRequest that = (RemoteExtensionActionRequest) obj;
         return Objects.equals(action, that.action)
             && Objects.equals(requestClass, that.requestClass)
             && Objects.equals(requestBytes, that.requestBytes);

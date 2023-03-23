@@ -18,7 +18,7 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RegisterTransportActionsRequest;
-import org.opensearch.sdk.action.ProxyAction;
+import org.opensearch.sdk.action.RemoteExtensionAction;
 import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.sdk.action.TestSDKActionModule;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
@@ -92,6 +92,6 @@ public class TestSDKTransportService extends OpenSearchTestCase {
             any(AcknowledgedResponseHandler.class)
         );
         assertEquals(TEST_UNIQUE_ID, registerTransportActionsRequestCaptor.getValue().getUniqueId());
-        assertTrue(registerTransportActionsRequestCaptor.getValue().getTransportActions().contains(ProxyAction.class.getName()));
+        assertTrue(registerTransportActionsRequestCaptor.getValue().getTransportActions().contains(RemoteExtensionAction.class.getName()));
     }
 }

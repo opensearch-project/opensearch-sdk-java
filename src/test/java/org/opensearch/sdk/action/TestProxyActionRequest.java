@@ -37,18 +37,18 @@ public class TestProxyActionRequest extends OpenSearchTestCase {
             expectedRequestBytes = BytesReference.toBytes(out.bytes());
         }
 
-        ProxyActionRequest request = new ProxyActionRequest(TestAction.INSTANCE, testRequest);
+        RemoteExtensionActionRequest request = new RemoteExtensionActionRequest(TestAction.INSTANCE, testRequest);
         assertEquals(expectedAction, request.getAction());
         assertEquals(expectedRequestClass, request.getRequestClass());
         assertArrayEquals(expectedRequestBytes, request.getRequestBytes());
 
-        request = new ProxyActionRequest(expectedAction, expectedRequestClass, expectedRequestBytes);
+        request = new RemoteExtensionActionRequest(expectedAction, expectedRequestClass, expectedRequestBytes);
 
         try (BytesStreamOutput out = new BytesStreamOutput()) {
             request.writeTo(out);
             out.flush();
             try (BytesStreamInput in = new BytesStreamInput(BytesReference.toBytes(out.bytes()))) {
-                request = new ProxyActionRequest(in);
+                request = new RemoteExtensionActionRequest(in);
 
                 assertEquals(expectedAction, request.getAction());
                 assertEquals(expectedRequestClass, request.getRequestClass());

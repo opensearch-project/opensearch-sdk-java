@@ -10,24 +10,23 @@
 package org.opensearch.sdk.action;
 
 import org.opensearch.action.ActionType;
-import org.opensearch.extensions.action.ExtensionActionResponse;
 import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 
 /**
- * The {@link ActionType} used as they key for the {@link ProxyTransportAction}.
+ * The {@link ActionType} used as they key for the {@link RemoteExtensionTransportAction}.
  */
-public class ProxyAction extends ActionType<RemoteExtensionActionResponse> {
+public class RemoteExtensionAction extends ActionType<RemoteExtensionActionResponse> {
 
     /**
      * The name to look up this action with
      */
-    public static final String NAME = "internal/proxyaction";
+    public static final String NAME = "internal/extension-proxyaction";
     /**
      * The singleton instance of this class
      */
-    public static final ProxyAction INSTANCE = new ProxyAction();
+    public static final RemoteExtensionAction INSTANCE = new RemoteExtensionAction();
 
-    private ProxyAction() {
+    private RemoteExtensionAction() {
         super(NAME, RemoteExtensionActionResponse::new);
     }
 }

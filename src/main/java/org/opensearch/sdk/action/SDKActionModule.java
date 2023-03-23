@@ -73,7 +73,7 @@ public class SDKActionModule extends AbstractModule {
         ActionRegistry actions = new ActionRegistry();
 
         // Register SDK actions
-        actions.register(new ActionHandler<>(ProxyAction.INSTANCE, ProxyTransportAction.class));
+        actions.register(new ActionHandler<>(RemoteExtensionAction.INSTANCE, RemoteExtensionTransportAction.class));
 
         // Register actions from getActions extension point
         if (extension instanceof ActionExtension) {
