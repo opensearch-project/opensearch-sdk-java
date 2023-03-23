@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -32,7 +31,7 @@ import org.opensearch.extensions.action.ExtensionActionResponse;
 import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 import org.opensearch.sdk.SDKClient;
 import org.opensearch.sdk.SDKTransportService;
-import org.opensearch.sdk.action.SDKActionModule;
+import org.opensearch.sdk.action.RemoteExtensionActionRequest;
 
 /**
  * This class handles a request from OpenSearch from another extension's {@link SDKTransportService#sendProxyActionRequest()} call.
@@ -40,18 +39,15 @@ import org.opensearch.sdk.action.SDKActionModule;
 public class ExtensionActionRequestHandler {
     private static final Logger logger = LogManager.getLogger(ExtensionActionRequestHandler.class);
 
-    final SDKActionModule sdkActionModule;
-    final SDKClient client;
+    private final SDKClient sdkClient;
 
     /**
      * Instantiate this handler
      *
      * @param sdkClient An initialized SDKClient with the registered actions
-     * @param sdkActionModule An initialized SDKActionModule with the registered actions
      */
-    public ExtensionActionRequestHandler(SDKClient sdkClient, SDKActionModule sdkActionModule) {
-        this.sdkActionModule = sdkActionModule;
-        this.client = sdkClient;
+    public ExtensionActionRequestHandler(SDKClient sdkClient) {
+        this.sdkClient = sdkClient;
     }
 
     /**
@@ -79,23 +75,17 @@ public class ExtensionActionRequestHandler {
         final RemoteExtensionActionResponse response = new RemoteExtensionActionResponse(false, new byte[0]);
 
         // Find matching ActionType instance
-        Optional<? extends ActionType<? extends ActionResponse>> optionalAction = sdkActionModule.getActions()
-            .values()
-            .stream()
-            .map(h -> h.getAction())
-            .filter(a -> a.getClass().getName().equals(request.getAction()))
-            .findAny();
-        if (optionalAction.isEmpty()) {
+        ActionType<? extends ActionResponse> action = sdkClient.getActionFromClassName(request.getAction());
+        if (action == null) {
             response.setResponseBytesAsString("No action [" + request.getAction() + "] is registered.");
             return response;
         }
-
-        ActionType<? extends ActionResponse> action = optionalAction.get();
         logger.debug("Found matching action [" + action.name() + "], an instance of [" + action.getClass().getName() + "]");
 
         // Extract request class name from bytes and instantiate request
-        int nullPos = indexOf(request.getRequestBytes(), (byte) 0);
-        String requestClassName = new String(Arrays.copyOfRange(request.getRequestBytes(), 0, nullPos), StandardCharsets.UTF_8);
+        int nullPos = indexOf(request.getRequestBytes(), RemoteExtensionActionRequest.UNIT_SEPARATOR);
+        String requestClassName = new String(Arrays.copyOfRange(request.getRequestBytes(), 0, nullPos + 1), StandardCharsets.UTF_8)
+            .stripTrailing();
         ActionRequest actionRequest = null;
         try {
             Class<?> clazz = Class.forName(requestClassName);
@@ -113,14 +103,13 @@ public class ExtensionActionRequestHandler {
         // TODO: We need async client.execute to hide these action listener details and return the future directly
         // https://github.com/opensearch-project/opensearch-sdk-java/issues/584
         CompletableFuture<RemoteExtensionActionResponse> futureResponse = new CompletableFuture<>();
-        client.execute(action, actionRequest, ActionListener.wrap(r -> {
+        sdkClient.execute(action, actionRequest, ActionListener.wrap(r -> {
             byte[] bytes = new byte[0];
             try (BytesStreamOutput out = new BytesStreamOutput()) {
                 ((ActionResponse) r).writeTo(out);
                 bytes = BytesReference.toBytes(out.bytes());
             } catch (IOException e) {
-                // This Should Never Happen (TM)
-                // Won't get an IOException locally
+                throw new IllegalStateException("Writing an OutputStream to memory should never result in an IOException.");
             }
             response.setSuccess(true);
             response.setResponseBytes(bytes);

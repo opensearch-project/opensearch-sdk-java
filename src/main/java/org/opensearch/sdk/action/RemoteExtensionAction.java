@@ -20,7 +20,7 @@ public class RemoteExtensionAction extends ActionType<RemoteExtensionActionRespo
     /**
      * The name to look up this action with
      */
-    public static final String NAME = "internal/extension-proxyaction";
+    public static final String NAME = "internal:remote-extension-action";
     /**
      * The singleton instance of this class
      */

@@ -27,6 +27,10 @@ import org.opensearch.extensions.action.ExtensionTransportActionsHandler;
  */
 public class RemoteExtensionActionRequest extends ActionRequest {
     /**
+     * The Unicode UNIT SEPARATOR used to separate the Request class name and parameter bytes
+     */
+    public static final byte UNIT_SEPARATOR = (byte) '\u001F';
+    /**
      * action is the TransportAction intended to be invoked which is registered by an extension via {@link ExtensionTransportActionsHandler}.
      */
     private final String action;
@@ -36,11 +40,13 @@ public class RemoteExtensionActionRequest extends ActionRequest {
     private final String requestClass;
     /**
      * requestBytes is the raw bytes being transported between extensions.
+     * <p>
+     * This array is the serialized bytes used to instantiate the {@link #requestClass} instance using its StreamInput constructor.
      */
     private final byte[] requestBytes;
 
     /**
-     * ProxyActionRequest constructor with an ActionType and Request class. Requires a dependency on the remote extension code.
+     * RemoteExtensionActionRequest constructor with an ActionType and Request class. Requires a dependency on the remote extension code.
      *
      * @param instance An instance of {@link ActionType} registered with the remote extension's getActions registry
      * @param request A class extending {@link ActionRequest} associated with an action to be executed on another extension.
@@ -53,14 +59,13 @@ public class RemoteExtensionActionRequest extends ActionRequest {
             request.writeTo(out);
             bytes = BytesReference.toBytes(out.bytes());
         } catch (IOException e) {
-            // This Should Never Happen (TM)
-            // Won't get an IOException locally
+            throw new IllegalStateException("Writing an OutputStream to memory should never result in an IOException.");
         }
         this.requestBytes = bytes;
     }
 
     /**
-     * ProxyActionRequest constructor with class names and request bytes. Does not require a dependency on the remote extension code.
+     * RemoteExtensionActionRequest constructor with class names and request bytes. Does not require a dependency on the remote extension code.
      *
      * @param action A string representing the fully qualified class name of the remote ActionType instance
      * @param requestClass A string representing the fully qualified class name of the remote ActionRequest class
@@ -73,7 +78,7 @@ public class RemoteExtensionActionRequest extends ActionRequest {
     }
 
     /**
-     * ProxyActionRequest constructor from {@link StreamInput}.
+     * RemoteExtensionActionRequest constructor from {@link StreamInput}.
      *
      * @param in bytes stream input used to de-serialize the message.
      * @throws IOException when message de-serialization fails.
@@ -112,7 +117,7 @@ public class RemoteExtensionActionRequest extends ActionRequest {
 
     @Override
     public String toString() {
-        return "ProxyActionRequest{action=" + action + ", requestClass=" + requestClass + ", requestBytes=" + requestBytes + "}";
+        return "RemoteExtensionActionRequest{action=" + action + ", requestClass=" + requestClass + ", requestBytes=" + requestBytes + "}";
     }
 
     @Override

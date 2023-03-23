@@ -137,12 +137,12 @@ public class ExtensionsRunner {
     private final SDKTransportService sdkTransportService;
     private final SDKActionModule sdkActionModule;
 
-    private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
-    private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
-    private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
+    private final ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
+    private final ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
+    private final ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
-    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
-    private ExtensionActionRequestHandler extensionsActionRequestHandler;
+    private final ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
+    private final ExtensionActionRequestHandler extensionsActionRequestHandler;
 
     /**
      * Instantiates a new update settings request handler
@@ -212,7 +212,7 @@ public class ExtensionsRunner {
         // initialize SDKClient action map
         initializeSdkClient();
 
-        extensionsActionRequestHandler = new ExtensionActionRequestHandler(getSdkClient(), getSdkActionModule());
+        extensionsActionRequestHandler = new ExtensionActionRequestHandler(getSdkClient());
 
         if (extension instanceof ActionExtension) {
             // store REST handlers in the registry

@@ -58,7 +58,7 @@ public class SDKActionModule extends AbstractModule {
          */
         class ActionRegistry extends NamedRegistry<ActionHandler<?, ?>> {
             ActionRegistry() {
-                super("sdkaction");
+                super("action");
             }
 
             /**

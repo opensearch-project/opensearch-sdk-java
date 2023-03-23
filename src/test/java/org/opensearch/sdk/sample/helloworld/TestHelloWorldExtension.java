@@ -122,6 +122,12 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
     }
 
     @Test
+    public void testClientGetActionFromClassName() {
+        ActionType<SampleResponse> action = SampleAction.INSTANCE;
+        assertEquals(action, sdkClient.getActionFromClassName(action.getClass().getName()));
+    }
+
+    @Test
     public void testClientExecuteSampleActions() throws Exception {
         String expectedName = "world";
         String expectedGreeting = "Hello, " + expectedName;

@@ -51,7 +51,7 @@ public class ExtensionActionResponseHandler implements TransportResponseHandler<
 
     @Override
     public void handleException(TransportException exp) {
-        logger.info("ExtensionActionResponseRequest failed", exp);
+        logger.error("ExtensionActionResponseRequest failed", exp);
         inProgressFuture.completeExceptionally(exp);
     }
 

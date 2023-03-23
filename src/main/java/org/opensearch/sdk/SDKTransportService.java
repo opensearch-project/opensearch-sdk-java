@@ -65,7 +65,7 @@ public class SDKTransportService {
                 registerTransportActionsResponseHandler
             );
         } catch (Exception e) {
-            logger.info("Failed to send Register Transport Actions request to OpenSearch", e);
+            logger.error("Failed to send Register Transport Actions request to OpenSearch", e);
         }
     }
 
@@ -81,7 +81,7 @@ public class SDKTransportService {
         byte[] requestClassBytes = request.getRequestClass().getBytes(StandardCharsets.UTF_8);
         byte[] proxyRequestBytes = ByteBuffer.allocate(requestClassBytes.length + 1 + request.getRequestBytes().length)
             .put(requestClassBytes)
-            .put((byte) 0)
+            .put(RemoteExtensionActionRequest.UNIT_SEPARATOR)
             .put(request.getRequestBytes())
             .array();
         ExtensionActionResponseHandler extensionActionResponseHandler = new ExtensionActionResponseHandler();
@@ -95,9 +95,9 @@ public class SDKTransportService {
             // Wait on response
             extensionActionResponseHandler.awaitResponse();
         } catch (TimeoutException e) {
-            logger.info("Failed to receive Remote Extension Action response from OpenSearch", e);
+            logger.error("Failed to receive Remote Extension Action response from OpenSearch", e);
         } catch (Exception e) {
-            logger.info("Failed to send Remote Extension Action request to OpenSearch", e);
+            logger.error("Failed to send Remote Extension Action request to OpenSearch", e);
         }
         // At this point, response handler has read in the response bytes
         return new RemoteExtensionActionResponse(
