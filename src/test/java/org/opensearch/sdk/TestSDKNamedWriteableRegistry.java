@@ -11,9 +11,7 @@ package org.opensearch.sdk;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opensearch.common.io.stream.NamedWriteable;
-import org.opensearch.common.io.stream.NamedWriteableRegistry;
-import org.opensearch.common.io.stream.StreamOutput;
+import org.opensearch.common.io.stream.*;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.core.xcontent.*;
 import org.opensearch.test.OpenSearchTestCase;
@@ -25,12 +23,24 @@ import java.util.List;
 public class TestSDKNamedWriteableRegistry extends OpenSearchTestCase {
     private TestSDKNamedWriteableRegistry.ExampleRunnerForTest runner;
 
+    private static class DummyNamedWriteable implements NamedWriteable {
+        DummyNamedWriteable(StreamInput in) {}
+
+        @Override
+        public String getWriteableName() {
+            return "test";
+        }
+
+        @Override
+        public void writeTo(StreamOutput out) throws IOException {}
+    }
+
     private static class Example implements NamedWriteable {
         public static final String NAME = "Example";
         public static final NamedWriteableRegistry.Entry WRITEABLE_REGISTRY = new NamedWriteableRegistry.Entry(
-            TestSDKNamedWriteableRegistry.Example.class,
-            NAME,
-            null
+                NamedWriteable.class,
+                NAME,
+                DummyNamedWriteable::new
         );
 
         private final String name;
@@ -97,7 +107,7 @@ public class TestSDKNamedWriteableRegistry extends OpenSearchTestCase {
         runner.updateNamedWriteableRegistry();
         NamedWriteableRegistry registry = runner.sdkNamedWriteableRegistry.getRegistry();
 
-        TestSDKNamedWriteableRegistry.Example example = (Example) registry.getReader(Example.class, Example.NAME);
-        assertEquals(TestSDKNamedWriteableRegistry.Example.NAME, example.getWriteableName());
+        Writeable.Reader<? extends NamedWriteable> reader = registry.getReader(NamedWriteable.class, Example.NAME);
+        assertNotNull(reader.read(null));
     }
 }
