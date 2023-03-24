@@ -16,6 +16,7 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.discovery.InitializeExtensionRequest;
 import org.opensearch.discovery.InitializeExtensionResponse;
 import org.opensearch.sdk.ExtensionsRunner;
+import org.opensearch.sdk.SDKTransportService;
 import org.opensearch.transport.TransportService;
 
 import static org.opensearch.sdk.ExtensionsRunner.NODE_NAME_SETTING;
@@ -48,6 +49,10 @@ public class ExtensionsInitRequestHandler {
         logger.info("Registering Extension Request received from OpenSearch");
         extensionsRunner.opensearchNode = extensionInitRequest.getSourceNode();
         extensionsRunner.setUniqueId(extensionInitRequest.getExtension().getId());
+        // TODO: Remove above two lines in favor of the below when refactoring
+        SDKTransportService sdkTransportService = extensionsRunner.getSdkTransportService();
+        sdkTransportService.setOpensearchNode(extensionInitRequest.getSourceNode());
+        sdkTransportService.setUniqueId(extensionInitRequest.getExtension().getId());
         // Successfully initialized. Send the response.
         try {
             return new InitializeExtensionResponse(
@@ -58,16 +63,12 @@ public class ExtensionsInitRequestHandler {
             // After sending successful response to initialization, send the REST API and Settings
             extensionsRunner.setOpensearchNode(extensionsRunner.opensearchNode);
             extensionsRunner.setExtensionNode(extensionInitRequest.getExtension());
+            // TODO: replace with sdkTransportService.getTransportService()
             TransportService extensionTransportService = extensionsRunner.getExtensionTransportService();
             extensionTransportService.connectToNode(extensionsRunner.opensearchNode);
             extensionsRunner.sendRegisterRestActionsRequest(extensionTransportService);
             extensionsRunner.sendRegisterCustomSettingsRequest(extensionTransportService);
-            extensionsRunner.getSdkActionModule()
-                .sendRegisterTransportActionsRequest(
-                    extensionTransportService,
-                    extensionsRunner.opensearchNode,
-                    extensionsRunner.getUniqueId()
-                );
+            sdkTransportService.sendRegisterTransportActionsRequest(extensionsRunner.getSdkActionModule().getActions());
             // Get OpenSearch Settings and set values on ExtensionsRunner
             Settings settings = extensionsRunner.sendEnvironmentSettingsRequest(extensionTransportService);
             extensionsRunner.setEnvironmentSettings(settings);

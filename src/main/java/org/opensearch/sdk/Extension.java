@@ -26,6 +26,13 @@ import org.opensearch.common.settings.Settings;
 public interface Extension {
 
     /**
+     * Set the instance of {@link ExtensionsRunner} for this extension.
+     *
+     * @param runner The ExtensionsRunner instance.
+     */
+    public void setExtensionsRunner(ExtensionsRunner runner);
+
+    /**
      * Gets the {@link ExtensionSettings} of this extension.
      *
      * @return the extension settings.
