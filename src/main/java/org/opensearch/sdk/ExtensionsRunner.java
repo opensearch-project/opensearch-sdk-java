@@ -25,6 +25,7 @@ import org.opensearch.discovery.InitializeExtensionRequest;
 import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
 import org.opensearch.extensions.UpdateSettingsRequest;
+import org.opensearch.extensions.action.ExtensionActionRequest;
 import org.opensearch.extensions.ExtensionsManager.RequestType;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsManager;
@@ -33,6 +34,7 @@ import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
+import org.opensearch.sdk.handlers.ExtensionActionRequestHandler;
 import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionDependencyResponseHandler;
@@ -132,13 +134,15 @@ public class ExtensionsRunner {
     private final SDKNamedXContentRegistry sdkNamedXContentRegistry;
     private final SDKClient sdkClient;
     private final SDKClusterService sdkClusterService;
+    private final SDKTransportService sdkTransportService;
     private final SDKActionModule sdkActionModule;
 
-    private ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
-    private ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
-    private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
+    private final ExtensionsInitRequestHandler extensionsInitRequestHandler = new ExtensionsInitRequestHandler(this);
+    private final ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
+    private final ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
-    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
+    private final ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
+    private final ExtensionActionRequestHandler extensionsActionRequestHandler;
 
     /**
      * Instantiates a new update settings request handler
@@ -152,7 +156,10 @@ public class ExtensionsRunner {
      * @throws IOException if the runner failed to read settings or API.
      */
     protected ExtensionsRunner(Extension extension) throws IOException {
+        // Link these classes together
         this.extension = extension;
+        extension.setExtensionsRunner(this);
+
         // Initialize concrete classes needed by extensions
         // These must have getters from this class to be accessible via createComponents
         // If they require later initialization, create a concrete wrapper class and update the internals
@@ -175,6 +182,8 @@ public class ExtensionsRunner {
         this.sdkClient = new SDKClient(extensionSettings);
         // initialize SDKClusterService. Must happen after extension field assigned
         this.sdkClusterService = new SDKClusterService(this);
+        // initialize SDKTransportService. Must happen after extension field assigned
+        this.sdkTransportService = new SDKTransportService();
 
         // Create Guice modules for injection
         List<com.google.inject.Module> modules = new ArrayList<>();
@@ -189,6 +198,7 @@ public class ExtensionsRunner {
 
             b.bind(SDKClient.class).toInstance(getSdkClient());
             b.bind(SDKClusterService.class).toInstance(getSdkClusterService());
+            b.bind(SDKTransportService.class).toInstance(getSdkTransportService());
         });
         // Bind the return values from create components
         modules.add(this::injectComponents);
@@ -201,6 +211,8 @@ public class ExtensionsRunner {
         // Perform other initialization. These should have access to injected classes.
         // initialize SDKClient action map
         initializeSdkClient();
+
+        extensionsActionRequestHandler = new ExtensionActionRequestHandler(getSdkClient());
 
         if (extension instanceof ActionExtension) {
             // store REST handlers in the registry
@@ -391,6 +403,25 @@ public class ExtensionsRunner {
             ((request, channel, task) -> channel.sendResponse(updateSettingsRequestHandler.handleUpdateSettingsRequest(request)))
         );
 
+        // This handles a remote extension request from OpenSearch or a plugin, sending an ExtensionActionResponse
+        transportService.registerRequestHandler(
+            ExtensionsManager.REQUEST_EXTENSION_HANDLE_TRANSPORT_ACTION,
+            ThreadPool.Names.GENERIC,
+            false,
+            false,
+            ExtensionActionRequest::new,
+            ((request, channel, task) -> channel.sendResponse(extensionsActionRequestHandler.handleExtensionActionRequest(request)))
+        );
+
+        // This handles a remote extension request from another extension, sending a RemoteExtensionActionResponse
+        transportService.registerRequestHandler(
+            ExtensionsManager.REQUEST_EXTENSION_HANDLE_REMOTE_TRANSPORT_ACTION,
+            ThreadPool.Names.GENERIC,
+            false,
+            false,
+            ExtensionActionRequest::new,
+            ((request, channel, task) -> channel.sendResponse(extensionsActionRequestHandler.handleRemoteExtensionActionRequest(request)))
+        );
     }
 
     /**
@@ -638,6 +669,10 @@ public class ExtensionsRunner {
         return extensionTransportService;
     }
 
+    public SDKTransportService getSdkTransportService() {
+        return sdkTransportService;
+    }
+
     /**
      * Starts an ActionListener.
      *
@@ -660,6 +695,8 @@ public class ExtensionsRunner {
         // initialize the transport service
         NettyTransport nettyTransport = new NettyTransport(runner);
         runner.extensionTransportService = nettyTransport.initializeExtensionTransportService(runner.getSettings(), runner.getThreadPool());
+        // TODO: merge above line with below line when refactoring out extensionTransportService
+        runner.getSdkTransportService().setTransportService(runner.extensionTransportService);
         runner.startActionListener(0);
     }
 

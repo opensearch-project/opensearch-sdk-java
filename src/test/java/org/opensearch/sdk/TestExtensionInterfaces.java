@@ -24,7 +24,6 @@ import org.opensearch.indices.breaker.BreakerSettings;
 import org.opensearch.ingest.Processor;
 import org.opensearch.test.OpenSearchTestCase;
 
-import java.util.Map;
 import java.util.function.Predicate;
 
 public class TestExtensionInterfaces extends OpenSearchTestCase {
@@ -36,6 +35,9 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
             public ExtensionSettings getExtensionSettings() {
                 return null;
             }
+
+            @Override
+            public void setExtensionsRunner(ExtensionsRunner runner) {}
         };
 
         assertTrue(extension.getSettings().isEmpty());
