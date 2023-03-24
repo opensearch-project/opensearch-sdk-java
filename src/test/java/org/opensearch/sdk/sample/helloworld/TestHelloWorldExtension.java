@@ -52,6 +52,7 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
     private Injector injector;
     private SDKClient sdkClient;
     private SDKRestClient sdkRestClient;
+    private final ExtensionSettings extensionSettings = new ExtensionSettings("", "", "", "localhost", "9200");
 
     static class UnregisteredAction extends ActionType<SampleResponse> {
         public static final String NAME = "helloworld/unregistered";
@@ -72,12 +73,12 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         Settings settings = Settings.builder().put(ExtensionsRunner.NODE_NAME_SETTING, "test").build();
         ThreadPool threadPool = new ThreadPool(settings);
         TaskManager taskManager = new TaskManager(settings, threadPool, Collections.emptySet());
+        this.sdkClient = new SDKClient(extensionSettings);
         this.injector = Guice.createInjector(new SDKActionModule(extension), b -> {
             b.bind(ThreadPool.class).toInstance(threadPool);
             b.bind(TaskManager.class).toInstance(taskManager);
-            b.bind(SDKClient.class);
+            b.bind(SDKClient.class).toInstance(sdkClient);
         });
-        this.sdkClient = new SDKClient();
         initializeSdkClient();
         this.sdkRestClient = sdkClient.initializeRestClient("localhost", 9200);
     }
