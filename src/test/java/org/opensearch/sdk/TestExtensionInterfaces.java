@@ -20,11 +20,11 @@ import org.opensearch.common.breaker.CircuitBreaker;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.index.mapper.Mapper;
 import org.opensearch.index.mapper.MetadataFieldMapper;
+import org.opensearch.indices.analysis.AnalysisModule;
 import org.opensearch.indices.breaker.BreakerSettings;
 import org.opensearch.ingest.Processor;
 import org.opensearch.test.OpenSearchTestCase;
 
-import java.util.Map;
 import java.util.function.Predicate;
 
 public class TestExtensionInterfaces extends OpenSearchTestCase {
@@ -186,5 +186,24 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         };
         assertTrue(repositoryExtension.getRepositories(null, null, null, null).isEmpty());
         assertTrue(repositoryExtension.getInternalRepositories(null, null, null, null).isEmpty());
+    }
+
+    @Test
+    public void testAnalysisExtension() {
+        AnalysisExtension analysisExtension = new AnalysisExtension() {
+        };
+        AnalysisModule.AnalysisProvider<?> provider = (indexSettings, environment, name, settings) -> null;
+        AnalysisModule.AnalysisProvider<?> analysisProvider = AnalysisExtension.requiresAnalysisSettings(provider);
+
+        assertTrue(analysisExtension.getCharFilters().isEmpty());
+        assertTrue(analysisExtension.getTokenFilters().isEmpty());
+        assertTrue(analysisExtension.getTokenizers().isEmpty());
+        assertTrue(analysisExtension.getAnalyzers().isEmpty());
+        assertTrue(analysisExtension.getPreBuiltAnalyzerProviderFactories().isEmpty());
+        assertTrue(analysisExtension.getPreConfiguredCharFilters().isEmpty());
+        assertTrue(analysisExtension.getPreConfiguredTokenFilters().isEmpty());
+        assertTrue(analysisExtension.getPreConfiguredTokenizers().isEmpty());
+        assertTrue(analysisExtension.getHunspellDictionaries().isEmpty());
+        assertTrue(analysisProvider.requiresAnalysisSettings());
     }
 }
