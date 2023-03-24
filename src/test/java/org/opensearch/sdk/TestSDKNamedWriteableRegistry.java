@@ -84,15 +84,15 @@ public class TestSDKNamedWriteableRegistry extends OpenSearchTestCase {
     public void testDefaultNamedWriteableRegistry() throws IOException {
         NamedWriteableRegistry registry = runner.sdkNamedWriteableRegistry.getRegistry();
 
-        XContentParseException ex = assertThrows(
-            XContentParseException.class,
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
             () -> registry.getReader(TestSDKNamedWriteableRegistry.Example.class, TestSDKNamedWriteableRegistry.Example.NAME)
         );
         assertEquals("Unknown NamedWriteable category [" + TestSDKNamedWriteableRegistry.Example.class.getName() + "]", ex.getMessage());
     }
 
     @Test
-    public void testCustomNamedWriteableRegistryParse() throws IOException {
+    public void testCustomNamedWriteableRegistry() throws IOException {
         // Update the runner before testing
         runner.updateNamedWriteableRegistry();
         NamedWriteableRegistry registry = runner.sdkNamedWriteableRegistry.getRegistry();
