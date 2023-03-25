@@ -225,6 +225,21 @@ public class SDKClient implements Closeable {
     }
 
     /**
+     * accepts the Request object and adds the necessary headers to RequestOptions.
+     *
+     * @param request the request
+     */
+    public void addHeadersToRequest(Request request) {
+        RequestOptions requestOptions = request.getOptions()
+            .toBuilder()
+            .addHeader("HeaderName1", "HeaderValue1")
+            .addHeader("HeaderName2", "HeaderValue2")
+            .build();
+
+        request.setOptions(requestOptions);
+    }
+
+    /**
      * Initializes a SDK Rest Client wrapping the {@link RestHighLevelClient}.
      * <p>
      * The purpose of this client is to provide a drop-in replacement for the syntax of the {@link Client}
@@ -597,5 +612,7 @@ public class SDKClient implements Closeable {
         public Cancellable getAliases(GetAliasesRequest getAliasesRequest, ActionListener<GetAliasesResponse> listener) {
             return this.indicesClient.getAliasAsync(getAliasesRequest, RequestOptions.DEFAULT, listener);
         }
+
     }
+
 }
