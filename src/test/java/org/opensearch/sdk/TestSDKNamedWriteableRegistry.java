@@ -38,9 +38,9 @@ public class TestSDKNamedWriteableRegistry extends OpenSearchTestCase {
     private static class Example implements NamedWriteable {
         public static final String NAME = "Example";
         public static final NamedWriteableRegistry.Entry WRITEABLE_REGISTRY = new NamedWriteableRegistry.Entry(
-                NamedWriteable.class,
-                NAME,
-                DummyNamedWriteable::new
+            NamedWriteable.class,
+            NAME,
+            DummyNamedWriteable::new
         );
 
         private final String name;
@@ -95,7 +95,7 @@ public class TestSDKNamedWriteableRegistry extends OpenSearchTestCase {
         NamedWriteableRegistry registry = runner.sdkNamedWriteableRegistry.getRegistry();
 
         IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
+            IllegalArgumentException.class,
             () -> registry.getReader(TestSDKNamedWriteableRegistry.Example.class, TestSDKNamedWriteableRegistry.Example.NAME)
         );
         assertEquals("Unknown NamedWriteable category [" + TestSDKNamedWriteableRegistry.Example.class.getName() + "]", ex.getMessage());
