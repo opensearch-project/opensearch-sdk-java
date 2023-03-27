@@ -15,7 +15,7 @@ import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.node.DiscoveryNode;
-import org.opensearch.extensions.rest.ExtensionRestRequest;
+import org.opensearch.rest.extensions.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
 import org.opensearch.common.settings.Setting;
@@ -168,6 +168,10 @@ public class ExtensionsRunner {
             .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
             .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
+            .put("ssl.transport.pemcert_filepath", "esnode.pem")
+            .put("ssl.transport.pemkey_filepath", "esnode-key.pem")
+            .put("ssl.transport.pemtrustedcas_filepath", "root-ca.pem")
+            .put("path.home", "/Users/cwperx/Projects/opensearch/opensearch-sdk-java")
             .build();
         this.threadPool = new ThreadPool(settings);
         this.taskManager = new TaskManager(settings, threadPool, Collections.emptySet());
@@ -218,6 +222,7 @@ public class ExtensionsRunner {
             // store REST handlers in the registry
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
                 for (Route route : extensionRestHandler.routes()) {
+
                     extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
                 }
             }

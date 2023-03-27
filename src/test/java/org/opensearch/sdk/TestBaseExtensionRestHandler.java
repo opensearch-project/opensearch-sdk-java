@@ -16,10 +16,11 @@ import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 import org.opensearch.common.bytes.BytesArray;
-import org.opensearch.extensions.rest.ExtensionRestRequest;
-import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestStatus;
+import org.opensearch.rest.extensions.ExtensionRestRequest;
+import org.opensearch.rest.extensions.ExtensionRestResponse;
+import org.opensearch.rest.extensions.RouteHandler;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestBaseExtensionRestHandler extends OpenSearchTestCase {

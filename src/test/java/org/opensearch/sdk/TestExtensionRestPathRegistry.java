@@ -13,10 +13,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opensearch.extensions.rest.ExtensionRestRequest;
-import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest.Method;
+import org.opensearch.rest.extensions.ExtensionRestRequest;
+import org.opensearch.rest.extensions.ExtensionRestResponse;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
