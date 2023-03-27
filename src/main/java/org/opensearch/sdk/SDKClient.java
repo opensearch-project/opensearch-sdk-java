@@ -225,21 +225,6 @@ public class SDKClient implements Closeable {
     }
 
     /**
-     * accepts the Request object and adds the necessary headers to RequestOptions.
-     *
-     * @param request the request
-     */
-    public void addHeadersToRequest(Request request) {
-        RequestOptions requestOptions = request.getOptions()
-            .toBuilder()
-            .addHeader("HeaderName1", "HeaderValue1")
-            .addHeader("HeaderName2", "HeaderValue2")
-            .build();
-
-        request.setOptions(requestOptions);
-    }
-
-    /**
      * Initializes a SDK Rest Client wrapping the {@link RestHighLevelClient}.
      * <p>
      * The purpose of this client is to provide a drop-in replacement for the syntax of the {@link Client}
@@ -475,12 +460,12 @@ public class SDKClient implements Closeable {
          * @see Requests#searchRequest(String...)
          */
         public void search(SearchRequest request, ActionListener<SearchResponse> listener) {
-            restHighLevelClient.searchAsync(request, RequestOptions.DEFAULT, listener);
+            RequestOptions options = RequestOptions.DEFAULT.toBuilder().addHeader("Authorization", "Bearer TOKEN_HERE").build();
+            restHighLevelClient.searchAsync(request, options, listener);
         }
 
         /**
          * Sends a request to the OpenSearch cluster that the client points to.
-         *
          * @param request the request to perform
          * @return the response returned by OpenSearch
          * @throws IOException in case of a problem or the connection was aborted
