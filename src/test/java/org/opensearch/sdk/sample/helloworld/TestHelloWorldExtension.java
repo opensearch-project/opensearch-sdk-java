@@ -25,7 +25,6 @@ import org.opensearch.action.ActionResponse;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.common.settings.Settings;
-import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.sdk.ActionExtension.ActionHandler;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
@@ -46,12 +45,14 @@ import com.google.inject.Key;
 
 import static org.opensearch.sdk.sample.helloworld.ExampleCustomSettingConfig.VALIDATED_SETTING;
 
+@SuppressWarnings("deprecation")
 public class TestHelloWorldExtension extends OpenSearchTestCase {
 
     private HelloWorldExtension extension;
     private Injector injector;
     private SDKClient sdkClient;
     private SDKRestClient sdkRestClient;
+    private final ExtensionSettings extensionSettings = new ExtensionSettings("", "", "", "localhost", "9200");
 
     static class UnregisteredAction extends ActionType<SampleResponse> {
         public static final String NAME = "helloworld/unregistered";
@@ -72,12 +73,12 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         Settings settings = Settings.builder().put(ExtensionsRunner.NODE_NAME_SETTING, "test").build();
         ThreadPool threadPool = new ThreadPool(settings);
         TaskManager taskManager = new TaskManager(settings, threadPool, Collections.emptySet());
+        this.sdkClient = new SDKClient(extensionSettings);
         this.injector = Guice.createInjector(new SDKActionModule(extension), b -> {
             b.bind(ThreadPool.class).toInstance(threadPool);
             b.bind(TaskManager.class).toInstance(taskManager);
-            b.bind(SDKClient.class);
+            b.bind(SDKClient.class).toInstance(sdkClient);
         });
-        this.sdkClient = new SDKClient();
         initializeSdkClient();
         this.sdkRestClient = sdkClient.initializeRestClient("localhost", 9200);
     }
@@ -109,15 +110,21 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
     @Test
     public void testExtensionRestHandlers() {
         List<ExtensionRestHandler> extensionRestHandlers = extension.getExtensionRestHandlers();
-        assertEquals(1, extensionRestHandlers.size());
-        List<Route> routes = extensionRestHandlers.get(0).routes();
-        assertEquals(4, routes.size());
+        assertEquals(2, extensionRestHandlers.size());
+        assertEquals(4, extensionRestHandlers.get(0).routes().size());
+        assertEquals(1, extensionRestHandlers.get(1).routes().size());
     }
 
     @Test
     public void testGetActions() {
         List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> actions = extension.getActions();
         assertEquals(1, actions.size());
+    }
+
+    @Test
+    public void testClientGetActionFromClassName() {
+        ActionType<SampleResponse> action = SampleAction.INSTANCE;
+        assertEquals(action, sdkClient.getActionFromClassName(action.getClass().getName()));
     }
 
     @Test
@@ -143,7 +150,6 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         assertEquals(expectedGreeting, response.getGreeting());
     }
 
-    @SuppressWarnings("deprecation")
     @Test
     public void testRestClientExecuteSampleActions() throws Exception {
         String expectedName = "world";
@@ -191,7 +197,6 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         assertEquals("The request name is blank.", cause.getMessage());
     }
 
-    @SuppressWarnings("deprecation")
     @Test
     public void testExceptionalRestClientExecuteSampleActions() throws Exception {
         String expectedName = "";

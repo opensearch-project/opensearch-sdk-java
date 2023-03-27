@@ -16,12 +16,14 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.opensearch.common.breaker.CircuitBreaker;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.index.mapper.Mapper;
 import org.opensearch.index.mapper.MetadataFieldMapper;
+import org.opensearch.indices.breaker.BreakerSettings;
+import org.opensearch.ingest.Processor;
 import org.opensearch.test.OpenSearchTestCase;
 
-import java.util.Map;
 import java.util.function.Predicate;
 
 public class TestExtensionInterfaces extends OpenSearchTestCase {
@@ -33,6 +35,9 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
             public ExtensionSettings getExtensionSettings() {
                 return null;
             }
+
+            @Override
+            public void setExtensionsRunner(ExtensionsRunner runner) {}
         };
 
         assertTrue(extension.getSettings().isEmpty());
@@ -149,5 +154,39 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         SystemIndexExtension systemIndexExtension = new SystemIndexExtension() {
         };
         assertTrue(systemIndexExtension.getSystemIndexDescriptors(null).isEmpty());
+    }
+
+    @Test
+    void testIngestExtension() {
+        IngestExtension ingestExtension = new IngestExtension() {
+        };
+        Processor.Parameters parameters = new Processor.Parameters(null, null, null, null, null, null, null, null, null);
+        assertTrue(ingestExtension.getProcessors(parameters).isEmpty());
+    }
+
+    @Test
+    void testCircuitBreakerExtension() {
+        CircuitBreakerExtension circuitBreakerExtension = new CircuitBreakerExtension() {
+            private CircuitBreaker circuitBreaker;
+
+            @Override
+            public BreakerSettings getCircuitBreaker(Settings settings) {
+                return null;
+            }
+
+            @Override
+            public void setCircuitBreaker(CircuitBreaker circuitBreaker) {
+                this.circuitBreaker = circuitBreaker;
+            }
+        };
+        assertNull(circuitBreakerExtension.getCircuitBreaker(null));
+    }
+
+    @Test
+    public void testRepositoryExtension() {
+        RepositoryExtension repositoryExtension = new RepositoryExtension() {
+        };
+        assertTrue(repositoryExtension.getRepositories(null, null, null, null).isEmpty());
+        assertTrue(repositoryExtension.getInternalRepositories(null, null, null, null).isEmpty());
     }
 }

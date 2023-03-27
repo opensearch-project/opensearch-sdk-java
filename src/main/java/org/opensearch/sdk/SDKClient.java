@@ -13,6 +13,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -86,10 +87,23 @@ public class SDKClient implements Closeable {
     private RestClient restClient;
     private RestHighLevelClient sdkRestClient;
     private OpenSearchAsyncClient javaAsyncClient;
+    private final ExtensionSettings extensionSettings;
+
+    /**
+    * Instantiates this class with a copy of the extension settings.
+    *
+    * @param extensionSettings The Extension settings
+    */
+    public SDKClient(ExtensionSettings extensionSettings) {
+        this.extensionSettings = extensionSettings;
+    }
 
     // Used by client.execute, populated by initialize method
     @SuppressWarnings("rawtypes")
     private Map<ActionType, TransportAction> actions = Collections.emptyMap();
+    // Used by remote client execution where we get a string for the class name
+    @SuppressWarnings("rawtypes")
+    private Map<String, ActionType> actionClassToInstanceMap = Collections.emptyMap();
 
     /**
      * Initialize this client.
@@ -99,6 +113,7 @@ public class SDKClient implements Closeable {
     @SuppressWarnings("rawtypes")
     public void initialize(Map<ActionType, TransportAction> actions) {
         this.actions = actions;
+        this.actionClassToInstanceMap = actions.keySet().stream().collect(Collectors.toMap(a -> a.getClass().getName(), a -> a));
     }
 
     /**
@@ -164,12 +179,11 @@ public class SDKClient implements Closeable {
     /**
      * Initializes an OpenSearchClient using OpenSearch JavaClient
      *
-     * @param settings The Extension settings
      * @return The SDKClient implementation of OpenSearchClient. The user is responsible for calling
      *         {@link #doCloseJavaClients()} when finished with the client
      */
-    public OpenSearchClient initializeJavaClient(ExtensionSettings settings) {
-        return initializeJavaClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
+    public OpenSearchClient initializeJavaClient() {
+        return initializeJavaClient(extensionSettings.getOpensearchAddress(), Integer.parseInt(extensionSettings.getOpensearchPort()));
     }
 
     /**
@@ -189,12 +203,11 @@ public class SDKClient implements Closeable {
     /**
      * Initializes an OpenAsyncSearchClient using OpenSearch JavaClient
      *
-     * @param settings The Extension settings
      * @return The SDKClient implementation of OpenSearchAsyncClient. The user is responsible for calling
      *         {@link #doCloseJavaClients()} when finished with the client as JavaClient and JavaAsyncClient uses the same close method
      */
-    public OpenSearchAsyncClient initializeJavaAsyncClient(ExtensionSettings settings) {
-        return initalizeJavaAsyncClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
+    public OpenSearchAsyncClient initializeJavaAsyncClient() {
+        return initalizeJavaAsyncClient(extensionSettings.getOpensearchAddress(), Integer.parseInt(extensionSettings.getOpensearchPort()));
     }
 
     /**
@@ -219,15 +232,14 @@ public class SDKClient implements Closeable {
      * <p>
      * Do not use this client for new development.
      *
-     * @param settings The Extension settings
      * @return The SDKClient implementation of RestHighLevelClient. The user is responsible for calling
      *         {@link #doCloseHighLevelClient()} when finished with the client
      * @deprecated Provided for compatibility with existing plugins to permit migration. Use
      *             {@link #initializeJavaClient} for new development.
      */
     @Deprecated
-    public SDKRestClient initializeRestClient(ExtensionSettings settings) {
-        return initializeRestClient(settings.getOpensearchAddress(), Integer.parseInt(settings.getOpensearchPort()));
+    public SDKRestClient initializeRestClient() {
+        return initializeRestClient(extensionSettings.getOpensearchAddress(), Integer.parseInt(extensionSettings.getOpensearchPort()));
     }
 
     /**
@@ -276,6 +288,17 @@ public class SDKClient implements Closeable {
     public void close() throws IOException {
         doCloseJavaClients();
         doCloseHighLevelClient();
+    }
+
+    /**
+     * Gets an instance of {@link ActionType} from its corresponding class name, suitable for using as the first parameter in {@link #execute(ActionType, ActionRequest, ActionListener)}.
+     *
+     * @param className The class name of the action type
+     * @return The instance corresponding to the class name
+     */
+    @SuppressWarnings("unchecked")
+    public ActionType<? extends ActionResponse> getActionFromClassName(String className) {
+        return actionClassToInstanceMap.get(className);
     }
 
     /**
