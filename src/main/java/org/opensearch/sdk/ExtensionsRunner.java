@@ -15,6 +15,7 @@ import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.node.DiscoveryNode;
+import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
@@ -110,6 +111,11 @@ public class ExtensionsRunner {
      */
     private final List<NamedXContentRegistry.Entry> customNamedXContent;
     /**
+     * Custom namedWriteable from the extension's getNamedWriteable. This field is initialized in the constructor.
+     */
+    private final List<NamedWriteableRegistry.Entry> customNamedWriteables;
+
+    /**
      * Custom settings from the extension's getSettings. This field is initialized in the constructor.
      */
     private final List<Setting<?>> customSettings;
@@ -136,6 +142,7 @@ public class ExtensionsRunner {
     private final Injector injector;
 
     private final SDKNamedXContentRegistry sdkNamedXContentRegistry;
+    private final SDKNamedWriteableRegistry sdkNamedWriteableRegistry;
     private final SDKClient sdkClient;
     private final SDKClusterService sdkClusterService;
     private final SDKTransportService sdkTransportService;
@@ -184,8 +191,13 @@ public class ExtensionsRunner {
         this.customSettings = extension.getSettings();
         // save custom namedXContent
         this.customNamedXContent = extension.getNamedXContent();
+        // save custom namedWriteable
+        this.customNamedWriteables = extension.getNamedWriteables();
         // initialize NamedXContent Registry. Must happen after getting extension namedXContent
         this.sdkNamedXContentRegistry = new SDKNamedXContentRegistry(this);
+        // initialize NamedWriteable Registry. Must happen after getting extension namedWriteable
+        this.sdkNamedWriteableRegistry = new SDKNamedWriteableRegistry(this);
+
         // initialize SDKClient. Must happen after getting extensionSettings
         this.sdkClient = new SDKClient(extensionSettings);
         // initialize SDKClusterService. Must happen after extension field assigned
@@ -307,12 +319,28 @@ public class ExtensionsRunner {
     }
 
     /**
+     * Updates the NamedXContentRegistry. Called from {@link ExtensionsInitRequestHandler}.
+     */
+    public void updateNamedWriteableRegistry() {
+        this.sdkNamedWriteableRegistry.updateNamedWriteableRegistry(this);
+    }
+
+    /**
      * Gets the NamedXContentRegistry. Only valid if {@link #isInitialized()} returns true.
      *
      * @return the NamedXContentRegistry if initialized, an empty registry otherwise.
      */
     public SDKNamedXContentRegistry getNamedXContentRegistry() {
         return this.sdkNamedXContentRegistry;
+    }
+
+    /**
+     * Gets the SDKNamedWriteableRegistry. Only valid if {@link #isInitialized()} returns true.
+     *
+     * @return the NamedWriteableRegistry if initialized, an empty registry otherwise.
+     */
+    public SDKNamedWriteableRegistry getNamedWriteableRegistry() {
+        return this.sdkNamedWriteableRegistry;
     }
 
     /**
@@ -351,6 +379,10 @@ public class ExtensionsRunner {
 
     public List<NamedXContentRegistry.Entry> getCustomNamedXContent() {
         return this.customNamedXContent;
+    }
+
+    public List<NamedWriteableRegistry.Entry> getCustomNamedWriteables() {
+        return this.customNamedWriteables;
     }
 
     /**
