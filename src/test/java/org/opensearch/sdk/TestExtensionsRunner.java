@@ -49,7 +49,7 @@ import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.extensions.UpdateSettingsRequest;
-import org.opensearch.rest.extensions.ExtensionRestRequest;
+import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;

@@ -15,7 +15,7 @@ import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.node.DiscoveryNode;
-import org.opensearch.rest.extensions.ExtensionRestRequest;
+import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
 import org.opensearch.common.settings.Setting;
@@ -31,6 +31,7 @@ import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.extensions.rest.RouteHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
@@ -222,8 +223,11 @@ public class ExtensionsRunner {
             // store REST handlers in the registry
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
                 for (Route route : extensionRestHandler.routes()) {
-
-                    extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
+                    if (route instanceof RouteHandler && ((RouteHandler) route).name() != null) {
+                        extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), ((RouteHandler)route).name(), extensionRestHandler);
+                    } else {
+                        extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
+                    }
                 }
             }
         }

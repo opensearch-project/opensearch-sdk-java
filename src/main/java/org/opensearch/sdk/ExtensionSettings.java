@@ -30,6 +30,8 @@ public class ExtensionSettings {
     private String opensearchAddress;
     private String opensearchPort;
 
+    private String shortName;
+
     /**
      * Jackson requires a no-arg constructor.
      */
@@ -42,22 +44,27 @@ public class ExtensionSettings {
      * Instantiate this class using the specified parameters.
      *
      * @param extensionName  The extension name. Provided to OpenSearch as a response to initialization query. Must match the defined extension name in OpenSearch.
+     * @param shortName  The shortened name for the extension
      * @param hostAddress  The IP Address to bind this extension to.
      * @param hostPort  The port to bind this extension to.
      * @param opensearchAddress  The IP Address on which OpenSearch is running.
      * @param opensearchPort  The port on which OpenSearch is running.
      */
-    public ExtensionSettings(String extensionName, String hostAddress, String hostPort, String opensearchAddress, String opensearchPort) {
+    public ExtensionSettings(String extensionName, String shortName, String hostAddress, String hostPort, String opensearchAddress, String opensearchPort) {
         super();
         this.extensionName = extensionName;
         this.hostAddress = hostAddress;
         this.hostPort = hostPort;
         this.opensearchAddress = opensearchAddress;
         this.opensearchPort = opensearchPort;
+        this.shortName = shortName;
     }
 
     public String getExtensionName() {
         return extensionName;
+    }
+    public String getShortName() {
+        return shortName;
     }
 
     public String getHostAddress() {
@@ -80,6 +87,8 @@ public class ExtensionSettings {
     public String toString() {
         return "ExtensionSettings{extensionName="
             + extensionName
+            + ", shortName="
+            + shortName
             + ", hostAddress="
             + hostAddress
             + ", hostPort="
@@ -111,6 +120,7 @@ public class ExtensionSettings {
             }
             return new ExtensionSettings(
                 extensionMap.get("extensionName").toString(),
+                extensionMap.get("shortName").toString(),
                 extensionMap.get("hostAddress").toString(),
                 extensionMap.get("hostPort").toString(),
                 extensionMap.get("opensearchAddress").toString(),
