@@ -90,7 +90,7 @@ public class NettyTransport {
                 threadPool,
                 networkService,
                 pageCacheRecycler,
-                namedWriteableRegistry,
+                extensionsRunner.getNamedWriteableRegistry().getRegistry(),
                 circuitBreakerService,
                 sks,
                 new SharedGroupFactory(settings)
