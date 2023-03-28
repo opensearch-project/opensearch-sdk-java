@@ -12,11 +12,15 @@ package org.opensearch.sdk.handlers;
 import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
+import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.discovery.InitializeExtensionRequest;
 import org.opensearch.discovery.InitializeExtensionResponse;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.SDKTransportService;
+import org.opensearch.transport.TransportMessageListener;
+import org.opensearch.transport.TransportRequest;
+import org.opensearch.transport.TransportRequestOptions;
 import org.opensearch.transport.TransportService;
 
 import static org.opensearch.sdk.ExtensionsRunner.NODE_NAME_SETTING;
@@ -49,6 +53,7 @@ public class ExtensionsInitRequestHandler {
         logger.info("Registering Extension Request received from OpenSearch");
         extensionsRunner.opensearchNode = extensionInitRequest.getSourceNode();
         extensionsRunner.setUniqueId(extensionInitRequest.getExtension().getId());
+        extensionsRunner.getThreadPool().getThreadContext().putHeader("extension_unique_id", extensionsRunner.getExtension().getExtensionSettings().getShortName());
         // TODO: Remove above two lines in favor of the below when refactoring
         SDKTransportService sdkTransportService = extensionsRunner.getSdkTransportService();
         sdkTransportService.setOpensearchNode(extensionInitRequest.getSourceNode());
@@ -65,7 +70,7 @@ public class ExtensionsInitRequestHandler {
             extensionsRunner.setExtensionNode(extensionInitRequest.getExtension());
             // TODO: replace with sdkTransportService.getTransportService()
             TransportService extensionTransportService = extensionsRunner.getExtensionTransportService();
-            extensionTransportService.connectToNode(extensionsRunner.opensearchNode);
+            extensionTransportService.connectToNodeAsExtension(extensionsRunner.opensearchNode, extensionsRunner.getExtension().getExtensionSettings().getShortName());
             extensionsRunner.sendRegisterRestActionsRequest(extensionTransportService);
             extensionsRunner.sendRegisterCustomSettingsRequest(extensionTransportService);
             sdkTransportService.sendRegisterTransportActionsRequest(extensionsRunner.getSdkActionModule().getActions());

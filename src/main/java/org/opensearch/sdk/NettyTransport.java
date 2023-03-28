@@ -36,6 +36,9 @@ import org.opensearch.search.SearchModule;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.transport.TransportInterceptor;
+import org.opensearch.transport.TransportMessageListener;
+import org.opensearch.transport.TransportRequest;
+import org.opensearch.transport.TransportRequestOptions;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.netty4.Netty4Transport;
 
@@ -124,7 +127,6 @@ public class NettyTransport {
      * @return The initialized TransportService object.
      */
     public TransportService initializeExtensionTransportService(Settings settings, ThreadPool threadPool) {
-
         Netty4Transport transport = getNetty4Transport(settings, threadPool);
 
         // create transport service

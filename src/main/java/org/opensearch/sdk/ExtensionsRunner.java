@@ -46,6 +46,9 @@ import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
 import org.opensearch.tasks.TaskManager;
 import org.opensearch.threadpool.ThreadPool;
+import org.opensearch.transport.TransportMessageListener;
+import org.opensearch.transport.TransportRequest;
+import org.opensearch.transport.TransportRequestOptions;
 import org.opensearch.transport.TransportResponse;
 import org.opensearch.transport.TransportResponseHandler;
 import org.opensearch.transport.TransportService;
@@ -169,9 +172,9 @@ public class ExtensionsRunner {
             .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
             .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
-            .put("ssl.transport.pemcert_filepath", "esnode.pem")
-            .put("ssl.transport.pemkey_filepath", "esnode-key.pem")
-            .put("ssl.transport.pemtrustedcas_filepath", "root-ca.pem")
+            .put("ssl.transport.pemcert_filepath", "certs/extension-01.pem")
+            .put("ssl.transport.pemkey_filepath", "certs/extension-01-key.pem")
+            .put("ssl.transport.pemtrustedcas_filepath", "certs/root-ca.pem")
             .put("path.home", "/Users/cwperx/Projects/opensearch/opensearch-sdk-java")
             .build();
         this.threadPool = new ThreadPool(settings);
@@ -356,6 +359,13 @@ public class ExtensionsRunner {
      * @param transportService  The TransportService to start.
      */
     public void startTransportService(TransportService transportService) {
+        transportService.addMessageListener(new TransportMessageListener() {
+            @Override
+            public void onRequestSent(DiscoveryNode node, long requestId, String action, TransportRequest request, TransportRequestOptions finalOptions) {
+
+                TransportMessageListener.super.onRequestSent(node, requestId, action, request, finalOptions);
+            }
+        });
         // start transport service and accept incoming requests
         transportService.start();
         transportService.acceptIncomingRequests();
