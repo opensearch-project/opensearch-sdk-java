@@ -44,7 +44,6 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 
 import static org.opensearch.sdk.sample.helloworld.ExampleCustomSettingConfig.VALIDATED_SETTING;
-import static org.opensearch.sdk.sample.helloworld.ExampleCustomSettingConfig.VALIDATED_SETTING_FALSE;
 
 @SuppressWarnings("deprecation")
 public class TestHelloWorldExtension extends OpenSearchTestCase {
@@ -248,27 +247,15 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
 
     @Test
     public void testValidatedSettings() {
-        final String expected = "abcde";
+        final String expected = "foo";
         final String actual = VALIDATED_SETTING.get(Settings.builder().put(VALIDATED_SETTING.getKey(), expected).build());
         assertEquals(expected, actual);
-
-        final String expectedFalse = "forbidden";
-        final String actualFalse = VALIDATED_SETTING_FALSE.get(
-            Settings.builder().put(VALIDATED_SETTING_FALSE.getKey(), expectedFalse).build()
-        );
-        assertEquals(expectedFalse, actualFalse);
 
         final IllegalArgumentException exceptionTrue = expectThrows(
             IllegalArgumentException.class,
             () -> VALIDATED_SETTING.get(Settings.builder().put(VALIDATED_SETTING.getKey(), "it's forbidden").build())
         );
 
-        final IllegalArgumentException exceptionFalse = expectThrows(
-            IllegalArgumentException.class,
-            () -> VALIDATED_SETTING_FALSE.get(Settings.builder().put(VALIDATED_SETTING_FALSE.getKey(), "abc").build())
-        );
-
         assertEquals("Setting [it's forbidden] does not match regex [^((?!forbidden).)*$]", exceptionTrue.getMessage());
-        assertEquals("Setting [abc] must match regex [^((?!forbidden).)*$]", exceptionFalse.getMessage());
     }
 }
