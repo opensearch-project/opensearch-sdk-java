@@ -80,7 +80,7 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
             b.bind(SDKClient.class).toInstance(sdkClient);
         });
         initializeSdkClient();
-        this.sdkRestClient = sdkClient.initializeRestClient("localhost", 9200, "token_value", "header_name");
+        this.sdkRestClient = sdkClient.initializeRestClient("localhost", 9200);
     }
 
     @SuppressWarnings("rawtypes")

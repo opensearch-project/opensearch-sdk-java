@@ -239,12 +239,7 @@ public class SDKClient implements Closeable {
      */
     @Deprecated
     public SDKRestClient initializeRestClient() {
-        return initializeRestClient(
-            extensionSettings.getOpensearchAddress(),
-            Integer.parseInt(extensionSettings.getOpensearchPort()),
-            "token",
-            "headerName"
-        );
+        return initializeRestClient(extensionSettings.getOpensearchAddress(), Integer.parseInt(extensionSettings.getOpensearchPort()));
     }
 
     /**
@@ -257,16 +252,14 @@ public class SDKClient implements Closeable {
      *
      * @param hostAddress The address of OpenSearch cluster, client can connect to
      * @param port        The port of OpenSearch cluster
-     * @param token The bearer token.
-     * @param headerName The header name.
      * @return The SDKClient implementation of RestHighLevelClient. The user is responsible for calling
      *         {@link #doCloseHighLevelClient()} when finished with the client
      * @deprecated Provided for compatibility with existing plugins to permit migration. Use
      *             {@link #initializeJavaClient} for new development.
      */
     @Deprecated
-    public SDKRestClient initializeRestClient(String hostAddress, int port, String token, String headerName) {
-        return new SDKRestClient(this, new RestHighLevelClient(builder(hostAddress, port)), token, headerName);
+    public SDKRestClient initializeRestClient(String hostAddress, int port) {
+        return new SDKRestClient(this, new RestHighLevelClient(builder(hostAddress, port)));
     }
 
     /**
@@ -348,22 +341,21 @@ public class SDKClient implements Closeable {
 
         private final SDKClient sdkClient;
         private final RestHighLevelClient restHighLevelClient;
-        private final String token;
-        private final String headerName;
+        private RequestOptions options = RequestOptions.DEFAULT;
 
         /**
          * Instantiate this class wrapping a {@link RestHighLevelClient}.
          *
-         * @param sdkClient The SDKClient instance.
+         * @param sdkClient           The SDKClient instance.
          * @param restHighLevelClient The client to wrap.
-         * @param token The bearer token.
-         * @param headerName The header name.
          */
-        public SDKRestClient(SDKClient sdkClient, RestHighLevelClient restHighLevelClient, String token, String headerName) {
+        public SDKRestClient(SDKClient sdkClient, RestHighLevelClient restHighLevelClient) {
             this.sdkClient = sdkClient;
             this.restHighLevelClient = restHighLevelClient;
-            this.token = token;
-            this.headerName = headerName;
+        }
+
+        public void setOptions(RequestOptions options) {
+            this.options = options;
         }
 
         /**
@@ -473,7 +465,6 @@ public class SDKClient implements Closeable {
          * @see Requests#searchRequest(String...)
          */
         public void search(SearchRequest request, ActionListener<SearchResponse> listener) {
-            RequestOptions options = RequestOptions.DEFAULT.toBuilder().addHeader(this.headerName, "Bearer" + this.token).build();
             restHighLevelClient.searchAsync(request, options, listener);
         }
 
