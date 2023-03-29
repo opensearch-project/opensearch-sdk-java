@@ -178,6 +178,7 @@ public class ExtensionsRunner {
         boolean sslEnabled = extensionSettings.getOtherSettings().containsKey("ssl.transport.enabled")
             && "true".equals(extensionSettings.getOtherSettings().get("ssl.transport.enabled"));
         if (sslEnabled) {
+            addSettingsToBuilder(settingsBuilder, "ssl.transport.enabled", extensionSettings);
             addSettingsToBuilder(settingsBuilder, "ssl.transport.pemcert_filepath", extensionSettings);
             addSettingsToBuilder(settingsBuilder, "ssl.transport.pemkey_filepath", extensionSettings);
             addSettingsToBuilder(settingsBuilder, "ssl.transport.pemtrustedcas_filepath", extensionSettings);
