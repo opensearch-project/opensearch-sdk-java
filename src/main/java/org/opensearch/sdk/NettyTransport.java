@@ -10,7 +10,6 @@
 package org.opensearch.sdk;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 
 import org.opensearch.Version;
@@ -24,13 +23,9 @@ import org.opensearch.sdk.ssl.DefaultSslKeyStore;
 import org.opensearch.sdk.ssl.SSLConfigConstants;
 import org.opensearch.sdk.ssl.SSLNettyTransport;
 import org.opensearch.sdk.ssl.SslKeyStore;
-import org.opensearch.search.SearchModule;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.transport.TransportInterceptor;
-import org.opensearch.transport.TransportMessageListener;
-import org.opensearch.transport.TransportRequest;
-import org.opensearch.transport.TransportRequestOptions;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.netty4.Netty4Transport;
 
@@ -67,8 +62,10 @@ public class NettyTransport {
 
         final CircuitBreakerService circuitBreakerService = new NoneCircuitBreakerService();
 
-        boolean transportSSLEnabled = settings.getAsBoolean(SSLConfigConstants.SSL_TRANSPORT_ENABLED,
-                SSLConfigConstants.SSL_TRANSPORT_ENABLED_DEFAULT);
+        boolean transportSSLEnabled = settings.getAsBoolean(
+            SSLConfigConstants.SSL_TRANSPORT_ENABLED,
+            SSLConfigConstants.SSL_TRANSPORT_ENABLED_DEFAULT
+        );
 
         Netty4Transport transport = new Netty4Transport(
             settings,

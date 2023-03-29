@@ -54,7 +54,15 @@ public class ExtensionSettings {
      * @param opensearchPort  The port on which OpenSearch is running.
      * @param otherSettings A generic map of any settings set in the config file that are not default setting keys
      */
-    public ExtensionSettings(String extensionName, String shortName, String hostAddress, String hostPort, String opensearchAddress, String opensearchPort, Map<String, String> otherSettings) {
+    public ExtensionSettings(
+        String extensionName,
+        String shortName,
+        String hostAddress,
+        String hostPort,
+        String opensearchAddress,
+        String opensearchPort,
+        Map<String, String> otherSettings
+    ) {
         super();
         this.extensionName = extensionName;
         this.shortName = shortName;
@@ -68,6 +76,7 @@ public class ExtensionSettings {
     public String getExtensionName() {
         return extensionName;
     }
+
     public String getShortName() {
         return shortName;
     }
@@ -130,7 +139,14 @@ public class ExtensionSettings {
                 throw new IOException("extension.yml is empty");
             }
             Map<String, String> otherSettings = new HashMap<>();
-            Set<String> defaultSettings = Set.of("extensionName", "shortName", "hostAddress", "hostPort", "opensearchAddress", "opensearchPort");
+            Set<String> defaultSettings = Set.of(
+                "extensionName",
+                "shortName",
+                "hostAddress",
+                "hostPort",
+                "opensearchAddress",
+                "opensearchPort"
+            );
             for (String settingKey : extensionMap.keySet()) {
                 if (!defaultSettings.contains(settingKey)) {
                     otherSettings.put(settingKey, extensionMap.get(settingKey).toString());

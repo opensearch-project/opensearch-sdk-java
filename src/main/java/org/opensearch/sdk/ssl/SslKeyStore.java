@@ -16,12 +16,11 @@ import javax.net.ssl.SSLException;
 
 public interface SslKeyStore {
 
-
     public SSLEngine createServerTransportSSLEngine() throws SSLException;
 
     public SSLEngine createClientTransportSSLEngine(String peerHost, int peerPort) throws SSLException;
+
     public String getSubjectAlternativeNames(X509Certificate cert);
 
     public void initTransportSSLConfig();
 }
-

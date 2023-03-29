@@ -92,8 +92,11 @@ public class DefaultSslKeyStore implements SslKeyStore {
             final int aesMaxKeyLength = Cipher.getMaxAllowedKeyLength("AES");
 
             if (aesMaxKeyLength < 256) {
-                log.info("AES-256 not supported, max key length for AES is {} bit."
-                        + " (This is not an issue, it just limits possible encryption strength. To enable AES 256, install 'Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files')", aesMaxKeyLength);
+                log.info(
+                    "AES-256 not supported, max key length for AES is {} bit."
+                        + " (This is not an issue, it just limits possible encryption strength. To enable AES 256, install 'Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files')",
+                    aesMaxKeyLength
+                );
             }
         } catch (final NoSuchAlgorithmException e) {
             log.error("AES encryption not supported (SG 1). ", e);
@@ -123,8 +126,10 @@ public class DefaultSslKeyStore implements SslKeyStore {
             _env = null;
         }
         env = _env;
-        transportSSLEnabled = settings.getAsBoolean(SSLConfigConstants.SSL_TRANSPORT_ENABLED,
-                SSLConfigConstants.SSL_TRANSPORT_ENABLED_DEFAULT);
+        transportSSLEnabled = settings.getAsBoolean(
+            SSLConfigConstants.SSL_TRANSPORT_ENABLED,
+            SSLConfigConstants.SSL_TRANSPORT_ENABLED_DEFAULT
+        );
 
         if (transportSSLEnabled) {
             sslTransportClientProvider = SslContext.defaultClientProvider();
@@ -142,21 +147,32 @@ public class DefaultSslKeyStore implements SslKeyStore {
         log.info("TLS Transport Client Provider : {}", sslTransportClientProvider);
         log.info("TLS Transport Server Provider : {}", sslTransportServerProvider);
 
-        log.debug("sslTransportClientProvider:{} with ciphers {}", sslTransportClientProvider,
-                getEnabledSSLCiphers(sslTransportClientProvider));
-        log.debug("sslTransportServerProvider:{} with ciphers {}", sslTransportServerProvider,
-                getEnabledSSLCiphers(sslTransportServerProvider));
+        log.debug(
+            "sslTransportClientProvider:{} with ciphers {}",
+            sslTransportClientProvider,
+            getEnabledSSLCiphers(sslTransportClientProvider)
+        );
+        log.debug(
+            "sslTransportServerProvider:{} with ciphers {}",
+            sslTransportServerProvider,
+            getEnabledSSLCiphers(sslTransportServerProvider)
+        );
 
-        log.info("Enabled TLS protocols for transport layer : {}",
-                Arrays.toString(getEnabledSSLProtocols(sslTransportServerProvider)));
+        log.info("Enabled TLS protocols for transport layer : {}", Arrays.toString(getEnabledSSLProtocols(sslTransportServerProvider)));
 
-        log.debug("sslTransportClientProvider:{} with protocols {}", sslTransportClientProvider,
-                getEnabledSSLProtocols(sslTransportClientProvider));
-        log.debug("sslTransportServerProvider:{} with protocols {}", sslTransportServerProvider,
-                getEnabledSSLProtocols(sslTransportServerProvider));
+        log.debug(
+            "sslTransportClientProvider:{} with protocols {}",
+            sslTransportClientProvider,
+            getEnabledSSLProtocols(sslTransportClientProvider)
+        );
+        log.debug(
+            "sslTransportServerProvider:{} with protocols {}",
+            sslTransportServerProvider,
+            getEnabledSSLProtocols(sslTransportServerProvider)
+        );
 
-        if (transportSSLEnabled && (getEnabledSSLCiphers(sslTransportClientProvider).isEmpty()
-                || getEnabledSSLCiphers(sslTransportServerProvider).isEmpty())) {
+        if (transportSSLEnabled
+            && (getEnabledSSLCiphers(sslTransportClientProvider).isEmpty() || getEnabledSSLCiphers(sslTransportServerProvider).isEmpty())) {
             throw new OpenSearchSecurityException("no valid cipher suites for transport protocol");
         }
 
@@ -196,10 +212,11 @@ public class DefaultSslKeyStore implements SslKeyStore {
         if (env == null) {
             log.info("No config directory, key- and truststore files are resolved absolutely");
         } else {
-            log.info("Config directory is {}/, from there the key- and truststore files are resolved relatively",
-                    env.configDir().toAbsolutePath());
+            log.info(
+                "Config directory is {}/, from there the key- and truststore files are resolved relatively",
+                env.configDir().toAbsolutePath()
+            );
         }
-
 
         if (transportSSLEnabled) {
             initTransportSSLConfig();
@@ -216,74 +233,78 @@ public class DefaultSslKeyStore implements SslKeyStore {
         // different files
         // That's why useRawFiles checks for extra location
         final boolean useKeyStore = settings.hasValue(SSLConfigConstants.SSL_TRANSPORT_KEYSTORE_FILEPATH);
-        final boolean useRawFiles = settings.hasValue(SSLConfigConstants.SSL_TRANSPORT_PEMCERT_FILEPATH) ||
-                (settings.hasValue(SSLConfigConstants.SSL_TRANSPORT_SERVER_PEMCERT_FILEPATH) && settings.hasValue(SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMCERT_FILEPATH));
+        final boolean useRawFiles = settings.hasValue(SSLConfigConstants.SSL_TRANSPORT_PEMCERT_FILEPATH)
+            || (settings.hasValue(SSLConfigConstants.SSL_TRANSPORT_SERVER_PEMCERT_FILEPATH)
+                && settings.hasValue(SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMCERT_FILEPATH));
 
-        final boolean extendedKeyUsageEnabled = settings.getAsBoolean(SSLConfigConstants.SSL_TRANSPORT_EXTENDED_KEY_USAGE_ENABLED,
-                SSLConfigConstants.SSL_TRANSPORT_EXTENDED_KEY_USAGE_ENABLED_DEFAULT);
+        final boolean extendedKeyUsageEnabled = settings.getAsBoolean(
+            SSLConfigConstants.SSL_TRANSPORT_EXTENDED_KEY_USAGE_ENABLED,
+            SSLConfigConstants.SSL_TRANSPORT_EXTENDED_KEY_USAGE_ENABLED_DEFAULT
+        );
 
         if (useKeyStore) {
 
-            final String keystoreFilePath = resolve(SSLConfigConstants.SSL_TRANSPORT_KEYSTORE_FILEPATH,
-                    true);
-            final String keystoreType = settings.get(SSLConfigConstants.SSL_TRANSPORT_KEYSTORE_TYPE,
-                    DEFAULT_STORE_TYPE);
+            final String keystoreFilePath = resolve(SSLConfigConstants.SSL_TRANSPORT_KEYSTORE_FILEPATH, true);
+            final String keystoreType = settings.get(SSLConfigConstants.SSL_TRANSPORT_KEYSTORE_TYPE, DEFAULT_STORE_TYPE);
             final String keystorePassword = SSL_TRANSPORT_KEYSTORE_PASSWORD.getSetting(settings, SSLConfigConstants.DEFAULT_STORE_PASSWORD);
 
-            final String truststoreFilePath = resolve(
-                    SSLConfigConstants.SSL_TRANSPORT_TRUSTSTORE_FILEPATH, true);
+            final String truststoreFilePath = resolve(SSLConfigConstants.SSL_TRANSPORT_TRUSTSTORE_FILEPATH, true);
 
             if (settings.get(SSLConfigConstants.SSL_TRANSPORT_TRUSTSTORE_FILEPATH, null) == null) {
-                throw new OpenSearchException(SSLConfigConstants.SSL_TRANSPORT_TRUSTSTORE_FILEPATH
-                        + " must be set if transport ssl is requested.");
+                throw new OpenSearchException(
+                    SSLConfigConstants.SSL_TRANSPORT_TRUSTSTORE_FILEPATH + " must be set if transport ssl is requested."
+                );
             }
 
-            final String truststoreType = settings.get(SSLConfigConstants.SSL_TRANSPORT_TRUSTSTORE_TYPE,
-                    DEFAULT_STORE_TYPE);
+            final String truststoreType = settings.get(SSLConfigConstants.SSL_TRANSPORT_TRUSTSTORE_TYPE, DEFAULT_STORE_TYPE);
             final String truststorePassword = SSL_TRANSPORT_TRUSTSTORE_PASSWORD.getSetting(settings);
 
-            KeystoreProps keystoreProps = new KeystoreProps(
-                    keystoreFilePath, keystoreType, keystorePassword);
+            KeystoreProps keystoreProps = new KeystoreProps(keystoreFilePath, keystoreType, keystorePassword);
 
-            KeystoreProps truststoreProps = new KeystoreProps(
-                    truststoreFilePath, truststoreType, truststorePassword);
+            KeystoreProps truststoreProps = new KeystoreProps(truststoreFilePath, truststoreType, truststorePassword);
             try {
                 CertFromKeystore certFromKeystore;
                 CertFromTruststore certFromTruststore;
                 if (extendedKeyUsageEnabled) {
-                    final String truststoreServerAlias = settings.get(SSLConfigConstants.SSL_TRANSPORT_SERVER_TRUSTSTORE_ALIAS,
-                            null);
-                    final String truststoreClientAlias = settings.get(SSLConfigConstants.SSL_TRANSPORT_CLIENT_TRUSTSTORE_ALIAS,
-                            null);
-                    final String keystoreServerAlias = settings.get(SSLConfigConstants.SSL_TRANSPORT_SERVER_KEYSTORE_ALIAS,
-                            null);
-                    final String keystoreClientAlias = settings.get(SSLConfigConstants.SSL_TRANSPORT_CLIENT_KEYSTORE_ALIAS,
-                            null);
+                    final String truststoreServerAlias = settings.get(SSLConfigConstants.SSL_TRANSPORT_SERVER_TRUSTSTORE_ALIAS, null);
+                    final String truststoreClientAlias = settings.get(SSLConfigConstants.SSL_TRANSPORT_CLIENT_TRUSTSTORE_ALIAS, null);
+                    final String keystoreServerAlias = settings.get(SSLConfigConstants.SSL_TRANSPORT_SERVER_KEYSTORE_ALIAS, null);
+                    final String keystoreClientAlias = settings.get(SSLConfigConstants.SSL_TRANSPORT_CLIENT_KEYSTORE_ALIAS, null);
                     final String serverKeyPassword = SSL_TRANSPORT_SERVER_KEYSTORE_KEYPASSWORD.getSetting(settings, keystorePassword);
                     final String clientKeyPassword = SSL_TRANSPORT_CLIENT_KEYSTORE_KEYPASSWORD.getSetting(settings, keystorePassword);
 
                     // we require all aliases to be set explicitly
                     // because they should be different for client and server
-                    if (keystoreServerAlias == null || keystoreClientAlias == null || truststoreServerAlias == null || truststoreClientAlias == null)
-                    {
-                        throw new OpenSearchException(SSLConfigConstants.SSL_TRANSPORT_SERVER_KEYSTORE_ALIAS + ", "
-                                + SSLConfigConstants.SSL_TRANSPORT_CLIENT_KEYSTORE_ALIAS + ", "
-                                + SSLConfigConstants.SSL_TRANSPORT_SERVER_TRUSTSTORE_ALIAS + ", "
+                    if (keystoreServerAlias == null
+                        || keystoreClientAlias == null
+                        || truststoreServerAlias == null
+                        || truststoreClientAlias == null) {
+                        throw new OpenSearchException(
+                            SSLConfigConstants.SSL_TRANSPORT_SERVER_KEYSTORE_ALIAS
+                                + ", "
+                                + SSLConfigConstants.SSL_TRANSPORT_CLIENT_KEYSTORE_ALIAS
+                                + ", "
+                                + SSLConfigConstants.SSL_TRANSPORT_SERVER_TRUSTSTORE_ALIAS
+                                + ", "
                                 + SSLConfigConstants.SSL_TRANSPORT_CLIENT_TRUSTSTORE_ALIAS
                                 + " must be set when "
-                                + SSLConfigConstants.SSL_TRANSPORT_EXTENDED_KEY_USAGE_ENABLED + " is true.");
+                                + SSLConfigConstants.SSL_TRANSPORT_EXTENDED_KEY_USAGE_ENABLED
+                                + " is true."
+                        );
                     }
 
                     certFromKeystore = new CertFromKeystore(
-                            keystoreProps, keystoreServerAlias, keystoreClientAlias, serverKeyPassword, clientKeyPassword);
-                    certFromTruststore = new CertFromTruststore(
-                            truststoreProps, truststoreServerAlias, truststoreClientAlias);
+                        keystoreProps,
+                        keystoreServerAlias,
+                        keystoreClientAlias,
+                        serverKeyPassword,
+                        clientKeyPassword
+                    );
+                    certFromTruststore = new CertFromTruststore(truststoreProps, truststoreServerAlias, truststoreClientAlias);
                 } else {
                     // when alias is null, we take first entry in the store
-                    final String truststoreAlias = settings.get(SSLConfigConstants.SSL_TRANSPORT_TRUSTSTORE_ALIAS,
-                            null);
-                    final String keystoreAlias = settings.get(SSLConfigConstants.SSL_TRANSPORT_KEYSTORE_ALIAS,
-                            null);
+                    final String truststoreAlias = settings.get(SSLConfigConstants.SSL_TRANSPORT_TRUSTSTORE_ALIAS, null);
+                    final String keystoreAlias = settings.get(SSLConfigConstants.SSL_TRANSPORT_KEYSTORE_ALIAS, null);
                     final String keyPassword = SSL_TRANSPORT_KEYSTORE_KEYPASSWORD.getSetting(settings, keystorePassword);
 
                     certFromKeystore = new CertFromKeystore(keystoreProps, keystoreAlias, keyPassword);
@@ -292,18 +313,24 @@ public class DefaultSslKeyStore implements SslKeyStore {
 
                 validateNewCerts(transportCerts, certFromKeystore.getCerts());
                 transportServerSslContext = buildSSLServerContext(
-                        certFromKeystore.getServerKey(), certFromKeystore.getServerCert(),
-                        certFromTruststore.getServerTrustedCerts(), getEnabledSSLCiphers(this.sslTransportServerProvider),
-                        this.sslTransportServerProvider, ClientAuth.REQUIRE);
+                    certFromKeystore.getServerKey(),
+                    certFromKeystore.getServerCert(),
+                    certFromTruststore.getServerTrustedCerts(),
+                    getEnabledSSLCiphers(this.sslTransportServerProvider),
+                    this.sslTransportServerProvider,
+                    ClientAuth.REQUIRE
+                );
                 transportClientSslContext = buildSSLClientContext(
-                        certFromKeystore.getClientKey(), certFromKeystore.getClientCert(),
-                        certFromTruststore.getClientTrustedCerts(), getEnabledSSLCiphers(sslTransportClientProvider),
-                        sslTransportClientProvider);
+                    certFromKeystore.getClientKey(),
+                    certFromKeystore.getClientCert(),
+                    certFromTruststore.getClientTrustedCerts(),
+                    getEnabledSSLCiphers(sslTransportClientProvider),
+                    sslTransportClientProvider
+                );
                 setTransportSSLCerts(certFromKeystore.getCerts());
             } catch (final Exception e) {
                 logExplanation(e);
-                throw new OpenSearchSecurityException(
-                        "Error while initializing transport SSL layer: " + e.toString(), e);
+                throw new OpenSearchSecurityException("Error while initializing transport SSL layer: " + e.toString(), e);
             }
 
         } else if (useRawFiles) {
@@ -311,55 +338,65 @@ public class DefaultSslKeyStore implements SslKeyStore {
                 CertFromFile certFromFile;
                 if (extendedKeyUsageEnabled) {
                     CertFileProps clientCertProps = new CertFileProps(
-                            resolve(SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMCERT_FILEPATH, true),
-                            resolve(SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMKEY_FILEPATH, true),
-                            resolve(SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMTRUSTEDCAS_FILEPATH, true),
-                            SSL_TRANSPORT_CLIENT_PEMKEY_PASSWORD.getSetting(settings)
+                        resolve(SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMCERT_FILEPATH, true),
+                        resolve(SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMKEY_FILEPATH, true),
+                        resolve(SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMTRUSTEDCAS_FILEPATH, true),
+                        SSL_TRANSPORT_CLIENT_PEMKEY_PASSWORD.getSetting(settings)
                     );
 
                     CertFileProps serverCertProps = new CertFileProps(
-                            resolve(SSLConfigConstants.SSL_TRANSPORT_SERVER_PEMCERT_FILEPATH, true),
-                            resolve(SSLConfigConstants.SSL_TRANSPORT_SERVER_PEMKEY_FILEPATH, true),
-                            resolve(SSLConfigConstants.SSL_TRANSPORT_SERVER_PEMTRUSTEDCAS_FILEPATH, true),
-                            SSL_TRANSPORT_SERVER_PEMKEY_PASSWORD.getSetting(settings)
+                        resolve(SSLConfigConstants.SSL_TRANSPORT_SERVER_PEMCERT_FILEPATH, true),
+                        resolve(SSLConfigConstants.SSL_TRANSPORT_SERVER_PEMKEY_FILEPATH, true),
+                        resolve(SSLConfigConstants.SSL_TRANSPORT_SERVER_PEMTRUSTEDCAS_FILEPATH, true),
+                        SSL_TRANSPORT_SERVER_PEMKEY_PASSWORD.getSetting(settings)
                     );
 
                     certFromFile = new CertFromFile(clientCertProps, serverCertProps);
                 } else {
                     CertFileProps certProps = new CertFileProps(
-                            resolve(SSLConfigConstants.SSL_TRANSPORT_PEMCERT_FILEPATH, true),
-                            resolve(SSLConfigConstants.SSL_TRANSPORT_PEMKEY_FILEPATH, true),
-                            resolve(SSLConfigConstants.SSL_TRANSPORT_PEMTRUSTEDCAS_FILEPATH, true),
-                            SSL_TRANSPORT_PEMKEY_PASSWORD.getSetting(settings)
+                        resolve(SSLConfigConstants.SSL_TRANSPORT_PEMCERT_FILEPATH, true),
+                        resolve(SSLConfigConstants.SSL_TRANSPORT_PEMKEY_FILEPATH, true),
+                        resolve(SSLConfigConstants.SSL_TRANSPORT_PEMTRUSTEDCAS_FILEPATH, true),
+                        SSL_TRANSPORT_PEMKEY_PASSWORD.getSetting(settings)
                     );
                     certFromFile = new CertFromFile(certProps);
                 }
 
                 validateNewCerts(transportCerts, certFromFile.getCerts());
                 transportServerSslContext = buildSSLServerContext(
-                        certFromFile.getServerPemKey(), certFromFile.getServerPemCert(), certFromFile.getServerTrustedCas(),
-                        certFromFile.getServerPemKeyPassword(),
-                        getEnabledSSLCiphers(this.sslTransportServerProvider),
-                        this.sslTransportServerProvider, ClientAuth.REQUIRE);
+                    certFromFile.getServerPemKey(),
+                    certFromFile.getServerPemCert(),
+                    certFromFile.getServerTrustedCas(),
+                    certFromFile.getServerPemKeyPassword(),
+                    getEnabledSSLCiphers(this.sslTransportServerProvider),
+                    this.sslTransportServerProvider,
+                    ClientAuth.REQUIRE
+                );
                 transportClientSslContext = buildSSLClientContext(
-                        certFromFile.getClientPemKey(), certFromFile.getClientPemCert(), certFromFile.getClientTrustedCas(),
-                        certFromFile.getClientPemKeyPassword(),
-                        getEnabledSSLCiphers(sslTransportClientProvider), sslTransportClientProvider);
+                    certFromFile.getClientPemKey(),
+                    certFromFile.getClientPemCert(),
+                    certFromFile.getClientTrustedCas(),
+                    certFromFile.getClientPemKeyPassword(),
+                    getEnabledSSLCiphers(sslTransportClientProvider),
+                    sslTransportClientProvider
+                );
                 setTransportSSLCerts(certFromFile.getCerts());
 
             } catch (final Exception e) {
                 logExplanation(e);
-                throw new OpenSearchSecurityException(
-                        "Error while initializing transport SSL layer from PEM: " + e.toString(), e);
+                throw new OpenSearchSecurityException("Error while initializing transport SSL layer from PEM: " + e.toString(), e);
             }
         } else {
-            throw new OpenSearchException(SSLConfigConstants.SSL_TRANSPORT_KEYSTORE_FILEPATH + " or "
-                    + SSLConfigConstants.SSL_TRANSPORT_SERVER_PEMCERT_FILEPATH + " and "
+            throw new OpenSearchException(
+                SSLConfigConstants.SSL_TRANSPORT_KEYSTORE_FILEPATH
+                    + " or "
+                    + SSLConfigConstants.SSL_TRANSPORT_SERVER_PEMCERT_FILEPATH
+                    + " and "
                     + SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMCERT_FILEPATH
-                    + " must be set if transport ssl is requested.");
+                    + " must be set if transport ssl is requested."
+            );
         }
     }
-
 
     /**
      * If the current and new certificates are same, skip remaining checks.
@@ -401,21 +438,15 @@ public class DefaultSslKeyStore implements SslKeyStore {
     private boolean hasValidDNs(final X509Certificate[] currentX509Certs, final X509Certificate[] newX509Certs) {
 
         final Function<? super X509Certificate, String> formatDNString = cert -> {
-            final String issuerDn = cert !=null && cert.getIssuerX500Principal() != null ? cert.getIssuerX500Principal().getName() : "";
-            final String subjectDn = cert !=null && cert.getSubjectX500Principal() != null ? cert.getSubjectX500Principal().getName() : "";
+            final String issuerDn = cert != null && cert.getIssuerX500Principal() != null ? cert.getIssuerX500Principal().getName() : "";
+            final String subjectDn = cert != null && cert.getSubjectX500Principal() != null ? cert.getSubjectX500Principal().getName() : "";
             final String san = getSubjectAlternativeNames(cert);
             return String.format("%s/%s/%s", issuerDn, subjectDn, san);
         };
 
-        final List<String> currentCertDNList = Arrays.stream(currentX509Certs)
-                .map(formatDNString)
-                .sorted()
-                .collect(Collectors.toList());
+        final List<String> currentCertDNList = Arrays.stream(currentX509Certs).map(formatDNString).sorted().collect(Collectors.toList());
 
-        final List<String> newCertDNList = Arrays.stream(newX509Certs)
-                .map(formatDNString)
-                .sorted()
-                .collect(Collectors.toList());
+        final List<String> newCertDNList = Arrays.stream(newX509Certs).map(formatDNString).sorted().collect(Collectors.toList());
 
         return currentCertDNList.equals(newCertDNList);
     }
@@ -430,17 +461,13 @@ public class DefaultSslKeyStore implements SslKeyStore {
     private boolean hasValidExpiryDates(final X509Certificate[] currentX509Certs, final X509Certificate[] newX509Certs) {
 
         // Get earliest expiry date for current certificates
-        final Date earliestExpiryDate = Arrays.stream(currentX509Certs)
-                .map(c -> c.getNotAfter())
-                .min(Date::compareTo)
-                .get();
+        final Date earliestExpiryDate = Arrays.stream(currentX509Certs).map(c -> c.getNotAfter()).min(Date::compareTo).get();
 
         // New certificates that expire before or on the same date as the current ones are invalid.
-        boolean newCertsExpireBeforeCurrentCerts = Arrays.stream(newX509Certs)
-                .anyMatch(cert -> {
-                    Date notAfterDate = cert.getNotAfter();
-                    return notAfterDate.before(earliestExpiryDate) || notAfterDate.equals(earliestExpiryDate);
-                });
+        boolean newCertsExpireBeforeCurrentCerts = Arrays.stream(newX509Certs).anyMatch(cert -> {
+            Date notAfterDate = cert.getNotAfter();
+            return notAfterDate.before(earliestExpiryDate) || notAfterDate.equals(earliestExpiryDate);
+        });
 
         return !newCertsExpireBeforeCurrentCerts;
     }
@@ -456,17 +483,13 @@ public class DefaultSslKeyStore implements SslKeyStore {
     private boolean areSameCerts(final X509Certificate[] currentX509Certs, final X509Certificate[] newX509Certs) {
 
         final Function<? super X509Certificate, String> certificateSignature = cert -> {
-            final byte[] signature = cert !=null && cert.getSignature() != null ? cert.getSignature() : null;
+            final byte[] signature = cert != null && cert.getSignature() != null ? cert.getSignature() : null;
             return new String(signature, StandardCharsets.UTF_8);
         };
 
-        final Set<String> currentCertSignatureSet = Arrays.stream(currentX509Certs)
-                .map(certificateSignature)
-                .collect(Collectors.toSet());
+        final Set<String> currentCertSignatureSet = Arrays.stream(currentX509Certs).map(certificateSignature).collect(Collectors.toSet());
 
-        final Set<String> newCertSignatureSet = Arrays.stream(newX509Certs)
-                .map(certificateSignature)
-                .collect(Collectors.toSet());
+        final Set<String> newCertSignatureSet = Arrays.stream(newX509Certs).map(certificateSignature).collect(Collectors.toSet());
 
         return currentCertSignatureSet.equals(newCertSignatureSet);
     }
@@ -479,8 +502,7 @@ public class DefaultSslKeyStore implements SslKeyStore {
 
     public SSLEngine createClientTransportSSLEngine(final String peerHost, final int peerPort) throws SSLException {
         if (peerHost != null) {
-            final SSLEngine engine = transportClientSslContext.newEngine(NettyAllocator.getAllocator(), peerHost,
-                    peerPort);
+            final SSLEngine engine = transportClientSslContext.newEngine(NettyAllocator.getAllocator(), peerHost, peerPort);
 
             final SSLParameters sslParams = new SSLParameters();
             sslParams.setEndpointIdentificationAlgorithm("HTTPS");
@@ -534,12 +556,10 @@ public class DefaultSslKeyStore implements SslKeyStore {
             engine = serverContext.createSSLEngine();
             jdkSupportedCiphers = Arrays.asList(engine.getEnabledCipherSuites());
             jdkSupportedProtocols = Arrays.asList(engine.getEnabledProtocols());
-            log.debug("JVM supports the following {} protocols {}", jdkSupportedProtocols.size(),
-                    jdkSupportedProtocols);
-            log.debug("JVM supports the following {} ciphers {}", jdkSupportedCiphers.size(),
-                    jdkSupportedCiphers);
+            log.debug("JVM supports the following {} protocols {}", jdkSupportedProtocols.size(), jdkSupportedProtocols);
+            log.debug("JVM supports the following {} ciphers {}", jdkSupportedCiphers.size(), jdkSupportedCiphers);
 
-            if(jdkSupportedProtocols.contains("TLSv1.3")) {
+            if (jdkSupportedProtocols.contains("TLSv1.3")) {
                 log.info("JVM supports TLSv1.3");
             }
 
@@ -556,7 +576,10 @@ public class DefaultSslKeyStore implements SslKeyStore {
             }
         }
 
-        if(jdkSupportedCiphers == null || jdkSupportedCiphers.isEmpty() || jdkSupportedProtocols == null || jdkSupportedProtocols.isEmpty()) {
+        if (jdkSupportedCiphers == null
+            || jdkSupportedCiphers.isEmpty()
+            || jdkSupportedProtocols == null
+            || jdkSupportedProtocols.isEmpty()) {
             throw new OpenSearchException("Unable to determine supported ciphers or protocols");
         }
 
@@ -567,12 +590,21 @@ public class DefaultSslKeyStore implements SslKeyStore {
         enabledTransportProtocolsJDKProvider.retainAll(secureTransportSSLProtocols);
     }
 
-    private SslContext buildSSLServerContext(final PrivateKey _key, final X509Certificate[] _cert,
-                                             final X509Certificate[] _trustedCerts, final Iterable<String> ciphers, final SslProvider sslProvider,
-                                             final ClientAuth authMode) throws SSLException {
+    private SslContext buildSSLServerContext(
+        final PrivateKey _key,
+        final X509Certificate[] _cert,
+        final X509Certificate[] _trustedCerts,
+        final Iterable<String> ciphers,
+        final SslProvider sslProvider,
+        final ClientAuth authMode
+    ) throws SSLException {
 
-        final SslContextBuilder _sslContextBuilder = configureSSLServerContextBuilder(SslContextBuilder.forServer(_key, _cert),
-                sslProvider, ciphers, authMode);
+        final SslContextBuilder _sslContextBuilder = configureSSLServerContextBuilder(
+            SslContextBuilder.forServer(_key, _cert),
+            sslProvider,
+            ciphers,
+            authMode
+        );
 
         if (_trustedCerts != null && _trustedCerts.length > 0) {
             _sslContextBuilder.trustManager(_trustedCerts);
@@ -581,12 +613,22 @@ public class DefaultSslKeyStore implements SslKeyStore {
         return buildSSLContext0(_sslContextBuilder);
     }
 
-    private SslContext buildSSLServerContext(final File _key, final File _cert, final File _trustedCerts,
-                                             final String pwd, final Iterable<String> ciphers, final SslProvider sslProvider, final ClientAuth authMode)
-            throws SSLException {
+    private SslContext buildSSLServerContext(
+        final File _key,
+        final File _cert,
+        final File _trustedCerts,
+        final String pwd,
+        final Iterable<String> ciphers,
+        final SslProvider sslProvider,
+        final ClientAuth authMode
+    ) throws SSLException {
 
-        final SslContextBuilder _sslContextBuilder = configureSSLServerContextBuilder(SslContextBuilder.forServer(_cert, _key, pwd),
-                sslProvider, ciphers, authMode);
+        final SslContextBuilder _sslContextBuilder = configureSSLServerContextBuilder(
+            SslContextBuilder.forServer(_cert, _key, pwd),
+            sslProvider,
+            ciphers,
+            authMode
+        );
 
         if (_trustedCerts != null) {
             _sslContextBuilder.trustManager(_trustedCerts);
@@ -595,46 +637,72 @@ public class DefaultSslKeyStore implements SslKeyStore {
         return buildSSLContext0(_sslContextBuilder);
     }
 
-    private SslContextBuilder configureSSLServerContextBuilder(final SslContextBuilder builder, final SslProvider sslProvider,
-                                                               final Iterable<String> ciphers, final ClientAuth authMode) {
-        return builder
-                .ciphers(Stream
-                        .concat(
-                                Http2SecurityUtil.CIPHERS.stream(),
-                                StreamSupport.stream(ciphers.spliterator(), false))
-                        .collect(Collectors.toSet()), SupportedCipherSuiteFilter.INSTANCE)
-                .clientAuth(Objects.requireNonNull(authMode))
-                .sessionCacheSize(0).sessionTimeout(0).sslProvider(sslProvider)
-                .applicationProtocolConfig(
-                        new ApplicationProtocolConfig(
-                                Protocol.ALPN,
-                                // NO_ADVERTISE is currently the only mode supported by both OpenSsl and JDK providers.
-                                SelectorFailureBehavior.NO_ADVERTISE,
-                                // ACCEPT is currently the only mode supported by both OpenSsl and JDK providers.
-                                SelectedListenerFailureBehavior.ACCEPT,
-                                ApplicationProtocolNames.HTTP_2,
-                                ApplicationProtocolNames.HTTP_1_1
-                        ));
+    private SslContextBuilder configureSSLServerContextBuilder(
+        final SslContextBuilder builder,
+        final SslProvider sslProvider,
+        final Iterable<String> ciphers,
+        final ClientAuth authMode
+    ) {
+        return builder.ciphers(
+            Stream.concat(Http2SecurityUtil.CIPHERS.stream(), StreamSupport.stream(ciphers.spliterator(), false))
+                .collect(Collectors.toSet()),
+            SupportedCipherSuiteFilter.INSTANCE
+        )
+            .clientAuth(Objects.requireNonNull(authMode))
+            .sessionCacheSize(0)
+            .sessionTimeout(0)
+            .sslProvider(sslProvider)
+            .applicationProtocolConfig(
+                new ApplicationProtocolConfig(
+                    Protocol.ALPN,
+                    // NO_ADVERTISE is currently the only mode supported by both OpenSsl and JDK providers.
+                    SelectorFailureBehavior.NO_ADVERTISE,
+                    // ACCEPT is currently the only mode supported by both OpenSsl and JDK providers.
+                    SelectedListenerFailureBehavior.ACCEPT,
+                    ApplicationProtocolNames.HTTP_2,
+                    ApplicationProtocolNames.HTTP_1_1
+                )
+            );
     }
 
-    private SslContext buildSSLClientContext(final PrivateKey _key, final X509Certificate[] _cert,
-                                             final X509Certificate[] _trustedCerts, final Iterable<String> ciphers, final SslProvider sslProvider)
-            throws SSLException {
+    private SslContext buildSSLClientContext(
+        final PrivateKey _key,
+        final X509Certificate[] _cert,
+        final X509Certificate[] _trustedCerts,
+        final Iterable<String> ciphers,
+        final SslProvider sslProvider
+    ) throws SSLException {
 
-        final SslContextBuilder _sslClientContextBuilder = SslContextBuilder.forClient().ciphers(ciphers)
-                .applicationProtocolConfig(ApplicationProtocolConfig.DISABLED).sessionCacheSize(0).sessionTimeout(0)
-                .sslProvider(sslProvider).trustManager(_trustedCerts).keyManager(_key, _cert);
+        final SslContextBuilder _sslClientContextBuilder = SslContextBuilder.forClient()
+            .ciphers(ciphers)
+            .applicationProtocolConfig(ApplicationProtocolConfig.DISABLED)
+            .sessionCacheSize(0)
+            .sessionTimeout(0)
+            .sslProvider(sslProvider)
+            .trustManager(_trustedCerts)
+            .keyManager(_key, _cert);
 
         return buildSSLContext0(_sslClientContextBuilder);
 
     }
 
-    private SslContext buildSSLClientContext(final File _key, final File _cert, final File _trustedCerts,
-                                             final String pwd, final Iterable<String> ciphers, final SslProvider sslProvider) throws SSLException {
+    private SslContext buildSSLClientContext(
+        final File _key,
+        final File _cert,
+        final File _trustedCerts,
+        final String pwd,
+        final Iterable<String> ciphers,
+        final SslProvider sslProvider
+    ) throws SSLException {
 
-        final SslContextBuilder _sslClientContextBuilder = SslContextBuilder.forClient().ciphers(ciphers)
-                .applicationProtocolConfig(ApplicationProtocolConfig.DISABLED).sessionCacheSize(0).sessionTimeout(0)
-                .sslProvider(sslProvider).trustManager(_trustedCerts).keyManager(_cert, _key, pwd);
+        final SslContextBuilder _sslClientContextBuilder = SslContextBuilder.forClient()
+            .ciphers(ciphers)
+            .applicationProtocolConfig(ApplicationProtocolConfig.DISABLED)
+            .sessionCacheSize(0)
+            .sessionTimeout(0)
+            .sslProvider(sslProvider)
+            .trustManager(_trustedCerts)
+            .keyManager(_cert, _key, pwd);
 
         return buildSSLContext0(_sslClientContextBuilder);
 
@@ -666,10 +734,12 @@ public class DefaultSslKeyStore implements SslKeyStore {
 
     private void logExplanation(Exception e) {
         if (ExceptionUtils.findMsg(e, "not contain valid private key") != null) {
-            log.error("Your keystore or PEM does not contain a key. "
+            log.error(
+                "Your keystore or PEM does not contain a key. "
                     + "If you specified a key password, try removing it. "
                     + "If you did not specify a key password, perhaps you need to if the key is in fact password-protected. "
-                    + "Maybe you just confused keys and certificates.");
+                    + "Maybe you just confused keys and certificates."
+            );
         }
 
         if (ExceptionUtils.findMsg(e, "not contain valid certificates") != null) {
@@ -684,14 +754,18 @@ public class DefaultSslKeyStore implements SslKeyStore {
         }
 
         if (Files.isDirectory(Paths.get(keystoreFilePath), LinkOption.NOFOLLOW_LINKS)) {
-            throw new OpenSearchException(
-                    "Is a directory: " + keystoreFilePath + " Expected a file for " + fileNameLogOnly);
+            throw new OpenSearchException("Is a directory: " + keystoreFilePath + " Expected a file for " + fileNameLogOnly);
         }
 
         if (!Files.isReadable(Paths.get(keystoreFilePath))) {
-            throw new OpenSearchException("Unable to read " + keystoreFilePath + " (" + Paths.get(keystoreFilePath)
+            throw new OpenSearchException(
+                "Unable to read "
+                    + keystoreFilePath
+                    + " ("
+                    + Paths.get(keystoreFilePath)
                     + "). Please make sure this files exists and is readable regarding to permissions. Property: "
-                    + fileNameLogOnly);
+                    + fileNameLogOnly
+            );
         }
     }
 
@@ -699,7 +773,9 @@ public class DefaultSslKeyStore implements SslKeyStore {
     public String getSubjectAlternativeNames(X509Certificate cert) {
         String san = "";
         try {
-            Collection<List<?>> altNames = cert !=null && cert.getSubjectAlternativeNames() != null ? cert.getSubjectAlternativeNames() : null;
+            Collection<List<?>> altNames = cert != null && cert.getSubjectAlternativeNames() != null
+                ? cert.getSubjectAlternativeNames()
+                : null;
             if (altNames != null) {
                 Collection<List<?>> sans = new ArrayList<>();
                 for (List<?> altName : altNames) {
@@ -707,12 +783,12 @@ public class DefaultSslKeyStore implements SslKeyStore {
                     sans.add(altName);
                     // otherName requires parsing to string
                     // if (type == 0) {
-                    //     List<?> otherName = getOtherName(altName);
-                    //     if (otherName != null) {
-                    //         sans.add(Arrays.asList(type, otherName));
-                    //     }
+                    // List<?> otherName = getOtherName(altName);
+                    // if (otherName != null) {
+                    // sans.add(Arrays.asList(type, otherName));
+                    // }
                     // } else {
-                    //     sans.add(altName);
+                    // sans.add(altName);
                     // }
                 }
                 san = sans.toString();
@@ -724,36 +800,35 @@ public class DefaultSslKeyStore implements SslKeyStore {
         return san;
     }
 
-//    private List<String> getOtherName(List<?> altName) {
-//        ASN1Primitive oct =  null;
-//        try {
-//            byte[] altNameBytes = (byte[]) altName.get(1);
-//            oct = (new ASN1InputStream(new ByteArrayInputStream(altNameBytes)).readObject());
-//        } catch (IOException e) {
-//            throw new RuntimeException("Could not read ASN1InputStream", e);
-//        }
-//        if (oct instanceof ASN1TaggedObject) {
-//            oct = ((ASN1TaggedObject) oct).getObject();
-//        }
-//        ASN1Sequence seq = ASN1Sequence.getInstance(oct);
-//
-//        // Get object identifier from first in sequence
-//        ASN1ObjectIdentifier asnOID = (ASN1ObjectIdentifier) seq.getObjectAt(0);
-//        String oid = asnOID.getId();
-//
-//        // Get value of object from second element
-//        final ASN1TaggedObject obj = (ASN1TaggedObject) seq.getObjectAt(1);
-//        // Could be tagged twice due to bug in java cert.getSubjectAltName
-//        ASN1Primitive prim = obj.getObject();
-//        if (prim instanceof ASN1TaggedObject) {
-//            prim = ASN1TaggedObject.getInstance(((ASN1TaggedObject) prim)).getObject();
-//        }
-//
-//        if (prim instanceof ASN1String) {
-//            return Collections.unmodifiableList(Arrays.asList(oid, ((ASN1String) prim).getString()));
-//        }
-//
-//        return null;
-//    }
+    // private List<String> getOtherName(List<?> altName) {
+    // ASN1Primitive oct = null;
+    // try {
+    // byte[] altNameBytes = (byte[]) altName.get(1);
+    // oct = (new ASN1InputStream(new ByteArrayInputStream(altNameBytes)).readObject());
+    // } catch (IOException e) {
+    // throw new RuntimeException("Could not read ASN1InputStream", e);
+    // }
+    // if (oct instanceof ASN1TaggedObject) {
+    // oct = ((ASN1TaggedObject) oct).getObject();
+    // }
+    // ASN1Sequence seq = ASN1Sequence.getInstance(oct);
+    //
+    // // Get object identifier from first in sequence
+    // ASN1ObjectIdentifier asnOID = (ASN1ObjectIdentifier) seq.getObjectAt(0);
+    // String oid = asnOID.getId();
+    //
+    // // Get value of object from second element
+    // final ASN1TaggedObject obj = (ASN1TaggedObject) seq.getObjectAt(1);
+    // // Could be tagged twice due to bug in java cert.getSubjectAltName
+    // ASN1Primitive prim = obj.getObject();
+    // if (prim instanceof ASN1TaggedObject) {
+    // prim = ASN1TaggedObject.getInstance(((ASN1TaggedObject) prim)).getObject();
+    // }
+    //
+    // if (prim instanceof ASN1String) {
+    // return Collections.unmodifiableList(Arrays.asList(oid, ((ASN1String) prim).getString()));
+    // }
+    //
+    // return null;
+    // }
 }
-

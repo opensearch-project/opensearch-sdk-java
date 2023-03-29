@@ -176,10 +176,11 @@ public class ExtensionsRunner {
         // If they require later initialization, create a concrete wrapper class and update the internals
         ExtensionSettings extensionSettings = extension.getExtensionSettings();
         Settings.Builder settingsBuilder = Settings.builder()
-                .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
-                .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
-                .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort());
-        boolean sslEnabled = extensionSettings.getOtherSettings().containsKey("ssl.transport.enabled") && "true".equals(extensionSettings.getOtherSettings().get("ssl.transport.enabled"));
+            .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
+            .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
+            .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort());
+        boolean sslEnabled = extensionSettings.getOtherSettings().containsKey("ssl.transport.enabled")
+            && "true".equals(extensionSettings.getOtherSettings().get("ssl.transport.enabled"));
         if (sslEnabled) {
             addSettingsToBuilder(settingsBuilder, "ssl.transport.pemcert_filepath", extensionSettings);
             addSettingsToBuilder(settingsBuilder, "ssl.transport.pemkey_filepath", extensionSettings);
@@ -243,7 +244,12 @@ public class ExtensionsRunner {
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
                 for (Route route : extensionRestHandler.routes()) {
                     if (route instanceof RouteHandler && ((RouteHandler) route).name() != null) {
-                        extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), ((RouteHandler)route).name(), extensionRestHandler);
+                        extensionRestPathRegistry.registerHandler(
+                            route.getMethod(),
+                            route.getPath(),
+                            ((RouteHandler) route).name(),
+                            extensionRestHandler
+                        );
                     } else {
                         extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
                     }
@@ -403,7 +409,13 @@ public class ExtensionsRunner {
     public void startTransportService(TransportService transportService) {
         transportService.addMessageListener(new TransportMessageListener() {
             @Override
-            public void onRequestSent(DiscoveryNode node, long requestId, String action, TransportRequest request, TransportRequestOptions finalOptions) {
+            public void onRequestSent(
+                DiscoveryNode node,
+                long requestId,
+                String action,
+                TransportRequest request,
+                TransportRequestOptions finalOptions
+            ) {
 
                 TransportMessageListener.super.onRequestSent(node, requestId, action, request, finalOptions);
             }

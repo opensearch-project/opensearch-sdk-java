@@ -12,15 +12,11 @@ package org.opensearch.sdk.handlers;
 import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
-import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.discovery.InitializeExtensionRequest;
 import org.opensearch.discovery.InitializeExtensionResponse;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.SDKTransportService;
-import org.opensearch.transport.TransportMessageListener;
-import org.opensearch.transport.TransportRequest;
-import org.opensearch.transport.TransportRequestOptions;
 import org.opensearch.transport.TransportService;
 
 import static org.opensearch.sdk.ExtensionsRunner.NODE_NAME_SETTING;
@@ -70,7 +66,10 @@ public class ExtensionsInitRequestHandler {
             extensionsRunner.setExtensionNode(extensionInitRequest.getExtension());
             // TODO: replace with sdkTransportService.getTransportService()
             TransportService extensionTransportService = extensionsRunner.getExtensionTransportService();
-            extensionTransportService.connectToNodeAsExtension(extensionsRunner.opensearchNode, extensionInitRequest.getExtension().getId());
+            extensionTransportService.connectToNodeAsExtension(
+                extensionsRunner.opensearchNode,
+                extensionInitRequest.getExtension().getId()
+            );
             extensionsRunner.sendRegisterRestActionsRequest(extensionTransportService);
             extensionsRunner.sendRegisterCustomSettingsRequest(extensionTransportService);
             sdkTransportService.sendRegisterTransportActionsRequest(extensionsRunner.getSdkActionModule().getActions());

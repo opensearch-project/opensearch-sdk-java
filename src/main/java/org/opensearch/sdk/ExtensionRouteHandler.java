@@ -1,3 +1,12 @@
+/*
+ * Copyright OpenSearch Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ */
+
 package org.opensearch.sdk;
 
 import org.opensearch.rest.RestRequest;
@@ -9,7 +18,13 @@ import java.util.function.Function;
 
 public class ExtensionRouteHandler extends RouteHandler {
 
-    public ExtensionRouteHandler(String extensionShortName, String handlerName, RestRequest.Method method, String path, Function<ExtensionRestRequest, ExtensionRestResponse> handler) {
+    public ExtensionRouteHandler(
+        String extensionShortName,
+        String handlerName,
+        RestRequest.Method method,
+        String path,
+        Function<ExtensionRestRequest, ExtensionRestResponse> handler
+    ) {
         super("extension:" + extensionShortName + "/" + handlerName, method, path, handler);
     }
 }
