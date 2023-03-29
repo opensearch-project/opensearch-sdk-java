@@ -17,14 +17,15 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.xcontent.XContentType;
-import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.rest.RestResponse;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.ExtensionRestHandler;
+import org.opensearch.sdk.TestBaseExtensionRestHandler;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestRestHelloAction extends OpenSearchTestCase {
@@ -65,8 +66,15 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         String token = "placeholder_token";
         Map<String, String> params = Collections.emptyMap();
 
-        ExtensionRestRequest getRequest = new ExtensionRestRequest(Method.GET, "/hello", params, null, new BytesArray(""), token);
-        ExtensionRestRequest putRequest = new ExtensionRestRequest(
+        RestRequest getRequest = TestBaseExtensionRestHandler.createTestRestRequest(
+            Method.GET,
+            "/hello",
+            params,
+            null,
+            new BytesArray(""),
+            token
+        );
+        RestRequest putRequest = TestBaseExtensionRestHandler.createTestRestRequest(
             Method.PUT,
             "/hello/Passing+Test",
             Map.of("name", "Passing+Test"),
@@ -74,7 +82,7 @@ public class TestRestHelloAction extends OpenSearchTestCase {
             new BytesArray(""),
             token
         );
-        ExtensionRestRequest postRequest = new ExtensionRestRequest(
+        RestRequest postRequest = TestBaseExtensionRestHandler.createTestRestRequest(
             Method.POST,
             "/hello",
             params,
@@ -82,7 +90,7 @@ public class TestRestHelloAction extends OpenSearchTestCase {
             new BytesArray("{\"adjective\":\"testable\"}"),
             token
         );
-        ExtensionRestRequest badPostRequest = new ExtensionRestRequest(
+        RestRequest badPostRequest = TestBaseExtensionRestHandler.createTestRestRequest(
             Method.POST,
             "/hello",
             params,
@@ -90,7 +98,7 @@ public class TestRestHelloAction extends OpenSearchTestCase {
             new BytesArray("{\"adjective\":\"\"}"),
             token
         );
-        ExtensionRestRequest noContentPostRequest = new ExtensionRestRequest(
+        RestRequest noContentPostRequest = TestBaseExtensionRestHandler.createTestRestRequest(
             Method.POST,
             "/hello",
             params,
@@ -98,7 +106,7 @@ public class TestRestHelloAction extends OpenSearchTestCase {
             new BytesArray(""),
             token
         );
-        ExtensionRestRequest badContentTypePostRequest = new ExtensionRestRequest(
+        RestRequest badContentTypePostRequest = TestBaseExtensionRestHandler.createTestRestRequest(
             Method.POST,
             "/hello",
             params,
@@ -106,8 +114,15 @@ public class TestRestHelloAction extends OpenSearchTestCase {
             new BytesArray("yaml:"),
             token
         );
-        ExtensionRestRequest deleteRequest = new ExtensionRestRequest(Method.DELETE, "/goodbye", params, null, new BytesArray(""), token);
-        ExtensionRestRequest badRequest = new ExtensionRestRequest(
+        RestRequest deleteRequest = TestBaseExtensionRestHandler.createTestRestRequest(
+            Method.DELETE,
+            "/goodbye",
+            params,
+            null,
+            new BytesArray(""),
+            token
+        );
+        RestRequest badRequest = TestBaseExtensionRestHandler.createTestRestRequest(
             Method.PUT,
             "/hello/Bad%Request",
             Map.of("name", "Bad%Request"),
@@ -115,9 +130,23 @@ public class TestRestHelloAction extends OpenSearchTestCase {
             new BytesArray(""),
             token
         );
-        ExtensionRestRequest unhandledMethodRequest = new ExtensionRestRequest(Method.HEAD, "/hi", params, null, new BytesArray(""), token);
-        ExtensionRestRequest unhandledPathRequest = new ExtensionRestRequest(Method.GET, "/hi", params, null, new BytesArray(""), token);
-        ExtensionRestRequest unhandledPathLengthRequest = new ExtensionRestRequest(
+        RestRequest unhandledMethodRequest = TestBaseExtensionRestHandler.createTestRestRequest(
+            Method.HEAD,
+            "/hi",
+            params,
+            null,
+            new BytesArray(""),
+            token
+        );
+        RestRequest unhandledPathRequest = TestBaseExtensionRestHandler.createTestRestRequest(
+            Method.GET,
+            "/hi",
+            params,
+            null,
+            new BytesArray(""),
+            token
+        );
+        RestRequest unhandledPathLengthRequest = TestBaseExtensionRestHandler.createTestRestRequest(
             Method.DELETE,
             "/goodbye/cruel/world",
             params,

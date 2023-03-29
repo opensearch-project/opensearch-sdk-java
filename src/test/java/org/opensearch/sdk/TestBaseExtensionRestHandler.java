@@ -119,7 +119,7 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
 
     }
 
-    private RestRequest createTestRestRequest(
+    public static RestRequest createTestRestRequest(
         final Method method,
         final String path,
         final Map<String, String> params,
