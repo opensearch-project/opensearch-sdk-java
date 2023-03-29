@@ -15,7 +15,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -31,6 +33,7 @@ public class ExtensionSettings {
     private String opensearchPort;
 
     private String shortName;
+    private Map<String, String> otherSettings;
 
     /**
      * Jackson requires a no-arg constructor.
@@ -49,15 +52,17 @@ public class ExtensionSettings {
      * @param hostPort  The port to bind this extension to.
      * @param opensearchAddress  The IP Address on which OpenSearch is running.
      * @param opensearchPort  The port on which OpenSearch is running.
+     * @param otherSettings A generic map of any settings set in the config file that are not default setting keys
      */
-    public ExtensionSettings(String extensionName, String shortName, String hostAddress, String hostPort, String opensearchAddress, String opensearchPort) {
+    public ExtensionSettings(String extensionName, String shortName, String hostAddress, String hostPort, String opensearchAddress, String opensearchPort, Map<String, String> otherSettings) {
         super();
         this.extensionName = extensionName;
+        this.shortName = shortName;
         this.hostAddress = hostAddress;
         this.hostPort = hostPort;
         this.opensearchAddress = opensearchAddress;
         this.opensearchPort = opensearchPort;
-        this.shortName = shortName;
+        this.otherSettings = otherSettings;
     }
 
     public String getExtensionName() {
@@ -83,6 +88,10 @@ public class ExtensionSettings {
         return opensearchPort;
     }
 
+    public Map<String, String> getOtherSettings() {
+        return otherSettings;
+    }
+
     @Override
     public String toString() {
         return "ExtensionSettings{extensionName="
@@ -97,6 +106,8 @@ public class ExtensionSettings {
             + opensearchAddress
             + ", opensearchPort="
             + opensearchPort
+            + ", otherSettings="
+            + otherSettings
             + "}";
     }
 
@@ -118,13 +129,21 @@ public class ExtensionSettings {
             if (extensionMap == null) {
                 throw new IOException("extension.yml is empty");
             }
+            Map<String, String> otherSettings = new HashMap<>();
+            Set<String> defaultSettings = Set.of("extensionName", "shortName", "hostAddress", "hostPort", "opensearchAddress", "opensearchPort");
+            for (String settingKey : extensionMap.keySet()) {
+                if (!defaultSettings.contains(settingKey)) {
+                    otherSettings.put(settingKey, extensionMap.get(settingKey).toString());
+                }
+            }
             return new ExtensionSettings(
                 extensionMap.get("extensionName").toString(),
                 extensionMap.get("shortName").toString(),
                 extensionMap.get("hostAddress").toString(),
                 extensionMap.get("hostPort").toString(),
                 extensionMap.get("opensearchAddress").toString(),
-                extensionMap.get("opensearchPort").toString()
+                extensionMap.get("opensearchPort").toString(),
+                otherSettings
             );
         } catch (URISyntaxException e) {
             throw new IOException("Error reading from extension.yml");

@@ -175,15 +175,19 @@ public class ExtensionsRunner {
         // These must have getters from this class to be accessible via createComponents
         // If they require later initialization, create a concrete wrapper class and update the internals
         ExtensionSettings extensionSettings = extension.getExtensionSettings();
-        this.settings = Settings.builder()
-            .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
-            .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
-            .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
-            .put("ssl.transport.pemcert_filepath", "certs/extension-01.pem")
-            .put("ssl.transport.pemkey_filepath", "certs/extension-01-key.pem")
-            .put("ssl.transport.pemtrustedcas_filepath", "certs/root-ca.pem")
-            .put("path.home", "/Users/cwperx/Projects/opensearch/opensearch-sdk-java")
-            .build();
+        Settings.Builder settingsBuilder = Settings.builder()
+                .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
+                .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
+                .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort());
+        boolean sslEnabled = extensionSettings.getOtherSettings().containsKey("ssl.transport.enabled") && "true".equals(extensionSettings.getOtherSettings().get("ssl.transport.enabled"));
+        if (sslEnabled) {
+            addSettingsToBuilder(settingsBuilder, "ssl.transport.pemcert_filepath", extensionSettings);
+            addSettingsToBuilder(settingsBuilder, "ssl.transport.pemkey_filepath", extensionSettings);
+            addSettingsToBuilder(settingsBuilder, "ssl.transport.pemtrustedcas_filepath", extensionSettings);
+            addSettingsToBuilder(settingsBuilder, "path.home", extensionSettings);
+        }
+        this.settings = settingsBuilder.build();
+
         this.threadPool = new ThreadPool(settings);
         this.taskManager = new TaskManager(settings, threadPool, Collections.emptySet());
 
@@ -245,6 +249,12 @@ public class ExtensionsRunner {
                     }
                 }
             }
+        }
+    }
+
+    private void addSettingsToBuilder(Settings.Builder settingsBuilder, String settingKey, ExtensionSettings extensionSettings) {
+        if (extensionSettings.getOtherSettings().containsKey(settingKey)) {
+            settingsBuilder.put(settingKey, extensionSettings.getOtherSettings().get(settingKey));
         }
     }
 
