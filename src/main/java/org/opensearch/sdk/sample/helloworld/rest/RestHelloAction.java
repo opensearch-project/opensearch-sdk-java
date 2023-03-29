@@ -21,7 +21,6 @@ import org.opensearch.extensions.rest.RouteHandler;
 import org.opensearch.sdk.BaseExtensionRestHandler;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionRouteHandler;
-import org.opensearch.sdk.ExtensionsRunner;
 
 import java.io.IOException;
 import java.net.URLDecoder;

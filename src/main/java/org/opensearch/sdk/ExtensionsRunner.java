@@ -243,10 +243,10 @@ public class ExtensionsRunner {
                 for (Route route : extensionRestHandler.routes()) {
                     if (route instanceof RouteHandler && ((RouteHandler) route).name() != null) {
                         extensionRestPathRegistry.registerHandler(
-                                route.getMethod(),
-                                route.getPath(),
-                                ((RouteHandler) route).name(),
-                                extensionRestHandler
+                            route.getMethod(),
+                            route.getPath(),
+                            ((RouteHandler) route).name(),
+                            extensionRestHandler
                         );
                     } else {
                         extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
