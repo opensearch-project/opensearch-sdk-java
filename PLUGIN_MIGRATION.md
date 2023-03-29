@@ -66,11 +66,6 @@ Many of these components are also available via Guice injection.
 
 Optionally change the `routes()` to `routeHandlers()`.  Change `prepareRequest()` to `handleRequest()`.
 
-### Replace RestRequest with ExtensionRestRequest
-
- - Change `request.contentParser()` to `request.contentParser(this.namedXContentRegistry)`
- - Change `request.getHttpRequest().method()` to `request.method()`
-
 ### Replace BytesRestResponse with ExtensionRestResponse
 
  - Add the `request` as the first parameter, the remainder of the parameters should be the same.
