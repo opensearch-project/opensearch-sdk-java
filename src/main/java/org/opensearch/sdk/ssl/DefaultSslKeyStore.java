@@ -495,19 +495,6 @@ public class DefaultSslKeyStore implements SslKeyStore {
 
     }
 
-    @Override
-    public String getTransportServerProviderName() {
-        return sslTransportServerProvider == null ? null : sslTransportServerProvider.toString();
-    }
-
-    @Override
-    public String getTransportClientProviderName() {
-        return sslTransportClientProvider == null ? null : sslTransportClientProvider.toString();
-    }
-
-    @Override
-    public X509Certificate[] getTransportCerts() { return transportCerts; }
-
     /**
      * Sets the transport X509Certificates.
      * @param certs          New X509 Certificates
