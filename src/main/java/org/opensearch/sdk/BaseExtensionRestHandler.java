@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.opensearch.common.xcontent.json.JsonXContent;
-import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
@@ -56,7 +55,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     /**
      * Determines if the request's path is a match for the configured handler path.
      *
-     * @param requestPath The path from the {@link ExtensionRestRequest}
+     * @param requestPath The path from the {@link RestRequest}
      * @param handlerPath The path from the {@link RouteHandler}
      * @return true if the request path matches the route
      */
