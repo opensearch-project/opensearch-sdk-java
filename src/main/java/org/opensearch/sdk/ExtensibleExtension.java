@@ -11,21 +11,8 @@ package org.opensearch.sdk;
 
 import java.util.List;
 
-/**
- * An extension point for {@link Extension} implementations to be themselves extensible.
- *
- * This class provides a callback for extensible Extensions to be informed of other Extensions
- * which extend them.
- *
- * @opensearch.api
- */
 public interface ExtensibleExtension {
 
-    /**
-     * Extension point for external Extensions to be extendable
-     *
-     * @opensearch.api
-     */
     interface ExtensionLoader {
         /**
          * Load extensions of the type from all extending Extensions. The concrete extensions must have either a no-arg constructor
