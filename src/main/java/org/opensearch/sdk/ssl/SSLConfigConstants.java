@@ -17,7 +17,8 @@ import org.opensearch.common.settings.Settings;
 
 public final class SSLConfigConstants {
     public static final String SSL_TRANSPORT_ENABLED = "ssl.transport.enabled";
-    public static final boolean SSL_TRANSPORT_ENABLED_DEFAULT = true;
+    // TODO Replace this with true when security changes are complete
+    public static final boolean SSL_TRANSPORT_ENABLED_DEFAULT = false;
     public static final String SSL_TRANSPORT_ENFORCE_HOSTNAME_VERIFICATION = "ssl.transport.enforce_hostname_verification";
     public static final String SSL_TRANSPORT_ENFORCE_HOSTNAME_VERIFICATION_RESOLVE_HOST_NAME = "ssl.transport.resolve_hostname";
 
