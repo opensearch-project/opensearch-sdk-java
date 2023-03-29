@@ -40,6 +40,21 @@ public class ExtensionRestPathRegistry {
     }
 
     /**
+     * Register a REST handler to handle a method and route in this extension's path registry.
+     *
+     * @param method  The method to register.
+     * @param path  The path to register. May include named wildcards.
+     * @param name  An optional name of the REST handler
+     * @param extensionRestHandler  The RestHandler to handle this route
+     */
+    public void registerHandler(Method method, String path, String name, ExtensionRestHandler extensionRestHandler) {
+        String restPathWithoutName = restPathToString(method, path);
+        pathTrie.insert(restPathWithoutName, extensionRestHandler);
+        String restPathWithName = restPathToString(method, path, name);
+        registeredPaths.add(restPathWithName);
+    }
+
+    /**
      * Get the registered REST handler for the specified method and URI.
      *
      * @param method  the registered method.
@@ -68,5 +83,17 @@ public class ExtensionRestPathRegistry {
      */
     public static String restPathToString(Method method, String path) {
         return method.name() + " " + path;
+    }
+
+    /**
+     * Converts a REST method and path to a space delimited string to be used as a map lookup key.
+     *
+     * @param method  the method.
+     * @param path  the path.
+     * @param name  the name.
+     * @return A string appending the method and path.
+     */
+    public static String restPathToString(Method method, String path, String name) {
+        return method.name() + " " + path + " " + name;
     }
 }

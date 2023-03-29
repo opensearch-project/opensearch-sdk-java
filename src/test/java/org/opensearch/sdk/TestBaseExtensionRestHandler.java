@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
+import org.opensearch.extensions.rest.RouteHandler;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.test.OpenSearchTestCase;

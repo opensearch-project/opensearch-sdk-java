@@ -18,6 +18,7 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
+import org.opensearch.extensions.rest.RouteHandler;
 import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
@@ -178,6 +179,7 @@ public class ExtensionsRunner {
         boolean sslEnabled = extensionSettings.getOtherSettings().containsKey("ssl.transport.enabled")
             && "true".equals(extensionSettings.getOtherSettings().get("ssl.transport.enabled"));
         if (sslEnabled) {
+            addSettingsToBuilder(settingsBuilder, "ssl.transport.enabled", extensionSettings);
             addSettingsToBuilder(settingsBuilder, "ssl.transport.pemcert_filepath", extensionSettings);
             addSettingsToBuilder(settingsBuilder, "ssl.transport.pemkey_filepath", extensionSettings);
             addSettingsToBuilder(settingsBuilder, "ssl.transport.pemtrustedcas_filepath", extensionSettings);
@@ -239,7 +241,16 @@ public class ExtensionsRunner {
             // store REST handlers in the registry
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
                 for (Route route : extensionRestHandler.routes()) {
-                    extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
+                    if (route instanceof RouteHandler && ((RouteHandler) route).name() != null) {
+                        extensionRestPathRegistry.registerHandler(
+                                route.getMethod(),
+                                route.getPath(),
+                                ((RouteHandler) route).name(),
+                                extensionRestHandler
+                        );
+                    } else {
+                        extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
+                    }
                 }
             }
         }
