@@ -21,9 +21,9 @@ import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.xcontent.XContentType;
+import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.rest.RestResponse;
 import org.opensearch.rest.RestStatus;
-import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.test.OpenSearchTestCase;
 

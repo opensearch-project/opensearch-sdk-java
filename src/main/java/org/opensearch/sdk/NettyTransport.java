@@ -105,6 +105,7 @@ public class NettyTransport {
      * @return The initialized TransportService object.
      */
     public TransportService initializeExtensionTransportService(Settings settings, ThreadPool threadPool) {
+
         Netty4Transport transport = getNetty4Transport(settings, threadPool);
 
         // create transport service

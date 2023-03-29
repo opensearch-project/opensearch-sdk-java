@@ -53,13 +53,6 @@ public class RestHelloAction extends BaseExtensionRestHandler {
     private List<String> worldAdjectives = new ArrayList<>();
     private Random rand = new Random();
 
-    /**
-     * Instantiate this action
-     *
-     * @param runner The ExtensionsRunner instance
-     */
-    public RestHelloAction() {}
-
     @Override
     public List<RouteHandler> routeHandlers() {
         return List.of(

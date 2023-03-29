@@ -3,7 +3,6 @@ hostAddress: 127.0.0.1
 hostPort: 4532
 opensearchAddress: 127.0.0.1
 opensearchPort: 9200
-shortName: hw
 ssl.transport.enabled: true
 ssl.transport.pemcert_filepath: certs/extension-01.pem
 ssl.transport.pemkey_filepath: certs/extension-01-key.pem
