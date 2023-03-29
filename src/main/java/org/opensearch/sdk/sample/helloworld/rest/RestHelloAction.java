@@ -11,8 +11,8 @@ package org.opensearch.sdk.sample.helloworld.rest;
 
 import org.opensearch.OpenSearchParseException;
 import org.opensearch.common.bytes.BytesReference;
-import org.opensearch.common.xcontent.NamedXContentRegistry;
-import org.opensearch.common.xcontent.XContentBuilder;
+import org.opensearch.core.xcontent.NamedXContentRegistry;
+import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
