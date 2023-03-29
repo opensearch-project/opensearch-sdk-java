@@ -56,7 +56,7 @@ public class HelloWorldExtension extends BaseExtension implements ActionExtensio
 
     @Override
     public List<ExtensionRestHandler> getExtensionRestHandlers() {
-        return List.of(new RestHelloAction(this.getExtensionSettings().getShortName()), new RestRemoteHelloAction(extensionsRunner()));
+        return List.of(new RestHelloAction(), new RestRemoteHelloAction(extensionsRunner()));
     }
 
     @Override

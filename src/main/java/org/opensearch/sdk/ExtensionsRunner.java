@@ -32,7 +32,6 @@ import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.rest.RestHandler.Route;
-import org.opensearch.extensions.rest.RouteHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
@@ -47,9 +46,6 @@ import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
 import org.opensearch.tasks.TaskManager;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.transport.TransportMessageListener;
-import org.opensearch.transport.TransportRequest;
-import org.opensearch.transport.TransportRequestOptions;
 import org.opensearch.transport.TransportResponse;
 import org.opensearch.transport.TransportResponseHandler;
 import org.opensearch.transport.TransportService;
@@ -176,10 +172,11 @@ public class ExtensionsRunner {
         // If they require later initialization, create a concrete wrapper class and update the internals
         ExtensionSettings extensionSettings = extension.getExtensionSettings();
         Settings.Builder settingsBuilder = Settings.builder()
-                .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
-                .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
-                .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort());
-        boolean sslEnabled = extensionSettings.getOtherSettings().containsKey("ssl.transport.enabled") && "true".equals(extensionSettings.getOtherSettings().get("ssl.transport.enabled"));
+            .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
+            .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
+            .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort());
+        boolean sslEnabled = extensionSettings.getOtherSettings().containsKey("ssl.transport.enabled")
+            && "true".equals(extensionSettings.getOtherSettings().get("ssl.transport.enabled"));
         if (sslEnabled) {
             addSettingsToBuilder(settingsBuilder, "ssl.transport.pemcert_filepath", extensionSettings);
             addSettingsToBuilder(settingsBuilder, "ssl.transport.pemkey_filepath", extensionSettings);
@@ -242,11 +239,7 @@ public class ExtensionsRunner {
             // store REST handlers in the registry
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
                 for (Route route : extensionRestHandler.routes()) {
-                    if (route instanceof RouteHandler && ((RouteHandler) route).name() != null) {
-                        extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), ((RouteHandler)route).name(), extensionRestHandler);
-                    } else {
-                        extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
-                    }
+                    extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
                 }
             }
         }
@@ -401,13 +394,6 @@ public class ExtensionsRunner {
      * @param transportService  The TransportService to start.
      */
     public void startTransportService(TransportService transportService) {
-        transportService.addMessageListener(new TransportMessageListener() {
-            @Override
-            public void onRequestSent(DiscoveryNode node, long requestId, String action, TransportRequest request, TransportRequestOptions finalOptions) {
-
-                TransportMessageListener.super.onRequestSent(node, requestId, action, request, finalOptions);
-            }
-        });
         // start transport service and accept incoming requests
         transportService.start();
         transportService.acceptIncomingRequests();

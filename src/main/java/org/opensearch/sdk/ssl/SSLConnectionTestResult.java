@@ -26,4 +26,3 @@ public enum SSLConnectionTestResult {
      */
     SSL_AVAILABLE
 }
-

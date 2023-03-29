@@ -63,8 +63,7 @@ public final class SecureSSLSettings {
         public final String defaultValue;
 
         public Setting<SecureString> asSetting() {
-            return SecureSetting.secureString(this.propertyName,
-                    new InsecureFallbackStringSetting(this.insecurePropertyName));
+            return SecureSetting.secureString(this.propertyName, new InsecureFallbackStringSetting(this.insecurePropertyName));
         }
 
         public Setting<SecureString> asInsecureSetting() {
@@ -77,9 +76,9 @@ public final class SecureSSLSettings {
 
         public String getSetting(Settings settings, String defaultValue) {
             return Optional.of(this.asSetting().get(settings))
-                    .filter(ss -> ss.length() > 0)
-                    .map(SecureString::toString)
-                    .orElse(defaultValue);
+                .filter(ss -> ss.length() > 0)
+                .map(SecureString::toString)
+                .orElse(defaultValue);
         }
     }
 
@@ -87,8 +86,8 @@ public final class SecureSSLSettings {
 
     public static List<Setting<?>> getSecureSettings() {
         return Arrays.stream(SSLSetting.values())
-                .flatMap(setting -> Stream.of(setting.asSetting(), setting.asInsecureSetting()))
-                .collect(Collectors.toList());
+            .flatMap(setting -> Stream.of(setting.asSetting(), setting.asInsecureSetting()))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -105,12 +104,15 @@ public final class SecureSSLSettings {
 
         public SecureString get(Settings settings) {
             if (this.exists(settings)) {
-                LOG.warn("Setting [{}] has a secure counterpart [{}{}] which should be used instead - allowing for legacy SSL setups",
-                        this.name, this.name, SECURE_SUFFIX);
+                LOG.warn(
+                    "Setting [{}] has a secure counterpart [{}{}] which should be used instead - allowing for legacy SSL setups",
+                    this.name,
+                    this.name,
+                    SECURE_SUFFIX
+                );
             }
 
             return super.get(settings);
         }
     }
 }
-
