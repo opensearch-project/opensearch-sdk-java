@@ -141,7 +141,7 @@ public class ExtensionsRestRequestHandler {
         }, null);
 
         // Get response from extension
-        ExtensionRestResponse response = restHandler.handleRequest(request);
+        ExtensionRestResponse response = restHandler.handleRequest(restRequest);
         logger.info("Sending extension response to OpenSearch: " + response.status());
         return new RestExecuteOnExtensionResponse(
             response.status(),
