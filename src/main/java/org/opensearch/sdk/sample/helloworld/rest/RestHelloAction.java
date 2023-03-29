@@ -70,9 +70,9 @@ public class RestHelloAction extends BaseExtensionRestHandler {
     public List<RouteHandler> routeHandlers() {
         return List.of(
             new ExtensionRouteHandler(this.extensionShortName, "greet", GET, "/hello", handleGetRequest),
-            new RouteHandler(POST, "/hello", handlePostRequest),
-            new RouteHandler(PUT, "/hello/{name}", handlePutRequest),
-            new RouteHandler(DELETE, "/goodbye", handleDeleteRequest)
+            new ExtensionRouteHandler(this.extensionShortName, "greet_with_adjective", POST, "/hello", handlePostRequest),
+            new ExtensionRouteHandler(this.extensionShortName, "greet_with_name", PUT, "/hello/{name}", handlePutRequest),
+            new ExtensionRouteHandler(this.extensionShortName, "goodbye", DELETE, "/goodbye", handleDeleteRequest)
         );
     }
 
