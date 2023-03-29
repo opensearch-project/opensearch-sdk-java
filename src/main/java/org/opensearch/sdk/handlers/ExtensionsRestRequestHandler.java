@@ -12,6 +12,7 @@ package org.opensearch.sdk.handlers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.bytes.BytesReference;
+import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
@@ -102,7 +103,8 @@ public class ExtensionsRestRequestHandler {
             public Map<String, List<String>> getHeaders() {
                 // This effectively recreates the only header we need right now
                 // PR replacing this will pass more headers
-                return Map.of("Content-Type", List.of(request.getXContentType().mediaType()));
+                XContentType xContentType = request.getXContentType();
+                return xContentType == null ? Collections.emptyMap() : Map.of("Content-Type", List.of(xContentType.mediaType()));
             }
 
             @Override

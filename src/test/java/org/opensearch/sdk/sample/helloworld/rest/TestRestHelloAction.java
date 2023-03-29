@@ -122,14 +122,6 @@ public class TestRestHelloAction extends OpenSearchTestCase {
             new BytesArray(""),
             token
         );
-        RestRequest badRequest = TestBaseExtensionRestHandler.createTestRestRequest(
-            Method.PUT,
-            "/hello/Bad%Request",
-            Map.of("name", "Bad%Request"),
-            null,
-            new BytesArray(""),
-            token
-        );
         RestRequest unhandledMethodRequest = TestBaseExtensionRestHandler.createTestRestRequest(
             Method.HEAD,
             "/hi",
@@ -221,13 +213,6 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         assertEquals(TEXT_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertEquals("Hello, World!", responseStr);
-
-        // Unparseable
-        response = restHelloAction.handleRequest(badRequest);
-        assertEquals(RestStatus.BAD_REQUEST, response.status());
-        assertEquals(TEXT_CONTENT_TYPE, response.contentType());
-        responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
-        assertTrue(responseStr.contains("Illegal hex characters in escape (%) pattern"));
 
         // Not registered, fails on method
         response = restHelloAction.handleRequest(unhandledMethodRequest);

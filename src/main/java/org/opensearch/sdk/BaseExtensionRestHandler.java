@@ -91,7 +91,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
             request,
             NOT_FOUND,
             "error",
-            "Extension REST action improperly configured to handle: [" + request.toString() + "]"
+            "Extension REST action improperly configured to handle: [" + request.method() + " " + request.uri() + "]"
         );
     }
 

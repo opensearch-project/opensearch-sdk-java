@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
@@ -98,7 +99,11 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
         ExtensionRestResponse response = handler.handleRequest(unhandledRequestMethod);
         assertEquals(RestStatus.NOT_FOUND, response.status());
         assertEquals(
-            "{\"error\":\"Extension REST action improperly configured to handle: [" + unhandledRequestMethod + "]\"}",
+            "{\"error\":\"Extension REST action improperly configured to handle: ["
+                + unhandledRequestMethod.method()
+                + " "
+                + unhandledRequestMethod.uri()
+                + "]\"}",
             response.content().utf8ToString()
         );
 
@@ -113,10 +118,13 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
         response = handler.handleRequest(unhandledRequestPath);
         assertEquals(RestStatus.NOT_FOUND, response.status());
         assertEquals(
-            "{\"error\":\"Extension REST action improperly configured to handle: [" + unhandledRequestPath + "]\"}",
+            "{\"error\":\"Extension REST action improperly configured to handle: ["
+                + unhandledRequestPath.method()
+                + " "
+                + unhandledRequestPath.uri()
+                + "]\"}",
             response.content().utf8ToString()
         );
-
     }
 
     public static RestRequest createTestRestRequest(
@@ -139,7 +147,11 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
 
             @Override
             public String uri() {
-                return path;
+                StringBuilder uri = new StringBuilder();
+                for (Entry<String, String> param : params.entrySet()) {
+                    uri.append(uri.isEmpty() ? '?' : '&').append(param.getKey()).append('=').append(param.getValue());
+                }
+                return path + uri.toString();
             }
 
             @Override
@@ -149,7 +161,7 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
 
             @Override
             public Map<String, List<String>> getHeaders() {
-                return Map.of("Content-Type", List.of(xContentType.mediaType()));
+                return xContentType == null ? Collections.emptyMap() : Map.of("Content-Type", List.of(xContentType.mediaType()));
             }
 
             @Override
