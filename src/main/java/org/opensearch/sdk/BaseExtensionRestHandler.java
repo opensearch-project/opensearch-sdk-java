@@ -18,11 +18,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.opensearch.common.xcontent.json.JsonXContent;
-import org.opensearch.rest.RestHandler.Route;
-import org.opensearch.rest.RestStatus;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
-import org.opensearch.extensions.rest.RouteHandler;
+import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.rest.RestStatus;
 
 /**
  * Provides convenience methods to reduce boilerplate code in an {@link ExtensionRestHandler} implementation.

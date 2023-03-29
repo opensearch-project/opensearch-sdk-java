@@ -17,10 +17,9 @@ import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
-import org.opensearch.extensions.rest.RouteHandler;
 import org.opensearch.sdk.BaseExtensionRestHandler;
 import org.opensearch.sdk.ExtensionRestHandler;
-import org.opensearch.sdk.ExtensionRouteHandler;
+import org.opensearch.sdk.RouteHandler;
 
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -54,21 +53,17 @@ public class RestHelloAction extends BaseExtensionRestHandler {
     private List<String> worldAdjectives = new ArrayList<>();
     private Random rand = new Random();
 
-    private String extensionShortName;
-
     /**
      * Instantiate this action
      *
      * @param runner The ExtensionsRunner instance
      */
-    public RestHelloAction(String extensionShortName) {
-        this.extensionShortName = extensionShortName;
-    }
+    public RestHelloAction() {}
 
     @Override
     public List<RouteHandler> routeHandlers() {
         return List.of(
-            new ExtensionRouteHandler(this.extensionShortName, "greet", GET, "/hello", handleGetRequest),
+            new RouteHandler(GET, "/hello", handleGetRequest),
             new RouteHandler(POST, "/hello", handlePostRequest),
             new RouteHandler(PUT, "/hello/{name}", handlePutRequest),
             new RouteHandler(DELETE, "/goodbye", handleDeleteRequest)

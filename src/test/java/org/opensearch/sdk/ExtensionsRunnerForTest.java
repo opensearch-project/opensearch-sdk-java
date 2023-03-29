@@ -17,6 +17,7 @@ import java.io.IOException;
 public class ExtensionsRunnerForTest extends ExtensionsRunner {
 
     public static final String NODE_NAME = "sample-extension";
+    public static final String NODE_SHORT_NAME = "se";
     public static final String NODE_HOST = "127.0.0.1";
     public static final String NODE_PORT = "4532";
 
@@ -26,7 +27,7 @@ public class ExtensionsRunnerForTest extends ExtensionsRunner {
      * @throws IOException if the runner failed to read settings or API.
      */
     public ExtensionsRunnerForTest() throws IOException {
-        super(new BaseExtension(new ExtensionSettings(NODE_NAME, NODE_HOST, NODE_PORT, "127.0.0.1", "9200")) {
+        super(new BaseExtension(new ExtensionSettings(NODE_NAME, NODE_SHORT_NAME, NODE_HOST, NODE_PORT, "127.0.0.1", "9200")) {
         });
     }
 

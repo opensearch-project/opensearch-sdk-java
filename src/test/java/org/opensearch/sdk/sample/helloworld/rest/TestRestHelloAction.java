@@ -40,7 +40,7 @@ public class TestRestHelloAction extends OpenSearchTestCase {
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        restHelloAction = new RestHelloAction("hw");
+        restHelloAction = new RestHelloAction();
     }
 
     @Test
