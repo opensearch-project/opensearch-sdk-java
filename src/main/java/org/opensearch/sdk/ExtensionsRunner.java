@@ -152,7 +152,7 @@ public class ExtensionsRunner {
     private final ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
     private final ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
-    private final ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
+    private final ExtensionsRestRequestHandler extensionsRestRequestHandler;
     private final AtomicReference<RunnableTaskExecutionListener> runnableTaskListener;
     private final IndexNameExpressionResolver indexNameExpressionResolver;
     private final ExtensionActionRequestHandler extensionsActionRequestHandler;
@@ -195,8 +195,10 @@ public class ExtensionsRunner {
         this.customNamedXContent = extension.getNamedXContent();
         // save custom namedWriteable
         this.customNamedWriteables = extension.getNamedWriteables();
-        // initialize NamedXContent Registry. Must happen after getting extension namedXContent
+        // initialize NamedXContent Registry.
         this.sdkNamedXContentRegistry = new SDKNamedXContentRegistry(this);
+        // initialize RestRequest Handler. Must happen after instantiating SDKNamedXContentRegistry
+        this.extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry, sdkNamedXContentRegistry);
         // initialize NamedWriteable Registry. Must happen after getting extension namedWriteable
         this.sdkNamedWriteableRegistry = new SDKNamedWriteableRegistry(this);
 
