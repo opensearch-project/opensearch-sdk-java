@@ -154,7 +154,6 @@ public class ExtensionsRunner {
         new ExtensionsIndicesModuleNameRequestHandler();
     private final ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
     private final ExtensionActionRequestHandler extensionsActionRequestHandler;
-    private final List<ExecutorBuilder<?>> executorBuilders;
     private final AtomicReference<RunnableTaskExecutionListener> runnableTaskListener;
     private final IndexNameExpressionResolver indexNameExpressionResolver;
 
@@ -184,9 +183,9 @@ public class ExtensionsRunner {
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
             .build();
 
-        this.executorBuilders = extension.getExecutorBuilders(settings);
+        final List<ExecutorBuilder<?>> executorBuilders = extension.getExecutorBuilders(settings);
 
-        runnableTaskListener = new AtomicReference<>();
+        this.runnableTaskListener = new AtomicReference<>();
         this.threadPool = new ThreadPool(settings, runnableTaskListener, executorBuilders.toArray(new ExecutorBuilder[0]));
         this.indexNameExpressionResolver = new IndexNameExpressionResolver(this.threadPool.getThreadContext());
         this.taskManager = new TaskManager(settings, threadPool, Collections.emptySet());
