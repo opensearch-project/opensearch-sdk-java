@@ -253,9 +253,9 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
 
         final IllegalArgumentException exceptionTrue = expectThrows(
             IllegalArgumentException.class,
-            () -> VALIDATED_SETTING.get(Settings.builder().put(VALIDATED_SETTING.getKey(), "it's forbidden").build())
+            () -> VALIDATED_SETTING.get(Settings.builder().put(VALIDATED_SETTING.getKey(), "forbidden").build())
         );
 
-        assertEquals("Setting [it's forbidden] does not match regex [^((?!forbidden).)*$]", exceptionTrue.getMessage());
+        assertEquals("Setting [forbidden] must match regex [forbidden]", exceptionTrue.getMessage());
     }
 }

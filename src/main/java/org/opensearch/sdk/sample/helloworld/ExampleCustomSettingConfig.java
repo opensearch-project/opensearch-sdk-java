@@ -23,7 +23,7 @@ public class ExampleCustomSettingConfig {
      */
     public static final Setting<String> VALIDATED_SETTING = Setting.simpleString(
         "custom.validate",
-        new RegexValidator("^((?!" + FORBIDDEN_VALUE + ").)*$", true),
+        new RegexValidator(FORBIDDEN_VALUE, false),
         Property.NodeScope,
         Property.Dynamic
     );
