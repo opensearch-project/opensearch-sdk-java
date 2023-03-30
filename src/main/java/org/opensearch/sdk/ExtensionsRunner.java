@@ -198,7 +198,7 @@ public class ExtensionsRunner {
         this.customNamedWriteables = extension.getNamedWriteables();
         // initialize NamedXContent Registry.
         this.sdkNamedXContentRegistry = new SDKNamedXContentRegistry(this);
-        // initialize RestRequest Handler. Must happen after instantiating SDKNmaedXContentRegistry
+        // initialize RestRequest Handler. Must happen after instantiating SDKNamedXContentRegistry
         this.extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry, sdkNamedXContentRegistry);
         // initialize NamedWriteable Registry. Must happen after getting extension namedWriteable
         this.sdkNamedWriteableRegistry = new SDKNamedWriteableRegistry(this);
