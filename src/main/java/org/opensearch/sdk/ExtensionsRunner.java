@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.ClusterState;
+import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
@@ -43,6 +44,8 @@ import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
 import org.opensearch.tasks.TaskManager;
+import org.opensearch.threadpool.ExecutorBuilder;
+import org.opensearch.threadpool.RunnableTaskExecutionListener;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportResponse;
 import org.opensearch.transport.TransportResponseHandler;
@@ -63,6 +66,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -146,6 +150,8 @@ public class ExtensionsRunner {
     private ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
     private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
+    private final AtomicReference<RunnableTaskExecutionListener> runnableTaskListener;
+    private final IndexNameExpressionResolver indexNameExpressionResolver;
 
     /**
      * Instantiates a new update settings request handler
@@ -169,7 +175,11 @@ public class ExtensionsRunner {
             .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
             .build();
-        this.threadPool = new ThreadPool(settings);
+        final List<ExecutorBuilder<?>> executorBuilders = extension.getExecutorBuilders(settings);
+
+        this.runnableTaskListener = new AtomicReference<>();
+        this.threadPool = new ThreadPool(settings, runnableTaskListener, executorBuilders.toArray(new ExecutorBuilder[0]));
+        this.indexNameExpressionResolver = new IndexNameExpressionResolver(this.threadPool.getThreadContext());
         this.taskManager = new TaskManager(settings, threadPool, Collections.emptySet());
 
         // save custom settings
@@ -198,6 +208,7 @@ public class ExtensionsRunner {
             b.bind(SDKNamedXContentRegistry.class).toInstance(getNamedXContentRegistry());
             b.bind(ThreadPool.class).toInstance(getThreadPool());
             b.bind(TaskManager.class).toInstance(getTaskManager());
+            b.bind(IndexNameExpressionResolver.class).toInstance(indexNameExpressionResolver);
 
             b.bind(SDKClient.class).toInstance(getSdkClient());
             b.bind(SDKClusterService.class).toInstance(getSdkClusterService());
@@ -359,6 +370,10 @@ public class ExtensionsRunner {
 
     public List<NamedWriteableRegistry.Entry> getCustomNamedWriteables() {
         return this.customNamedWriteables;
+    }
+
+    public IndexNameExpressionResolver getIndexNameExpressionResolver() {
+        return this.indexNameExpressionResolver;
     }
 
     /**
