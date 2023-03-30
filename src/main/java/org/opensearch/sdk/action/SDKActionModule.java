@@ -21,7 +21,7 @@ import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.NamedRegistry;
 import org.opensearch.extensions.ExtensionsManager;
-import org.opensearch.extensions.RegisterTransportActionsRequest;
+import org.opensearch.extensions.action.RegisterTransportActionsRequest;
 import org.opensearch.sdk.ActionExtension.ActionHandler;
 import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
