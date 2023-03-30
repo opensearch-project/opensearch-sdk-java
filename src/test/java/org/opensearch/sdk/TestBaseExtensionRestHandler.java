@@ -149,7 +149,7 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
             public String uri() {
                 StringBuilder uri = new StringBuilder();
                 for (Entry<String, String> param : params.entrySet()) {
-                    uri.append(uri.isEmpty() ? '?' : '&').append(param.getKey()).append('=').append(param.getValue());
+                    uri.append(uri.length() == 0 ? '?' : '&').append(param.getKey()).append('=').append(param.getValue());
                 }
                 return path + uri.toString();
             }
