@@ -227,6 +227,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         assertNotNull(extensionsRunner.getTaskManager());
         assertNotNull(extensionsRunner.getSdkClient());
         assertNotNull(extensionsRunner.getSdkClusterService());
+        assertNotNull(extensionsRunner.getIndexNameExpressionResolver());
 
         settings = extensionsRunner.getSettings();
         assertEquals(ExtensionsRunnerForTest.NODE_NAME, settings.get(ExtensionsRunner.NODE_NAME_SETTING));
