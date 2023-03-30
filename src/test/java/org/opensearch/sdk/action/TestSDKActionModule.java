@@ -20,7 +20,7 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.extensions.ExtensionsManager;
-import org.opensearch.extensions.RegisterTransportActionsRequest;
+import org.opensearch.extensions.action.RegisterTransportActionsRequest;
 import org.opensearch.sdk.ActionExtension;
 import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionSettings;
