@@ -154,6 +154,7 @@ public class ExtensionsRunner {
         new ExtensionsIndicesModuleNameRequestHandler();
     private final ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
     private final ExtensionActionRequestHandler extensionsActionRequestHandler;
+    private final List<ExecutorBuilder<?>> executorBuilders;
     private final AtomicReference<RunnableTaskExecutionListener> runnableTaskListener;
     private final IndexNameExpressionResolver indexNameExpressionResolver;
 
@@ -183,7 +184,7 @@ public class ExtensionsRunner {
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
             .build();
 
-        final List<ExecutorBuilder<?>> executorBuilders = extension.getExecutorBuilders(settings);
+        this.executorBuilders = extension.getExecutorBuilders(settings);
 
         runnableTaskListener = new AtomicReference<>();
         this.threadPool = new ThreadPool(settings, runnableTaskListener, executorBuilders.toArray(new ExecutorBuilder[0]));
@@ -214,11 +215,11 @@ public class ExtensionsRunner {
         modules.add(b -> {
             b.bind(ExtensionsRunner.class).toInstance(this);
             b.bind(Extension.class).toInstance(extension);
-            b.bind(IndexNameExpressionResolver.class).toInstance(indexNameExpressionResolver);
 
             b.bind(SDKNamedXContentRegistry.class).toInstance(getNamedXContentRegistry());
             b.bind(ThreadPool.class).toInstance(getThreadPool());
             b.bind(TaskManager.class).toInstance(getTaskManager());
+            b.bind(IndexNameExpressionResolver.class).toInstance(indexNameExpressionResolver);
 
             b.bind(SDKClient.class).toInstance(getSdkClient());
             b.bind(SDKClusterService.class).toInstance(getSdkClusterService());
