@@ -18,6 +18,7 @@ import org.opensearch.action.delete.DeleteRequest;
 import org.opensearch.action.get.GetRequest;
 import org.opensearch.action.get.MultiGetRequest;
 import org.opensearch.action.index.IndexRequest;
+import org.opensearch.action.search.MultiSearchRequest;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.update.UpdateRequest;
 import org.opensearch.client.Cancellable;
@@ -96,6 +97,7 @@ public class TestSDKClient extends OpenSearchTestCase {
         assertDoesNotThrow(() -> restClient.update(new UpdateRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.delete(new DeleteRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.search(new SearchRequest(), ActionListener.wrap(r -> {}, e -> {})));
+        assertDoesNotThrow(() -> restClient.multiSearch(new MultiSearchRequest(), ActionListener.wrap(r -> {}, e -> {})));
         expectThrows(ConnectException.class, () -> restClient.performRequest(new Request("GET", "/")));
 
         sdkClient.doCloseHighLevelClient();
