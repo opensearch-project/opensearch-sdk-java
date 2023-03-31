@@ -192,8 +192,6 @@ public class ExtensionsRunner {
         }
         this.settings = settingsBuilder.build();
 
-        this.threadPool = new ThreadPool(settings);
-
         final List<ExecutorBuilder<?>> executorBuilders = extension.getExecutorBuilders(settings);
 
         this.runnableTaskListener = new AtomicReference<>();
