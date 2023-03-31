@@ -13,9 +13,9 @@ import org.opensearch.action.ActionListener;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RemoteExtensionActionResponse;
-import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.extensions.rest.RouteHandler;
+import org.opensearch.rest.RestRequest;
 import org.opensearch.sdk.BaseExtensionRestHandler;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.SDKClient;
@@ -54,7 +54,7 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
         return List.of(new RouteHandler(GET, "/hello/{name}", handleRemoteGetRequest));
     }
 
-    private Function<ExtensionRestRequest, ExtensionRestResponse> handleRemoteGetRequest = (request) -> {
+    private Function<RestRequest, ExtensionRestResponse> handleRemoteGetRequest = (request) -> {
         SDKClient client = extensionsRunner.getSdkClient();
 
         String name = request.param("name");
