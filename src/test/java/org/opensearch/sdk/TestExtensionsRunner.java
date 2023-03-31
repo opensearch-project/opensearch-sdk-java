@@ -66,7 +66,10 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
     private static final String EXTENSION_NAME = "sample-extension";
     private ExtensionsInitRequestHandler extensionsInitRequestHandler;
-    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(new ExtensionRestPathRegistry());
+    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(
+        new ExtensionRestPathRegistry(),
+        SDKNamedXContentRegistry.EMPTY
+    );
     private ExtensionsRunner extensionsRunner;
     private TransportService transportService;
 
@@ -227,6 +230,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         assertNotNull(extensionsRunner.getTaskManager());
         assertNotNull(extensionsRunner.getSdkClient());
         assertNotNull(extensionsRunner.getSdkClusterService());
+        assertNotNull(extensionsRunner.getIndexNameExpressionResolver());
 
         settings = extensionsRunner.getSettings();
         assertEquals(ExtensionsRunnerForTest.NODE_NAME, settings.get(ExtensionsRunner.NODE_NAME_SETTING));
