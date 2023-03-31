@@ -11,9 +11,9 @@ package org.opensearch.sdk;
 
 import java.util.function.Function;
 
-import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
 
 /**
@@ -21,7 +21,7 @@ import org.opensearch.rest.RestRequest.Method;
  */
 public class RouteHandler extends Route {
 
-    private final Function<ExtensionRestRequest, ExtensionRestResponse> responseHandler;
+    private final Function<RestRequest, ExtensionRestResponse> responseHandler;
 
     /**
      * Handle the method and path with the specified handler.
@@ -30,7 +30,7 @@ public class RouteHandler extends Route {
      * @param path The path to handle.
      * @param handler The method which handles the method and path.
      */
-    public RouteHandler(Method method, String path, Function<ExtensionRestRequest, ExtensionRestResponse> handler) {
+    public RouteHandler(Method method, String path, Function<RestRequest, ExtensionRestResponse> handler) {
         super(method, path);
         this.responseHandler = handler;
     }
@@ -41,7 +41,7 @@ public class RouteHandler extends Route {
      * @param request The request to handle
      * @return the {@link ExtensionRestResponse} result from the handler for this route.
      */
-    public ExtensionRestResponse handleRequest(ExtensionRestRequest request) {
+    public ExtensionRestResponse handleRequest(RestRequest request) {
         return responseHandler.apply(request);
     }
 }
