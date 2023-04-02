@@ -11,7 +11,18 @@ package org.opensearch.sdk;
 
 import java.util.List;
 
+/**
+ * An extension point for {@link Extension} implementations to be themselves extensible.
+ *
+ * This class provides a callback for extensible Extensions to be informed of other Extensions
+ * which extend them.
+ *
+ */
+
 public interface ExtensibleExtension {
+    /**
+     * Extension point for external Extensions to be extendable
+     */
 
     interface ExtensionLoader {
         /**
@@ -29,6 +40,7 @@ public interface ExtensibleExtension {
      *
      * This method is called once only, after initializing this Extension and all Extensions extending this Extension. It is called before
      * any other methods on this Extension instance are called.
+     * @param loader the loader to use to load extensions
      */
     default void loadExtensions(ExtensionLoader loader) {}
 }
