@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.opensearch.common.xcontent.json.JsonXContent;
-import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestStatus;
 
 /**
@@ -44,7 +44,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     }
 
     @Override
-    public ExtensionRestResponse handleRequest(ExtensionRestRequest request) {
+    public ExtensionRestResponse handleRequest(RestRequest request) {
         Optional<RouteHandler> handler = routeHandlers().stream()
             .filter(rh -> rh.getMethod().equals(request.method()))
             .filter(rh -> restPathMatches(request.path(), rh.getPath()))
@@ -55,7 +55,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     /**
      * Determines if the request's path is a match for the configured handler path.
      *
-     * @param requestPath The path from the {@link ExtensionRestRequest}
+     * @param requestPath The path from the {@link RestRequest}
      * @param handlerPath The path from the {@link RouteHandler}
      * @return true if the request path matches the route
      */
@@ -85,12 +85,12 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
      * @param request The request that couldn't be handled.
      * @return an ExtensionRestResponse identifying the unhandled request.
      */
-    protected ExtensionRestResponse unhandledRequest(ExtensionRestRequest request) {
+    protected ExtensionRestResponse unhandledRequest(RestRequest request) {
         return createJsonResponse(
             request,
             NOT_FOUND,
             "error",
-            "Extension REST action improperly configured to handle: [" + request.toString() + "]"
+            "Extension REST action improperly configured to handle: [" + request.method() + " " + request.uri() + "]"
         );
     }
 
@@ -101,7 +101,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
      * @param e The exception
      * @return an ExtensionRestResponse identifying the exception
      */
-    protected ExtensionRestResponse exceptionalRequest(ExtensionRestRequest request, Exception e) {
+    protected ExtensionRestResponse exceptionalRequest(RestRequest request, Exception e) {
         return createJsonResponse(request, INTERNAL_SERVER_ERROR, "error", "Request failed with exception: [" + e.getMessage() + "]");
     }
 
@@ -114,12 +114,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
      * @param responseStr The string to include
      * @return an ExtensionRestResponse in JSON format including the specified string as the content of the specified field
      */
-    protected ExtensionRestResponse createJsonResponse(
-        ExtensionRestRequest request,
-        RestStatus status,
-        String fieldName,
-        String responseStr
-    ) {
+    protected ExtensionRestResponse createJsonResponse(RestRequest request, RestStatus status, String fieldName, String responseStr) {
         try {
             return new ExtensionRestResponse(
                 request,
