@@ -10,15 +10,15 @@
 package org.opensearch.sdk;
 
 import org.junit.jupiter.api.Test;
-import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
+import org.opensearch.rest.RestRequest;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestExtensionRestHandler extends OpenSearchTestCase {
     private class NoOpExtensionRestHandler implements ExtensionRestHandler {
 
         @Override
-        public ExtensionRestResponse handleRequest(ExtensionRestRequest request) {
+        public ExtensionRestResponse handleRequest(RestRequest request) {
             return null;
         }
     }

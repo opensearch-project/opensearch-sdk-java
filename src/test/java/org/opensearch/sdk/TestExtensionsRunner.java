@@ -69,7 +69,10 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
     private static final String EXTENSION_NAME = "sample-extension";
     private ExtensionsInitRequestHandler extensionsInitRequestHandler;
-    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(new ExtensionRestPathRegistry());
+    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(
+        new ExtensionRestPathRegistry(),
+        SDKNamedXContentRegistry.EMPTY
+    );
     private ExtensionsRunner extensionsRunner;
     private TransportService transportService;
 
