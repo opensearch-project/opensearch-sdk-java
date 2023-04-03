@@ -15,6 +15,7 @@ import org.opensearch.action.ActionRequest;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.extensions.action.ExtensionActionRequest;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Constructor;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -29,7 +30,7 @@ public class ExtensionActionUtil {
     /**
      * The Unicode UNIT SEPARATOR used to separate the Request class name and parameter bytes
      */
-    private static final byte UNIT_SEPARATOR = (byte) '\u001F';
+    public static final byte UNIT_SEPARATOR = (byte) '\u001F';
 
     /**
      * @param request r is an object of the "Remote Extension Action Request" class, containing information about the
@@ -38,7 +39,7 @@ public class ExtensionActionUtil {
      * @return a byte array containing all the necessary information about the request to be sent to the remote server.
      * This byte array is constructed using the class name of the request, a unit separator, and the request data itself.
      */
-    public byte[] createProxyRequestBytes(RemoteExtensionActionRequest request) {
+    public static byte[] createProxyRequestBytes(RemoteExtensionActionRequest request) {
         byte[] requestClassBytes = request.getRequestClass().getBytes(StandardCharsets.UTF_8);
         return ByteBuffer.allocate(requestClassBytes.length + 1 + request.getRequestBytes().length)
             .put(requestClassBytes)
@@ -54,7 +55,7 @@ public class ExtensionActionUtil {
      * and is created using the request data stored in the byte array provided in the "requestBytes" parameter.
      */
     public static ActionRequest createActionRequest(ExtensionActionRequest requestBytes) {
-        int nullPos = indexOf(requestBytes.getRequestBytes());
+        int nullPos = delimPos(requestBytes.getRequestBytes());
         String requestClassName = new String(Arrays.copyOfRange(requestBytes.getRequestBytes(), 0, nullPos + 1), StandardCharsets.UTF_8)
             .stripTrailing();
         ActionRequest actionRequest = null;
@@ -71,7 +72,31 @@ public class ExtensionActionUtil {
         return actionRequest;
     }
 
-    private static int indexOf(byte[] bytes) {
+    /**
+     * @param actionRequest  is an instance of the Action Request class that is used to create an ExtensionActionRequest object.
+     * @return an Extension ActionRequest object based on an Action Request input.
+     */
+    public static ExtensionActionRequest createExtensionActionRequest(ActionRequest actionRequest) {
+        byte[] requestBytes;
+        ExtensionActionRequest extensionActionRequest = null;
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            requestBytes = outputStream.toByteArray();
+            String requestClassName = new String(Arrays.copyOfRange(requestBytes, 0, delimPos(requestBytes) + 1), StandardCharsets.UTF_8)
+                .stripTrailing();
+            Class<?> clazz = Class.forName(requestClassName);
+            Constructor<?> constructor = clazz.getConstructor(StreamInput.class);
+            StreamInput requestByteStream = StreamInput.wrap(
+                Arrays.copyOfRange(requestBytes, delimPos(requestBytes) + 1, requestBytes.length)
+            );
+            extensionActionRequest = (ExtensionActionRequest) constructor.newInstance(requestByteStream);
+        } catch (Exception e) {
+            logger.debug("Failed to create request bytes for [" + actionRequest + "]: " + e.getMessage());
+        }
+        return extensionActionRequest;
+    }
+
+    private static int delimPos(byte[] bytes) {
         for (int offset = 0; offset < bytes.length; ++offset) {
             if (bytes[offset] == ExtensionActionUtil.UNIT_SEPARATOR) {
                 return offset;
