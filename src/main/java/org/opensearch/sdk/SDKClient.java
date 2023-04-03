@@ -45,6 +45,8 @@ import org.opensearch.action.get.MultiGetRequest;
 import org.opensearch.action.get.MultiGetResponse;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.index.IndexResponse;
+import org.opensearch.action.search.MultiSearchRequest;
+import org.opensearch.action.search.MultiSearchResponse;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.action.support.TransportAction;
@@ -461,6 +463,16 @@ public class SDKClient implements Closeable {
          */
         public void search(SearchRequest request, ActionListener<SearchResponse> listener) {
             restHighLevelClient.searchAsync(request, RequestOptions.DEFAULT, listener);
+        }
+
+        /**
+         * Search across all documents that match the criteria
+         *
+         * @param request The multiSearch Request
+         * @param listener A listener to be notified with a result
+         */
+        public void multiSearch(MultiSearchRequest request, ActionListener<MultiSearchResponse> listener) {
+            restHighLevelClient.msearchAsync(request, RequestOptions.DEFAULT, listener);
         }
 
         /**
