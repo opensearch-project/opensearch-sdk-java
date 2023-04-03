@@ -12,24 +12,14 @@ package org.opensearch.sdk.handlers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.common.bytes.BytesReference;
-import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
-import org.opensearch.http.HttpRequest;
-import org.opensearch.http.HttpResponse;
-import org.opensearch.rest.RestRequest;
-import org.opensearch.rest.RestRequest.Method;
-import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.SDKHttpRequest;
 import org.opensearch.sdk.SDKNamedXContentRegistry;
 import org.opensearch.sdk.SDKRestRequest;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 import org.opensearch.sdk.ExtensionRestPathRegistry;
 
@@ -88,7 +78,7 @@ public class ExtensionsRestRequestHandler {
             sdkHttpRequest,
             null
         );
-        
+
         // Get response from extension
         ExtensionRestResponse response = restHandler.handleRequest(sdkRestRequest);
         logger.info("Sending extension response to OpenSearch: " + response.status());
