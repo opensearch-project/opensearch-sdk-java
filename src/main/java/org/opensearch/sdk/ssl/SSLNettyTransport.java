@@ -161,7 +161,7 @@ public class SSLNettyTransport extends Netty4Transport {
 
                     if (log.isDebugEnabled()) {
                         log.debug(
-                            "Hostname of peer is {} ({}/{}) with hostnameVerificationResovleHostName: {}",
+                            "Hostname of peer is {} ({}/{}) with hostnameVerificationResolveHostName: {}",
                             hostname,
                             inetSocketAddress.getHostName(),
                             inetSocketAddress.getHostString(),
@@ -191,10 +191,11 @@ public class SSLNettyTransport extends Netty4Transport {
         @SuppressWarnings("removal")
         public SSLClientChannelInitializer(DiscoveryNode node) {
             this.node = node;
-            hostnameVerificationEnabled = false;
-            // settings.getAsBoolean(SSLConfigConstants.SECURITY_SSL_TRANSPORT_ENFORCE_HOSTNAME_VERIFICATION, true);
-            hostnameVerificationResovleHostName = false;
-            // settings.getAsBoolean(SSLConfigConstants.SECURITY_SSL_TRANSPORT_ENFORCE_HOSTNAME_VERIFICATION_RESOLVE_HOST_NAME, true);
+            hostnameVerificationEnabled = settings.getAsBoolean(SSLConfigConstants.SSL_TRANSPORT_ENFORCE_HOSTNAME_VERIFICATION, true);
+            hostnameVerificationResovleHostName = settings.getAsBoolean(
+                SSLConfigConstants.SSL_TRANSPORT_ENFORCE_HOSTNAME_VERIFICATION_RESOLVE_HOST_NAME,
+                true
+            );
 
             connectionTestResult = SSLConnectionTestResult.SSL_AVAILABLE;
         }
