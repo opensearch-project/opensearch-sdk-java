@@ -52,8 +52,6 @@ public final class SSLConfigConstants {
     public static final String SSL_TRANSPORT_ENABLED_PROTOCOLS = "ssl.transport.enabled_protocols";
     public static final String DEFAULT_STORE_PASSWORD = "changeit"; // #16
 
-    public static final String JDK_TLS_REJECT_CLIENT_INITIATED_RENEGOTIATION = "jdk.tls.rejectClientInitiatedRenegotiation";
-
     private static final String[] _SECURE_SSL_PROTOCOLS = { "TLSv1.3", "TLSv1.2", "TLSv1.1" };
 
     public static final String[] getSecureSSLProtocols(Settings settings) {
