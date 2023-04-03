@@ -91,7 +91,7 @@ public class ExtensionsRestRequestHandler {
             public String uri() {
                 // path strips query off uri but probably want to pass the whole uri
                 // this will make the request behave as expected (without query params)
-                return request.path();
+                return request.uri();
             }
 
             @Override
@@ -114,7 +114,7 @@ public class ExtensionsRestRequestHandler {
 
             @Override
             public HttpVersion protocolVersion() {
-                return null;
+                return request.httpVersion();
             }
 
             @Override
