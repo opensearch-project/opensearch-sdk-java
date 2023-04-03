@@ -100,7 +100,7 @@ public class TestSDKClient extends OpenSearchTestCase {
         assertDoesNotThrow(() -> restClient.delete(new DeleteRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.search(new SearchRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.multiSearch(new MultiSearchRequest(), ActionListener.wrap(r -> {}, e -> {})));
-        assertDoesNotThrow(() -> restClient.performRequestAsync(new Request("", ""), new ResponseListener() {
+        assertDoesNotThrow(() -> restClient.performRequestAsync(new Request("GET", "/"), new ResponseListener() {
 
             @Override
             public void onSuccess(Response response) {}
