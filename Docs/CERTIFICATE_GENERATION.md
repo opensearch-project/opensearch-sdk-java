@@ -132,5 +132,6 @@ ssl.transport.enabled: true
 ssl.transport.pemcert_filepath: extension-01.pem
 ssl.transport.pemkey_filepath: extension-01-key.pem
 ssl.transport.pemtrustedcas_filepath: root-ca.pem
+ssl.transport.enforce_hostname_verification: false
 path.home: <path/to/extension>
 ```
