@@ -10,7 +10,6 @@
 package org.opensearch.sdk;
 
 import org.opensearch.rest.RestRequest;
-import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.extensions.rest.RouteHandler;
 
