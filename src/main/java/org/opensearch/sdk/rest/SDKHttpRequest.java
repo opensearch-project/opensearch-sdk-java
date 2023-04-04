@@ -7,7 +7,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.rest;
 
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
@@ -30,7 +30,7 @@ public class SDKHttpRequest implements HttpRequest {
     private final HttpVersion httpVersion;
 
     /**
-    * Instantiates this class with a copy of request
+    * Instantiates this class with a copy of {@link ExtensionRestRequest}
     *
     * @param request The request
     */
@@ -42,63 +42,43 @@ public class SDKHttpRequest implements HttpRequest {
         this.httpVersion = request.httpVersion();
     }
 
-    /**
-    * This method returns request method
-    * @return A method of request
-    */
     @Override
     public RestRequest.Method method() {
         return method;
     }
 
-    /**
-    * This method returns request uri
-    * @return URI of request
-    */
     @Override
     public String uri() {
         return uri;
     }
 
-    /**
-    * This method returns request content
-    * @return content of request
-    */
     @Override
     public BytesReference content() {
         return content;
     }
 
-    /**
-    * This method returns request headers
-    * @return map containing headers
-    */
     @Override
     public Map<String, List<String>> getHeaders() {
         return headers;
     }
 
     /**
-    * This method returns request cookies
-    * @return list containing cookies
+    * Not implemented. Does nothing.
+    * @return null
     */
     @Override
     public List<String> strictCookies() {
         return null;
     }
 
-    /**
-    * This method returns request HTTP protocol version
-    * @return version of request HTTP protocol
-    */
     @Override
     public HttpVersion protocolVersion() {
         return httpVersion;
     }
 
     /**
-    * This method removes headers from request
-    * @param s header
+    * Not implemented. Does nothing.
+    * @return null
     */
     @Override
     public HttpRequest removeHeader(String s) {
@@ -106,9 +86,10 @@ public class SDKHttpRequest implements HttpRequest {
     }
 
     /**
-    * This method creates response
+    * Not implemented. Does nothing.
     * @param restStatus response status
     * @param bytesReference content
+    * @return null
     */
     @Override
     public HttpResponse createResponse(RestStatus restStatus, BytesReference bytesReference) {
@@ -116,8 +97,8 @@ public class SDKHttpRequest implements HttpRequest {
     }
 
     /**
-    * This method returns inbound exception
-    * @return thrown exception
+    * Not implemented. Does nothing.
+    * @return null
     */
     @Override
     public Exception getInboundException() {
@@ -125,7 +106,7 @@ public class SDKHttpRequest implements HttpRequest {
     }
 
     /**
-    * Release any resources associated with this request.
+    * Not implemented. Does nothing.
     */
     @Override
     public void release() {
@@ -133,9 +114,8 @@ public class SDKHttpRequest implements HttpRequest {
     }
 
     /**
-    * If this instances uses any pooled resources, creates a copy of this instance that does not use any pooled resources and releases
-    * any resources associated with this instance. If the instance does not use any shared resources, returns itself.
-    * @return a safe unpooled http request
+    * Not implemented. Does nothing.
+    * @return null
     */
     @Override
     public HttpRequest releaseAndCopy() {

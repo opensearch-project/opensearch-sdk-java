@@ -17,9 +17,9 @@ import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionsRunner;
-import org.opensearch.sdk.SDKHttpRequest;
 import org.opensearch.sdk.SDKNamedXContentRegistry;
-import org.opensearch.sdk.SDKRestRequest;
+import org.opensearch.sdk.rest.SDKHttpRequest;
+import org.opensearch.sdk.rest.SDKRestRequest;
 
 import org.opensearch.sdk.ExtensionRestPathRegistry;
 
@@ -69,13 +69,12 @@ public class ExtensionsRestRequestHandler {
             );
         }
 
-        SDKHttpRequest sdkHttpRequest = new SDKHttpRequest(request);
         SDKRestRequest sdkRestRequest = new SDKRestRequest(
             sdkNamedXContentRegistry.getRegistry(),
             request.params(),
             request.path(),
             request.headers(),
-            sdkHttpRequest,
+            new SDKHttpRequest(request),
             null
         );
 

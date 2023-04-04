@@ -7,7 +7,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.rest;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +22,7 @@ import org.opensearch.rest.RestRequest;
  */
 public class SDKRestRequest extends RestRequest {
     /**
-    * Instantiates this class with a copy of request
+    * Instantiates this class with request's params
     *
     * @param xContentRegistry The request's content registry
     * @param params The request's params
