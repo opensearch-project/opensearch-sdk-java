@@ -33,6 +33,7 @@ import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.sdk.api.ActionExtension;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
