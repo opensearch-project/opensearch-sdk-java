@@ -12,19 +12,13 @@ package org.opensearch.sdk;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 import org.opensearch.common.bytes.BytesArray;
-import org.opensearch.common.bytes.BytesReference;
-import org.opensearch.common.xcontent.XContentType;
-import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
-import org.opensearch.http.HttpRequest;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
-import org.opensearch.sdk.rest.SDKRestRequest;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.test.OpenSearchTestCase;
 
@@ -58,13 +52,16 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
 
     @Test
     public void testJsonErrorResponse() {
-        RestRequest successfulRequest = createTestRestRequest(
+        RestRequest successfulRequest = TestSDKRestRequest.createTestRestRequest(
             Method.GET,
             "foo",
+            "foo",
+            Collections.emptyMap(),
             Collections.emptyMap(),
             null,
             new BytesArray("bar".getBytes(StandardCharsets.UTF_8)),
-            ""
+            "",
+            null
         );
         ExtensionRestResponse response = handler.handleRequest(successfulRequest);
         assertEquals(RestStatus.OK, response.status());
@@ -73,13 +70,16 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
 
     @Test
     public void testErrorResponseOnException() {
-        RestRequest exceptionalRequest = createTestRestRequest(
+        RestRequest exceptionalRequest = TestSDKRestRequest.createTestRestRequest(
             Method.GET,
             "foo",
+            "foo",
+            Collections.emptyMap(),
             Collections.emptyMap(),
             null,
             new BytesArray("baz".getBytes(StandardCharsets.UTF_8)),
-            ""
+            "",
+            null
         );
         ExtensionRestResponse response = handler.handleRequest(exceptionalRequest);
         assertEquals(RestStatus.INTERNAL_SERVER_ERROR, response.status());
@@ -88,7 +88,7 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
 
     @Test
     public void testErrorResponseOnUnhandled() {
-        RestRequest unhandledRequestMethod = createTestRestRequest(
+        RestRequest unhandledRequestMethod = TestSDKRestRequest.createTestRestRequest(
             Method.PUT,
             "foo",
             "foo",
@@ -110,7 +110,7 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
             response.content().utf8ToString()
         );
 
-        RestRequest unhandledRequestPath = createTestRestRequest(
+        RestRequest unhandledRequestPath = TestSDKRestRequest.createTestRestRequest(
             Method.GET,
             "foobar",
             "foobar",
@@ -131,30 +131,5 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
                 + "]\"}",
             response.content().utf8ToString()
         );
-    }
-
-    public static RestRequest createTestRestRequest(
-        final Method method,
-        final String uri,
-        final String path,
-        final Map<String, String> params,
-        final Map<String, String> headers,
-        final XContentType xContentType,
-        final BytesReference content,
-        final String principalIdentifier,
-        final HttpRequest.HttpVersion httpVersion
-    ) {
-        ExtensionRestRequest request = new ExtensionRestRequest(
-            method,
-            uri,
-            path,
-            params,
-            headers,
-            xContentType,
-            content,
-            principalIdentifier,
-            httpVersion
-        );
-        return new SDKRestRequest(null, request.params(), request.path(), request.headers(), new SDKHttpRequest(request), null);
     }
 }
