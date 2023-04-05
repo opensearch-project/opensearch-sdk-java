@@ -60,8 +60,8 @@ public class TestSDKRestRequest extends OpenSearchTestCase {
         assertEquals(exptectedXContentType, sdkRestRequest.getXContentType());
         assertEquals(expectedContent, sdkRestRequest.content());
 
-        Map<String, Object> source = sdkRestRequest.contentParser().map();
-        assertEquals("bar", (String) source.get("foo"));
+        Map<String, String> source = sdkRestRequest.contentParser().mapStrings();
+        assertEquals("bar", source.get("foo"));
     }
 
     public static RestRequest createTestRestRequest(
