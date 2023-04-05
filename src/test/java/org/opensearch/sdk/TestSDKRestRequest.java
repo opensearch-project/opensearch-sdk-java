@@ -34,8 +34,11 @@ public class TestSDKRestRequest extends OpenSearchTestCase {
         String expectedUri = "foobar?foo=bar&baz=42";
         String expectedPath = "foo";
         Map<String, String> expectedParams = Map.ofEntries(entry("foo", "bar"), entry("baz", "42"));
-        Map<String, List<String>> expectedHeaders = Map.ofEntries(entry("foo", Arrays.asList("hello", "world")));
-        XContentType exptectedXContentType = null;
+        Map<String, List<String>> expectedHeaders = Map.ofEntries(
+            entry("Content-Type", Arrays.asList("application/json")),
+            entry("foo", Arrays.asList("hello", "world"))
+        );
+        XContentType exptectedXContentType = XContentType.JSON;
         BytesReference expectedContent = new BytesArray("bar");
 
         SDKRestRequest sdkRestRequest = createTestRestRequest(
@@ -54,7 +57,11 @@ public class TestSDKRestRequest extends OpenSearchTestCase {
         assertEquals(expectedPath, sdkRestRequest.path());
         assertEquals(expectedParams, sdkRestRequest.params());
         assertEquals(expectedHeaders, sdkRestRequest.getHeaders());
+        assertEquals(exptectedXContentType, sdkRestRequest.getXContentType());
         assertEquals(expectedContent, sdkRestRequest.content());
+
+        Map<String, Object> source = sdkRestRequest.contentParser().map();
+        assertEquals("bar", (String) source.get("foo"));
     }
 
     public static RestRequest createTestRestRequest(
@@ -68,6 +75,7 @@ public class TestSDKRestRequest extends OpenSearchTestCase {
         final String principalIdentifier,
         final HttpRequest.HttpVersion httpVersion
     ) {
+        // xContentType is not used. It will be parsed from headers
         ExtensionRestRequest request = new ExtensionRestRequest(
             method,
             uri,
