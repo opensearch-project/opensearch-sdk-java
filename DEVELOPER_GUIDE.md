@@ -62,6 +62,7 @@ Fork [OpenSearch](https://github.com/opensearch-project/OpenSearch/), clone loca
 
 #### Enable Extensions Feature Flag
 
+##### Option 1
 Add the experimental feature system property to `gradle/run.gradle` to enable extensions:
 
 ```
@@ -74,6 +75,11 @@ testClusters {
   }
 }
 ```
+
+##### Option 2
+Add the experimental feature flag as a command line argument
+- `./bin/opensearch -E opensearch.experimental.feature.extensions.enabled=true` when running from a local distribution
+- `./gradlew run -Dopensearch.experimental.feature.extensions.enabled=true` when running using gradle in developer mode
 
 ## Create extensions.yml file
 
