@@ -86,7 +86,7 @@ Enable the experimental feature flag by setting it to true in `opensearch.yml`.
 - cd in to your local distribution build for OpenSearch.
 - now cd into config folder and open `opensearch.yml` in your local editor
 - Search for `opensearch.experimental.feature.extensions.enabled`, uncomment and set it to `true`
-- Run OpenSearch using 
+- Run OpenSearch using
   - `./bin/opensearch` when running from a local distribution
 
 ## Create extensions.yml file
