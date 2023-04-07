@@ -39,7 +39,7 @@ public class SDKHttpRequest implements HttpRequest {
         this.uri = request.uri();
         this.content = request.content();
         this.headers = request.headers();
-        this.httpVersion = request.httpVersion();
+        this.httpVersion = request.protocolVersion();
     }
 
     @Override
