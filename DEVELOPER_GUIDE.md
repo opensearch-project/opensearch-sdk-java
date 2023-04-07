@@ -88,7 +88,6 @@ Enable the experimental feature flag by setting it to true in `opensearch.yml`.
 - Search for `opensearch.experimental.feature.extensions.enabled`, uncomment and set it to `true`
 - Run OpenSearch using 
   - `./bin/opensearch` when running from a local distribution
-  - `./gradlew run` when running using gradle in developer mode
 
 ## Create extensions.yml file
 
