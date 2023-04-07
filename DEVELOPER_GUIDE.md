@@ -81,6 +81,15 @@ Add the experimental feature flag as a command line argument
 - `./bin/opensearch -E opensearch.experimental.feature.extensions.enabled=true` when running from a local distribution
 - `./gradlew run -Dopensearch.experimental.feature.extensions.enabled=true` when running using gradle in developer mode
 
+##### Option 3
+Enable the experimental feature flag by setting it to true in `opensearch.yml`.
+- cd in to your local distribution build for OpenSearch.
+- now cd into config folder and open `opensearch.yml` in your local editor
+- Search for `opensearch.experimental.feature.extensions.enabled`, uncomment and set it to `true`
+- Run OpenSearch using 
+  - `./bin/opensearch` when running from a local distribution
+  - `./gradlew run` when running using gradle in developer mode
+
 ## Create extensions.yml file
 
 Every extension will require metadata stored in an extensions.yml file in order to be loaded successfully.  In order to make the SDK look like an extension within OpenSearch, there must be an entry for the SDK within `extensions.yml`.
