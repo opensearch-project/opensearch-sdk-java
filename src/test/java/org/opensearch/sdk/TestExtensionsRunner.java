@@ -45,6 +45,7 @@ import org.opensearch.extensions.AcknowledgedResponse;
 import org.opensearch.extensions.ExtensionDependency;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
+import org.opensearch.http.HttpRequest;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestStatus;
@@ -142,13 +143,17 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         String ext = "token_placeholder";
         @SuppressWarnings("unused") // placeholder to test the token when identity features merged
         Principal userPrincipal = () -> "user1";
+        HttpRequest.HttpVersion httpVersion = HttpRequest.HttpVersion.HTTP_1_1;
         ExtensionRestRequest request = new ExtensionRestRequest(
             Method.GET,
             "/foo",
+            "/foo",
+            Collections.emptyMap(),
             Collections.emptyMap(),
             null,
             new BytesArray("bar"),
-            ext
+            ext,
+            httpVersion
         );
         RestExecuteOnExtensionResponse response = extensionsRestRequestHandler.handleRestExecuteOnExtensionRequest(request);
         // this will fail in test environment with no registered actions
