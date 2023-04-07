@@ -9,6 +9,7 @@
 
 package org.opensearch.sdk;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ import static java.util.Map.entry;
 
 public class TestSDKRestRequest extends OpenSearchTestCase {
     @Test
-    public void TestSDKRestRequestMethods() {
+    public void TestSDKRestRequestMethods() throws IOException {
         RestRequest.Method expectedMethod = Method.GET;
         String expectedUri = "foobar?foo=bar&baz=42";
         String expectedPath = "foo";
@@ -41,7 +42,7 @@ public class TestSDKRestRequest extends OpenSearchTestCase {
         XContentType exptectedXContentType = XContentType.JSON;
         BytesReference expectedContent = new BytesArray("bar");
 
-        SDKRestRequest sdkRestRequest = createTestRestRequest(
+        RestRequest sdkRestRequest = createTestRestRequest(
             expectedMethod,
             expectedUri,
             expectedPath,
@@ -69,7 +70,7 @@ public class TestSDKRestRequest extends OpenSearchTestCase {
         final String uri,
         final String path,
         final Map<String, String> params,
-        final Map<String, String> headers,
+        final Map<String, List<String>> headers,
         final XContentType xContentType,
         final BytesReference content,
         final String principalIdentifier,
