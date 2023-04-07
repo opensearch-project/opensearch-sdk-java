@@ -26,7 +26,7 @@ import org.opensearch.http.HttpRequest.HttpVersion;
 import org.opensearch.rest.RestResponse;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.ExtensionRestHandler;
-import org.opensearch.sdk.TestSDKRestRequest;
+import org.opensearch.sdk.rest.TestSDKRestRequest;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestRestHelloAction extends OpenSearchTestCase {

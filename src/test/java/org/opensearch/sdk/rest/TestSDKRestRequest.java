@@ -7,14 +7,14 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.rest;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.xcontent.XContentType;
@@ -22,15 +22,13 @@ import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.http.HttpRequest;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
-import org.opensearch.sdk.rest.SDKHttpRequest;
-import org.opensearch.sdk.rest.SDKRestRequest;
 import org.opensearch.test.OpenSearchTestCase;
 
 import static java.util.Map.entry;
 
 public class TestSDKRestRequest extends OpenSearchTestCase {
     @Test
-    public void TestSDKRestRequestMethods() throws IOException {
+    public void testSDKRestRequestMethods() throws IOException {
         RestRequest.Method expectedMethod = Method.GET;
         String expectedUri = "foobar?foo=bar&baz=42";
         String expectedPath = "foo";
@@ -40,7 +38,7 @@ public class TestSDKRestRequest extends OpenSearchTestCase {
             entry("foo", Arrays.asList("hello", "world"))
         );
         XContentType exptectedXContentType = XContentType.JSON;
-        BytesReference expectedContent = new BytesArray("bar");
+        BytesReference expectedContent = new BytesArray("{\"foo\":\"bar\"}");
 
         RestRequest sdkRestRequest = createTestRestRequest(
             expectedMethod,
