@@ -415,7 +415,7 @@ public class SDKClient implements Closeable {
          * @see Requests#indexRequest(String)
          */
         public void index(IndexRequest request, ActionListener<IndexResponse> listener) {
-            restHighLevelClient.indexAsync(request, RequestOptions.DEFAULT, listener);
+            restHighLevelClient.indexAsync(request, options, listener);
         }
 
         /**
@@ -426,7 +426,7 @@ public class SDKClient implements Closeable {
          * @see Requests#getRequest(String)
          */
         public void get(GetRequest request, ActionListener<GetResponse> listener) {
-            restHighLevelClient.getAsync(request, RequestOptions.DEFAULT, listener);
+            restHighLevelClient.getAsync(request, options, listener);
         }
 
         /**
@@ -436,7 +436,7 @@ public class SDKClient implements Closeable {
          * @param listener A listener to be notified with a result
          */
         public void multiGet(MultiGetRequest request, ActionListener<MultiGetResponse> listener) {
-            restHighLevelClient.mgetAsync(request, RequestOptions.DEFAULT, listener);
+            restHighLevelClient.mgetAsync(request, options, listener);
         }
 
         /**
@@ -446,7 +446,7 @@ public class SDKClient implements Closeable {
          * @param listener A listener to be notified with a result
          */
         public void update(UpdateRequest request, ActionListener<UpdateResponse> listener) {
-            restHighLevelClient.updateAsync(request, RequestOptions.DEFAULT, listener);
+            restHighLevelClient.updateAsync(request, options, listener);
         }
 
         /**
@@ -457,7 +457,7 @@ public class SDKClient implements Closeable {
          * @see Requests#deleteRequest(String)
          */
         public void delete(DeleteRequest request, ActionListener<DeleteResponse> listener) {
-            restHighLevelClient.deleteAsync(request, RequestOptions.DEFAULT, listener);
+            restHighLevelClient.deleteAsync(request, options, listener);
         }
 
         /**
@@ -478,7 +478,7 @@ public class SDKClient implements Closeable {
          * @param listener A listener to be notified with a result
          */
         public void multiSearch(MultiSearchRequest request, ActionListener<MultiSearchResponse> listener) {
-            restHighLevelClient.msearchAsync(request, RequestOptions.DEFAULT, listener);
+            restHighLevelClient.msearchAsync(request, options, listener);
         }
 
         /**
