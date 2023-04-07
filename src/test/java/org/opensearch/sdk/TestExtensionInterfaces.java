@@ -23,6 +23,19 @@ import org.opensearch.index.mapper.MetadataFieldMapper;
 import org.opensearch.indices.analysis.AnalysisModule;
 import org.opensearch.indices.breaker.BreakerSettings;
 import org.opensearch.ingest.Processor;
+import org.opensearch.sdk.api.ActionExtension;
+import org.opensearch.sdk.api.AnalysisExtension;
+import org.opensearch.sdk.api.CircuitBreakerExtension;
+import org.opensearch.sdk.api.EngineExtension;
+import org.opensearch.sdk.api.IndexStoreExtension;
+import org.opensearch.sdk.api.IngestExtension;
+import org.opensearch.sdk.api.MapperExtension;
+import org.opensearch.sdk.api.PersistentTaskExtension;
+import org.opensearch.sdk.api.RepositoryExtension;
+import org.opensearch.sdk.api.ScriptExtension;
+import org.opensearch.sdk.api.SearchExtension;
+import org.opensearch.sdk.api.SystemIndexExtension;
+
 import org.opensearch.test.OpenSearchTestCase;
 
 import java.util.function.Predicate;
