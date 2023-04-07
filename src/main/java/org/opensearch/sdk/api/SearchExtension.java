@@ -7,7 +7,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.api;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -24,6 +24,7 @@ import org.opensearch.index.query.QueryBuilder;
 import org.opensearch.index.query.QueryParser;
 import org.opensearch.index.query.functionscore.ScoreFunctionBuilder;
 import org.opensearch.index.query.functionscore.ScoreFunctionParser;
+import org.opensearch.sdk.Extension;
 import org.opensearch.search.SearchExtBuilder;
 import org.opensearch.search.aggregations.Aggregation;
 import org.opensearch.search.aggregations.AggregationBuilder;

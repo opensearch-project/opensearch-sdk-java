@@ -7,7 +7,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.api;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharFilter;
