@@ -7,14 +7,16 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.rest;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.opensearch.common.Nullable;
 import org.opensearch.common.path.PathTrie;
 import org.opensearch.rest.RestUtils;
 import org.opensearch.rest.RestRequest.Method;
+import org.opensearch.sdk.ExtensionRestHandler;
 
 /**
  * This class registers REST paths from extension Rest Handlers.
@@ -22,7 +24,7 @@ import org.opensearch.rest.RestRequest.Method;
 public class ExtensionRestPathRegistry {
 
     // PathTrie to match paths to handlers
-    private PathTrie<ExtensionRestHandler> pathTrie = new PathTrie<>(RestUtils.REST_DECODER);
+    private PathTrie<SDKMethodHandlers> pathTrie = new PathTrie<>(RestUtils.REST_DECODER);
     // List to return registered handlers
     private List<String> registeredPaths = new ArrayList<>();
 
@@ -34,20 +36,25 @@ public class ExtensionRestPathRegistry {
      * @param extensionRestHandler  The RestHandler to handle this route
      */
     public void registerHandler(Method method, String path, ExtensionRestHandler extensionRestHandler) {
-        String restPath = restPathToString(method, path);
-        pathTrie.insert(restPath, extensionRestHandler);
-        registeredPaths.add(restPath);
+        pathTrie.insertOrUpdate(
+            path,
+            new SDKMethodHandlers(path, extensionRestHandler, method),
+            (mHandlers, newMHandler) -> mHandlers.addMethods(extensionRestHandler, method)
+        );
+        registeredPaths.add(restPathToString(method, path));
     }
 
     /**
-     * Get the registered REST handler for the specified method and URI.
+     * Get the registered REST handler for the specified method and path.
      *
      * @param method  the registered method.
      * @param path  the registered path.
-     * @return The REST handler registered to handle this method and URI combination if found, null otherwise.
+     * @return The REST handler registered to handle this method and path combination if found, null otherwise.
      */
+    @Nullable
     public ExtensionRestHandler getHandler(Method method, String path) {
-        return pathTrie.retrieve(restPathToString(method, path));
+        SDKMethodHandlers mHandlers = pathTrie.retrieve(path);
+        return mHandlers == null ? null : mHandlers.getHandler(method);
     }
 
     /**
@@ -60,7 +67,9 @@ public class ExtensionRestPathRegistry {
     }
 
     /**
-     * Converts a REST method and path to a space delimited string to be used as a map lookup key.
+     * Converts a REST method and path to a space delimited string.
+     * <p>
+     * This provides convenience for logging and serialization over transport.
      *
      * @param method  the method.
      * @param path  the path.
