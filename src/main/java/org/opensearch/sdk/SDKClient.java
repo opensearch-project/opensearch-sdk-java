@@ -45,6 +45,8 @@ import org.opensearch.action.get.MultiGetRequest;
 import org.opensearch.action.get.MultiGetResponse;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.index.IndexResponse;
+import org.opensearch.action.search.MultiSearchRequest;
+import org.opensearch.action.search.MultiSearchResponse;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.action.support.TransportAction;
@@ -62,6 +64,7 @@ import org.opensearch.client.Requests;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.Request;
 import org.opensearch.client.Response;
+import org.opensearch.client.ResponseListener;
 import org.opensearch.client.RestClientBuilder;
 import org.opensearch.client.RestHighLevelClient;
 import org.opensearch.client.indices.CreateIndexRequest;
@@ -469,6 +472,16 @@ public class SDKClient implements Closeable {
         }
 
         /**
+         * Search across all documents that match the criteria
+         *
+         * @param request The multiSearch Request
+         * @param listener A listener to be notified with a result
+         */
+        public void multiSearch(MultiSearchRequest request, ActionListener<MultiSearchResponse> listener) {
+            restHighLevelClient.msearchAsync(request, RequestOptions.DEFAULT, listener);
+        }
+
+        /**
          * Sends a request to the OpenSearch cluster that the client points to.
          * @param request the request to perform
          * @return the response returned by OpenSearch
@@ -476,6 +489,27 @@ public class SDKClient implements Closeable {
          */
         public Response performRequest(Request request) throws IOException {
             return restHighLevelClient.getLowLevelClient().performRequest(request);
+        }
+
+        /**
+         * Sends a request to the OpenSearch cluster that the client points to.
+         * The request is executed asynchronously and the provided
+         * {@link ResponseListener} gets notified upon request completion or
+         * failure. Selects a host out of the provided ones in a round-robin
+         * fashion. Failing hosts are marked dead and retried after a certain
+         * amount of time (minimum 1 minute, maximum 30 minutes), depending on how
+         * many times they previously failed (the more failures, the later they
+         * will be retried). In case of failures all of the alive nodes (or dead
+         * nodes that deserve a retry) are retried until one responds or none of
+         * them does, in which case an {@link IOException} will be thrown.
+         *
+         * @param request the request to perform
+         * @param responseListener the {@link ResponseListener} to notify when the
+         *      request is completed or fails
+         * @return Cancellable instance that may be used to cancel the request
+         */
+        public Cancellable performRequestAsync(Request request, ResponseListener responseListener) {
+            return restHighLevelClient.getLowLevelClient().performRequestAsync(request, responseListener);
         }
 
         @Override

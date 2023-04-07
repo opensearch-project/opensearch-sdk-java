@@ -11,12 +11,11 @@ package org.opensearch.sdk.sample.helloworld.rest;
 
 import org.opensearch.OpenSearchParseException;
 import org.opensearch.common.bytes.BytesReference;
-import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.common.xcontent.json.JsonXContent;
-import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
+import org.opensearch.rest.RestRequest;
 import org.opensearch.sdk.BaseExtensionRestHandler;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.RouteHandler;
@@ -63,14 +62,14 @@ public class RestHelloAction extends BaseExtensionRestHandler {
         );
     }
 
-    private Function<ExtensionRestRequest, ExtensionRestResponse> handleGetRequest = (request) -> {
+    private Function<RestRequest, ExtensionRestResponse> handleGetRequest = (request) -> {
         String worldNameWithRandomAdjective = worldAdjectives.isEmpty()
             ? worldName
             : String.join(" ", worldAdjectives.get(rand.nextInt(worldAdjectives.size())), worldName);
         return new ExtensionRestResponse(request, OK, String.format(GREETING, worldNameWithRandomAdjective));
     };
 
-    private Function<ExtensionRestRequest, ExtensionRestResponse> handlePostRequest = (request) -> {
+    private Function<RestRequest, ExtensionRestResponse> handlePostRequest = (request) -> {
         if (request.hasContent()) {
             String adjective = "";
             XContentType contentType = request.getXContentType();
@@ -79,7 +78,7 @@ public class RestHelloAction extends BaseExtensionRestHandler {
                 adjective = request.content().utf8ToString();
             } else if (contentType.equals(XContentType.JSON)) {
                 try {
-                    adjective = request.contentParser(NamedXContentRegistry.EMPTY).mapStrings().get("adjective");
+                    adjective = request.contentParser().mapStrings().get("adjective");
                 } catch (IOException | OpenSearchParseException e) {
                     // Sample plain text response
                     return new ExtensionRestResponse(request, BAD_REQUEST, "Unable to parse adjective from JSON");
@@ -118,7 +117,7 @@ public class RestHelloAction extends BaseExtensionRestHandler {
         return new ExtensionRestResponse(request, BAD_REQUEST, TEXT_CONTENT_TYPE, noContent);
     };
 
-    private Function<ExtensionRestRequest, ExtensionRestResponse> handlePutRequest = (request) -> {
+    private Function<RestRequest, ExtensionRestResponse> handlePutRequest = (request) -> {
         String name = request.param("name");
         try {
             worldName = URLDecoder.decode(name, StandardCharsets.UTF_8);
@@ -128,7 +127,7 @@ public class RestHelloAction extends BaseExtensionRestHandler {
         return new ExtensionRestResponse(request, OK, "Updated the world's name to " + worldName);
     };
 
-    private Function<ExtensionRestRequest, ExtensionRestResponse> handleDeleteRequest = (request) -> {
+    private Function<RestRequest, ExtensionRestResponse> handleDeleteRequest = (request) -> {
         this.worldName = DEFAULT_NAME;
         this.worldAdjectives.clear();
         return new ExtensionRestResponse(request, OK, "Goodbye, cruel world! Restored default values.");
