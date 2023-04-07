@@ -25,7 +25,7 @@ import org.opensearch.action.ActionResponse;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.common.settings.Settings;
-import org.opensearch.sdk.ActionExtension.ActionHandler;
+import org.opensearch.sdk.api.ActionExtension.ActionHandler;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleResponse;
