@@ -17,13 +17,13 @@ import org.opensearch.action.ActionType;
 import org.opensearch.action.support.ActionFilters;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.common.NamedRegistry;
-import org.opensearch.sdk.ActionExtension.ActionHandler;
+import org.opensearch.sdk.api.ActionExtension.ActionHandler;
 import org.opensearch.sdk.Extension;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.MapBinder;
 
-import org.opensearch.sdk.ActionExtension;
+import org.opensearch.sdk.api.ActionExtension;
 
 import static java.util.Collections.unmodifiableMap;
 

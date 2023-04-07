@@ -7,13 +7,14 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.api;
 
 import org.opensearch.cluster.service.ClusterService;
 import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.env.Environment;
 import org.opensearch.indices.recovery.RecoverySettings;
 import org.opensearch.repositories.Repository;
+import org.opensearch.sdk.Extension;
 
 import java.util.Collections;
 import java.util.Map;
