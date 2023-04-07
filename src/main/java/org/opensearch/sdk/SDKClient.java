@@ -349,7 +349,7 @@ public class SDKClient implements Closeable {
         /**
          * Instantiate this class wrapping a {@link RestHighLevelClient}.
          *
-         * @param sdkClient           The SDKClient instance.
+         * @param sdkClient The SDKClient instance.
          * @param restHighLevelClient The client to wrap.
          */
         public SDKRestClient(SDKClient sdkClient, RestHighLevelClient restHighLevelClient) {
