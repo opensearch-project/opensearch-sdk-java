@@ -17,16 +17,14 @@ import org.opensearch.common.settings.Setting.Property;
  * {@link ExampleCustomSettingConfig} contains the custom settings value and their static declarations.
  */
 public class ExampleCustomSettingConfig {
-    private static final String FORBIDDEN_REGEX = "forbidden";
-
+    private static final String FORBIDDEN_VALUE = "forbidden";
     /**
-     * A string setting. If the string setting matches the FORBIDDEN_REGEX string, the validation will fail.
+     * A string setting. If the string setting matches the FORBIDDEN_REGEX string and parameter isMatching is true the validation will fail.
      */
     public static final Setting<String> VALIDATED_SETTING = Setting.simpleString(
         "custom.validate",
-        new RegexValidator(FORBIDDEN_REGEX),
+        new RegexValidator(FORBIDDEN_VALUE, false),
         Property.NodeScope,
         Property.Dynamic
     );
-
 }
