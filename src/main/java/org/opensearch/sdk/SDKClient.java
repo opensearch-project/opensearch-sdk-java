@@ -549,6 +549,11 @@ public class SDKClient implements Closeable {
     public static class SDKIndicesClient {
 
         private final IndicesClient indicesClient;
+        private RequestOptions options = RequestOptions.DEFAULT;
+
+        public void setOptions(RequestOptions options) {
+            this.options = options;
+        }
 
         /**
          * Instantiate this class wrapping an {@link IndicesClient}.
@@ -567,7 +572,7 @@ public class SDKClient implements Closeable {
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable create(CreateIndexRequest createIndexRequest, ActionListener<CreateIndexResponse> listener) {
-            return indicesClient.createAsync(createIndexRequest, RequestOptions.DEFAULT, listener);
+            return indicesClient.createAsync(createIndexRequest, options, listener);
         }
 
         /**
@@ -578,7 +583,7 @@ public class SDKClient implements Closeable {
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable delete(DeleteIndexRequest deleteIndexRequest, ActionListener<AcknowledgedResponse> listener) {
-            return indicesClient.deleteAsync(deleteIndexRequest, RequestOptions.DEFAULT, listener);
+            return indicesClient.deleteAsync(deleteIndexRequest, options, listener);
         }
 
         /**
@@ -589,7 +594,7 @@ public class SDKClient implements Closeable {
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable putSettings(UpdateSettingsRequest updateSettingsRequest, ActionListener<AcknowledgedResponse> listener) {
-            return indicesClient.putSettingsAsync(updateSettingsRequest, RequestOptions.DEFAULT, listener);
+            return indicesClient.putSettingsAsync(updateSettingsRequest, options, listener);
         }
 
         /**
@@ -600,7 +605,7 @@ public class SDKClient implements Closeable {
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable putMapping(PutMappingRequest putMappingRequest, ActionListener<AcknowledgedResponse> listener) {
-            return this.indicesClient.putMappingAsync(putMappingRequest, RequestOptions.DEFAULT, listener);
+            return this.indicesClient.putMappingAsync(putMappingRequest, options, listener);
         }
 
         /**
@@ -611,7 +616,7 @@ public class SDKClient implements Closeable {
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable getMapping(GetMappingsRequest getMappingsRequest, ActionListener<GetMappingsResponse> listener) {
-            return this.indicesClient.getMappingAsync(getMappingsRequest, RequestOptions.DEFAULT, listener);
+            return this.indicesClient.getMappingAsync(getMappingsRequest, options, listener);
         }
 
         /**
@@ -622,7 +627,7 @@ public class SDKClient implements Closeable {
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable rolloverIndex(RolloverRequest rolloverRequest, ActionListener<RolloverResponse> listener) {
-            return this.indicesClient.rolloverAsync(rolloverRequest, RequestOptions.DEFAULT, listener);
+            return this.indicesClient.rolloverAsync(rolloverRequest, options, listener);
         }
 
         /**
@@ -633,9 +638,7 @@ public class SDKClient implements Closeable {
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable getAliases(GetAliasesRequest getAliasesRequest, ActionListener<GetAliasesResponse> listener) {
-            return this.indicesClient.getAliasAsync(getAliasesRequest, RequestOptions.DEFAULT, listener);
+            return this.indicesClient.getAliasAsync(getAliasesRequest, options, listener);
         }
-
     }
-
 }
