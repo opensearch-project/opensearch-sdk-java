@@ -106,7 +106,7 @@ But it doesn't _do_ anything yet.  Here is where you can start defining your own
 If you want to handle REST Requests, implement the `ActionExtension` interface and override the `getExtensionRestHandlers()` method.  Pass a list of classes which will handle those requests.
 
 ```java
-import org.opensearch.sdk.api.*;
+import org.opensearch.sdk.api.ActionExtension;
 
 public class CRUDExtension extends BaseExtension implements ActionExtension {
 
