@@ -7,7 +7,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.rest;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -19,7 +19,6 @@ import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
-import org.opensearch.sdk.rest.TestSDKRestRequest;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.test.OpenSearchTestCase;
 
@@ -28,7 +27,12 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
     private final BaseExtensionRestHandler handler = new BaseExtensionRestHandler() {
         @Override
         public List<RouteHandler> routeHandlers() {
-            return List.of(new RouteHandler(Method.GET, "foo", handleFoo));
+            return List.of(new RouteHandler(Method.GET, "/foo", handleFoo));
+        }
+
+        @Override
+        public List<DeprecatedRouteHandler> deprecatedRouteHandlers() {
+            return List.of(new DeprecatedRouteHandler(Method.GET, "/deprecated/foo", "It's deprecated", handleFoo));
         }
 
         private Function<RestRequest, ExtensionRestResponse> handleFoo = (request) -> {
@@ -52,11 +56,29 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
     }
 
     @Test
-    public void testJsonErrorResponse() {
+    public void testJsonResponse() {
         RestRequest successfulRequest = TestSDKRestRequest.createTestRestRequest(
             Method.GET,
-            "foo",
-            "foo",
+            "/foo",
+            "/foo",
+            Collections.emptyMap(),
+            Collections.emptyMap(),
+            null,
+            new BytesArray("bar".getBytes(StandardCharsets.UTF_8)),
+            "",
+            null
+        );
+        ExtensionRestResponse response = handler.handleRequest(successfulRequest);
+        assertEquals(RestStatus.OK, response.status());
+        assertEquals("{\"success\":\"bar\"}", response.content().utf8ToString());
+    }
+
+    @Test
+    public void testJsonDeprecatedResponse() {
+        RestRequest successfulRequest = TestSDKRestRequest.createTestRestRequest(
+            Method.GET,
+            "/deprecated/foo",
+            "/deprecated/foo",
             Collections.emptyMap(),
             Collections.emptyMap(),
             null,
@@ -73,8 +95,8 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
     public void testErrorResponseOnException() {
         RestRequest exceptionalRequest = TestSDKRestRequest.createTestRestRequest(
             Method.GET,
-            "foo",
-            "foo",
+            "/foo",
+            "/foo",
             Collections.emptyMap(),
             Collections.emptyMap(),
             null,
@@ -91,8 +113,8 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
     public void testErrorResponseOnUnhandled() {
         RestRequest unhandledRequestMethod = TestSDKRestRequest.createTestRestRequest(
             Method.PUT,
-            "foo",
-            "foo",
+            "/foo",
+            "/foo",
             Collections.emptyMap(),
             Collections.emptyMap(),
             null,

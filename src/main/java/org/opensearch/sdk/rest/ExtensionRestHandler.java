@@ -7,7 +7,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.rest;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +15,7 @@ import java.util.List;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.RestHandler;
+import org.opensearch.rest.RestHandler.DeprecatedRoute;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 
@@ -41,6 +42,16 @@ public interface ExtensionRestHandler {
      * @return The routes this handler will handle.
      */
     default List<Route> routes() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * A list of routes handled by this RestHandler that are deprecated and do not have a direct replacement.
+     * If changing the {@code path} or {@code method} of a route, use {@link #replacedRoutes()}.
+     *
+     * @return Deprecated routes this handler will handle.
+     */
+    default List<DeprecatedRoute> deprecatedRoutes() {
         return Collections.emptyList();
     }
 }

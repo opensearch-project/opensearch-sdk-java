@@ -7,17 +7,17 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.rest;
 
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
+import org.opensearch.rest.RestHandler.DeprecatedRoute;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
-import org.opensearch.sdk.rest.ExtensionRestPathRegistry;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
@@ -28,6 +28,11 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
         @Override
         public List<Route> routes() {
             return List.of(new Route(Method.GET, "/foo"));
+        }
+
+        @Override
+        public List<DeprecatedRoute> deprecatedRoutes() {
+            return List.of(new DeprecatedRoute(Method.POST, "/deprecated/foo", "It's deprecated!"));
         }
 
         @Override
@@ -102,6 +107,12 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
     public void testGetHandler() {
         assertEquals(fooHandler, extensionRestPathRegistry.getHandler(Method.GET, "/foo"));
         assertNull(extensionRestPathRegistry.getHandler(Method.PUT, "/foo"));
+
+        // Deprecated handler wraps the original
+        ExtensionRestHandler deprecationHandler = extensionRestPathRegistry.getHandler(Method.POST, "/deprecated/foo");
+        assertTrue(deprecationHandler instanceof ExtensionDeprecationRestHandler);
+        assertEquals(fooHandler, ((ExtensionDeprecationRestHandler) deprecationHandler).getHandler());
+        assertEquals("It's deprecated!", ((ExtensionDeprecationRestHandler) deprecationHandler).getDeprecationMessage());
 
         // Exact match and wildcard match can overlap, exact takes priority
         assertEquals(barHandler, extensionRestPathRegistry.getHandler(Method.PUT, "/bar/mars"));

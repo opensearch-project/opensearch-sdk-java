@@ -7,19 +7,19 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.rest;
 
 import java.util.function.Function;
 
 import org.opensearch.extensions.rest.ExtensionRestResponse;
-import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.rest.RestHandler.DeprecatedRoute;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
 
 /**
- * A subclass of {@link Route} that includes a handler method for that route.
+ * A subclass of {@link DeprecatedRoute} that includes a handler method for that route.
  */
-public class RouteHandler extends Route {
+public class DeprecatedRouteHandler extends DeprecatedRoute {
 
     private final Function<RestRequest, ExtensionRestResponse> responseHandler;
 
@@ -29,9 +29,15 @@ public class RouteHandler extends Route {
      * @param method The {@link Method} to handle.
      * @param path The path to handle.
      * @param handler The method which handles the method and path.
+     * @param deprecationMessage The message to log with the deprecation logger
      */
-    public RouteHandler(Method method, String path, Function<RestRequest, ExtensionRestResponse> handler) {
-        super(method, path);
+    public DeprecatedRouteHandler(
+        Method method,
+        String path,
+        String deprecationMessage,
+        Function<RestRequest, ExtensionRestResponse> handler
+    ) {
+        super(method, path, deprecationMessage);
         this.responseHandler = handler;
     }
 

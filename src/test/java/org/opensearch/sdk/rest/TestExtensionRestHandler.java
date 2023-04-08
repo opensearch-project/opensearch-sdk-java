@@ -7,7 +7,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.rest;
 
 import org.junit.jupiter.api.Test;
 import org.opensearch.extensions.rest.ExtensionRestResponse;

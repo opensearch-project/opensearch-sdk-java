@@ -7,7 +7,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.rest;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +21,7 @@ import java.io.IOException;
 
 import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
+import org.opensearch.rest.RestHandler.DeprecatedRoute;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestStatus;
@@ -31,8 +32,7 @@ import org.opensearch.rest.RestStatus;
 public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
 
     /**
-     * Defines a list of methods which handle each rest {@link Route}. Override this in a subclass to use the functional
-     * syntax.
+     * Defines a list of methods which handle each rest {@link Route}. Override this in a subclass to use the functional syntax.
      *
      * @return a list of {@link RouteHandler} with corresponding methods to each route.
      */
@@ -45,20 +45,44 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
         return List.copyOf(routeHandlers());
     }
 
+    /**
+     * Defines a list of methods which handle each rest {@link DeprecatedRoute}. Override this in a subclass to use the functional syntax.
+     *
+     * @return a list of {@link DeprecatedRouteHandler} with corresponding methods to each route.
+     */
+    protected List<DeprecatedRouteHandler> deprecatedRouteHandlers() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<DeprecatedRoute> deprecatedRoutes() {
+        return List.copyOf(deprecatedRouteHandlers());
+    }
+
     @Override
     public ExtensionRestResponse handleRequest(RestRequest request) {
         Optional<RouteHandler> handler = routeHandlers().stream()
             .filter(rh -> rh.getMethod().equals(request.method()))
             .filter(rh -> restPathMatches(request.path(), rh.getPath()))
             .findFirst();
-        return handler.isPresent() ? handler.get().handleRequest(request) : unhandledRequest(request);
+        if (handler.isPresent()) {
+            return handler.get().handleRequest(request);
+        }
+        Optional<DeprecatedRouteHandler> deprecatedHandler = deprecatedRouteHandlers().stream()
+            .filter(rh -> rh.getMethod().equals(request.method()))
+            .filter(rh -> restPathMatches(request.path(), rh.getPath()))
+            .findFirst();
+        if (deprecatedHandler.isPresent()) {
+            return deprecatedHandler.get().handleRequest(request);
+        }
+        return unhandledRequest(request);
     }
 
     /**
      * Determines if the request's path is a match for the configured handler path.
      *
      * @param requestPath The path from the {@link RestRequest}
-     * @param handlerPath The path from the {@link RouteHandler}
+     * @param handlerPath The path from the {@link RouteHandler} or {@link DeprecatedRouteHandler}
      * @return true if the request path matches the route
      */
     private boolean restPathMatches(String requestPath, String handlerPath) {
