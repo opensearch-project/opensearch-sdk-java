@@ -29,13 +29,22 @@ public class ExtensionRestPathRegistry {
     private List<String> registeredPaths = new ArrayList<>();
 
     /**
-     * Register a REST handler to handle a method and route in this extension's path registry.
+     * Registers a REST handler with the controller. The REST handler declares the {@code method} and {@code path} combinations.
      *
-     * @param method  The method to register.
-     * @param path  The path to register. May include named wildcards.
-     * @param extensionRestHandler  The RestHandler to handle this route
+     * @param restHandler The RestHandler to register routes.
      */
-    public void registerHandler(Method method, String path, ExtensionRestHandler extensionRestHandler) {
+    public void registerHandler(ExtensionRestHandler restHandler) {
+        restHandler.routes().forEach(route -> registerHandler(route.getMethod(), route.getPath(), restHandler));
+    }
+
+    /**
+     * Registers a REST handler to be executed when one of the provided methods and path match the request.
+     *
+     * @param path Path to handle (e.g., "/{index}/{type}/_bulk")
+     * @param handler The handler to actually execute
+     * @param method GET, POST, etc.
+     */
+    private void registerHandler(Method method, String path, ExtensionRestHandler extensionRestHandler) {
         pathTrie.insertOrUpdate(
             path,
             new SDKMethodHandlers(path, extensionRestHandler, method),

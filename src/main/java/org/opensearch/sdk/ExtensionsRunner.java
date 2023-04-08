@@ -32,7 +32,6 @@ import org.opensearch.extensions.ExtensionsManager.RequestType;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.index.IndicesModuleRequest;
-import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.sdk.api.ActionExtension;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
@@ -245,9 +244,7 @@ public class ExtensionsRunner {
         if (extension instanceof ActionExtension) {
             // store REST handlers in the registry
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
-                for (Route route : extensionRestHandler.routes()) {
-                    extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
-                }
+                extensionRestPathRegistry.registerHandler(extensionRestHandler);
             }
         }
     }

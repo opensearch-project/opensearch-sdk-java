@@ -64,21 +64,38 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
         List<ExtensionRestHandler> handlerList = List.of(fooHandler, barHandler, bazHandler);
         super.setUp();
         for (ExtensionRestHandler handler : handlerList) {
-            for (Route route : handler.routes()) {
-                extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), handler);
-            }
+            extensionRestPathRegistry.registerHandler(handler);
         }
     }
 
     @Test
     public void testRegisterConflicts() {
         // Can't register same exact name
-        assertThrows(IllegalArgumentException.class, () -> extensionRestPathRegistry.registerHandler(Method.GET, "/foo", fooHandler));
+        ExtensionRestHandler duplicateFooHandler = new ExtensionRestHandler() {
+            @Override
+            public List<Route> routes() {
+                return List.of(new Route(Method.GET, "/foo"));
+            }
+
+            @Override
+            public ExtensionRestResponse handleRequest(RestRequest request) {
+                return null;
+            }
+        };
+        assertThrows(IllegalArgumentException.class, () -> extensionRestPathRegistry.registerHandler(duplicateFooHandler));
         // Can't register conflicting named wildcards, even if method is different
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> extensionRestPathRegistry.registerHandler(Method.GET, "/bar/{none}", barHandler)
-        );
+        ExtensionRestHandler barNoneHandler = new ExtensionRestHandler() {
+            @Override
+            public List<Route> routes() {
+                return List.of(new Route(Method.GET, "/bar/{none}"));
+            }
+
+            @Override
+            public ExtensionRestResponse handleRequest(RestRequest request) {
+                return null;
+            }
+        };
+        assertThrows(IllegalArgumentException.class, () -> extensionRestPathRegistry.registerHandler(barNoneHandler));
     }
 
     @Test
