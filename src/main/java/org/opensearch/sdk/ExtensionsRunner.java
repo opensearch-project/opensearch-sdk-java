@@ -503,13 +503,19 @@ public class ExtensionsRunner {
      */
     public void sendRegisterRestActionsRequest(TransportService transportService) {
         List<String> extensionRestPaths = extensionRestPathRegistry.getRegisteredPaths();
-        logger.info("Sending Register REST Actions request to OpenSearch for " + extensionRestPaths);
+        List<String> extensionDeprecatedRestPaths = extensionRestPathRegistry.getRegisteredDeprecatedPaths();
+        logger.info(
+            "Sending Register REST Actions request to OpenSearch for "
+                + extensionRestPaths
+                + " and deprecated paths "
+                + extensionDeprecatedRestPaths
+        );
         AcknowledgedResponseHandler registerActionsResponseHandler = new AcknowledgedResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsManager.REQUEST_EXTENSION_REGISTER_REST_ACTIONS,
-                new RegisterRestActionsRequest(getUniqueId(), extensionRestPaths),
+                new RegisterRestActionsRequest(getUniqueId(), extensionRestPaths, extensionDeprecatedRestPaths),
                 registerActionsResponseHandler
             );
         } catch (Exception e) {

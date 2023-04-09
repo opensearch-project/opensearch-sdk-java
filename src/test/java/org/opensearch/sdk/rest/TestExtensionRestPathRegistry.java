@@ -133,6 +133,15 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
     }
 
     @Test
+    public void testGetRegisteredDeprecatedPaths() {
+        List<String> registeredDeprecatedPaths = extensionRestPathRegistry.getRegisteredDeprecatedPaths();
+        assertEquals(0, registeredDeprecatedPaths.size() % 2);
+        int index = registeredDeprecatedPaths.indexOf("POST /deprecated/foo");
+        assertTrue(index >= 0);
+        assertEquals("It's deprecated!", registeredDeprecatedPaths.get(index + 1));
+    }
+
+    @Test
     public void testRestPathToString() {
         assertEquals("GET /foo", ExtensionRestPathRegistry.restPathToString(Method.GET, "/foo"));
     }
