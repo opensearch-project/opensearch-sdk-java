@@ -16,6 +16,7 @@ import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.RestHandler;
 import org.opensearch.rest.RestHandler.DeprecatedRoute;
+import org.opensearch.rest.RestHandler.ReplacedRoute;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 
@@ -52,6 +53,16 @@ public interface ExtensionRestHandler {
      * @return Deprecated routes this handler will handle.
      */
     default List<DeprecatedRoute> deprecatedRoutes() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * A list of routes handled by this RestHandler that have had their {@code path} and/or {@code method} changed.
+     * The pre-existing {@code route} will be registered as deprecated alongside the updated {@code route}.
+     *
+     * @return Replaced routes this handler will handle.
+     */
+    default List<ReplacedRoute> replacedRoutes() {
         return Collections.emptyList();
     }
 }

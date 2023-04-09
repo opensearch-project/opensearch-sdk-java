@@ -28,8 +28,8 @@ public class DeprecatedRouteHandler extends DeprecatedRoute {
      *
      * @param method The {@link Method} to handle.
      * @param path The path to handle.
-     * @param handler The method which handles the method and path.
      * @param deprecationMessage The message to log with the deprecation logger
+     * @param handler The method which handles the method and path.
      */
     public DeprecatedRouteHandler(
         Method method,

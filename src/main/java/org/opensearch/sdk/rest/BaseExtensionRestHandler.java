@@ -22,6 +22,7 @@ import java.io.IOException;
 import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestHandler.DeprecatedRoute;
+import org.opensearch.rest.RestHandler.ReplacedRoute;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestStatus;
@@ -59,6 +60,20 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
         return List.copyOf(deprecatedRouteHandlers());
     }
 
+    /**
+     * Defines a list of methods which handle each rest {@link ReplacedRoute}. Override this in a subclass to use the functional syntax.
+     *
+     * @return a list of {@link ReplacedRouteHandler} with corresponding methods to each route.
+     */
+    protected List<ReplacedRouteHandler> replacedRouteHandlers() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<ReplacedRoute> replacedRoutes() {
+        return List.copyOf(replacedRouteHandlers());
+    }
+
     @Override
     public ExtensionRestResponse handleRequest(RestRequest request) {
         Optional<RouteHandler> handler = routeHandlers().stream()
@@ -74,6 +89,20 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
             .findFirst();
         if (deprecatedHandler.isPresent()) {
             return deprecatedHandler.get().handleRequest(request);
+        }
+        Optional<ReplacedRouteHandler> replacedHandler = replacedRouteHandlers().stream()
+            .filter(rh -> rh.getMethod().equals(request.method()))
+            .filter(rh -> restPathMatches(request.path(), rh.getPath()))
+            .findFirst();
+        if (replacedHandler.isPresent()) {
+            return replacedHandler.get().handleRequest(request);
+        }
+        replacedHandler = replacedRouteHandlers().stream()
+            .filter(rh -> rh.getDeprecatedMethod().equals(request.method()))
+            .filter(rh -> restPathMatches(request.path(), rh.getDeprecatedPath()))
+            .findFirst();
+        if (replacedHandler.isPresent()) {
+            return replacedHandler.get().handleRequest(request);
         }
         return unhandledRequest(request);
     }

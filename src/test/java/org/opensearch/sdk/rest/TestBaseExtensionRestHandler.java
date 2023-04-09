@@ -17,6 +17,7 @@ import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
+import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestStatus;
@@ -33,6 +34,15 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
         @Override
         public List<DeprecatedRouteHandler> deprecatedRouteHandlers() {
             return List.of(new DeprecatedRouteHandler(Method.GET, "/deprecated/foo", "It's deprecated", handleFoo));
+        }
+
+        @Override
+        public List<ReplacedRouteHandler> replacedRouteHandlers() {
+            return List.of(
+                new ReplacedRouteHandler(Method.GET, "/old/foo", Method.GET, "/new/foo", handleFoo),
+                new ReplacedRouteHandler(Method.PUT, "/old/put/foo", "/new/put/foo", handleFoo),
+                new ReplacedRouteHandler(new Route(Method.POST, "/foo"), "/old", "/new", handleFoo)
+            );
         }
 
         private Function<RestRequest, ExtensionRestResponse> handleFoo = (request) -> {
@@ -87,6 +97,105 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
             null
         );
         ExtensionRestResponse response = handler.handleRequest(successfulRequest);
+        assertEquals(RestStatus.OK, response.status());
+        assertEquals("{\"success\":\"bar\"}", response.content().utf8ToString());
+    }
+
+    @Test
+    public void testJsonReplacedResponseGet() {
+        RestRequest successfulRequestOld = TestSDKRestRequest.createTestRestRequest(
+            Method.GET,
+            "/old/foo",
+            "/old/foo",
+            Collections.emptyMap(),
+            Collections.emptyMap(),
+            null,
+            new BytesArray("bar".getBytes(StandardCharsets.UTF_8)),
+            "",
+            null
+        );
+        RestRequest successfulRequestNew = TestSDKRestRequest.createTestRestRequest(
+            Method.GET,
+            "/new/foo",
+            "/new/foo",
+            Collections.emptyMap(),
+            Collections.emptyMap(),
+            null,
+            new BytesArray("bar".getBytes(StandardCharsets.UTF_8)),
+            "",
+            null
+        );
+        ExtensionRestResponse response = handler.handleRequest(successfulRequestOld);
+        assertEquals(RestStatus.OK, response.status());
+        assertEquals("{\"success\":\"bar\"}", response.content().utf8ToString());
+
+        response = handler.handleRequest(successfulRequestNew);
+        assertEquals(RestStatus.OK, response.status());
+        assertEquals("{\"success\":\"bar\"}", response.content().utf8ToString());
+    }
+
+    @Test
+    public void testJsonReplacedResponsePut() {
+        RestRequest successfulRequestOld = TestSDKRestRequest.createTestRestRequest(
+            Method.PUT,
+            "/old/put/foo",
+            "/old/put/foo",
+            Collections.emptyMap(),
+            Collections.emptyMap(),
+            null,
+            new BytesArray("bar".getBytes(StandardCharsets.UTF_8)),
+            "",
+            null
+        );
+        RestRequest successfulRequestNew = TestSDKRestRequest.createTestRestRequest(
+            Method.PUT,
+            "/new/put/foo",
+            "/new/put/foo",
+            Collections.emptyMap(),
+            Collections.emptyMap(),
+            null,
+            new BytesArray("bar".getBytes(StandardCharsets.UTF_8)),
+            "",
+            null
+        );
+        ExtensionRestResponse response = handler.handleRequest(successfulRequestOld);
+        assertEquals(RestStatus.OK, response.status());
+        assertEquals("{\"success\":\"bar\"}", response.content().utf8ToString());
+
+        response = handler.handleRequest(successfulRequestNew);
+        assertEquals(RestStatus.OK, response.status());
+        assertEquals("{\"success\":\"bar\"}", response.content().utf8ToString());
+    }
+
+    @Test
+    public void testJsonReplacedResponsePost() {
+        RestRequest successfulRequestOld = TestSDKRestRequest.createTestRestRequest(
+            Method.POST,
+            "/old/foo",
+            "/old/foo",
+            Collections.emptyMap(),
+            Collections.emptyMap(),
+            null,
+            new BytesArray("bar".getBytes(StandardCharsets.UTF_8)),
+            "",
+            null
+        );
+        RestRequest successfulRequestNew = TestSDKRestRequest.createTestRestRequest(
+            Method.POST,
+            "/new/foo",
+            "/new/foo",
+            Collections.emptyMap(),
+            Collections.emptyMap(),
+            null,
+            new BytesArray("bar".getBytes(StandardCharsets.UTF_8)),
+            "",
+            null
+        );
+        ExtensionRestResponse response = handler.handleRequest(successfulRequestOld);
+        assertEquals(RestStatus.OK, response.status());
+        assertEquals("{\"success\":\"bar\"}", response.content().utf8ToString());
+
+        response = handler.handleRequest(successfulRequestNew);
         assertEquals(RestStatus.OK, response.status());
         assertEquals("{\"success\":\"bar\"}", response.content().utf8ToString());
     }
