@@ -7,11 +7,12 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.api;
 
 import org.opensearch.common.settings.Settings;
 import org.opensearch.script.ScriptContext;
 import org.opensearch.script.ScriptEngine;
+import org.opensearch.sdk.Extension;
 
 import java.util.Collection;
 import java.util.Collections;

@@ -22,10 +22,11 @@ import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.xcontent.XContentType;
+import org.opensearch.http.HttpRequest.HttpVersion;
 import org.opensearch.rest.RestResponse;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.ExtensionRestHandler;
-import org.opensearch.sdk.TestBaseExtensionRestHandler;
+import org.opensearch.sdk.rest.TestSDKRestRequest;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestRestHelloAction extends OpenSearchTestCase {
@@ -66,85 +67,115 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         String token = "placeholder_token";
         Map<String, String> params = Collections.emptyMap();
 
-        RestRequest getRequest = TestBaseExtensionRestHandler.createTestRestRequest(
+        RestRequest getRequest = TestSDKRestRequest.createTestRestRequest(
             Method.GET,
             "/hello",
+            "/hello",
             params,
-            null,
+            headers(XContentType.JSON),
+            XContentType.JSON,
             new BytesArray(""),
-            token
+            token,
+            HttpVersion.HTTP_1_1
         );
-        RestRequest putRequest = TestBaseExtensionRestHandler.createTestRestRequest(
+        RestRequest putRequest = TestSDKRestRequest.createTestRestRequest(
             Method.PUT,
             "/hello/Passing+Test",
+            "/hello/Passing+Test",
             Map.of("name", "Passing+Test"),
-            null,
+            headers(XContentType.JSON),
+            XContentType.JSON,
             new BytesArray(""),
-            token
+            token,
+            HttpVersion.HTTP_1_1
         );
-        RestRequest postRequest = TestBaseExtensionRestHandler.createTestRestRequest(
+        RestRequest postRequest = TestSDKRestRequest.createTestRestRequest(
             Method.POST,
             "/hello",
+            "/hello",
             params,
+            headers(XContentType.JSON),
             XContentType.JSON,
             new BytesArray("{\"adjective\":\"testable\"}"),
-            token
+            token,
+            HttpVersion.HTTP_1_1
         );
-        RestRequest badPostRequest = TestBaseExtensionRestHandler.createTestRestRequest(
+        RestRequest badPostRequest = TestSDKRestRequest.createTestRestRequest(
             Method.POST,
             "/hello",
+            "/hello",
             params,
+            headers(XContentType.JSON),
             XContentType.JSON,
             new BytesArray("{\"adjective\":\"\"}"),
-            token
+            token,
+            HttpVersion.HTTP_1_1
         );
-        RestRequest noContentPostRequest = TestBaseExtensionRestHandler.createTestRestRequest(
+        RestRequest noContentPostRequest = TestSDKRestRequest.createTestRestRequest(
             Method.POST,
             "/hello",
+            "/hello",
             params,
+            headers(null),
             null,
             new BytesArray(""),
-            token
+            token,
+            HttpVersion.HTTP_1_1
         );
-        RestRequest badContentTypePostRequest = TestBaseExtensionRestHandler.createTestRestRequest(
+        RestRequest badContentTypePostRequest = TestSDKRestRequest.createTestRestRequest(
             Method.POST,
             "/hello",
+            "/hello",
             params,
+            headers(XContentType.YAML),
             XContentType.YAML,
             new BytesArray("yaml:"),
-            token
+            token,
+            HttpVersion.HTTP_1_1
         );
-        RestRequest deleteRequest = TestBaseExtensionRestHandler.createTestRestRequest(
+        RestRequest deleteRequest = TestSDKRestRequest.createTestRestRequest(
             Method.DELETE,
             "/goodbye",
+            "/goodbye",
             params,
-            null,
+            headers(XContentType.JSON),
+            XContentType.JSON,
             new BytesArray(""),
-            token
+            token,
+            HttpVersion.HTTP_1_1
         );
-        RestRequest unhandledMethodRequest = TestBaseExtensionRestHandler.createTestRestRequest(
+        RestRequest unhandledMethodRequest = TestSDKRestRequest.createTestRestRequest(
             Method.HEAD,
             "/hi",
-            params,
-            null,
-            new BytesArray(""),
-            token
-        );
-        RestRequest unhandledPathRequest = TestBaseExtensionRestHandler.createTestRestRequest(
-            Method.GET,
             "/hi",
             params,
-            null,
+            headers(XContentType.JSON),
+            XContentType.JSON,
             new BytesArray(""),
-            token
+            token,
+            HttpVersion.HTTP_1_1
         );
-        RestRequest unhandledPathLengthRequest = TestBaseExtensionRestHandler.createTestRestRequest(
+        RestRequest unhandledPathRequest = TestSDKRestRequest.createTestRestRequest(
+            Method.GET,
+            "/hi",
+            "/hi",
+            params,
+            headers(XContentType.JSON),
+            XContentType.JSON,
+            new BytesArray(""),
+            token,
+            HttpVersion.HTTP_1_1
+        );
+        RestRequest unhandledPathLengthRequest = TestSDKRestRequest.createTestRestRequest(
             Method.DELETE,
             "/goodbye/cruel/world",
+            "/goodbye/cruel/world",
             params,
-            null,
+            headers(XContentType.JSON),
+            XContentType.JSON,
             new BytesArray(""),
-            token
+            token,
+            HttpVersion.HTTP_1_1
         );
 
         // Initial default response
@@ -234,5 +265,9 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         assertEquals(JSON_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("/goodbye"));
+    }
+
+    private static Map<String, List<String>> headers(XContentType type) {
+        return type == null ? Collections.emptyMap() : Map.of("Content-Type", List.of(type.mediaType()));
     }
 }

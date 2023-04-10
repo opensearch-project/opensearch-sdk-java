@@ -21,7 +21,7 @@ import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionSettings;
 import org.opensearch.sdk.ExtensionsRunner;
-import org.opensearch.sdk.ActionExtension;
+import org.opensearch.sdk.api.ActionExtension;
 import org.opensearch.sdk.sample.helloworld.rest.RestHelloAction;
 import org.opensearch.sdk.sample.helloworld.rest.RestRemoteHelloAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;

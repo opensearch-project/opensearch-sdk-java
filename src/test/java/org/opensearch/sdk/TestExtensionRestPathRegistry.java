@@ -17,6 +17,7 @@ import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
+import org.opensearch.sdk.rest.ExtensionRestPathRegistry;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
@@ -73,10 +74,10 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
     public void testRegisterConflicts() {
         // Can't register same exact name
         assertThrows(IllegalArgumentException.class, () -> extensionRestPathRegistry.registerHandler(Method.GET, "/foo", fooHandler));
-        // Can't register conflicting named wildcards
+        // Can't register conflicting named wildcards, even if method is different
         assertThrows(
             IllegalArgumentException.class,
-            () -> extensionRestPathRegistry.registerHandler(Method.PUT, "/bar/{none}", barHandler)
+            () -> extensionRestPathRegistry.registerHandler(Method.GET, "/bar/{none}", barHandler)
         );
     }
 
