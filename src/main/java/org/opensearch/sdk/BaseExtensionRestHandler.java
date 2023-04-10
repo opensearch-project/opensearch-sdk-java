@@ -136,6 +136,15 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
         }
     }
 
+    /**
+     * Returns a String message of the detail of any unrecognized error occurred
+     *
+     * @param request The request that caused the exception
+     * @param invalids invalid strings
+     * @param candidates candidates involved
+     * @param detail
+     * @return an String that contains the message.
+     */
     public static final String unrecognized(RestRequest request, Set<String> invalids, Set<String> candidates, String detail) {
         StringBuilder message = new StringBuilder(
             String.format(Locale.ROOT, "request [%s] contains unrecognized %s%s: ", request.path(), detail, invalids.size() > 1 ? "s" : "")
