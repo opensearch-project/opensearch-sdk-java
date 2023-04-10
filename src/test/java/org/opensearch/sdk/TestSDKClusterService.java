@@ -12,6 +12,8 @@ package org.opensearch.sdk;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.opensearch.action.admin.cluster.state.ClusterStateRequest;
+import org.opensearch.common.Strings;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Setting.Property;
 import org.opensearch.common.settings.Settings;
@@ -54,12 +56,15 @@ public class TestSDKClusterService extends OpenSearchTestCase {
 
         // After initialization should be successful
         when(extensionsRunner.isInitialized()).thenReturn(true);
-        sdkClusterService.state();
-        verify(extensionsRunner, times(1)).getExtensionTransportService();
+        SDKTransportService sdkTransportService = mock(SDKTransportService.class);
+        when(extensionsRunner.getSdkTransportService()).thenReturn(sdkTransportService);
 
-        ArgumentCaptor<TransportService> argumentCaptor = ArgumentCaptor.forClass(TransportService.class);
-        verify(extensionsRunner, times(1)).sendClusterStateRequest(argumentCaptor.capture());
-        assertNull(argumentCaptor.getValue());
+        sdkClusterService.state();
+        ArgumentCaptor<ClusterStateRequest> argumentCaptor = ArgumentCaptor.forClass(ClusterStateRequest.class);
+        verify(sdkTransportService, times(1)).sendClusterStateRequest(argumentCaptor.capture());
+        assertArrayEquals(Strings.EMPTY_ARRAY, argumentCaptor.getValue().indices());
+        assertTrue(argumentCaptor.getValue().nodes());
+        assertTrue(argumentCaptor.getValue().routingTable());
     }
 
     @Test

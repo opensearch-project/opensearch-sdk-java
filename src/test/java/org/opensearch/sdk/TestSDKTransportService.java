@@ -13,20 +13,26 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.opensearch.Version;
+import org.opensearch.action.admin.cluster.state.ClusterStateRequest;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RegisterTransportActionsRequest;
+import org.opensearch.extensions.action.TransportActionRequestFromExtension;
 import org.opensearch.sdk.action.RemoteExtensionAction;
+import org.opensearch.sdk.action.RemoteExtensionActionRequest;
 import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.sdk.action.TestSDKActionModule;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
+import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
+import org.opensearch.sdk.handlers.ExtensionActionResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.Transport;
 import org.opensearch.transport.TransportService;
 
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import static java.util.Collections.emptyMap;
@@ -100,5 +106,44 @@ public class TestSDKTransportService extends OpenSearchTestCase {
         );
         // Internal action should be filtered out
         assertFalse(registerTransportActionsRequestCaptor.getValue().getTransportActions().contains(RemoteExtensionAction.class.getName()));
+    }
+
+    @Test
+    public void testRemoteExtensionActionRequest() {
+        ArgumentCaptor<TransportActionRequestFromExtension> transportActionRequestFromExtensionCaptor = ArgumentCaptor.forClass(
+            TransportActionRequestFromExtension.class
+        );
+        String expectedAction = "com.example.action";
+        String expectedRequest = "com.example.request";
+        byte[] expectedRequestBytes = "test".getBytes(StandardCharsets.UTF_8);
+        RemoteExtensionActionRequest request = new RemoteExtensionActionRequest(expectedAction, expectedRequest, expectedRequestBytes);
+        sdkTransportService.sendRemoteExtensionActionRequest(request);
+        verify(transportService, times(1)).sendRequest(
+            any(),
+            eq(ExtensionsManager.TRANSPORT_ACTION_REQUEST_FROM_EXTENSION),
+            transportActionRequestFromExtensionCaptor.capture(),
+            any(ExtensionActionResponseHandler.class)
+        );
+        assertEquals(TEST_UNIQUE_ID, transportActionRequestFromExtensionCaptor.getValue().getUniqueId());
+        assertEquals(expectedAction, transportActionRequestFromExtensionCaptor.getValue().getAction());
+        String expectedString = expectedRequest + (char) RemoteExtensionActionRequest.UNIT_SEPARATOR + "test";
+        assertEquals(
+            expectedString,
+            new String(transportActionRequestFromExtensionCaptor.getValue().getRequestBytes(), StandardCharsets.UTF_8)
+        );
+    }
+
+    @Test
+    public void testsendClusterStateRequest() {
+        ArgumentCaptor<ClusterStateRequest> clusterStateRequestCaptor = ArgumentCaptor.forClass(ClusterStateRequest.class);
+        ClusterStateRequest request = new ClusterStateRequest().clear().indices("foo", "bar");
+        sdkTransportService.sendClusterStateRequest(request);
+        verify(transportService, times(1)).sendRequest(
+            any(),
+            eq(ExtensionsManager.REQUEST_EXTENSION_CLUSTER_STATE),
+            clusterStateRequestCaptor.capture(),
+            any(ClusterStateResponseHandler.class)
+        );
+        assertArrayEquals(new String[] { "foo", "bar" }, clusterStateRequestCaptor.getValue().indices());
     }
 }

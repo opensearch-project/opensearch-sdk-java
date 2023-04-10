@@ -52,7 +52,6 @@ import org.opensearch.rest.RestStatus;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.extensions.UpdateSettingsRequest;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
-import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
@@ -175,14 +174,6 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
             AcknowledgedResponse.class,
             extensionsRunner.updateSettingsRequestHandler.handleUpdateSettingsRequest(request).getClass()
         );
-    }
-
-    @Test
-    public void testClusterStateRequest() {
-
-        extensionsRunner.sendClusterStateRequest(transportService);
-
-        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ClusterStateResponseHandler.class));
     }
 
     @Test

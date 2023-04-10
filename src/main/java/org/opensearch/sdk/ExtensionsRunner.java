@@ -13,7 +13,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
-import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
@@ -35,7 +34,6 @@ import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.sdk.api.ActionExtension;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
-import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionActionRequestHandler;
 import org.opensearch.sdk.action.SDKActionModule;
@@ -551,35 +549,6 @@ public class ExtensionsRunner {
         } catch (Exception e) {
             logger.info("Failed to send " + requestType + " request to OpenSearch", e);
         }
-    }
-
-    /**
-     * Requests the cluster state from OpenSearch.  The result will be handled by a {@link ClusterStateResponseHandler}.
-     *
-     * @param transportService  The TransportService defining the connection to OpenSearch.
-     * @return The cluster state of OpenSearch
-     */
-
-    public ClusterState sendClusterStateRequest(TransportService transportService) {
-        logger.info("Sending Cluster State request to OpenSearch");
-        ClusterStateResponseHandler clusterStateResponseHandler = new ClusterStateResponseHandler();
-        try {
-            transportService.sendRequest(
-                opensearchNode,
-                ExtensionsManager.REQUEST_EXTENSION_CLUSTER_STATE,
-                new ExtensionRequest(ExtensionsManager.RequestType.REQUEST_EXTENSION_CLUSTER_STATE),
-                clusterStateResponseHandler
-            );
-            // Wait on cluster state response
-            clusterStateResponseHandler.awaitResponse();
-        } catch (TimeoutException e) {
-            logger.info("Failed to receive Cluster State response from OpenSearch", e);
-        } catch (Exception e) {
-            logger.info("Failed to send Cluster State request to OpenSearch", e);
-        }
-
-        // At this point, response handler has read in the cluster state
-        return clusterStateResponseHandler.getClusterState();
     }
 
     /**

@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.opensearch.action.admin.cluster.state.ClusterStateRequest;
+import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RegisterTransportActionsRequest;
@@ -27,6 +29,7 @@ import org.opensearch.sdk.api.ActionExtension.ActionHandler;
 import org.opensearch.sdk.action.RemoteExtensionActionRequest;
 import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
+import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionActionResponseHandler;
 import org.opensearch.transport.TransportService;
 
@@ -104,6 +107,32 @@ public class SDKTransportService {
             extensionActionResponseHandler.isSuccess(),
             extensionActionResponseHandler.getResponseBytes()
         );
+    }
+
+    /**
+     * Requests the Cluster State from OpenSearch
+     *
+     * @param request a ClusterStateRequest object defining the information to be retrieved
+     * @return The requested cluster state. Only the parts of the cluster state that were requested are included in the returned {@link ClusterState} instance.
+     */
+    public ClusterState sendClusterStateRequest(ClusterStateRequest request) {
+        logger.info("Sending Cluster State request to OpenSearch");
+        ClusterStateResponseHandler clusterStateResponseHandler = new ClusterStateResponseHandler();
+        try {
+            transportService.sendRequest(
+                opensearchNode,
+                ExtensionsManager.REQUEST_EXTENSION_CLUSTER_STATE,
+                request,
+                clusterStateResponseHandler
+            );
+            // Wait on response
+            clusterStateResponseHandler.awaitResponse();
+        } catch (TimeoutException e) {
+            logger.error("Failed to receive Cluster State response from OpenSearch", e);
+        } catch (Exception e) {
+            logger.error("Failed to send Cluster State request to OpenSearch", e);
+        }
+        return clusterStateResponseHandler.getClusterState();
     }
 
     public TransportService getTransportService() {

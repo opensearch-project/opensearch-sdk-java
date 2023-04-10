@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
+import org.opensearch.action.admin.cluster.state.ClusterStateRequest;
 import org.opensearch.cluster.ClusterState;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.SettingUpgrader;
@@ -52,7 +53,7 @@ public class SDKClusterService {
      */
     public ClusterState state() {
         if (extensionsRunner.isInitialized()) {
-            return extensionsRunner.sendClusterStateRequest(extensionsRunner.getExtensionTransportService());
+            return extensionsRunner.getSdkTransportService().sendClusterStateRequest(new ClusterStateRequest().all());
         }
         throw new IllegalStateException("The Extensions Runner has not been initialized.");
     }
