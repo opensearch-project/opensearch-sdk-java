@@ -245,15 +245,17 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         assertEquals("failed to find action [" + UnregisteredAction.INSTANCE + "] to execute", ex.getMessage());
     }
 
+    @Test
     public void testValidatedSettings() {
-        final String expected = randomAlphaOfLengthBetween(1, 5);
+        final String expected = "foo";
         final String actual = VALIDATED_SETTING.get(Settings.builder().put(VALIDATED_SETTING.getKey(), expected).build());
         assertEquals(expected, actual);
 
-        final IllegalArgumentException exception = expectThrows(
+        final IllegalArgumentException exceptionTrue = expectThrows(
             IllegalArgumentException.class,
-            () -> VALIDATED_SETTING.get(Settings.builder().put("custom.validated", "it's forbidden").build())
+            () -> VALIDATED_SETTING.get(Settings.builder().put(VALIDATED_SETTING.getKey(), "it's forbidden").build())
         );
-        assertEquals("Setting must not contain [forbidden]", exception.getMessage());
+
+        assertEquals("Setting [it's forbidden] must match regex [forbidden]", exceptionTrue.getMessage());
     }
 }
