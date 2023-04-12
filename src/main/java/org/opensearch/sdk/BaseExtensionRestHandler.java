@@ -12,13 +12,7 @@ package org.opensearch.sdk;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.Set;
-import java.util.Locale;
-import java.util.ArrayList;
-import org.apache.lucene.search.spell.LevenshteinDistance;
-import org.apache.lucene.util.CollectionUtil;
-import org.opensearch.common.collect.Tuple;
 import org.opensearch.rest.BaseRestHandler;
 import static org.opensearch.rest.RestStatus.INTERNAL_SERVER_ERROR;
 import static org.opensearch.rest.RestStatus.NOT_FOUND;
@@ -151,6 +145,6 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
         final Set<String> candidates,
         final String detail
     ) {
-        return BaseRestHandler.unrecognizedStrings(request,invalids,candidates,detail);
+        return BaseRestHandler.unrecognizedStrings(request, invalids, candidates, detail);
     }
 }
