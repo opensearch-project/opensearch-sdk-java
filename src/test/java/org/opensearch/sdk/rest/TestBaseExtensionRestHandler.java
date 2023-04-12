@@ -39,9 +39,9 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
         @Override
         public List<ReplacedRouteHandler> replacedRouteHandlers() {
             return List.of(
-                new ReplacedRouteHandler(Method.GET, "/old/foo", Method.GET, "/new/foo", handleFoo),
-                new ReplacedRouteHandler(Method.PUT, "/old/put/foo", "/new/put/foo", handleFoo),
-                new ReplacedRouteHandler(new Route(Method.POST, "/foo"), "/old", "/new", handleFoo)
+                new ReplacedRouteHandler(Method.GET, "/new/foo", Method.GET, "/old/foo", handleFoo),
+                new ReplacedRouteHandler(Method.PUT, "/new/put/foo", "/old/put/foo", handleFoo),
+                new ReplacedRouteHandler(new Route(Method.POST, "/foo"), "/new", "/old", handleFoo)
             );
         }
 

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestHandler.DeprecatedRoute;
+import org.opensearch.rest.RestHandler.ReplacedRoute;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
@@ -39,6 +40,18 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
         @Override
         public ExtensionRestResponse handleRequest(RestRequest request) {
             return null;
+        }
+    };
+    private BaseExtensionRestHandler replacedFooHandler = new BaseExtensionRestHandler() {
+        @Override
+        public List<ReplacedRoute> replacedRoutes() {
+            return List.of(
+                new ReplacedRouteHandler(Method.GET, "/new/foo", Method.GET, "/old/foo", r -> { return null; }),
+                new ReplacedRouteHandler(Method.PUT, "/new/put/foo", "/old/put/foo", r -> {
+                    return null;
+                }),
+                new ReplacedRouteHandler(new Route(Method.POST, "/foo"), "/new", "/old", r -> { return null; })
+            );
         }
     };
     private ExtensionRestHandler barHandler = new ExtensionRestHandler() {
@@ -67,7 +80,7 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
     @Override
     @BeforeEach
     public void setUp() throws Exception {
-        List<ExtensionRestHandler> handlerList = List.of(fooHandler, barHandler, bazHandler);
+        List<ExtensionRestHandler> handlerList = List.of(fooHandler, replacedFooHandler, barHandler, bazHandler);
         super.setUp();
         for (ExtensionRestHandler handler : handlerList) {
             extensionRestPathRegistry.registerHandler(handler);
@@ -140,6 +153,30 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
         int index = registeredDeprecatedPaths.indexOf("POST /deprecated/foo");
         assertTrue(index >= 0);
         assertEquals("It's deprecated!", registeredDeprecatedPaths.get(index + 1));
+    }
+
+    @Test
+    public void testGetRegisteredReplacedPaths() {
+        List<String> registeredPaths = extensionRestPathRegistry.getRegisteredPaths();
+        assertTrue(registeredPaths.contains("GET /new/foo"));
+        assertTrue(registeredPaths.contains("PUT /new/put/foo"));
+        assertTrue(registeredPaths.contains("POST /new/foo"));
+
+        List<String> registeredDeprecatedPaths = extensionRestPathRegistry.getRegisteredDeprecatedPaths();
+        assertTrue(registeredDeprecatedPaths.contains("GET /old/foo"));
+        int index = registeredDeprecatedPaths.indexOf("GET /old/foo");
+        assertTrue(index >= 0);
+        assertEquals("[GET /old/foo] is deprecated! Use [GET /new/foo] instead.", registeredDeprecatedPaths.get(index + 1));
+
+        assertTrue(registeredDeprecatedPaths.contains("PUT /old/put/foo"));
+        index = registeredDeprecatedPaths.indexOf("PUT /old/put/foo");
+        assertTrue(index >= 0);
+        assertEquals("[PUT /old/put/foo] is deprecated! Use [PUT /new/put/foo] instead.", registeredDeprecatedPaths.get(index + 1));
+
+        assertTrue(registeredDeprecatedPaths.contains("POST /old/foo"));
+        index = registeredDeprecatedPaths.indexOf("POST /old/foo");
+        assertTrue(index >= 0);
+        assertEquals("[POST /old/foo] is deprecated! Use [POST /new/foo] instead.", registeredDeprecatedPaths.get(index + 1));
     }
 
     @Test

@@ -18,10 +18,7 @@ import static org.opensearch.rest.RestStatus.INTERNAL_SERVER_ERROR;
 import static org.opensearch.rest.RestStatus.NOT_FOUND;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 
 import org.opensearch.common.logging.DeprecationLogger;
@@ -208,8 +205,8 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     ) {
         return BaseRestHandler.unrecognizedStrings(request, invalids, candidates, detail);
     }
-    
-    /*
+
+    /**
      * A subclass of {@link Route} that includes a handler method for that route.
      */
     public static class RouteHandler extends Route {
