@@ -17,6 +17,7 @@ import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.path.PathTrie;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestUtils;
+import org.opensearch.sdk.rest.BaseExtensionRestHandler.ExtensionDeprecationRestHandler;
 
 /**
  * This class registers REST paths from extension Rest Handlers.

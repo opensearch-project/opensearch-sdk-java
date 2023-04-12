@@ -18,12 +18,20 @@ import static org.opensearch.rest.RestStatus.INTERNAL_SERVER_ERROR;
 import static org.opensearch.rest.RestStatus.NOT_FOUND;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
 
+import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestHandler.DeprecatedRoute;
 import org.opensearch.rest.RestHandler.ReplacedRoute;
 import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.rest.RestRequest.Method;
+import org.opensearch.rest.DeprecationRestHandler;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestStatus;
 
@@ -199,5 +207,120 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
         final String detail
     ) {
         return BaseRestHandler.unrecognizedStrings(request, invalids, candidates, detail);
+    }
+    
+    /*
+     * A subclass of {@link Route} that includes a handler method for that route.
+     */
+    public static class RouteHandler extends Route {
+
+        private final Function<RestRequest, ExtensionRestResponse> responseHandler;
+
+        /**
+         * Handle the method and path with the specified handler.
+         *
+         * @param method The {@link Method} to handle.
+         * @param path The path to handle.
+         * @param handler The method which handles the method and path.
+         */
+        public RouteHandler(Method method, String path, Function<RestRequest, ExtensionRestResponse> handler) {
+            super(method, path);
+            this.responseHandler = handler;
+        }
+
+        /**
+         * Executes the handler for this route.
+         *
+         * @param request The request to handle
+         * @return the {@link ExtensionRestResponse} result from the handler for this route.
+         */
+        public ExtensionRestResponse handleRequest(RestRequest request) {
+            return responseHandler.apply(request);
+        }
+    }
+
+    /**
+     * A subclass of {@link DeprecatedRoute} that includes a handler method for that route.
+     */
+    public static class DeprecatedRouteHandler extends DeprecatedRoute {
+
+        private final Function<RestRequest, ExtensionRestResponse> responseHandler;
+
+        /**
+         * Handle the method and path with the specified handler.
+         *
+         * @param method The {@link Method} to handle.
+         * @param path The path to handle.
+         * @param deprecationMessage The message to log with the deprecation logger
+         * @param handler The method which handles the method and path.
+         */
+        public DeprecatedRouteHandler(
+            Method method,
+            String path,
+            String deprecationMessage,
+            Function<RestRequest, ExtensionRestResponse> handler
+        ) {
+            super(method, path, deprecationMessage);
+            this.responseHandler = handler;
+        }
+
+        /**
+         * Executes the handler for this route.
+         *
+         * @param request The request to handle
+         * @return the {@link ExtensionRestResponse} result from the handler for this route.
+         */
+        public ExtensionRestResponse handleRequest(RestRequest request) {
+            return responseHandler.apply(request);
+        }
+    }
+
+    /**
+     * {@code ExtensionDeprecationRestHandler} provides a proxy for any existing {@link Extension RestHandler} so that usage of the handler can be logged using the {@link DeprecationLogger}.
+     */
+    public static class ExtensionDeprecationRestHandler implements ExtensionRestHandler {
+
+        private final ExtensionRestHandler handler;
+        private final String deprecationMessage;
+        private final DeprecationLogger deprecationLogger;
+
+        /**
+         * Create a {@link DeprecationRestHandler} that encapsulates the {@code handler} using the {@code deprecationLogger} to log deprecation {@code warning}.
+         *
+         * @param handler The rest handler to deprecate (it's possible that the handler is reused with a different name!)
+         * @param deprecationMessage The message to warn users with when they use the {@code handler}
+         * @param deprecationLogger The deprecation logger
+         * @throws NullPointerException if any parameter except {@code deprecationMessage} is {@code null}
+         * @throws IllegalArgumentException if {@code deprecationMessage} is not a valid header
+         */
+        public ExtensionDeprecationRestHandler(
+            ExtensionRestHandler handler,
+            String deprecationMessage,
+            DeprecationLogger deprecationLogger
+        ) {
+            this.handler = Objects.requireNonNull(handler);
+            this.deprecationMessage = DeprecationRestHandler.requireValidHeader(deprecationMessage);
+            this.deprecationLogger = Objects.requireNonNull(deprecationLogger);
+        }
+
+        /**
+         * {@inheritDoc}
+         * <p>
+         * Usage is logged via the {@link DeprecationLogger} so that the actual response can be notified of deprecation as well.
+         */
+        @Override
+        public ExtensionRestResponse handleRequest(RestRequest restRequest) {
+            deprecationLogger.deprecate("deprecated_route", deprecationMessage);
+
+            return handler.handleRequest(restRequest);
+        }
+
+        ExtensionRestHandler getHandler() {
+            return handler;
+        }
+
+        String getDeprecationMessage() {
+            return deprecationMessage;
+        }
     }
 }

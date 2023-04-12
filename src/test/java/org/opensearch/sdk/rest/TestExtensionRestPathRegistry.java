@@ -18,6 +18,7 @@ import org.opensearch.rest.RestHandler.DeprecatedRoute;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
+import org.opensearch.sdk.rest.BaseExtensionRestHandler.ExtensionDeprecationRestHandler;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
