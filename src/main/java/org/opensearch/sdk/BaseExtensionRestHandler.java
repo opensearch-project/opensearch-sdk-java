@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import org.apache.lucene.search.spell.LevenshteinDistance;
 import org.apache.lucene.util.CollectionUtil;
 import org.opensearch.common.collect.Tuple;
+import org.opensearch.rest.BaseRestHandler;
 import static org.opensearch.rest.RestStatus.INTERNAL_SERVER_ERROR;
 import static org.opensearch.rest.RestStatus.NOT_FOUND;
 
@@ -136,13 +137,13 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     }
 
     /**
-     * Returns a String message of the detail of any unrecognized error occurred
+     * Returns a String message of the detail of any unrecognized error occurred. The string is intended for use in error messages to be returned to the user.
      *
      * @param request The request that caused the exception
-     * @param invalids invalid strings
-     * @param candidates candidates involved
-     * @param detail
-     * @return an String that contains the message.
+     * @param invalids Strings from the request which were unable to be understood.
+     * @param candidates A set of words that are most likely to be the valid strings determined invalid, to be suggested to the user.
+     * @param detail The parameter contains the details of the exception.
+     * @return a String that contains the message.
      */
     protected final String unrecognized(
         final RestRequest request,
@@ -150,42 +151,6 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
         final Set<String> candidates,
         final String detail
     ) {
-        StringBuilder message = new StringBuilder(
-            String.format(Locale.ROOT, "request [%s] contains unrecognized %s%s: ", request.path(), detail, invalids.size() > 1 ? "s" : "")
-        );
-        boolean first = true;
-        for (final String invalid : invalids) {
-            final LevenshteinDistance ld = new LevenshteinDistance();
-            final List<Tuple<Float, String>> scoredParams = new ArrayList<>();
-            for (final String candidate : candidates) {
-                final float distance = ld.getDistance(invalid, candidate);
-                if (distance > 0.5f) {
-                    scoredParams.add(new Tuple<>(distance, candidate));
-                }
-            }
-            CollectionUtil.timSort(scoredParams, (a, b) -> {
-                // sort by distance in reverse order, then parameter name for equal distances
-                int compare = a.v1().compareTo(b.v1());
-                if (compare != 0) return -compare;
-                else return a.v2().compareTo(b.v2());
-            });
-            if (first == false) {
-                message.append(", ");
-            }
-            message.append("[").append(invalid).append("]");
-            final List<String> keys = scoredParams.stream().map(Tuple::v2).collect(Collectors.toList());
-            if (keys.isEmpty() == false) {
-                message.append(" -> did you mean ");
-                if (keys.size() == 1) {
-                    message.append("[").append(keys.get(0)).append("]");
-                } else {
-                    message.append("any of ").append(keys.toString());
-                }
-                message.append("?");
-            }
-            first = false;
-        }
-
-        return message.toString();
+        return BaseRestHandler.unrecognizedStrings(request,invalids,candidates,detail);
     }
 }
