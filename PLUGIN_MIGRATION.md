@@ -69,3 +69,9 @@ Optionally change the `routes()` to `routeHandlers()`.  Change `prepareRequest()
 ### Replace BytesRestResponse with ExtensionRestResponse
 
  - Add the `request` as the first parameter, the remainder of the parameters should be the same.
+
+### Replace Return Type for SDKRestClient
+
+While most SDKRestClient client return types match existing classes, some changes may be necessary to conform to the new method signatures. Examples include:
+- Replace the return type to `ParsedStringTerms` from `StringTerms` to fetch the aggregation for a specific index.
+- Replace `ObjectObjectCursor<String, List<AliasMetadata>> entry` with `Entry<String, Set<AliasMetadata>> entry`
