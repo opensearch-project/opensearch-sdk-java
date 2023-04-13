@@ -40,9 +40,9 @@ The `client.execute(action, request, responseListener)` method is implemented on
 
 For TransportActions internal to the plugin (registered with `getActions()`), change the transport action inheritance from HandledTransportAction to directly inherit from `TransportAction`.
 
-TransportActions on OpenSearch are not accessible to extensions, and will need to be replaced with functionality from either a client or some other functionality directly provided by the Extensions SDK.  A few examples of the types of changes needed include:
+TransportActions on OpenSearch are not accessible to extensions, and will need to be replaced with functionality from either a client (OpenSearch Client for Java or the SDKRestClient) or some other functionality directly provided by the Extensions SDK.  A few examples of the types of changes needed include:
  - Some transport actions on OpenSearch, such as the `GetFieldMappingsAction`, are exposed via the REST API and should be called using those clients.
- - Some transport actions on OpenSearch, such as getting Cluster State to test the creation of an index, result in far more data transfer than is needed and should be replaced by REST API calls to endpoints which filter to just the information required. For example, testing for the existence of an index should use one of the Index API endpoints.
+ - Some information available from services on OpenSearch, such as the state on ClusterService, stats on IndexingPressure object, and others, are designed for local access and would transfer far more data than needed if implemented directly. Calls to these services should be replaced by REST API calls to endpoints which filter to just the information required. For example, cluster state associated with inidices should use one of the Index API endpoints. Indexing Pressure can be retrieved by Node API endpoints.
 
 ### Replace RestHandler with ExtensionRestHandler
 
