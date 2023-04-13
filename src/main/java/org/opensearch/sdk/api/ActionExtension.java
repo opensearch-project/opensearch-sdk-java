@@ -22,7 +22,7 @@ import org.opensearch.common.Strings;
 import org.opensearch.common.util.concurrent.ThreadContext;
 import org.opensearch.rest.RestHeaderDefinition;
 import org.opensearch.sdk.Extension;
-import org.opensearch.sdk.ExtensionRestHandler;
+import org.opensearch.sdk.rest.ExtensionRestHandler;
 
 import java.util.Collection;
 import java.util.Collections;
