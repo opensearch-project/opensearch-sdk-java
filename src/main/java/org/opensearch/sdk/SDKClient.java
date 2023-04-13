@@ -632,7 +632,7 @@ public class SDKClient implements Closeable {
             GetFieldMappingsRequest getFieldMappingsRequest,
             ActionListener<GetFieldMappingsResponse> listener
         ) {
-            return this.indicesClient.getFieldMappingAsync(getFieldMappingsRequest, RequestOptions.DEFAULT, listener);
+            return this.indicesClient.getFieldMappingAsync(getFieldMappingsRequest, options, listener);
         }
 
         /**
