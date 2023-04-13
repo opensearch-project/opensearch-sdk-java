@@ -62,6 +62,8 @@ import org.opensearch.client.RestClientBuilder;
 import org.opensearch.client.RestHighLevelClient;
 import org.opensearch.client.indices.CreateIndexRequest;
 import org.opensearch.client.indices.CreateIndexResponse;
+import org.opensearch.client.indices.GetFieldMappingsRequest;
+import org.opensearch.client.indices.GetFieldMappingsResponse;
 import org.opensearch.client.indices.GetMappingsRequest;
 import org.opensearch.client.indices.GetMappingsResponse;
 import org.opensearch.client.indices.PutMappingRequest;
@@ -591,6 +593,20 @@ public class SDKClient implements Closeable {
          */
         public Cancellable getMapping(GetMappingsRequest getMappingsRequest, ActionListener<GetMappingsResponse> listener) {
             return this.indicesClient.getMappingAsync(getMappingsRequest, options, listener);
+        }
+
+        /**
+         * Asynchronously retrieves the field mappings on an index or indices using the Get Field Mapping API.
+         *
+         * @param getFieldMappingsRequest the request
+         * @param listener the listener to be notified upon request completion
+         * @return cancellable that may be used to cancel the request
+         */
+        public Cancellable getFieldMapping(
+            GetFieldMappingsRequest getFieldMappingsRequest,
+            ActionListener<GetFieldMappingsResponse> listener
+        ) {
+            return this.indicesClient.getFieldMappingAsync(getFieldMappingsRequest, options, listener);
         }
 
         /**
