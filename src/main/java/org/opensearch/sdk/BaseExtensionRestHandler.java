@@ -9,13 +9,15 @@
 
 package org.opensearch.sdk;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import org.opensearch.rest.BaseRestHandler;
 import static org.opensearch.rest.RestStatus.INTERNAL_SERVER_ERROR;
 import static org.opensearch.rest.RestStatus.NOT_FOUND;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
@@ -126,5 +128,23 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
             // If we messed up JSON code above, just send plain text
             return new ExtensionRestResponse(request, status, fieldName + ": " + responseStr);
         }
+    }
+
+    /**
+     * Returns a String message of the detail of any unrecognized error occurred. The string is intended for use in error messages to be returned to the user.
+     *
+     * @param request The request that caused the exception
+     * @param invalids Strings from the request which were unable to be understood.
+     * @param candidates A set of words that are most likely to be the valid strings determined invalid, to be suggested to the user.
+     * @param detail The parameter contains the details of the exception.
+     * @return a String that contains the message.
+     */
+    protected final String unrecognized(
+        final RestRequest request,
+        final Set<String> invalids,
+        final Set<String> candidates,
+        final String detail
+    ) {
+        return BaseRestHandler.unrecognizedStrings(request, invalids, candidates, detail);
     }
 }
