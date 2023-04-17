@@ -45,6 +45,7 @@ import org.opensearch.extensions.AcknowledgedResponse;
 import org.opensearch.extensions.ExtensionDependency;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
+import org.opensearch.http.HttpRequest;
 import org.opensearch.rest.BytesRestResponse;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestStatus;
@@ -55,6 +56,7 @@ import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
+import org.opensearch.sdk.rest.ExtensionRestPathRegistry;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.Transport;
@@ -66,7 +68,10 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
     private static final String EXTENSION_NAME = "sample-extension";
     private ExtensionsInitRequestHandler extensionsInitRequestHandler;
-    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(new ExtensionRestPathRegistry());
+    private ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(
+        new ExtensionRestPathRegistry(),
+        SDKNamedXContentRegistry.EMPTY
+    );
     private ExtensionsRunner extensionsRunner;
     private TransportService transportService;
 
@@ -139,13 +144,17 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         String ext = "token_placeholder";
         @SuppressWarnings("unused") // placeholder to test the token when identity features merged
         Principal userPrincipal = () -> "user1";
+        HttpRequest.HttpVersion httpVersion = HttpRequest.HttpVersion.HTTP_1_1;
         ExtensionRestRequest request = new ExtensionRestRequest(
             Method.GET,
             "/foo",
+            "/foo",
+            Collections.emptyMap(),
             Collections.emptyMap(),
             null,
             new BytesArray("bar"),
-            ext
+            ext,
+            httpVersion
         );
         RestExecuteOnExtensionResponse response = extensionsRestRequestHandler.handleRestExecuteOnExtensionRequest(request);
         // this will fail in test environment with no registered actions
@@ -227,6 +236,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         assertNotNull(extensionsRunner.getTaskManager());
         assertNotNull(extensionsRunner.getSdkClient());
         assertNotNull(extensionsRunner.getSdkClusterService());
+        assertNotNull(extensionsRunner.getIndexNameExpressionResolver());
 
         settings = extensionsRunner.getSettings();
         assertEquals(ExtensionsRunnerForTest.NODE_NAME, settings.get(ExtensionsRunner.NODE_NAME_SETTING));

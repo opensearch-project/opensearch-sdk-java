@@ -7,7 +7,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.api;
 
 import org.opensearch.action.ActionType;
 import org.opensearch.action.ActionRequest;
@@ -21,6 +21,8 @@ import org.opensearch.action.support.TransportActions;
 import org.opensearch.common.Strings;
 import org.opensearch.common.util.concurrent.ThreadContext;
 import org.opensearch.rest.RestHeaderDefinition;
+import org.opensearch.sdk.Extension;
+import org.opensearch.sdk.rest.ExtensionRestHandler;
 
 import java.util.Collection;
 import java.util.Collections;

@@ -14,7 +14,7 @@ import org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestFram
 
 plugins {
     id 'java'
-    id "com.diffplug.spotless" version "6.17.0" apply false
+    id "com.diffplug.spotless" version "6.18.0" apply false
     id 'jacoco'
     id "com.form.diff-coverage" version "0.9.5"
     // for javadocs and checks spotless doesn't do
@@ -77,7 +77,7 @@ dependencies {
 
     def opensearchVersion = "3.0.0-SNAPSHOT"
     def log4jVersion = "2.20.0"
-    def nettyVersion = "4.1.90.Final"
+    def nettyVersion = "4.1.91.Final"
     def jacksonDatabindVersion = "2.14.2"
     def guavaVersion = "31.1-jre"
     def guiceVersion = "5.1.0"

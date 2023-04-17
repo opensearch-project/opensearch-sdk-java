@@ -14,7 +14,9 @@ import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.ClusterState;
+import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
 import org.opensearch.cluster.node.DiscoveryNode;
+import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
@@ -30,7 +32,7 @@ import org.opensearch.extensions.ExtensionsManager.RequestType;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.index.IndicesModuleRequest;
-import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.sdk.api.ActionExtension;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
@@ -43,7 +45,11 @@ import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
+import org.opensearch.sdk.rest.ExtensionRestHandler;
+import org.opensearch.sdk.rest.ExtensionRestPathRegistry;
 import org.opensearch.tasks.TaskManager;
+import org.opensearch.threadpool.ExecutorBuilder;
+import org.opensearch.threadpool.RunnableTaskExecutionListener;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportResponse;
 import org.opensearch.transport.TransportResponseHandler;
@@ -64,6 +70,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -106,6 +113,11 @@ public class ExtensionsRunner {
      */
     private final List<NamedXContentRegistry.Entry> customNamedXContent;
     /**
+     * Custom namedWriteable from the extension's getNamedWriteable. This field is initialized in the constructor.
+     */
+    private final List<NamedWriteableRegistry.Entry> customNamedWriteables;
+
+    /**
      * Custom settings from the extension's getSettings. This field is initialized in the constructor.
      */
     private final List<Setting<?>> customSettings;
@@ -132,6 +144,7 @@ public class ExtensionsRunner {
     private final Injector injector;
 
     private final SDKNamedXContentRegistry sdkNamedXContentRegistry;
+    private final SDKNamedWriteableRegistry sdkNamedWriteableRegistry;
     private final SDKClient sdkClient;
     private final SDKClusterService sdkClusterService;
     private final SDKTransportService sdkTransportService;
@@ -141,8 +154,10 @@ public class ExtensionsRunner {
     private final ExtensionsIndicesModuleRequestHandler extensionsIndicesModuleRequestHandler = new ExtensionsIndicesModuleRequestHandler();
     private final ExtensionsIndicesModuleNameRequestHandler extensionsIndicesModuleNameRequestHandler =
         new ExtensionsIndicesModuleNameRequestHandler();
-    private final ExtensionsRestRequestHandler extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry);
+    private final ExtensionsRestRequestHandler extensionsRestRequestHandler;
     private final ExtensionActionRequestHandler extensionsActionRequestHandler;
+    private final AtomicReference<RunnableTaskExecutionListener> runnableTaskListener;
+    private final IndexNameExpressionResolver indexNameExpressionResolver;
 
     /**
      * Instantiates a new update settings request handler
@@ -169,15 +184,27 @@ public class ExtensionsRunner {
             .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
             .build();
-        this.threadPool = new ThreadPool(settings);
+
+        final List<ExecutorBuilder<?>> executorBuilders = extension.getExecutorBuilders(settings);
+
+        this.runnableTaskListener = new AtomicReference<>();
+        this.threadPool = new ThreadPool(settings, runnableTaskListener, executorBuilders.toArray(new ExecutorBuilder[0]));
+        this.indexNameExpressionResolver = new IndexNameExpressionResolver(this.threadPool.getThreadContext());
         this.taskManager = new TaskManager(settings, threadPool, Collections.emptySet());
 
         // save custom settings
         this.customSettings = extension.getSettings();
         // save custom namedXContent
         this.customNamedXContent = extension.getNamedXContent();
-        // initialize NamedXContent Registry. Must happen after getting extension namedXContent
+        // save custom namedWriteable
+        this.customNamedWriteables = extension.getNamedWriteables();
+        // initialize NamedXContent Registry.
         this.sdkNamedXContentRegistry = new SDKNamedXContentRegistry(this);
+        // initialize RestRequest Handler. Must happen after instantiating SDKNamedXContentRegistry
+        this.extensionsRestRequestHandler = new ExtensionsRestRequestHandler(extensionRestPathRegistry, sdkNamedXContentRegistry);
+        // initialize NamedWriteable Registry. Must happen after getting extension namedWriteable
+        this.sdkNamedWriteableRegistry = new SDKNamedWriteableRegistry(this);
+
         // initialize SDKClient. Must happen after getting extensionSettings
         this.sdkClient = new SDKClient(extensionSettings);
         // initialize SDKClusterService. Must happen after extension field assigned
@@ -195,6 +222,7 @@ public class ExtensionsRunner {
             b.bind(SDKNamedXContentRegistry.class).toInstance(getNamedXContentRegistry());
             b.bind(ThreadPool.class).toInstance(getThreadPool());
             b.bind(TaskManager.class).toInstance(getTaskManager());
+            b.bind(IndexNameExpressionResolver.class).toInstance(indexNameExpressionResolver);
 
             b.bind(SDKClient.class).toInstance(getSdkClient());
             b.bind(SDKClusterService.class).toInstance(getSdkClusterService());
@@ -217,9 +245,7 @@ public class ExtensionsRunner {
         if (extension instanceof ActionExtension) {
             // store REST handlers in the registry
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
-                for (Route route : extensionRestHandler.routes()) {
-                    extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
-                }
+                extensionRestPathRegistry.registerHandler(extensionRestHandler);
             }
         }
     }
@@ -295,12 +321,28 @@ public class ExtensionsRunner {
     }
 
     /**
+     * Updates the NamedXContentRegistry. Called from {@link ExtensionsInitRequestHandler}.
+     */
+    public void updateNamedWriteableRegistry() {
+        this.sdkNamedWriteableRegistry.updateNamedWriteableRegistry(this);
+    }
+
+    /**
      * Gets the NamedXContentRegistry. Only valid if {@link #isInitialized()} returns true.
      *
      * @return the NamedXContentRegistry if initialized, an empty registry otherwise.
      */
     public SDKNamedXContentRegistry getNamedXContentRegistry() {
         return this.sdkNamedXContentRegistry;
+    }
+
+    /**
+     * Gets the SDKNamedWriteableRegistry. Only valid if {@link #isInitialized()} returns true.
+     *
+     * @return the NamedWriteableRegistry if initialized, an empty registry otherwise.
+     */
+    public SDKNamedWriteableRegistry getNamedWriteableRegistry() {
+        return this.sdkNamedWriteableRegistry;
     }
 
     /**
@@ -339,6 +381,14 @@ public class ExtensionsRunner {
 
     public List<NamedXContentRegistry.Entry> getCustomNamedXContent() {
         return this.customNamedXContent;
+    }
+
+    public List<NamedWriteableRegistry.Entry> getCustomNamedWriteables() {
+        return this.customNamedWriteables;
+    }
+
+    public IndexNameExpressionResolver getIndexNameExpressionResolver() {
+        return this.indexNameExpressionResolver;
     }
 
     /**
@@ -453,13 +503,19 @@ public class ExtensionsRunner {
      */
     public void sendRegisterRestActionsRequest(TransportService transportService) {
         List<String> extensionRestPaths = extensionRestPathRegistry.getRegisteredPaths();
-        logger.info("Sending Register REST Actions request to OpenSearch for " + extensionRestPaths);
+        List<String> extensionDeprecatedRestPaths = extensionRestPathRegistry.getRegisteredDeprecatedPaths();
+        logger.info(
+            "Sending Register REST Actions request to OpenSearch for "
+                + extensionRestPaths
+                + " and deprecated paths "
+                + extensionDeprecatedRestPaths
+        );
         AcknowledgedResponseHandler registerActionsResponseHandler = new AcknowledgedResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsManager.REQUEST_EXTENSION_REGISTER_REST_ACTIONS,
-                new RegisterRestActionsRequest(getUniqueId(), extensionRestPaths),
+                new RegisterRestActionsRequest(getUniqueId(), extensionRestPaths, extensionDeprecatedRestPaths),
                 registerActionsResponseHandler
             );
         } catch (Exception e) {

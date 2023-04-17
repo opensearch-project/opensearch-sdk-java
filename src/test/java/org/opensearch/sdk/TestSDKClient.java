@@ -18,11 +18,15 @@ import org.opensearch.action.delete.DeleteRequest;
 import org.opensearch.action.get.GetRequest;
 import org.opensearch.action.get.MultiGetRequest;
 import org.opensearch.action.index.IndexRequest;
+import org.opensearch.action.search.MultiSearchRequest;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.update.UpdateRequest;
 import org.opensearch.client.Cancellable;
 import org.opensearch.client.Request;
+import org.opensearch.client.Response;
+import org.opensearch.client.ResponseListener;
 import org.opensearch.client.indices.CreateIndexRequest;
+import org.opensearch.client.indices.GetFieldMappingsRequest;
 import org.opensearch.client.indices.GetMappingsRequest;
 import org.opensearch.client.indices.PutMappingRequest;
 import org.opensearch.client.indices.rollover.RolloverRequest;
@@ -96,6 +100,16 @@ public class TestSDKClient extends OpenSearchTestCase {
         assertDoesNotThrow(() -> restClient.update(new UpdateRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.delete(new DeleteRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.search(new SearchRequest(), ActionListener.wrap(r -> {}, e -> {})));
+        assertDoesNotThrow(() -> restClient.multiSearch(new MultiSearchRequest(), ActionListener.wrap(r -> {}, e -> {})));
+        assertDoesNotThrow(() -> restClient.performRequestAsync(new Request("GET", "/"), new ResponseListener() {
+
+            @Override
+            public void onSuccess(Response response) {}
+
+            @Override
+            public void onFailure(Exception exception) {}
+
+        }));
         expectThrows(ConnectException.class, () -> restClient.performRequest(new Request("GET", "/")));
 
         sdkClient.doCloseHighLevelClient();
@@ -111,6 +125,10 @@ public class TestSDKClient extends OpenSearchTestCase {
         assertInstanceOf(Cancellable.class, indicesClient.delete(new DeleteIndexRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertInstanceOf(Cancellable.class, indicesClient.putSettings(new UpdateSettingsRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertInstanceOf(Cancellable.class, indicesClient.getMapping(new GetMappingsRequest(), ActionListener.wrap(r -> {}, e -> {})));
+        assertInstanceOf(
+            Cancellable.class,
+            indicesClient.getFieldMapping(new GetFieldMappingsRequest(), ActionListener.wrap(r -> {}, e -> {}))
+        );
         assertInstanceOf(Cancellable.class, indicesClient.putMapping(new PutMappingRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertInstanceOf(
             Cancellable.class,

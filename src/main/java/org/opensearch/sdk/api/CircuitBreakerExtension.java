@@ -7,12 +7,13 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.api;
 
 import org.opensearch.common.breaker.CircuitBreaker;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.indices.breaker.BreakerSettings;
 import org.opensearch.indices.breaker.CircuitBreakerService;
+import org.opensearch.sdk.Extension;
 
 /**
  * An extension point for {@link Extension} implementations to add custom circuit breakers

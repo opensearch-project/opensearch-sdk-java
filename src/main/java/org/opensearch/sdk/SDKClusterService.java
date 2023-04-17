@@ -126,16 +126,6 @@ public class SDKClusterService {
         }
 
         /**
-         * Add multiple settings update consumers to OpenSearch. Before initialization the updates will be stored in a pending state.
-         *
-         * @param settingsUpdateConsumers A map of Setting to update Consumer.
-         */
-        public synchronized void addSettingsUpdateConsumer(Map<Setting<?>, Consumer<?>> settingsUpdateConsumers) {
-            settingsUpdateConsumers.entrySet().stream().forEach(e -> pendingSettingsUpdateConsumers.put(e.getKey(), e.getValue()));
-            sendPendingSettingsUpdateConsumers();
-        }
-
-        /**
          * If the ExtensionRunner has been initialized, send pending updates to OpenSearch, otherwise do nothing.
          * <p>
          * This method should be called from ExtensionsRunner after initialization, to clear the pending updates.
