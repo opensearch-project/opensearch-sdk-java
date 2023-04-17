@@ -23,7 +23,7 @@ import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RegisterTransportActionsRequest;
 import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 import org.opensearch.extensions.action.TransportActionRequestFromExtension;
-import org.opensearch.sdk.ActionExtension.ActionHandler;
+import org.opensearch.sdk.api.ActionExtension.ActionHandler;
 import org.opensearch.sdk.action.RemoteExtensionActionRequest;
 import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;

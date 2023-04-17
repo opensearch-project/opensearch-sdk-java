@@ -31,12 +31,18 @@ The `SDKClient` provides two (eventually three) client options.
 
 The [Java Client for OpenSearch](https://github.com/opensearch-project/opensearch-java) (`OpenSearchClient`) will be supported with both synchronous and asynchronous clients, and is actively developed along with other language clients and should be used whenever possible. These clients do have significant implementation differences compared to the existing `Client` interface implemented by plugins.
 
+## Change Plugin and OpenSearch TransportAction implementations
+
 The `SDKRestClient` provides wrapper methods matching the `Client` API (but not implementing it), implemented internally with the (soon to be deprecated) `RestHighLevelClient`.  While this speeds migration efforts, it should be considered a temporary "bridge" with follow up migration efforts to the `OpenSearchClient` planned.
  - While the class names and method parameters are the same, the `Request` and `Response` classes are often in different packages. In most cases, other than changing `import` statements, no additional code changes are required. In a few cases, there are minor changes required to interface with the new response class API.
 
 The `client.execute(action, request, responseListener)` method is implemented on the SDKClient.
 
-Change the transport action inheritance from HandledTransportAction to directly inherit from `TransportAction`.
+For TransportActions internal to the plugin (registered with `getActions()`), change the transport action inheritance from HandledTransportAction to directly inherit from `TransportAction`.
+
+TransportActions on OpenSearch are not accessible to extensions, and will need to be replaced with functionality from either a client (OpenSearch Client for Java or the SDKRestClient) or some other functionality directly provided by the Extensions SDK.  A few examples of the types of changes needed include:
+ - Some transport actions on OpenSearch, such as the `GetFieldMappingsAction`, are exposed via the REST API and should be called using those clients.
+ - Some information available from services on OpenSearch, such as the state on ClusterService, stats on IndexingPressure object, and others, are designed for local access and would transfer far more data than needed if implemented directly. Calls to these services should be replaced by REST API calls to endpoints which filter to just the information required. For example, cluster state associated with inidices should use one of the Index API endpoints. Indexing Pressure can be retrieved by Node API endpoints.
 
 ### Replace RestHandler with ExtensionRestHandler
 
@@ -69,3 +75,9 @@ Optionally change the `routes()` to `routeHandlers()`.  Change `prepareRequest()
 ### Replace BytesRestResponse with ExtensionRestResponse
 
  - Add the `request` as the first parameter, the remainder of the parameters should be the same.
+
+### Replace Return Type for SDKRestClient
+
+While most SDKRestClient client return types match existing classes, some changes may be necessary to conform to the new method signatures. Examples include:
+- Replace the return type to `ParsedStringTerms` from `StringTerms` to fetch the aggregation for a specific index.
+- Replace `ObjectObjectCursor<String, List<AliasMetadata>> entry` with `Entry<String, Set<AliasMetadata>> entry`

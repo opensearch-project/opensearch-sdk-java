@@ -32,7 +32,7 @@ import org.opensearch.extensions.ExtensionsManager.RequestType;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.index.IndicesModuleRequest;
-import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.sdk.api.ActionExtension;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
@@ -45,6 +45,8 @@ import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
+import org.opensearch.sdk.rest.ExtensionRestHandler;
+import org.opensearch.sdk.rest.ExtensionRestPathRegistry;
 import org.opensearch.tasks.TaskManager;
 import org.opensearch.threadpool.ExecutorBuilder;
 import org.opensearch.threadpool.RunnableTaskExecutionListener;
@@ -243,9 +245,7 @@ public class ExtensionsRunner {
         if (extension instanceof ActionExtension) {
             // store REST handlers in the registry
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
-                for (Route route : extensionRestHandler.routes()) {
-                    extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
-                }
+                extensionRestPathRegistry.registerHandler(extensionRestHandler);
             }
         }
     }
@@ -503,13 +503,19 @@ public class ExtensionsRunner {
      */
     public void sendRegisterRestActionsRequest(TransportService transportService) {
         List<String> extensionRestPaths = extensionRestPathRegistry.getRegisteredPaths();
-        logger.info("Sending Register REST Actions request to OpenSearch for " + extensionRestPaths);
+        List<String> extensionDeprecatedRestPaths = extensionRestPathRegistry.getRegisteredDeprecatedPaths();
+        logger.info(
+            "Sending Register REST Actions request to OpenSearch for "
+                + extensionRestPaths
+                + " and deprecated paths "
+                + extensionDeprecatedRestPaths
+        );
         AcknowledgedResponseHandler registerActionsResponseHandler = new AcknowledgedResponseHandler();
         try {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsManager.REQUEST_EXTENSION_REGISTER_REST_ACTIONS,
-                new RegisterRestActionsRequest(getUniqueId(), extensionRestPaths),
+                new RegisterRestActionsRequest(getUniqueId(), extensionRestPaths, extensionDeprecatedRestPaths),
                 registerActionsResponseHandler
             );
         } catch (Exception e) {
