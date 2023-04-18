@@ -31,17 +31,7 @@ ext {
 
 apply plugin: 'application'
 apply from: 'gradle/formatting.gradle'
-apply plugin: 'ivy-publish'
-
-task sourceJar(type: Jar) {
-    archiveClassifier.set('sources')
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar) {
-    archiveClassifier.set('javadoc')
-    from javadoc.destinationDir
-}
+apply plugin: 'maven-publish'
 
 // Temporary to keep "gradle run" working
 // TODO: change this to an extension designed for testing instead of duplicating a sample
@@ -52,23 +42,30 @@ mainClassName = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
 group 'org.opensearch.sdk'
 version '2.0.0-SNAPSHOT'
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
 
 publishing {
     publications {
-        ivy(IvyPublication) {
-            organisation = 'org.opensearch.sdk'
-            module = 'your-module-name'
-            revision = '2.0.0-SNAPSHOT'
+        group = "${group}"
+        version = "${version}"
+        mavenJava(MavenPublication) {
             from components.java
-            artifact sourceJar
-            artifact javadocJar
         }
+        sourceCompatibility = 11
+        targetCompatibility = 11
     }
 
     repositories {
-        ivy {
-            name = 'local-ivy-repo'
-            url = file("$buildDir/repo")
+        maven {
+            name = "Snapshots" //  optional target repository name
+            url = "https://aws.oss.sonatype.org/content/repositories/snapshots"
+            credentials {
+                username "$System.env.SONATYPE_USERNAME"
+                password "$System.env.SONATYPE_PASSWORD"
+            }
         }
     }
 }
@@ -76,16 +73,8 @@ publishing {
 repositories {
     mavenLocal()
     mavenCentral()
-    ivy {
-        url "https://aws.oss.sonatype.org/content/repositories/snapshots"
-        credentials {
-            username "$System.env.SONATYPE_USERNAME"
-            password "$System.env.SONATYPE_PASSWORD"
-        }
-    }
-    ivy {
-        url "https://d1nvenhzbhpy0q.cloudfront.net/snapshots/lucene/"
-    }
+    maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
+    maven { url "https://d1nvenhzbhpy0q.cloudfront.net/snapshots/lucene/"}
 }
 
 dependencies {
@@ -133,10 +122,10 @@ dependencies {
 
 // this task runs the helloworld sample extension
 task helloWorld(type: JavaExec) {
-  group = 'Execution'
-  description = 'Run HelloWorld Extension.'
-  mainClass = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
-  classpath = sourceSets.main.runtimeClasspath
+    group = 'Execution'
+    description = 'Run HelloWorld Extension.'
+    mainClass = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
+    classpath = sourceSets.main.runtimeClasspath
 }
 
 test {
