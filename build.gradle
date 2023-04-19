@@ -255,7 +255,7 @@ task integTest(type: RestIntegTestTask) {
 tasks.named("check").configure { dependsOn(integTest) }
 
 task startTestExtension(type: Exec) {
-    commandLine 'bash', '-c', "./gradlew helloWorld &" 
+    commandLine 'bash', '-c', "./gradlew helloWorld &"
 }
 
 integTest {
@@ -265,11 +265,6 @@ integTest {
     systemProperty "https", System.getProperty("https")
     systemProperty "user", System.getProperty("user")
     systemProperty "password", System.getProperty("password")
-
-    filter {
-        includeTestsMatching "org.opensearch.sdk.TestExtensionsRunner"
-    }
-    
 
     // The 'doFirst' delays till execution time.
     doFirst {
@@ -313,5 +308,5 @@ testClusters.integTest {
             debugPort += 1
         }
     }
-    
+
 }
