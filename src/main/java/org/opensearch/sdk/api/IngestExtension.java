@@ -7,9 +7,10 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.api;
 
 import org.opensearch.ingest.Processor;
+import org.opensearch.sdk.Extension;
 
 import java.util.Collections;
 import java.util.Map;

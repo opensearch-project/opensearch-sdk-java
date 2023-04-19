@@ -15,9 +15,12 @@ import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.extensions.rest.RestExecuteOnExtensionResponse;
-import org.opensearch.sdk.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionsRunner;
-import org.opensearch.sdk.ExtensionRestPathRegistry;
+import org.opensearch.sdk.SDKNamedXContentRegistry;
+import org.opensearch.sdk.rest.ExtensionRestHandler;
+import org.opensearch.sdk.rest.ExtensionRestPathRegistry;
+import org.opensearch.sdk.rest.SDKHttpRequest;
+import org.opensearch.sdk.rest.SDKRestRequest;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
@@ -32,13 +35,16 @@ import static org.opensearch.rest.RestStatus.NOT_FOUND;
 public class ExtensionsRestRequestHandler {
     private static final Logger logger = LogManager.getLogger(ExtensionsRestRequestHandler.class);
     private final ExtensionRestPathRegistry extensionRestPathRegistry;
+    private final SDKNamedXContentRegistry sdkNamedXContentRegistry;
 
     /**
      * Instantiate this class with an existing registry
      *
      * @param restPathRegistry The ExtensionsRunnerer's REST path registry
+     * @param sdkNamedXContentRegistry
      */
-    public ExtensionsRestRequestHandler(ExtensionRestPathRegistry restPathRegistry) {
+    public ExtensionsRestRequestHandler(ExtensionRestPathRegistry restPathRegistry, SDKNamedXContentRegistry sdkNamedXContentRegistry) {
+        this.sdkNamedXContentRegistry = sdkNamedXContentRegistry;
         this.extensionRestPathRegistry = restPathRegistry;
     }
 
@@ -62,8 +68,17 @@ public class ExtensionsRestRequestHandler {
             );
         }
 
+        SDKRestRequest sdkRestRequest = new SDKRestRequest(
+            sdkNamedXContentRegistry.getRegistry(),
+            request.params(),
+            request.path(),
+            request.headers(),
+            new SDKHttpRequest(request),
+            null
+        );
+
         // Get response from extension
-        ExtensionRestResponse response = restHandler.handleRequest(request);
+        ExtensionRestResponse response = restHandler.handleRequest(sdkRestRequest);
         logger.info("Sending extension response to OpenSearch: " + response.status());
         return new RestExecuteOnExtensionResponse(
             response.status(),

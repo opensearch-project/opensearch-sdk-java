@@ -20,8 +20,22 @@ import org.opensearch.common.breaker.CircuitBreaker;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.index.mapper.Mapper;
 import org.opensearch.index.mapper.MetadataFieldMapper;
+import org.opensearch.indices.analysis.AnalysisModule;
 import org.opensearch.indices.breaker.BreakerSettings;
 import org.opensearch.ingest.Processor;
+import org.opensearch.sdk.api.ActionExtension;
+import org.opensearch.sdk.api.AnalysisExtension;
+import org.opensearch.sdk.api.CircuitBreakerExtension;
+import org.opensearch.sdk.api.EngineExtension;
+import org.opensearch.sdk.api.IndexStoreExtension;
+import org.opensearch.sdk.api.IngestExtension;
+import org.opensearch.sdk.api.MapperExtension;
+import org.opensearch.sdk.api.PersistentTaskExtension;
+import org.opensearch.sdk.api.RepositoryExtension;
+import org.opensearch.sdk.api.ScriptExtension;
+import org.opensearch.sdk.api.SearchExtension;
+import org.opensearch.sdk.api.SystemIndexExtension;
+
 import org.opensearch.test.OpenSearchTestCase;
 
 import java.util.function.Predicate;
@@ -188,5 +202,24 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         };
         assertTrue(repositoryExtension.getRepositories(null, null, null, null).isEmpty());
         assertTrue(repositoryExtension.getInternalRepositories(null, null, null, null).isEmpty());
+    }
+
+    @Test
+    public void testAnalysisExtension() {
+        AnalysisExtension analysisExtension = new AnalysisExtension() {
+        };
+        AnalysisModule.AnalysisProvider<?> provider = (indexSettings, environment, name, settings) -> null;
+        AnalysisModule.AnalysisProvider<?> analysisProvider = AnalysisExtension.requiresAnalysisSettings(provider);
+
+        assertTrue(analysisExtension.getCharFilters().isEmpty());
+        assertTrue(analysisExtension.getTokenFilters().isEmpty());
+        assertTrue(analysisExtension.getTokenizers().isEmpty());
+        assertTrue(analysisExtension.getAnalyzers().isEmpty());
+        assertTrue(analysisExtension.getPreBuiltAnalyzerProviderFactories().isEmpty());
+        assertTrue(analysisExtension.getPreConfiguredCharFilters().isEmpty());
+        assertTrue(analysisExtension.getPreConfiguredTokenFilters().isEmpty());
+        assertTrue(analysisExtension.getPreConfiguredTokenizers().isEmpty());
+        assertTrue(analysisExtension.getHunspellDictionaries().isEmpty());
+        assertTrue(analysisProvider.requiresAnalysisSettings());
     }
 }

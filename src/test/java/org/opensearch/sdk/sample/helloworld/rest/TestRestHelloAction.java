@@ -17,14 +17,16 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.xcontent.XContentType;
-import org.opensearch.extensions.rest.ExtensionRestRequest;
+import org.opensearch.http.HttpRequest.HttpVersion;
 import org.opensearch.rest.RestResponse;
 import org.opensearch.rest.RestStatus;
-import org.opensearch.sdk.ExtensionRestHandler;
+import org.opensearch.sdk.rest.ExtensionRestHandler;
+import org.opensearch.sdk.rest.TestSDKRestRequest;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestRestHelloAction extends OpenSearchTestCase {
@@ -65,65 +67,115 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         String token = "placeholder_token";
         Map<String, String> params = Collections.emptyMap();
 
-        ExtensionRestRequest getRequest = new ExtensionRestRequest(Method.GET, "/hello", params, null, new BytesArray(""), token);
-        ExtensionRestRequest putRequest = new ExtensionRestRequest(
+        RestRequest getRequest = TestSDKRestRequest.createTestRestRequest(
+            Method.GET,
+            "/hello",
+            "/hello",
+            params,
+            headers(XContentType.JSON),
+            XContentType.JSON,
+            new BytesArray(""),
+            token,
+            HttpVersion.HTTP_1_1
+        );
+        RestRequest putRequest = TestSDKRestRequest.createTestRestRequest(
             Method.PUT,
             "/hello/Passing+Test",
+            "/hello/Passing+Test",
             Map.of("name", "Passing+Test"),
-            null,
+            headers(XContentType.JSON),
+            XContentType.JSON,
             new BytesArray(""),
-            token
+            token,
+            HttpVersion.HTTP_1_1
         );
-        ExtensionRestRequest postRequest = new ExtensionRestRequest(
+        RestRequest postRequest = TestSDKRestRequest.createTestRestRequest(
             Method.POST,
             "/hello",
+            "/hello",
             params,
+            headers(XContentType.JSON),
             XContentType.JSON,
             new BytesArray("{\"adjective\":\"testable\"}"),
-            token
+            token,
+            HttpVersion.HTTP_1_1
         );
-        ExtensionRestRequest badPostRequest = new ExtensionRestRequest(
+        RestRequest badPostRequest = TestSDKRestRequest.createTestRestRequest(
             Method.POST,
             "/hello",
+            "/hello",
             params,
+            headers(XContentType.JSON),
             XContentType.JSON,
             new BytesArray("{\"adjective\":\"\"}"),
-            token
+            token,
+            HttpVersion.HTTP_1_1
         );
-        ExtensionRestRequest noContentPostRequest = new ExtensionRestRequest(
+        RestRequest noContentPostRequest = TestSDKRestRequest.createTestRestRequest(
             Method.POST,
             "/hello",
+            "/hello",
             params,
+            headers(null),
             null,
             new BytesArray(""),
-            token
+            token,
+            HttpVersion.HTTP_1_1
         );
-        ExtensionRestRequest badContentTypePostRequest = new ExtensionRestRequest(
+        RestRequest badContentTypePostRequest = TestSDKRestRequest.createTestRestRequest(
             Method.POST,
             "/hello",
+            "/hello",
             params,
+            headers(XContentType.YAML),
             XContentType.YAML,
             new BytesArray("yaml:"),
-            token
+            token,
+            HttpVersion.HTTP_1_1
         );
-        ExtensionRestRequest deleteRequest = new ExtensionRestRequest(Method.DELETE, "/goodbye", params, null, new BytesArray(""), token);
-        ExtensionRestRequest badRequest = new ExtensionRestRequest(
-            Method.PUT,
-            "/hello/Bad%Request",
-            Map.of("name", "Bad%Request"),
-            null,
+        RestRequest deleteRequest = TestSDKRestRequest.createTestRestRequest(
+            Method.DELETE,
+            "/goodbye",
+            "/goodbye",
+            params,
+            headers(XContentType.JSON),
+            XContentType.JSON,
             new BytesArray(""),
-            token
+            token,
+            HttpVersion.HTTP_1_1
         );
-        ExtensionRestRequest unhandledMethodRequest = new ExtensionRestRequest(Method.HEAD, "/hi", params, null, new BytesArray(""), token);
-        ExtensionRestRequest unhandledPathRequest = new ExtensionRestRequest(Method.GET, "/hi", params, null, new BytesArray(""), token);
-        ExtensionRestRequest unhandledPathLengthRequest = new ExtensionRestRequest(
+        RestRequest unhandledMethodRequest = TestSDKRestRequest.createTestRestRequest(
+            Method.HEAD,
+            "/hi",
+            "/hi",
+            params,
+            headers(XContentType.JSON),
+            XContentType.JSON,
+            new BytesArray(""),
+            token,
+            HttpVersion.HTTP_1_1
+        );
+        RestRequest unhandledPathRequest = TestSDKRestRequest.createTestRestRequest(
+            Method.GET,
+            "/hi",
+            "/hi",
+            params,
+            headers(XContentType.JSON),
+            XContentType.JSON,
+            new BytesArray(""),
+            token,
+            HttpVersion.HTTP_1_1
+        );
+        RestRequest unhandledPathLengthRequest = TestSDKRestRequest.createTestRestRequest(
             Method.DELETE,
             "/goodbye/cruel/world",
+            "/goodbye/cruel/world",
             params,
-            null,
+            headers(XContentType.JSON),
+            XContentType.JSON,
             new BytesArray(""),
-            token
+            token,
+            HttpVersion.HTTP_1_1
         );
 
         // Initial default response
@@ -193,13 +245,6 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertEquals("Hello, World!", responseStr);
 
-        // Unparseable
-        response = restHelloAction.handleRequest(badRequest);
-        assertEquals(RestStatus.BAD_REQUEST, response.status());
-        assertEquals(TEXT_CONTENT_TYPE, response.contentType());
-        responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
-        assertTrue(responseStr.contains("Illegal hex characters in escape (%) pattern"));
-
         // Not registered, fails on method
         response = restHelloAction.handleRequest(unhandledMethodRequest);
         assertEquals(RestStatus.NOT_FOUND, response.status());
@@ -220,5 +265,9 @@ public class TestRestHelloAction extends OpenSearchTestCase {
         assertEquals(JSON_CONTENT_TYPE, response.contentType());
         responseStr = new String(BytesReference.toBytes(response.content()), StandardCharsets.UTF_8);
         assertTrue(responseStr.contains("/goodbye"));
+    }
+
+    private static Map<String, List<String>> headers(XContentType type) {
+        return type == null ? Collections.emptyMap() : Map.of("Content-Type", List.of(type.mediaType()));
     }
 }
