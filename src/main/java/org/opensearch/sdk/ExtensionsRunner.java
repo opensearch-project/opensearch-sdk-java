@@ -17,6 +17,7 @@ import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
+import org.opensearch.extensions.proto.ExtensionRequestProto;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
@@ -28,7 +29,6 @@ import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
 import org.opensearch.extensions.UpdateSettingsRequest;
 import org.opensearch.extensions.action.ExtensionActionRequest;
-import org.opensearch.extensions.ExtensionsManager.RequestType;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.index.IndicesModuleRequest;
@@ -544,7 +544,7 @@ public class ExtensionsRunner {
 
     private void sendGenericRequestWithExceptionHandling(
         TransportService transportService,
-        RequestType requestType,
+        ExtensionRequestProto.RequestType requestType,
         String orchestratorNameString,
         TransportResponseHandler<? extends TransportResponse> responseHandler
     ) {
@@ -570,7 +570,7 @@ public class ExtensionsRunner {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsManager.REQUEST_EXTENSION_CLUSTER_STATE,
-                new ExtensionRequest(ExtensionsManager.RequestType.REQUEST_EXTENSION_CLUSTER_STATE),
+                new ExtensionRequest(ExtensionRequestProto.RequestType.REQUEST_EXTENSION_CLUSTER_STATE),
                 clusterStateResponseHandler
             );
             // Wait on cluster state response
@@ -598,7 +598,7 @@ public class ExtensionsRunner {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsManager.REQUEST_EXTENSION_DEPENDENCY_INFORMATION,
-                new ExtensionRequest(ExtensionsManager.RequestType.REQUEST_EXTENSION_DEPENDENCY_INFORMATION, uniqueId),
+                new ExtensionRequest(ExtensionRequestProto.RequestType.REQUEST_EXTENSION_DEPENDENCY_INFORMATION, uniqueId),
                 extensionDependencyResponseHandler
             );
             // Wait on Extension Dependency response
@@ -621,7 +621,7 @@ public class ExtensionsRunner {
     public void sendClusterSettingsRequest(TransportService transportService) {
         sendGenericRequestWithExceptionHandling(
             transportService,
-            ExtensionsManager.RequestType.REQUEST_EXTENSION_CLUSTER_SETTINGS,
+            ExtensionRequestProto.RequestType.REQUEST_EXTENSION_CLUSTER_SETTINGS,
             ExtensionsManager.REQUEST_EXTENSION_CLUSTER_SETTINGS,
             new ClusterSettingsResponseHandler()
         );
@@ -640,7 +640,7 @@ public class ExtensionsRunner {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsManager.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS,
-                new ExtensionRequest(ExtensionsManager.RequestType.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS),
+                new ExtensionRequest(ExtensionRequestProto.RequestType.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS),
                 environmentSettingsResponseHandler
             );
             // Wait on environment settings response
