@@ -31,15 +31,10 @@ import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.discovery.InitializeExtensionRequest;
 import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
 import org.opensearch.extensions.DiscoveryExtensionNode;
-import org.opensearch.extensions.UpdateSettingsRequest;
-import org.opensearch.extensions.action.ExtensionActionRequest;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.UpdateSettingsRequest;
 import org.opensearch.extensions.action.ExtensionActionRequest;
-import org.opensearch.extensions.rest.ExtensionRestRequest;
-import org.opensearch.extensions.rest.RegisterRestActionsRequest;
-import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
 import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
@@ -78,27 +73,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMCERT_FILEPATH;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMKEY_FILEPATH;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMTRUSTEDCAS_FILEPATH;
 import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_ENABLED;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_ENABLED_CIPHERS;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_ENABLED_PROTOCOLS;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_ENFORCE_HOSTNAME_VERIFICATION;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_ENFORCE_HOSTNAME_VERIFICATION_RESOLVE_HOST_NAME;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_EXTENDED_KEY_USAGE_ENABLED;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_KEYSTORE_ALIAS;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_KEYSTORE_FILEPATH;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_KEYSTORE_TYPE;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_PEMCERT_FILEPATH;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_PEMKEY_FILEPATH;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_PEMTRUSTEDCAS_FILEPATH;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_SERVER_PEMCERT_FILEPATH;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_SERVER_PEMKEY_FILEPATH;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_SERVER_PEMTRUSTEDCAS_FILEPATH;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_TRUSTSTORE_ALIAS;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_TRUSTSTORE_FILEPATH;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_TRUSTSTORE_TYPE;
 
 /**
  * The primary class to run an extension.
@@ -209,31 +184,12 @@ public class ExtensionsRunner {
             .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
             .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort());
-        boolean sslEnabled = extensionSettings.getOtherSettings().containsKey(SSL_TRANSPORT_ENABLED)
-            && "true".equals(extensionSettings.getOtherSettings().get(SSL_TRANSPORT_ENABLED));
+        boolean sslEnabled = extensionSettings.getSecuritySettings().containsKey(SSL_TRANSPORT_ENABLED)
+            && "true".equals(extensionSettings.getSecuritySettings().get(SSL_TRANSPORT_ENABLED));
         if (sslEnabled) {
-            addSettingsToBuilder(settingsBuilder, "path.home", extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_ENABLED, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_PEMCERT_FILEPATH, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_PEMKEY_FILEPATH, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_PEMTRUSTEDCAS_FILEPATH, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_ENFORCE_HOSTNAME_VERIFICATION, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_ENFORCE_HOSTNAME_VERIFICATION_RESOLVE_HOST_NAME, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_EXTENDED_KEY_USAGE_ENABLED, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_CLIENT_PEMKEY_FILEPATH, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_CLIENT_PEMCERT_FILEPATH, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_CLIENT_PEMTRUSTEDCAS_FILEPATH, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_SERVER_PEMKEY_FILEPATH, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_SERVER_PEMCERT_FILEPATH, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_SERVER_PEMTRUSTEDCAS_FILEPATH, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_ENABLED_PROTOCOLS, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_ENABLED_CIPHERS, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_KEYSTORE_FILEPATH, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_KEYSTORE_ALIAS, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_KEYSTORE_TYPE, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_TRUSTSTORE_ALIAS, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_TRUSTSTORE_FILEPATH, extensionSettings);
-            addSettingsToBuilder(settingsBuilder, SSL_TRANSPORT_TRUSTSTORE_TYPE, extensionSettings);
+            for (String settingsKey : ExtensionSettings.SECURITY_SETTINGS_KEYS) {
+                addSettingsToBuilder(settingsBuilder, settingsKey, extensionSettings);
+            }
         }
         this.settings = settingsBuilder.build();
 
@@ -303,8 +259,8 @@ public class ExtensionsRunner {
     }
 
     private void addSettingsToBuilder(Settings.Builder settingsBuilder, String settingKey, ExtensionSettings extensionSettings) {
-        if (extensionSettings.getOtherSettings().containsKey(settingKey)) {
-            settingsBuilder.put(settingKey, extensionSettings.getOtherSettings().get(settingKey));
+        if (extensionSettings.getSecuritySettings().containsKey(settingKey)) {
+            settingsBuilder.put(settingKey, extensionSettings.getSecuritySettings().get(settingKey));
         }
     }
 
