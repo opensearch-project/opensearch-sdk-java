@@ -17,10 +17,9 @@ import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.extensions.rest.RouteHandler;
 import org.opensearch.rest.RestRequest;
-import org.opensearch.sdk.BaseExtensionRestHandler;
-import org.opensearch.sdk.ExtensionRestHandler;
+import org.opensearch.sdk.rest.BaseExtensionRestHandler;
+import org.opensearch.sdk.rest.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionRouteHandler;
-
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;

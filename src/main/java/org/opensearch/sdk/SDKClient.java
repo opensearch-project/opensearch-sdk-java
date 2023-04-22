@@ -37,6 +37,8 @@ import org.opensearch.action.ActionType;
 import org.opensearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
+import org.opensearch.action.bulk.BulkRequest;
+import org.opensearch.action.bulk.BulkResponse;
 import org.opensearch.action.delete.DeleteRequest;
 import org.opensearch.action.delete.DeleteResponse;
 import org.opensearch.action.get.GetRequest;
@@ -69,6 +71,8 @@ import org.opensearch.client.RestClientBuilder;
 import org.opensearch.client.RestHighLevelClient;
 import org.opensearch.client.indices.CreateIndexRequest;
 import org.opensearch.client.indices.CreateIndexResponse;
+import org.opensearch.client.indices.GetFieldMappingsRequest;
+import org.opensearch.client.indices.GetFieldMappingsResponse;
 import org.opensearch.client.indices.GetMappingsRequest;
 import org.opensearch.client.indices.GetMappingsResponse;
 import org.opensearch.client.indices.PutMappingRequest;
@@ -344,6 +348,7 @@ public class SDKClient implements Closeable {
 
         private final SDKClient sdkClient;
         private final RestHighLevelClient restHighLevelClient;
+        private RequestOptions options = RequestOptions.DEFAULT;
 
         /**
          * Instantiate this class wrapping a {@link RestHighLevelClient}.
@@ -354,6 +359,10 @@ public class SDKClient implements Closeable {
         public SDKRestClient(SDKClient sdkClient, RestHighLevelClient restHighLevelClient) {
             this.sdkClient = sdkClient;
             this.restHighLevelClient = restHighLevelClient;
+        }
+
+        public void setOptions(RequestOptions options) {
+            this.options = options;
         }
 
         /**
@@ -410,7 +419,7 @@ public class SDKClient implements Closeable {
          * @see Requests#indexRequest(String)
          */
         public void index(IndexRequest request, ActionListener<IndexResponse> listener) {
-            restHighLevelClient.indexAsync(request, RequestOptions.DEFAULT, listener);
+            restHighLevelClient.indexAsync(request, options, listener);
         }
 
         /**
@@ -421,7 +430,7 @@ public class SDKClient implements Closeable {
          * @see Requests#getRequest(String)
          */
         public void get(GetRequest request, ActionListener<GetResponse> listener) {
-            restHighLevelClient.getAsync(request, RequestOptions.DEFAULT, listener);
+            restHighLevelClient.getAsync(request, options, listener);
         }
 
         /**
@@ -431,7 +440,7 @@ public class SDKClient implements Closeable {
          * @param listener A listener to be notified with a result
          */
         public void multiGet(MultiGetRequest request, ActionListener<MultiGetResponse> listener) {
-            restHighLevelClient.mgetAsync(request, RequestOptions.DEFAULT, listener);
+            restHighLevelClient.mgetAsync(request, options, listener);
         }
 
         /**
@@ -441,7 +450,7 @@ public class SDKClient implements Closeable {
          * @param listener A listener to be notified with a result
          */
         public void update(UpdateRequest request, ActionListener<UpdateResponse> listener) {
-            restHighLevelClient.updateAsync(request, RequestOptions.DEFAULT, listener);
+            restHighLevelClient.updateAsync(request, options, listener);
         }
 
         /**
@@ -452,7 +461,7 @@ public class SDKClient implements Closeable {
          * @see Requests#deleteRequest(String)
          */
         public void delete(DeleteRequest request, ActionListener<DeleteResponse> listener) {
-            restHighLevelClient.deleteAsync(request, RequestOptions.DEFAULT, listener);
+            restHighLevelClient.deleteAsync(request, options, listener);
         }
 
         /**
@@ -463,7 +472,7 @@ public class SDKClient implements Closeable {
          * @see Requests#searchRequest(String...)
          */
         public void search(SearchRequest request, ActionListener<SearchResponse> listener) {
-            restHighLevelClient.searchAsync(request, RequestOptions.DEFAULT, listener);
+            restHighLevelClient.searchAsync(request, options, listener);
         }
 
         /**
@@ -473,12 +482,21 @@ public class SDKClient implements Closeable {
          * @param listener A listener to be notified with a result
          */
         public void multiSearch(MultiSearchRequest request, ActionListener<MultiSearchResponse> listener) {
-            restHighLevelClient.msearchAsync(request, RequestOptions.DEFAULT, listener);
+            restHighLevelClient.msearchAsync(request, options, listener);
+        }
+
+        /**
+         * Executes a bulk request using the Bulk API.
+         *
+         * @param request the request
+         * @param listener A listener to be notified of a result
+         */
+        public void bulk(BulkRequest request, ActionListener<BulkResponse> listener) {
+            restHighLevelClient.bulkAsync(request, options, listener);
         }
 
         /**
          * Sends a request to the OpenSearch cluster that the client points to.
-         *
          * @param request the request to perform
          * @return the response returned by OpenSearch
          * @throws IOException in case of a problem or the connection was aborted
@@ -545,6 +563,11 @@ public class SDKClient implements Closeable {
     public static class SDKIndicesClient {
 
         private final IndicesClient indicesClient;
+        private RequestOptions options = RequestOptions.DEFAULT;
+
+        public void setOptions(RequestOptions options) {
+            this.options = options;
+        }
 
         /**
          * Instantiate this class wrapping an {@link IndicesClient}.
@@ -563,7 +586,7 @@ public class SDKClient implements Closeable {
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable create(CreateIndexRequest createIndexRequest, ActionListener<CreateIndexResponse> listener) {
-            return indicesClient.createAsync(createIndexRequest, RequestOptions.DEFAULT, listener);
+            return indicesClient.createAsync(createIndexRequest, options, listener);
         }
 
         /**
@@ -574,7 +597,7 @@ public class SDKClient implements Closeable {
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable delete(DeleteIndexRequest deleteIndexRequest, ActionListener<AcknowledgedResponse> listener) {
-            return indicesClient.deleteAsync(deleteIndexRequest, RequestOptions.DEFAULT, listener);
+            return indicesClient.deleteAsync(deleteIndexRequest, options, listener);
         }
 
         /**
@@ -585,7 +608,7 @@ public class SDKClient implements Closeable {
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable putSettings(UpdateSettingsRequest updateSettingsRequest, ActionListener<AcknowledgedResponse> listener) {
-            return indicesClient.putSettingsAsync(updateSettingsRequest, RequestOptions.DEFAULT, listener);
+            return indicesClient.putSettingsAsync(updateSettingsRequest, options, listener);
         }
 
         /**
@@ -596,7 +619,7 @@ public class SDKClient implements Closeable {
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable putMapping(PutMappingRequest putMappingRequest, ActionListener<AcknowledgedResponse> listener) {
-            return this.indicesClient.putMappingAsync(putMappingRequest, RequestOptions.DEFAULT, listener);
+            return this.indicesClient.putMappingAsync(putMappingRequest, options, listener);
         }
 
         /**
@@ -607,7 +630,21 @@ public class SDKClient implements Closeable {
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable getMapping(GetMappingsRequest getMappingsRequest, ActionListener<GetMappingsResponse> listener) {
-            return this.indicesClient.getMappingAsync(getMappingsRequest, RequestOptions.DEFAULT, listener);
+            return this.indicesClient.getMappingAsync(getMappingsRequest, options, listener);
+        }
+
+        /**
+         * Asynchronously retrieves the field mappings on an index or indices using the Get Field Mapping API.
+         *
+         * @param getFieldMappingsRequest the request
+         * @param listener the listener to be notified upon request completion
+         * @return cancellable that may be used to cancel the request
+         */
+        public Cancellable getFieldMapping(
+            GetFieldMappingsRequest getFieldMappingsRequest,
+            ActionListener<GetFieldMappingsResponse> listener
+        ) {
+            return this.indicesClient.getFieldMappingAsync(getFieldMappingsRequest, options, listener);
         }
 
         /**
@@ -618,7 +655,7 @@ public class SDKClient implements Closeable {
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable rolloverIndex(RolloverRequest rolloverRequest, ActionListener<RolloverResponse> listener) {
-            return this.indicesClient.rolloverAsync(rolloverRequest, RequestOptions.DEFAULT, listener);
+            return this.indicesClient.rolloverAsync(rolloverRequest, options, listener);
         }
 
         /**
@@ -629,7 +666,7 @@ public class SDKClient implements Closeable {
          * @return cancellable that may be used to cancel the request
          */
         public Cancellable getAliases(GetAliasesRequest getAliasesRequest, ActionListener<GetAliasesResponse> listener) {
-            return this.indicesClient.getAliasAsync(getAliasesRequest, RequestOptions.DEFAULT, listener);
+            return this.indicesClient.getAliasAsync(getAliasesRequest, options, listener);
         }
     }
 }

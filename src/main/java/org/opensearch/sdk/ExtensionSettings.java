@@ -21,6 +21,28 @@ import java.util.Set;
 
 import org.yaml.snakeyaml.Yaml;
 
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMCERT_FILEPATH;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMKEY_FILEPATH;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMTRUSTEDCAS_FILEPATH;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_ENABLED;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_ENABLED_CIPHERS;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_ENABLED_PROTOCOLS;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_ENFORCE_HOSTNAME_VERIFICATION;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_ENFORCE_HOSTNAME_VERIFICATION_RESOLVE_HOST_NAME;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_EXTENDED_KEY_USAGE_ENABLED;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_KEYSTORE_ALIAS;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_KEYSTORE_FILEPATH;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_KEYSTORE_TYPE;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_PEMCERT_FILEPATH;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_PEMKEY_FILEPATH;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_PEMTRUSTEDCAS_FILEPATH;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_SERVER_PEMCERT_FILEPATH;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_SERVER_PEMKEY_FILEPATH;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_SERVER_PEMTRUSTEDCAS_FILEPATH;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_TRUSTSTORE_ALIAS;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_TRUSTSTORE_FILEPATH;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_TRUSTSTORE_TYPE;
+
 /**
  * This class encapsulates the settings for an Extension.
  */
@@ -31,9 +53,33 @@ public class ExtensionSettings {
     private String hostPort;
     private String opensearchAddress;
     private String opensearchPort;
-
     private String shortName;
-    private Map<String, String> otherSettings;
+    public static final Set<String> SECURITY_SETTINGS_KEYS = Set.of(
+        "path.home", // TODO Find the right place to put this setting
+        SSL_TRANSPORT_CLIENT_PEMCERT_FILEPATH,
+        SSL_TRANSPORT_CLIENT_PEMKEY_FILEPATH,
+        SSL_TRANSPORT_CLIENT_PEMTRUSTEDCAS_FILEPATH,
+        SSL_TRANSPORT_ENABLED,
+        SSL_TRANSPORT_ENABLED_CIPHERS,
+        SSL_TRANSPORT_ENABLED_PROTOCOLS,
+        SSL_TRANSPORT_ENFORCE_HOSTNAME_VERIFICATION,
+        SSL_TRANSPORT_ENFORCE_HOSTNAME_VERIFICATION_RESOLVE_HOST_NAME,
+        SSL_TRANSPORT_EXTENDED_KEY_USAGE_ENABLED,
+        SSL_TRANSPORT_KEYSTORE_ALIAS,
+        SSL_TRANSPORT_KEYSTORE_FILEPATH,
+        SSL_TRANSPORT_KEYSTORE_TYPE,
+        SSL_TRANSPORT_PEMCERT_FILEPATH,
+        SSL_TRANSPORT_PEMKEY_FILEPATH,
+        SSL_TRANSPORT_PEMTRUSTEDCAS_FILEPATH,
+        SSL_TRANSPORT_SERVER_PEMCERT_FILEPATH,
+        SSL_TRANSPORT_SERVER_PEMKEY_FILEPATH,
+        SSL_TRANSPORT_SERVER_PEMTRUSTEDCAS_FILEPATH,
+        SSL_TRANSPORT_TRUSTSTORE_ALIAS,
+        SSL_TRANSPORT_TRUSTSTORE_FILEPATH,
+        SSL_TRANSPORT_TRUSTSTORE_TYPE
+    );
+
+    private Map<String, String> securitySettings;
 
     /**
      * Jackson requires a no-arg constructor.
@@ -52,7 +98,7 @@ public class ExtensionSettings {
      * @param hostPort  The port to bind this extension to.
      * @param opensearchAddress  The IP Address on which OpenSearch is running.
      * @param opensearchPort  The port on which OpenSearch is running.
-     * @param otherSettings A generic map of any settings set in the config file that are not default setting keys
+     * @param securitySettings A generic map of any settings set in the config file that are not default setting keys
      */
     public ExtensionSettings(
         String extensionName,
@@ -61,7 +107,7 @@ public class ExtensionSettings {
         String hostPort,
         String opensearchAddress,
         String opensearchPort,
-        Map<String, String> otherSettings
+        Map<String, String> securitySettings
     ) {
         super();
         this.extensionName = extensionName;
@@ -70,7 +116,7 @@ public class ExtensionSettings {
         this.hostPort = hostPort;
         this.opensearchAddress = opensearchAddress;
         this.opensearchPort = opensearchPort;
-        this.otherSettings = otherSettings;
+        this.securitySettings = securitySettings;
     }
 
     /**
@@ -98,7 +144,7 @@ public class ExtensionSettings {
         this.hostPort = hostPort;
         this.opensearchAddress = opensearchAddress;
         this.opensearchPort = opensearchPort;
-        this.otherSettings = Map.of();
+        this.securitySettings = Map.of();
     }
 
     public String getExtensionName() {
@@ -125,8 +171,8 @@ public class ExtensionSettings {
         return opensearchPort;
     }
 
-    public Map<String, String> getOtherSettings() {
-        return otherSettings;
+    public Map<String, String> getSecuritySettings() {
+        return securitySettings;
     }
 
     @Override
@@ -143,8 +189,8 @@ public class ExtensionSettings {
             + opensearchAddress
             + ", opensearchPort="
             + opensearchPort
-            + ", otherSettings="
-            + otherSettings
+            + ", securitySettings="
+            + securitySettings
             + "}";
     }
 
@@ -166,18 +212,10 @@ public class ExtensionSettings {
             if (extensionMap == null) {
                 throw new IOException("extension.yml is empty");
             }
-            Map<String, String> otherSettings = new HashMap<>();
-            Set<String> defaultSettings = Set.of(
-                "extensionName",
-                "shortName",
-                "hostAddress",
-                "hostPort",
-                "opensearchAddress",
-                "opensearchPort"
-            );
+            Map<String, String> securitySettings = new HashMap<>();
             for (String settingKey : extensionMap.keySet()) {
-                if (!defaultSettings.contains(settingKey)) {
-                    otherSettings.put(settingKey, extensionMap.get(settingKey).toString());
+                if (SECURITY_SETTINGS_KEYS.contains(settingKey)) {
+                    securitySettings.put(settingKey, extensionMap.get(settingKey).toString());
                 }
             }
             return new ExtensionSettings(
@@ -187,7 +225,7 @@ public class ExtensionSettings {
                 extensionMap.get("hostPort").toString(),
                 extensionMap.get("opensearchAddress").toString(),
                 extensionMap.get("opensearchPort").toString(),
-                otherSettings
+                securitySettings
             );
         } catch (URISyntaxException e) {
             throw new IOException("Error reading from extension.yml");

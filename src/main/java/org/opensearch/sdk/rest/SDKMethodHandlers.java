@@ -10,7 +10,6 @@
 package org.opensearch.sdk.rest;
 
 import org.opensearch.common.Nullable;
-import org.opensearch.sdk.ExtensionRestHandler;
 
 import java.util.HashMap;
 import java.util.Map;
