@@ -76,6 +76,7 @@ repositories {
 dependencies {
 
     def opensearchVersion = "3.0.0-SNAPSHOT"
+    def jobSchedulerVersion = "3.0.0.0-SNAPSHOT"
     def log4jVersion = "2.20.0"
     def nettyVersion = "4.1.91.Final"
     def jacksonDatabindVersion = "2.14.2"
@@ -87,6 +88,11 @@ dependencies {
     def jaxbVersion = "2.3.1"
 
     implementation("org.opensearch:opensearch:${opensearchVersion}")
+
+    // job-scheduler dependency is added for hello world sample extension
+    implementation("org.opensearch.plugin:opensearch-job-scheduler:${jobSchedulerVersion}")
+    implementation "org.opensearch:opensearch-job-scheduler-spi:${jobSchedulerVersion}"
+    
     implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
     implementation("org.apache.logging.log4j:log4j-core:${log4jVersion}")
     implementation("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
