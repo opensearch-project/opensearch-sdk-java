@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import org.opensearch.extensions.rest.RouteHandler;
 import org.opensearch.rest.BaseRestHandler;
 import static org.opensearch.rest.RestStatus.INTERNAL_SERVER_ERROR;
 import static org.opensearch.rest.RestStatus.NOT_FOUND;
@@ -204,36 +206,6 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
         final String detail
     ) {
         return BaseRestHandler.unrecognizedStrings(request, invalids, candidates, detail);
-    }
-
-    /**
-     * A subclass of {@link Route} that includes a handler method for that route.
-     */
-    public static class RouteHandler extends Route {
-
-        private final Function<RestRequest, ExtensionRestResponse> responseHandler;
-
-        /**
-         * Handle the method and path with the specified handler.
-         *
-         * @param method The {@link Method} to handle.
-         * @param path The path to handle.
-         * @param handler The method which handles the method and path.
-         */
-        public RouteHandler(Method method, String path, Function<RestRequest, ExtensionRestResponse> handler) {
-            super(method, path);
-            this.responseHandler = handler;
-        }
-
-        /**
-         * Executes the handler for this route.
-         *
-         * @param request The request to handle
-         * @return the {@link ExtensionRestResponse} result from the handler for this route.
-         */
-        public ExtensionRestResponse handleRequest(RestRequest request) {
-            return responseHandler.apply(request);
-        }
     }
 
     /**

@@ -60,7 +60,7 @@ public class ExtensionRestPathRegistry {
      * @param handler The handler to actually execute
      * @param method GET, POST, etc.
      */
-    private void registerHandler(Method method, String path, ExtensionRestHandler extensionRestHandler) {
+    public void registerHandler(Method method, String path, ExtensionRestHandler extensionRestHandler) {
         pathTrie.insertOrUpdate(
             path,
             new SDKMethodHandlers(path, extensionRestHandler, method),
@@ -143,9 +143,9 @@ public class ExtensionRestPathRegistry {
      */
     public void registerHandler(Method method, String path, String name, ExtensionRestHandler extensionRestHandler) {
         pathTrie.insertOrUpdate(
-                path,
-                new SDKMethodHandlers(path, extensionRestHandler, method),
-                (mHandlers, newMHandler) -> mHandlers.addMethods(extensionRestHandler, method)
+            path,
+            new SDKMethodHandlers(path, extensionRestHandler, method),
+            (mHandlers, newMHandler) -> mHandlers.addMethods(extensionRestHandler, method)
         );
         String restPathWithName = restPathToString(method, path, name);
         registeredPaths.add(restPathWithName);
