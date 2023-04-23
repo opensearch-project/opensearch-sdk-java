@@ -92,7 +92,7 @@ dependencies {
     // job-scheduler dependency is added for hello world sample extension
     implementation("org.opensearch.plugin:opensearch-job-scheduler:${jobSchedulerVersion}")
     implementation "org.opensearch:opensearch-job-scheduler-spi:${jobSchedulerVersion}"
-    
+
     implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
     implementation("org.apache.logging.log4j:log4j-core:${log4jVersion}")
     implementation("org.apache.logging.log4j:log4j-jul:${log4jVersion}")

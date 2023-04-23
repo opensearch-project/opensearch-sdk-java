@@ -80,9 +80,7 @@ public class HelloWorldExtension extends BaseExtension implements ActionExtensio
 
     @Override
     public List<NamedXContentRegistry.Entry> getNamedXContent() {
-        return ImmutableList.of(
-                GreetJob.XCONTENT_REGISTRY
-        );
+        return ImmutableList.of(GreetJob.XCONTENT_REGISTRY);
     }
 
     @Deprecated

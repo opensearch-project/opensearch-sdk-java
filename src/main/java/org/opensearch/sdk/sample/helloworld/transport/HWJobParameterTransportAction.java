@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionListener;
 import org.opensearch.action.support.ActionFilters;
 import org.opensearch.action.support.TransportAction;
-import org.opensearch.common.inject.Provides;
 import org.opensearch.common.xcontent.LoggingDeprecationHandler;
 import org.opensearch.common.xcontent.XContentHelper;
 import org.opensearch.common.xcontent.XContentType;
@@ -40,9 +39,9 @@ public class HWJobParameterTransportAction extends TransportAction<JobParameterR
 
     @Inject
     protected HWJobParameterTransportAction(
-            ActionFilters actionFilters,
-            TaskManager taskManager,
-            SDKNamedXContentRegistry xContentRegistry
+        ActionFilters actionFilters,
+        TaskManager taskManager,
+        SDKNamedXContentRegistry xContentRegistry
     ) {
         super(HWJobParameterAction.NAME, actionFilters, taskManager);
         this.xContentRegistry = xContentRegistry;
@@ -55,10 +54,10 @@ public class HWJobParameterTransportAction extends TransportAction<JobParameterR
         ActionListener<JobParameterResponse> listener = wrapRestActionListener(actionListener, errorMessage);
         try {
             XContentParser parser = XContentHelper.createParser(
-                    xContentRegistry.getRegistry(),
-                    LoggingDeprecationHandler.INSTANCE,
-                    request.getJobSource(),
-                    XContentType.JSON
+                xContentRegistry.getRegistry(),
+                LoggingDeprecationHandler.INSTANCE,
+                request.getJobSource(),
+                XContentType.JSON
             );
             ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.nextToken(), parser);
             ScheduledJobParameter scheduledJobParameter = GreetJob.parse(parser);

@@ -38,9 +38,9 @@ public class GreetJob implements Writeable, ToXContentObject, ScheduledJobParame
 
     public static final String PARSE_FIELD_NAME = "GreetJob";
     public static final NamedXContentRegistry.Entry XCONTENT_REGISTRY = new NamedXContentRegistry.Entry(
-            GreetJob.class,
-            new ParseField(PARSE_FIELD_NAME),
-            it -> parse(it)
+        GreetJob.class,
+        new ParseField(PARSE_FIELD_NAME),
+        it -> parse(it)
     );
 
     public static final String HELLO_WORLD_JOB_INDEX = ".hello-world-jobs";
@@ -62,13 +62,13 @@ public class GreetJob implements Writeable, ToXContentObject, ScheduledJobParame
     private final Long lockDurationSeconds;
 
     public GreetJob(
-            String name,
-            Schedule schedule,
-            Boolean isEnabled,
-            Instant enabledTime,
-            Instant disabledTime,
-            Instant lastUpdateTime,
-            Long lockDurationSeconds
+        String name,
+        Schedule schedule,
+        Boolean isEnabled,
+        Instant enabledTime,
+        Instant disabledTime,
+        Instant lastUpdateTime,
+        Long lockDurationSeconds
     ) {
         this.name = name;
         this.schedule = schedule;
@@ -96,12 +96,12 @@ public class GreetJob implements Writeable, ToXContentObject, ScheduledJobParame
     @Override
     public XContentBuilder toXContent(XContentBuilder builder, ToXContent.Params params) throws IOException {
         XContentBuilder xContentBuilder = builder.startObject()
-                .field(NAME_FIELD, name)
-                .field(SCHEDULE_FIELD, schedule)
-                .field(IS_ENABLED_FIELD, isEnabled)
-                .field(ENABLED_TIME_FIELD, enabledTime.toEpochMilli())
-                .field(LAST_UPDATE_TIME_FIELD, lastUpdateTime.toEpochMilli())
-                .field(LOCK_DURATION_SECONDS, lockDurationSeconds);
+            .field(NAME_FIELD, name)
+            .field(SCHEDULE_FIELD, schedule)
+            .field(IS_ENABLED_FIELD, isEnabled)
+            .field(ENABLED_TIME_FIELD, enabledTime.toEpochMilli())
+            .field(LAST_UPDATE_TIME_FIELD, lastUpdateTime.toEpochMilli())
+            .field(LOCK_DURATION_SECONDS, lockDurationSeconds);
         if (disabledTime != null) {
             xContentBuilder.field(DISABLED_TIME_FIELD, disabledTime.toEpochMilli());
         }
@@ -175,12 +175,12 @@ public class GreetJob implements Writeable, ToXContentObject, ScheduledJobParame
         if (o == null || getClass() != o.getClass()) return false;
         GreetJob that = (GreetJob) o;
         return Objects.equal(getName(), that.getName())
-                && Objects.equal(getSchedule(), that.getSchedule())
-                && Objects.equal(isEnabled(), that.isEnabled())
-                && Objects.equal(getEnabledTime(), that.getEnabledTime())
-                && Objects.equal(getDisabledTime(), that.getDisabledTime())
-                && Objects.equal(getLastUpdateTime(), that.getLastUpdateTime())
-                && Objects.equal(getLockDurationSeconds(), that.getLockDurationSeconds());
+            && Objects.equal(getSchedule(), that.getSchedule())
+            && Objects.equal(isEnabled(), that.isEnabled())
+            && Objects.equal(getEnabledTime(), that.getEnabledTime())
+            && Objects.equal(getDisabledTime(), that.getDisabledTime())
+            && Objects.equal(getLastUpdateTime(), that.getLastUpdateTime())
+            && Objects.equal(getLockDurationSeconds(), that.getLockDurationSeconds());
     }
 
     @Override
@@ -243,20 +243,19 @@ public class GreetJob implements Writeable, ToXContentObject, ScheduledJobParame
         GreetJobPojo.SchedulePojo.IntervalPojo interval = null;
         if (this.schedule instanceof IntervalSchedule) {
             interval = new GreetJobPojo.SchedulePojo.IntervalPojo(
-                    ((IntervalSchedule)this.schedule).getUnit().toString(),
-                    ((IntervalSchedule)this.schedule).getInterval(),
-                    ((IntervalSchedule)this.schedule).getStartTime().toEpochMilli()
+                ((IntervalSchedule) this.schedule).getUnit().toString(),
+                ((IntervalSchedule) this.schedule).getInterval(),
+                ((IntervalSchedule) this.schedule).getStartTime().toEpochMilli()
             );
         }
         return new GreetJobPojo(
-                this.enabledTime.toEpochMilli(),
-                this.lastUpdateTime.toEpochMilli(),
-                this.name,
-                this.lockDurationSeconds.intValue(),
-                this.isEnabled.booleanValue(),
-                new GreetJobPojo.SchedulePojo(
-                        interval
-                ));
+            this.enabledTime.toEpochMilli(),
+            this.lastUpdateTime.toEpochMilli(),
+            this.name,
+            this.lockDurationSeconds.intValue(),
+            this.isEnabled.booleanValue(),
+            new GreetJobPojo.SchedulePojo(interval)
+        );
     }
 
     public static class GreetJobPojo {
@@ -271,7 +270,14 @@ public class GreetJob implements Writeable, ToXContentObject, ScheduledJobParame
 
         public SchedulePojo schedule;
 
-        public GreetJobPojo(long enabledTime, long lastUpdateTime, String name, int lockDurationSeconds, boolean enabled, SchedulePojo schedule) {
+        public GreetJobPojo(
+            long enabledTime,
+            long lastUpdateTime,
+            String name,
+            int lockDurationSeconds,
+            boolean enabled,
+            SchedulePojo schedule
+        ) {
             this.enabled_time = enabledTime;
             this.last_update_time = lastUpdateTime;
             this.name = name;

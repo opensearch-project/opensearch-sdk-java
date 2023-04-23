@@ -9,7 +9,6 @@
 
 package org.opensearch.sdk.sample.helloworld.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
 import jakarta.json.stream.JsonParser;
 import org.apache.commons.codec.Charsets;
@@ -29,11 +28,7 @@ import org.opensearch.client.opensearch.indices.CreateIndexRequest;
 import org.opensearch.client.opensearch.indices.GetMappingResponse;
 import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
 import org.opensearch.common.Strings;
-import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.io.stream.StreamInput;
-import org.opensearch.common.xcontent.XContentFactory;
-import org.opensearch.common.xcontent.XContentHelper;
-import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.extensions.ExtensionsManager;
@@ -56,7 +51,6 @@ import org.opensearch.sdk.sample.helloworld.transport.HWJobRunnerAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleResponse;
-import org.opensearch.sdk.sample.helloworld.util.RestHandlerUtils;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -66,7 +60,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -94,8 +87,8 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
     @Override
     public List<RouteHandler> routeHandlers() {
         return List.of(
-                new RouteHandler(GET, "/hello/{name}", handleRemoteGetRequest),
-                new RouteHandler(PUT, "/schedule/hello", handleScheduleRequest)
+            new RouteHandler(GET, "/hello/{name}", handleRemoteGetRequest),
+            new RouteHandler(PUT, "/schedule/hello", handleScheduleRequest)
         );
     }
 
@@ -164,7 +157,9 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
         } catch (WarningFailureException e) {
             // ignore
         } catch (Exception e) {
-            if (e instanceof ResourceAlreadyExistsException || e.getCause() instanceof ResourceAlreadyExistsException || e.getMessage().contains("resource_already_exists_exception")) {
+            if (e instanceof ResourceAlreadyExistsException
+                || e.getCause() instanceof ResourceAlreadyExistsException
+                || e.getMessage().contains("resource_already_exists_exception")) {
                 // ignore
             } else {
                 // Catch all other OpenSearchExceptions
@@ -177,9 +172,7 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
             GetMappingResponse response = fromJson(mappingsJson, GetMappingResponse.class);
             TypeMapping mappings = response.get(GreetJob.HELLO_WORLD_JOB_INDEX).mappings();
 
-            CreateIndexRequest cir = new CreateIndexRequest.Builder()
-                    .index(GreetJob.HELLO_WORLD_JOB_INDEX)
-                    .mappings(mappings).build();
+            CreateIndexRequest cir = new CreateIndexRequest.Builder().index(GreetJob.HELLO_WORLD_JOB_INDEX).mappings(mappings).build();
 
             OpenSearchIndicesClient indicesClient = javaClient.indices();
             indicesClient.create(cir);
@@ -194,14 +187,12 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
              * {"acknowledged":true,"shards_acknowledged":true,"index":".hello-world-jobs"}
              */
         } catch (OpenSearchException e) {
-            if (e instanceof ResourceAlreadyExistsException || e.getCause() instanceof ResourceAlreadyExistsException) {
-            } else {
+            if (e instanceof ResourceAlreadyExistsException || e.getCause() instanceof ResourceAlreadyExistsException) {} else {
                 // Catch all other OpenSearchExceptions
                 return new ExtensionRestResponse(request, RestStatus.INTERNAL_SERVER_ERROR, e.getMessage());
             }
         } catch (Exception e) {
-            if (e.getMessage().contains("resource_already_exists_exception")) {
-            } else {
+            if (e.getMessage().contains("resource_already_exists_exception")) {} else {
                 // Catch all other OpenSearchExceptions
                 return new ExtensionRestResponse(request, RestStatus.INTERNAL_SERVER_ERROR, e.getMessage());
             }
@@ -210,22 +201,11 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
         Schedule schedule = new IntervalSchedule(Instant.now(), 1, ChronoUnit.MINUTES);
         Duration duration = Duration.of(1, ChronoUnit.MINUTES);
 
-        GreetJob job = new GreetJob(
-                "hw",
-                schedule,
-                true,
-                Instant.now(),
-                null,
-                Instant.now(),
-                duration.getSeconds()
-        );
+        GreetJob job = new GreetJob("hw", schedule, true, Instant.now(), null, Instant.now(), duration.getSeconds());
 
         try {
             // Reference: AnomalyDetector - IndexAnomalyDetectorJobActionHandler.indexAnomalyDetectorJob
-            IndexRequest ir = new IndexRequest.Builder()
-                    .index(GreetJob.HELLO_WORLD_JOB_INDEX)
-                    .document(job.toPojo())
-                    .build();
+            IndexRequest ir = new IndexRequest.Builder().index(GreetJob.HELLO_WORLD_JOB_INDEX).document(job.toPojo()).build();
             javaClient.index(ir);
         } catch (IOException e) {
             return new ExtensionRestResponse(request, RestStatus.INTERNAL_SERVER_ERROR, e.getMessage());
@@ -251,14 +231,14 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
         // https://github.com/opensearch-project/opensearch-sdk-java/issues/584
         CompletableFuture<RemoteExtensionActionResponse> futureResponse = new CompletableFuture<>();
         client.execute(
-                RemoteExtensionAction.INSTANCE,
-                proxyActionRequest,
-                ActionListener.wrap(r -> futureResponse.complete(r), e -> futureResponse.completeExceptionally(e))
+            RemoteExtensionAction.INSTANCE,
+            proxyActionRequest,
+            ActionListener.wrap(r -> futureResponse.complete(r), e -> futureResponse.completeExceptionally(e))
         );
         try {
             RemoteExtensionActionResponse response = futureResponse.orTimeout(
-                    ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT,
-                    TimeUnit.SECONDS
+                ExtensionsManager.EXTENSION_REQUEST_WAIT_TIMEOUT,
+                TimeUnit.SECONDS
             ).get();
             if (!response.isSuccess()) {
                 return new ExtensionRestResponse(request, OK, "Remote extension reponse failed: " + response.getResponseBytesAsString());

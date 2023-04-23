@@ -16,7 +16,6 @@ import org.opensearch.action.ActionListener;
 import org.opensearch.action.get.GetRequest;
 import org.opensearch.action.support.ActionFilters;
 import org.opensearch.action.support.TransportAction;
-import org.opensearch.common.inject.Provides;
 import org.opensearch.common.xcontent.LoggingDeprecationHandler;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.core.xcontent.XContentParser;
@@ -47,10 +46,10 @@ public class HWJobRunnerTransportAction extends TransportAction<JobRunnerRequest
 
     @Inject
     protected HWJobRunnerTransportAction(
-            ActionFilters actionFilters,
-            TaskManager taskManager,
-            SDKNamedXContentRegistry xContentRegistry,
-            SDKRestClient client
+        ActionFilters actionFilters,
+        TaskManager taskManager,
+        SDKNamedXContentRegistry xContentRegistry,
+        SDKRestClient client
     ) {
         super(HWJobRunnerAction.NAME, actionFilters, taskManager);
         this.client = client;
@@ -120,7 +119,7 @@ public class HWJobRunnerTransportAction extends TransportAction<JobRunnerRequest
                 } else {
                     try {
                         XContentParser parser = XContentType.JSON.xContent()
-                                .createParser(xContentRegistry.getRegistry(), LoggingDeprecationHandler.INSTANCE, response.getSourceAsString());
+                            .createParser(xContentRegistry.getRegistry(), LoggingDeprecationHandler.INSTANCE, response.getSourceAsString());
                         ensureExpectedToken(XContentParser.Token.START_OBJECT, parser.nextToken(), parser);
                         listener.onResponse(GreetJob.parse(parser));
                     } catch (IOException e) {
@@ -141,12 +140,12 @@ public class HWJobRunnerTransportAction extends TransportAction<JobRunnerRequest
 
     private boolean validateJobExecutionContext(JobExecutionContext jobExecutionContext) {
         if (jobExecutionContext != null
-                && jobExecutionContext.getJobId() != null
-                && !jobExecutionContext.getJobId().isEmpty()
-                && jobExecutionContext.getJobIndexName() != null
-                && !jobExecutionContext.getJobIndexName().isEmpty()
-                && jobExecutionContext.getExpectedExecutionTime() != null
-                && jobExecutionContext.getJobVersion() != null) {
+            && jobExecutionContext.getJobId() != null
+            && !jobExecutionContext.getJobId().isEmpty()
+            && jobExecutionContext.getJobIndexName() != null
+            && !jobExecutionContext.getJobIndexName().isEmpty()
+            && jobExecutionContext.getExpectedExecutionTime() != null
+            && jobExecutionContext.getJobVersion() != null) {
             return true;
         }
         return false;
