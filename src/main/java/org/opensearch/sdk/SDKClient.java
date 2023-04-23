@@ -37,6 +37,8 @@ import org.opensearch.action.ActionType;
 import org.opensearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
+import org.opensearch.action.bulk.BulkRequest;
+import org.opensearch.action.bulk.BulkResponse;
 import org.opensearch.action.delete.DeleteRequest;
 import org.opensearch.action.delete.DeleteResponse;
 import org.opensearch.action.get.GetRequest;
@@ -481,6 +483,16 @@ public class SDKClient implements Closeable {
          */
         public void multiSearch(MultiSearchRequest request, ActionListener<MultiSearchResponse> listener) {
             restHighLevelClient.msearchAsync(request, options, listener);
+        }
+
+        /**
+         * Executes a bulk request using the Bulk API.
+         *
+         * @param request the request
+         * @param listener A listener to be notified of a result
+         */
+        public void bulk(BulkRequest request, ActionListener<BulkResponse> listener) {
+            restHighLevelClient.bulkAsync(request, options, listener);
         }
 
         /**
