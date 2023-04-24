@@ -42,6 +42,10 @@ mainClassName = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
 group 'org.opensearch.sdk'
 version '2.0.0-SNAPSHOT'
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
 
 publishing {
     publications {
@@ -118,10 +122,10 @@ dependencies {
 
 // this task runs the helloworld sample extension
 task helloWorld(type: JavaExec) {
-  group = 'Execution'
-  description = 'Run HelloWorld Extension.'
-  mainClass = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
-  classpath = sourceSets.main.runtimeClasspath
+    group = 'Execution'
+    description = 'Run HelloWorld Extension.'
+    mainClass = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
+    classpath = sourceSets.main.runtimeClasspath
 }
 
 test {
