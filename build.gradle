@@ -88,7 +88,6 @@ dependencies {
     def jaxbVersion = "2.3.1"
 
     implementation("org.opensearch:opensearch:${opensearchVersion}")
-
     // job-scheduler dependency is added for hello world sample extension
     implementation("org.opensearch.plugin:opensearch-job-scheduler:${jobSchedulerVersion}")
     implementation "org.opensearch:opensearch-job-scheduler-spi:${jobSchedulerVersion}"
