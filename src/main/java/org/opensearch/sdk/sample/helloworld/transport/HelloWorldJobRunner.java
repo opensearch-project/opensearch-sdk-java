@@ -15,11 +15,18 @@ import org.opensearch.jobscheduler.spi.JobExecutionContext;
 import org.opensearch.jobscheduler.spi.ScheduledJobParameter;
 import org.opensearch.jobscheduler.spi.ScheduledJobRunner;
 
+/**
+ * Hello World Job Runner
+ */
 public class HelloWorldJobRunner implements ScheduledJobRunner {
     private static final Logger log = LogManager.getLogger(HelloWorldJobRunner.class);
 
     private static HelloWorldJobRunner INSTANCE;
 
+    /**
+     *
+     * @return Return or create an instance of this job runner
+     */
     public static HelloWorldJobRunner getJobRunnerInstance() {
         if (INSTANCE != null) {
             return INSTANCE;

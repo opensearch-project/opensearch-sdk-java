@@ -67,6 +67,10 @@ public final class RestHandlerUtils {
         });
     }
 
+    /**
+     * @param e Throwable
+     * @return Return a boolean whether there was an exception thrown on a request
+     */
     public static boolean isBadRequest(Throwable e) {
         if (e == null) {
             return false;
@@ -74,6 +78,10 @@ public final class RestHandlerUtils {
         return e instanceof IllegalArgumentException;
     }
 
+    /**
+     * @param e Throwable
+     * @return Return boolean if throwable is of a proper exception type
+     */
     public static boolean isProperExceptionToReturn(Throwable e) {
         if (e == null) {
             return false;

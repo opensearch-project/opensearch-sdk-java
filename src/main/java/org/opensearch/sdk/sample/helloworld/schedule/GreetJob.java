@@ -30,6 +30,9 @@ import java.time.Instant;
 
 import static org.opensearch.common.xcontent.XContentParserUtils.ensureExpectedToken;
 
+/**
+ * Sample scheduled job for the HelloWorld Extension
+ */
 public class GreetJob implements Writeable, ToXContentObject, ScheduledJobParameter {
     enum ScheduleType {
         CRON,
@@ -61,6 +64,16 @@ public class GreetJob implements Writeable, ToXContentObject, ScheduledJobParame
     private final Instant lastUpdateTime;
     private final Long lockDurationSeconds;
 
+    /**
+     *
+     * @param name name of the scheduled job
+     * @param schedule The schedule, cron or interval, the job run will run with
+     * @param isEnabled Flag to indices whether this job is enabled
+     * @param enabledTime Timestamp when the job was last enabled
+     * @param disabledTime Timestamp when the job was last disabled
+     * @param lastUpdateTime Timestamp when the job was last updated
+     * @param lockDurationSeconds Time in seconds for how long this job should acquire a lock
+     */
     public GreetJob(
         String name,
         Schedule schedule,
@@ -79,6 +92,11 @@ public class GreetJob implements Writeable, ToXContentObject, ScheduledJobParame
         this.lockDurationSeconds = lockDurationSeconds;
     }
 
+    /**
+     *
+     * @param input The input stream
+     * @throws IOException Thrown if there is an error parsing the input stream into a GreetJob
+     */
     public GreetJob(StreamInput input) throws IOException {
         name = input.readString();
         if (input.readEnum(GreetJob.ScheduleType.class) == ScheduleType.CRON) {
@@ -93,6 +111,13 @@ public class GreetJob implements Writeable, ToXContentObject, ScheduledJobParame
         lockDurationSeconds = input.readLong();
     }
 
+    /**
+     *
+     * @param builder An XContentBuilder instance
+     * @param params TOXContent.Params
+     * @return
+     * @throws IOException
+     */
     @Override
     public XContentBuilder toXContent(XContentBuilder builder, ToXContent.Params params) throws IOException {
         XContentBuilder xContentBuilder = builder.startObject()
@@ -108,6 +133,11 @@ public class GreetJob implements Writeable, ToXContentObject, ScheduledJobParame
         return xContentBuilder.endObject();
     }
 
+    /**
+     *
+     * @param output The output stream
+     * @throws IOException
+     */
     @Override
     public void writeTo(StreamOutput output) throws IOException {
         output.writeString(name);
@@ -124,6 +154,12 @@ public class GreetJob implements Writeable, ToXContentObject, ScheduledJobParame
         output.writeLong(lockDurationSeconds);
     }
 
+    /**
+     *
+     * @param parser Parser that takes builds a GreetJob from XContent
+     * @return An instance of a GreetJob
+     * @throws IOException
+     */
     public static GreetJob parse(XContentParser parser) throws IOException {
         String name = null;
         Schedule schedule = null;
@@ -239,6 +275,10 @@ public class GreetJob implements Writeable, ToXContentObject, ScheduledJobParame
         return null;
     }
 
+    /**
+     *
+     * @return Returns a plain old java object of a GreetJob for writing to the hello world jobs index
+     */
     public GreetJobPojo toPojo() {
         GreetJobPojo.SchedulePojo.IntervalPojo interval = null;
         if (this.schedule instanceof IntervalSchedule) {
@@ -258,6 +298,9 @@ public class GreetJob implements Writeable, ToXContentObject, ScheduledJobParame
         );
     }
 
+    /**
+     * A plain java representation of a GreetJob using only primitives
+     */
     public static class GreetJobPojo {
         public long enabled_time;
         public long last_update_time;
@@ -270,6 +313,15 @@ public class GreetJob implements Writeable, ToXContentObject, ScheduledJobParame
 
         public SchedulePojo schedule;
 
+        /**
+         *
+         * @param enabledTime
+         * @param lastUpdateTime
+         * @param name
+         * @param lockDurationSeconds
+         * @param enabled
+         * @param schedule
+         */
         public GreetJobPojo(
             long enabledTime,
             long lastUpdateTime,
@@ -286,14 +338,24 @@ public class GreetJob implements Writeable, ToXContentObject, ScheduledJobParame
             this.schedule = schedule;
         }
 
+        /**
+         * A plain java representation of a Schedule using only primitives
+         */
         public static class SchedulePojo {
 
             public IntervalPojo interval;
 
+            /**
+             *
+             * @param interval An Interval instance
+             */
             public SchedulePojo(IntervalPojo interval) {
                 this.interval = interval;
             }
 
+            /**
+             * A plain java representation of a Interval using only primitives
+             */
             public static class IntervalPojo {
                 public String unit;
 
@@ -301,6 +363,12 @@ public class GreetJob implements Writeable, ToXContentObject, ScheduledJobParame
 
                 public long start_time;
 
+                /**
+                 *
+                 * @param unit Unit of time
+                 * @param period Number of units between job execution
+                 * @param start_time The time when the interval first started
+                 */
                 public IntervalPojo(String unit, int period, long start_time) {
                     this.unit = unit;
                     this.period = period;

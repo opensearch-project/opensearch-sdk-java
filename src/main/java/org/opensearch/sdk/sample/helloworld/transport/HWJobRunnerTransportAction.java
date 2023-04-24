@@ -37,6 +37,9 @@ import java.util.concurrent.TimeoutException;
 import static org.opensearch.common.xcontent.XContentParserUtils.ensureExpectedToken;
 import static org.opensearch.sdk.sample.helloworld.util.RestHandlerUtils.wrapRestActionListener;
 
+/**
+ * Hello World Job Runner Transport Action
+ */
 public class HWJobRunnerTransportAction extends TransportAction<JobRunnerRequest, JobRunnerResponse> {
 
     private static final Logger LOG = LogManager.getLogger(HWJobRunnerTransportAction.class);
@@ -44,6 +47,14 @@ public class HWJobRunnerTransportAction extends TransportAction<JobRunnerRequest
     private SDKRestClient client;
     private final SDKNamedXContentRegistry xContentRegistry;
 
+    /**
+     * Instantiate this action
+     *
+     * @param actionFilters Action filters
+     * @param taskManager The task manager
+     * @param xContentRegistry xContentRegistry
+     * @param client SDKRestClient
+     */
     @Inject
     protected HWJobRunnerTransportAction(
         ActionFilters actionFilters,

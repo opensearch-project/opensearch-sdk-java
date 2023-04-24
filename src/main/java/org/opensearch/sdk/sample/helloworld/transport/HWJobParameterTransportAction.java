@@ -31,12 +31,22 @@ import org.opensearch.tasks.TaskManager;
 import static org.opensearch.common.xcontent.XContentParserUtils.ensureExpectedToken;
 import static org.opensearch.sdk.sample.helloworld.util.RestHandlerUtils.wrapRestActionListener;
 
+/**
+ * Hello World Job Parameter Transport Action
+ */
 public class HWJobParameterTransportAction extends TransportAction<JobParameterRequest, JobParameterResponse> {
 
     private static final Logger LOG = LogManager.getLogger(HWJobParameterTransportAction.class);
 
     private final SDKNamedXContentRegistry xContentRegistry;
 
+    /**
+     * Instantiate this action
+     *
+     * @param actionFilters Action filters
+     * @param taskManager The task manager
+     * @param xContentRegistry The xContentRegistry
+     */
     @Inject
     protected HWJobParameterTransportAction(
         ActionFilters actionFilters,

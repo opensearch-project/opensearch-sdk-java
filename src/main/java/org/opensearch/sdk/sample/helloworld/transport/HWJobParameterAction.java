@@ -12,6 +12,9 @@ package org.opensearch.sdk.sample.helloworld.transport;
 import org.opensearch.action.ActionType;
 import org.opensearch.jobscheduler.transport.response.JobParameterResponse;
 
+/**
+ * Hello World Job Parameter Action
+ */
 public class HWJobParameterAction extends ActionType<JobParameterResponse> {
     public static final String NAME = "extensions:hw/greet_job_parameter";
     public static final HWJobParameterAction INSTANCE = new HWJobParameterAction();

@@ -140,6 +140,15 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
         }
     }
 
+    /**
+     * Deserializes json string into a java object
+     *
+     * @param json The JSON string
+     * @param clazz The class to deserialize to
+     * @param <T> The class to deserialize to
+     *
+     * @return Object instance of clazz requested
+     */
     public <T> T fromJson(String json, Class<T> clazz) {
         int rand = new Random().nextInt();
         JsonpMapper mapper = setupMapper(rand);

@@ -12,6 +12,9 @@ package org.opensearch.sdk.sample.helloworld.transport;
 import org.opensearch.action.ActionType;
 import org.opensearch.jobscheduler.transport.response.JobRunnerResponse;
 
+/**
+ * Hello World Job Runner Action
+ */
 public class HWJobRunnerAction extends ActionType<JobRunnerResponse> {
 
     public static final String NAME = "extensions:hw/greet_job_runner";
