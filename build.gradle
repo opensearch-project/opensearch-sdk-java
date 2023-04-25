@@ -81,7 +81,7 @@ dependencies {
 
     def opensearchVersion = "3.0.0-SNAPSHOT"
     def log4jVersion = "2.20.0"
-    def nettyVersion = "4.1.91.Final"
+    def nettyVersion = "4.1.92.Final"
     def jacksonDatabindVersion = "2.15.0"
     def guavaVersion = "31.1-jre"
     def guiceVersion = "5.1.0"
