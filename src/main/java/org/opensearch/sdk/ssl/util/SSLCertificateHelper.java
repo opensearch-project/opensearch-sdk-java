@@ -143,7 +143,7 @@ public class SSLCertificateHelper {
                 log.debug("Keystore has {} entries/aliases", ks.size());
                 for (String _alias : aliases) {
                     log.debug(
-                        "Alias {}: is a certificate entry?{}/is a key entry?{}",
+                        "Alias {}: is a certificate entry? {}/is a key entry? {}",
                         _alias,
                         ks.isCertificateEntry(_alias),
                         ks.isKeyEntry(_alias)
