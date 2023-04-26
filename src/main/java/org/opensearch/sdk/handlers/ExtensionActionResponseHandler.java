@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * This class handles the response from OpenSearch to a {@link SDKTransportService#sendRemoteExtensionActionRequest()} call.
+ * This class handles the response from OpenSearch to a {@link SDKTransportService#sendRemoteExtensionActionRequest} call.
  */
 public class ExtensionActionResponseHandler implements TransportResponseHandler<RemoteExtensionActionResponse> {
 

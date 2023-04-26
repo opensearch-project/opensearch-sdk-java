@@ -34,7 +34,7 @@ import org.opensearch.sdk.SDKTransportService;
 import org.opensearch.sdk.action.RemoteExtensionActionRequest;
 
 /**
- * This class handles a request from OpenSearch from another extension's {@link SDKTransportService#sendRemoteExtensionActionRequest()} call.
+ * This class handles a request from OpenSearch from another extension's {@link SDKTransportService#sendRemoteExtensionActionRequest} call.
  */
 public class ExtensionActionRequestHandler {
     private static final Logger logger = LogManager.getLogger(ExtensionActionRequestHandler.class);
