@@ -86,8 +86,8 @@ dependencies {
     def guavaVersion = "31.1-jre"
     def guiceVersion = "5.1.0"
     def junit4Version = "4.13.2"
-    def junit5Version = "5.9.2"
-    def junitPlatform = "1.9.2"
+    def junit5Version = "5.9.3"
+    def junitPlatform = "1.9.3"
     def jaxbVersion = "2.3.1"
 
     implementation("org.opensearch:opensearch:${opensearchVersion}")
