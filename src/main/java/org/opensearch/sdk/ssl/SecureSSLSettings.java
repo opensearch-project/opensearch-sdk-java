@@ -9,11 +9,7 @@
 
 package org.opensearch.sdk.ssl;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,6 +31,9 @@ public final class SecureSSLSettings {
     private static final String PREFIX = "ssl";
     private static final String TRANSPORT_PREFIX = PREFIX + ".transport";
 
+    /**
+     * SSLSetting
+     */
     public enum SSLSetting {
         // transport settings
         SSL_TRANSPORT_PEMKEY_PASSWORD(TRANSPORT_PREFIX + ".pemkey_password"),
@@ -46,10 +45,19 @@ public final class SecureSSLSettings {
         SSL_TRANSPORT_CLIENT_KEYSTORE_KEYPASSWORD(TRANSPORT_PREFIX + ".client.keystore_keypassword"),
         SSL_TRANSPORT_TRUSTSTORE_PASSWORD(TRANSPORT_PREFIX + ".truststore_password", DEFAULT_STORE_PASSWORD);
 
+        /**
+         *
+         * @param insecurePropertyName insecure property name
+         */
         SSLSetting(String insecurePropertyName) {
             this(insecurePropertyName, null);
         }
 
+        /**
+         *
+         * @param insecurePropertyName insecure property name
+         * @param defaultValue default value
+         */
         SSLSetting(String insecurePropertyName, String defaultValue) {
             this.insecurePropertyName = insecurePropertyName;
             this.propertyName = String.format("%s%s", this.insecurePropertyName, SECURE_SUFFIX);
@@ -62,18 +70,37 @@ public final class SecureSSLSettings {
 
         public final String defaultValue;
 
+        /**
+         *
+         * @return Returns the setting with a secure string
+         */
         public Setting<SecureString> asSetting() {
             return SecureSetting.secureString(this.propertyName, new InsecureFallbackStringSetting(this.insecurePropertyName));
         }
 
+        /**
+         *
+         * @return Returns the setting with an insecure string
+         */
         public Setting<SecureString> asInsecureSetting() {
             return new InsecureFallbackStringSetting(this.insecurePropertyName);
         }
 
+        /**
+         *
+         * @param settings Gets this setting from all settings
+         * @return The value of the setting
+         */
         public String getSetting(Settings settings) {
             return this.getSetting(settings, this.defaultValue);
         }
 
+        /**
+         *
+         * @param settings Gets this setting from all settings
+         * @param defaultValue default value if the setting does not exist
+         * @return The value of the setting
+         */
         public String getSetting(Settings settings, String defaultValue) {
             return Optional.of(this.asSetting().get(settings))
                 .filter(ss -> ss.length() > 0)
@@ -84,12 +111,6 @@ public final class SecureSSLSettings {
 
     private SecureSSLSettings() {}
 
-    public static List<Setting<?>> getSecureSettings() {
-        return Arrays.stream(SSLSetting.values())
-            .flatMap(setting -> Stream.of(setting.asSetting(), setting.asInsecureSetting()))
-            .collect(Collectors.toList());
-    }
-
     /**
      * Alternative to InsecureStringSetting, which doesn't raise an exception if allow_insecure_settings is false, but
      * instead log.WARNs the violation. This is to appease a potential cyclic dependency between commons-utils
@@ -97,11 +118,20 @@ public final class SecureSSLSettings {
     private static class InsecureFallbackStringSetting extends Setting<SecureString> {
         private final String name;
 
+        /**
+         *
+         * @param name name of the insecure setting
+         */
         private InsecureFallbackStringSetting(String name) {
             super(name, "", s -> new SecureString(s.toCharArray()), Property.Deprecated, Property.Filtered, Property.NodeScope);
             this.name = name;
         }
 
+        /**
+         *
+         * @param settings all settings
+         * @return returns a secure string of the setting
+         */
         public SecureString get(Settings settings) {
             if (this.exists(settings)) {
                 LOG.warn(

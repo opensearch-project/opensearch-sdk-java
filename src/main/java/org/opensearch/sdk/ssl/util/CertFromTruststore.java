@@ -18,6 +18,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
+/**
+ * Helper class with methods to read a certificate from a truststore
+ */
 public class CertFromTruststore {
     private final KeystoreProps keystoreProps;
 
@@ -27,6 +30,9 @@ public class CertFromTruststore {
     private final String clientTruststoreAlias;
     private final X509Certificate[] clientTrustedCerts;
 
+    /**
+     * Default constructor
+     */
     public CertFromTruststore() {
         keystoreProps = null;
         serverTruststoreAlias = null;
@@ -35,10 +41,23 @@ public class CertFromTruststore {
         clientTrustedCerts = null;
     }
 
+    /**
+     *
+     * @return An empty CertFromTruststore object
+     */
     public static CertFromTruststore Empty() {
         return new CertFromTruststore();
     }
 
+    /**
+     *
+     * @param keystoreProps Keystore Props
+     * @param truststoreAlias Truststore Alias
+     * @throws CertificateException
+     * @throws NoSuchAlgorithmException
+     * @throws KeyStoreException
+     * @throws IOException
+     */
     public CertFromTruststore(KeystoreProps keystoreProps, String truststoreAlias) throws CertificateException, NoSuchAlgorithmException,
         KeyStoreException, IOException {
         this.keystoreProps = keystoreProps;
@@ -53,6 +72,16 @@ public class CertFromTruststore {
         validate();
     }
 
+    /**
+     *
+     * @param keystoreProps Keystore Props
+     * @param serverTruststoreAlias Server Truststore Alias
+     * @param clientTruststoreAlias Client Truststore Alias
+     * @throws CertificateException
+     * @throws NoSuchAlgorithmException
+     * @throws KeyStoreException
+     * @throws IOException
+     */
     public CertFromTruststore(KeystoreProps keystoreProps, String serverTruststoreAlias, String clientTruststoreAlias)
         throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
         this.keystoreProps = keystoreProps;

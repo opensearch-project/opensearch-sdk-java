@@ -27,11 +27,21 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
+/**
+ * Helper class with helpful methods related to SSL Certificates
+ */
 public class SSLCertificateHelper {
 
     private static final Logger log = LogManager.getLogger(SSLCertificateHelper.class);
     private static boolean stripRootFromChain = true; // TODO check
 
+    /**
+     *
+     * @param ks Keystore
+     * @param alias Keystore Alias
+     * @return Returns an array of root certificates
+     * @throws KeyStoreException
+     */
     public static X509Certificate[] exportRootCertificates(final KeyStore ks, final String alias) throws KeyStoreException {
         logKeyStore(ks);
 
@@ -72,6 +82,13 @@ public class SSLCertificateHelper {
         return trustedCerts.toArray(new X509Certificate[0]);
     }
 
+    /**
+     *
+     * @param ks Keystore
+     * @param alias Keystore Alias
+     * @return Returns the chain of certificates
+     * @throws KeyStoreException
+     */
     public static X509Certificate[] exportServerCertChain(final KeyStore ks, String alias) throws KeyStoreException {
         logKeyStore(ks);
         final List<String> aliases = toList(ks.aliases());
@@ -108,6 +125,16 @@ public class SSLCertificateHelper {
         return new X509Certificate[0];
     }
 
+    /**
+     *
+     * @param ks Keystore
+     * @param alias Keystore Alias
+     * @param keyPassword Keystore Password
+     * @return Returns the private key from the keystore
+     * @throws KeyStoreException
+     * @throws UnrecoverableKeyException
+     * @throws NoSuchAlgorithmException
+     */
     public static PrivateKey exportDecryptedKey(final KeyStore ks, final String alias, final char[] keyPassword) throws KeyStoreException,
         UnrecoverableKeyException, NoSuchAlgorithmException {
         logKeyStore(ks);
@@ -136,6 +163,10 @@ public class SSLCertificateHelper {
         return null;
     }
 
+    /**
+     *
+     * @param ks Keystore
+     */
     private static void logKeyStore(final KeyStore ks) {
         try {
             final List<String> aliases = toList(ks.aliases());

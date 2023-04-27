@@ -12,6 +12,9 @@ package org.opensearch.sdk.ssl.util;
 import java.io.File;
 import java.security.cert.X509Certificate;
 
+/**
+ * Class with methods for reading in a certificate from a file
+ */
 public class CertFromFile {
     private final CertFileProps clientCertProps;
     private final CertFileProps serverCertProps;
@@ -26,6 +29,12 @@ public class CertFromFile {
 
     private final X509Certificate[] loadedCerts;
 
+    /**
+     *
+     * @param clientCertProps Client certificate properties
+     * @param serverCertProps Server certificate properties
+     * @throws Exception
+     */
     public CertFromFile(CertFileProps clientCertProps, CertFileProps serverCertProps) throws Exception {
         this.serverCertProps = serverCertProps;
         this.serverPemCert = new File(serverCertProps.getPemCertFilePath());
@@ -42,6 +51,11 @@ public class CertFromFile {
             PemKeyReader.loadCertificateFromFile(serverCertProps.getPemCertFilePath()) };
     }
 
+    /**
+     *
+     * @param certProps Certificate properties
+     * @throws Exception
+     */
     public CertFromFile(CertFileProps certProps) throws Exception {
         this.serverCertProps = certProps;
         this.serverPemCert = new File(certProps.getPemCertFilePath());

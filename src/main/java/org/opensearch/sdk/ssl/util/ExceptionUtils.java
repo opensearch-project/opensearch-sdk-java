@@ -9,23 +9,17 @@
 
 package org.opensearch.sdk.ssl.util;
 
-import org.opensearch.OpenSearchException;
-
+/**
+ * File with help methods for handling exceptions related to SSL
+ */
 public class ExceptionUtils {
 
-    public static Throwable getRootCause(final Throwable e) {
-
-        if (e == null) {
-            return null;
-        }
-
-        final Throwable cause = e.getCause();
-        if (cause == null) {
-            return e;
-        }
-        return getRootCause(cause);
-    }
-
+    /**
+     *
+     * @param e Throwable
+     * @param msg Message to find within message text
+     * @return Returns the throwable if it contains the message text
+     */
     public static Throwable findMsg(final Throwable e, String msg) {
 
         if (e == null) {
@@ -41,22 +35,5 @@ public class ExceptionUtils {
             return null;
         }
         return findMsg(cause, msg);
-    }
-
-    public static OpenSearchException createBadHeaderException() {
-        return new OpenSearchException(
-            "Illegal parameter in http or transport request found."
-                + System.lineSeparator()
-                + "This means that one node is trying to connect to another with "
-                + System.lineSeparator()
-                + "a non-node certificate (no OID or security.nodes_dn incorrect configured) or that someone "
-                + System.lineSeparator()
-                + "is spoofing requests. Check your TLS certificate setup as described here: "
-                + "See https://opendistro.github.io/for-elasticsearch-docs/docs/troubleshoot/tls/"
-        );
-    }
-
-    public static OpenSearchException createTransportClientNoLongerSupportedException() {
-        return new OpenSearchException("Transport client authentication no longer supported.");
     }
 }

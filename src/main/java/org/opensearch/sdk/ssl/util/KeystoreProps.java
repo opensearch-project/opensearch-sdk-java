@@ -17,11 +17,20 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 
+/**
+ * File that contains properties for a keystore
+ */
 public class KeystoreProps {
     private final String filePath;
     private final String type;
     private final char[] password;
 
+    /**
+     *
+     * @param filePath Filepath to the keystore
+     * @param type The type of keystore
+     * @param password The password to the keystore
+     */
     public KeystoreProps(String filePath, String type, String password) {
         this.filePath = filePath;
         this.type = type;
@@ -40,6 +49,14 @@ public class KeystoreProps {
         return password;
     }
 
+    /**
+     *
+     * @return Returns the keystore give the keystore props
+     * @throws KeyStoreException
+     * @throws IOException
+     * @throws CertificateException
+     * @throws NoSuchAlgorithmException
+     */
     public KeyStore loadKeystore() throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
         final KeyStore ts = KeyStore.getInstance(type);
         ts.load(new FileInputStream(new File(filePath)), password);

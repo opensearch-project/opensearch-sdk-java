@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Class that contains methods for reading in a certificate from a keystore
+ */
 public class CertFromKeystore {
 
     private final KeystoreProps keystoreProps;
@@ -39,6 +42,17 @@ public class CertFromKeystore {
 
     private X509Certificate[] loadedCerts;
 
+    /**
+     *
+     * @param keystoreProps Keystore Props
+     * @param keystoreAlias Keystore Alias
+     * @param keyPassword Keystore Password
+     * @throws CertificateException
+     * @throws NoSuchAlgorithmException
+     * @throws KeyStoreException
+     * @throws IOException
+     * @throws UnrecoverableKeyException
+     */
     public CertFromKeystore(KeystoreProps keystoreProps, String keystoreAlias, String keyPassword) throws CertificateException,
         NoSuchAlgorithmException, KeyStoreException, IOException, UnrecoverableKeyException {
         this.keystoreProps = keystoreProps;
@@ -59,6 +73,19 @@ public class CertFromKeystore {
         validate();
     }
 
+    /**
+     *
+     * @param keystoreProps Keystore Props
+     * @param serverKeystoreAlias Server Keystore Alias
+     * @param clientKeystoreAlias Client Keystore Alias
+     * @param serverKeyPassword Server Key Password
+     * @param clientKeyPassword Client Key Password
+     * @throws CertificateException
+     * @throws NoSuchAlgorithmException
+     * @throws KeyStoreException
+     * @throws IOException
+     * @throws UnrecoverableKeyException
+     */
     public CertFromKeystore(
         KeystoreProps keystoreProps,
         String serverKeystoreAlias,
