@@ -83,6 +83,9 @@ import static org.opensearch.sdk.ssl.SecureSSLSettings.SSLSetting.SSL_TRANSPORT_
 import static org.opensearch.sdk.ssl.SecureSSLSettings.SSLSetting.SSL_TRANSPORT_SERVER_PEMKEY_PASSWORD;
 import static org.opensearch.sdk.ssl.SecureSSLSettings.SSLSetting.SSL_TRANSPORT_TRUSTSTORE_PASSWORD;
 
+/**
+ * Default SSL Key Store. This class contains methods to setup SSL for an extension
+ */
 public class DefaultSslKeyStore implements SslKeyStore {
 
     private static final String DEFAULT_STORE_TYPE = "JKS";
@@ -115,6 +118,11 @@ public class DefaultSslKeyStore implements SslKeyStore {
     private X509Certificate[] transportCerts;
     private final Environment env;
 
+    /**
+     * Constructs a DefaultSslKeyStore
+     * @param settings The SSL settings
+     * @param configPath The path to the config directory for this extension
+     */
     public DefaultSslKeyStore(final Settings settings, final Path configPath) {
         super();
 
@@ -494,12 +502,24 @@ public class DefaultSslKeyStore implements SslKeyStore {
         return currentCertSignatureSet.equals(newCertSignatureSet);
     }
 
+    /**
+     *
+     * @return Returns a server SSL Transport engine for this extension based on settings
+     * @throws SSLException
+     */
     public SSLEngine createServerTransportSSLEngine() throws SSLException {
         final SSLEngine engine = transportServerSslContext.newEngine(NettyAllocator.getAllocator());
         engine.setEnabledProtocols(getEnabledSSLProtocols(this.sslTransportServerProvider));
         return engine;
     }
 
+    /**
+     *
+     * @param peerHost The peer hostname
+     * @param peerPort The peer port
+     * @return Returns a client SSL Transport engine for this extension based on settings
+     * @throws SSLException
+     */
     public SSLEngine createClientTransportSSLEngine(final String peerHost, final int peerPort) throws SSLException {
         if (peerHost != null) {
             final SSLEngine engine = transportClientSslContext.newEngine(NettyAllocator.getAllocator(), peerHost, peerPort);

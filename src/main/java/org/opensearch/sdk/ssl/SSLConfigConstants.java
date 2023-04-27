@@ -15,6 +15,9 @@ import java.util.List;
 
 import org.opensearch.common.settings.Settings;
 
+/**
+ * Class containing constants for SSL
+ */
 public final class SSLConfigConstants {
     public static final String SSL_TRANSPORT_ENABLED = "ssl.transport.enabled";
     // TODO Replace this with true when security changes are complete
@@ -54,6 +57,11 @@ public final class SSLConfigConstants {
 
     private static final String[] _SECURE_SSL_PROTOCOLS = { "TLSv1.3", "TLSv1.2", "TLSv1.1" };
 
+    /**
+     *
+     * @param settings SSL Settings
+     * @return returns an array of the secure SSL protocols
+     */
     public static final String[] getSecureSSLProtocols(Settings settings) {
         List<String> configuredProtocols = null;
 
@@ -182,6 +190,11 @@ public final class SSLConfigConstants {
     };
     // @formatter:on
 
+    /**
+     *
+     * @param settings SSL Settings
+     * @return Returns a list of the secure SSL ciphers
+     */
     public static final List<String> getSecureSSLCiphers(Settings settings) {
 
         List<String> configuredCiphers = null;

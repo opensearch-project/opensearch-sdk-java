@@ -38,11 +38,26 @@ import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.transport.TcpChannel;
 import org.opensearch.transport.netty4.Netty4Transport;
 
+/**
+ * Class that setups up secure TLS channel for this extension to use with transport requests
+ */
 public class SSLNettyTransport extends Netty4Transport {
 
     private static final Logger logger = LogManager.getLogger(SSLNettyTransport.class);
     private final SslKeyStore ossks;
 
+    /**
+     *
+     * @param settings SSL Settings
+     * @param version version
+     * @param threadPool threadPool
+     * @param networkService networkService
+     * @param pageCacheRecycler pageCacheRecycler
+     * @param namedWriteableRegistry namedWriteableRegistry
+     * @param circuitBreakerService circuitBreakerService
+     * @param ossks ossks
+     * @param sharedGroupFactory sharedGroupFactory
+     */
     public SSLNettyTransport(
         final Settings settings,
         final Version version,
@@ -68,6 +83,11 @@ public class SSLNettyTransport extends Netty4Transport {
         this.ossks = ossks;
     }
 
+    /**
+     *
+     * @param channel The channel
+     * @param e Exception
+     */
     @Override
     public void onException(TcpChannel channel, Exception e) {
 
@@ -82,22 +102,44 @@ public class SSLNettyTransport extends Netty4Transport {
         super.onException(channel, e);
     }
 
+    /**
+     *
+     * @param name name of channel
+     * @return ChannelHandler
+     */
     @Override
     protected ChannelHandler getServerChannelInitializer(String name) {
         return new SSLServerChannelInitializer(name);
     }
 
+    /**
+     *
+     * @param node Node this channel is connected to
+     * @return ChannelHandler
+     */
     @Override
     protected ChannelHandler getClientChannelInitializer(DiscoveryNode node) {
         return new SSLClientChannelInitializer(node);
     }
 
+    /**
+     * SSLServerChannelInitializer
+     */
     protected class SSLServerChannelInitializer extends Netty4Transport.ServerChannelInitializer {
 
+        /**
+         *
+         * @param name name of this channel
+         */
         public SSLServerChannelInitializer(String name) {
             super(name);
         }
 
+        /**
+         *
+         * @param ch            the {@link Channel} which was registered.
+         * @throws Exception
+         */
         @Override
         protected void initChannel(Channel ch) throws Exception {
             super.initChannel(ch);
@@ -106,6 +148,12 @@ public class SSLNettyTransport extends Netty4Transport {
             ch.pipeline().addFirst("ssl_server", sslHandler);
         }
 
+        /**
+         *
+         * @param ctx ChannelHandlerContext
+         * @param cause Throwable
+         * @throws Exception
+         */
         @Override
         public final void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
             if (cause instanceof DecoderException && cause != null) {
@@ -118,22 +166,38 @@ public class SSLNettyTransport extends Netty4Transport {
         }
     }
 
+    /**
+     * ClientSSLHandler
+     */
     protected static class ClientSSLHandler extends ChannelOutboundHandlerAdapter {
         private final Logger log = LogManager.getLogger(this.getClass());
         private final SslKeyStore sks;
         private final boolean hostnameVerificationEnabled;
         private final boolean hostnameVerificationResovleHostName;
 
+        /**
+         *
+         * @param sks Security Keystore
+         * @param hostnameVerificationEnabled flag to indicate if hostname verification is enabled
+         * @param hostnameVerificationResolveHostName flag to indicate if hostnames should be resolved with hostname
+         *                                            verification
+         */
         private ClientSSLHandler(
             final SslKeyStore sks,
             final boolean hostnameVerificationEnabled,
-            final boolean hostnameVerificationResovleHostName
+            final boolean hostnameVerificationResolveHostName
         ) {
             this.sks = sks;
             this.hostnameVerificationEnabled = hostnameVerificationEnabled;
-            this.hostnameVerificationResovleHostName = hostnameVerificationResovleHostName;
+            this.hostnameVerificationResovleHostName = hostnameVerificationResolveHostName;
         }
 
+        /**
+         *
+         * @param ctx ChannelHandlerContext
+         * @param cause Throwable
+         * @throws Exception
+         */
         @Override
         public final void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
             if (cause instanceof DecoderException && cause != null) {
@@ -145,6 +209,14 @@ public class SSLNettyTransport extends Netty4Transport {
             super.exceptionCaught(ctx, cause);
         }
 
+        /**
+         *
+         * @param ctx               the {@link ChannelHandlerContext} for which the connect operation is made
+         * @param remoteAddress     the {@link SocketAddress} to which it should connect
+         * @param localAddress      the {@link SocketAddress} which is used as source on connect
+         * @param promise           the {@link ChannelPromise} to notify once the operation completes
+         * @throws Exception
+         */
         @Override
         public void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise)
             throws Exception {
@@ -182,12 +254,19 @@ public class SSLNettyTransport extends Netty4Transport {
         }
     }
 
+    /**
+     * SSLClientChannelInitializer
+     */
     protected class SSLClientChannelInitializer extends Netty4Transport.ClientChannelInitializer {
         private final boolean hostnameVerificationEnabled;
         private final boolean hostnameVerificationResovleHostName;
         private final DiscoveryNode node;
         private SSLConnectionTestResult connectionTestResult;
 
+        /**
+         *
+         * @param node The node to connect to
+         */
         @SuppressWarnings("removal")
         public SSLClientChannelInitializer(DiscoveryNode node) {
             this.node = node;
@@ -200,6 +279,11 @@ public class SSLNettyTransport extends Netty4Transport {
             connectionTestResult = SSLConnectionTestResult.SSL_AVAILABLE;
         }
 
+        /**
+         *
+         * @param ch            the {@link Channel} which was registered.
+         * @throws Exception
+         */
         @Override
         protected void initChannel(Channel ch) throws Exception {
             super.initChannel(ch);
@@ -224,6 +308,12 @@ public class SSLNettyTransport extends Netty4Transport {
             }
         }
 
+        /**
+         *
+         * @param ctx ChannelHandlerContext
+         * @param cause Throwable
+         * @throws Exception
+         */
         @Override
         public final void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
             if (cause instanceof DecoderException && cause != null) {

@@ -245,7 +245,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     }
 
     /**
-     * {@code ExtensionDeprecationRestHandler} provides a proxy for any existing {@link Extension RestHandler} so that usage of the handler can be logged using the {@link DeprecationLogger}.
+     * {@code ExtensionDeprecationRestHandler} provides a proxy for any existing {@link ExtensionRestHandler} so that usage of the handler can be logged using the {@link DeprecationLogger}.
      */
     public static class ExtensionDeprecationRestHandler implements ExtensionRestHandler {
 
