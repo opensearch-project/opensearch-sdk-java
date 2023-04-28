@@ -37,6 +37,7 @@ import org.opensearch.client.opensearch.cluster.OpenSearchClusterAsyncClient;
 import org.opensearch.client.opensearch.cluster.OpenSearchClusterClient;
 import org.opensearch.client.opensearch.indices.OpenSearchIndicesAsyncClient;
 import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
+import org.opensearch.index.reindex.DeleteByQueryRequest;
 import org.opensearch.sdk.SDKClient.SDKClusterAdminClient;
 import org.opensearch.sdk.SDKClient.SDKIndicesClient;
 import org.opensearch.sdk.SDKClient.SDKRestClient;
@@ -100,6 +101,7 @@ public class TestSDKClient extends OpenSearchTestCase {
         assertDoesNotThrow(() -> restClient.multiGet(new MultiGetRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.update(new UpdateRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.delete(new DeleteRequest(), ActionListener.wrap(r -> {}, e -> {})));
+        assertDoesNotThrow(() -> restClient.deleteByQueryAsync(new DeleteByQueryRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.search(new SearchRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.multiSearch(new MultiSearchRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.bulk(new BulkRequest(), ActionListener.wrap(r -> {}, e -> {})));
