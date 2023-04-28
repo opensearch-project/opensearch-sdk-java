@@ -101,7 +101,7 @@ public class TestSDKClient extends OpenSearchTestCase {
         assertDoesNotThrow(() -> restClient.multiGet(new MultiGetRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.update(new UpdateRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.delete(new DeleteRequest(), ActionListener.wrap(r -> {}, e -> {})));
-        assertDoesNotThrow(() -> restClient.deleteByQueryAsync(new DeleteByQueryRequest(), ActionListener.wrap(r -> {}, e -> {})));
+        assertDoesNotThrow(() -> restClient.deleteByQuery(new DeleteByQueryRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.search(new SearchRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.multiSearch(new MultiSearchRequest(), ActionListener.wrap(r -> {}, e -> {})));
         assertDoesNotThrow(() -> restClient.bulk(new BulkRequest(), ActionListener.wrap(r -> {}, e -> {})));
