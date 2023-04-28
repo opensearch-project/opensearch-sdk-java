@@ -2,6 +2,7 @@ name: Validate Gradle Wrapper
 on:
   push:
     branches-ignore:
+      - 'backport/**'
       - 'whitesource-remediate/**'
   pull_request:
     types: [opened, synchronize, reopened]
