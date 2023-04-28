@@ -76,6 +76,8 @@ import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
+import org.opensearch.index.reindex.BulkByScrollResponse;
+import org.opensearch.index.reindex.DeleteByQueryRequest;
 
 /**
  * This class creates SDKClient for an extension to make requests to OpenSearch
@@ -436,6 +438,17 @@ public class SDKClient implements Closeable {
          */
         public void delete(DeleteRequest request, ActionListener<DeleteResponse> listener) {
             restHighLevelClient.deleteAsync(request, options, listener);
+        }
+
+        /**
+         * Deletes a document from the index based on the query.
+         *
+         * @param request The delete by query request
+         * @param listener A listener to be notified with a result
+         *
+         */
+        public void deleteByQueryAsync(DeleteByQueryRequest request, ActionListener<BulkByScrollResponse> listener) {
+            restHighLevelClient.deleteByQueryAsync(request, options, listener);
         }
 
         /**
