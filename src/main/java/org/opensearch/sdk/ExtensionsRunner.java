@@ -9,6 +9,10 @@
 
 package org.opensearch.sdk;
 
+import com.google.inject.Binder;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionType;
@@ -25,20 +29,20 @@ import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.discovery.InitializeExtensionRequest;
-import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
-import org.opensearch.extensions.UpdateSettingsRequest;
-import org.opensearch.extensions.action.ExtensionActionRequest;
+import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsManager;
+import org.opensearch.extensions.UpdateSettingsRequest;
+import org.opensearch.extensions.action.ExtensionActionRequest;
 import org.opensearch.index.IndicesModuleRequest;
+import org.opensearch.sdk.action.SDKActionModule;
+import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.sdk.api.ActionExtension;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
 import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionActionRequestHandler;
-import org.opensearch.sdk.action.SDKActionModule;
-import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionDependencyResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionsIndicesModuleNameRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
@@ -56,11 +60,6 @@ import org.opensearch.transport.TransportResponseHandler;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
 
-import com.google.inject.Binder;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,6 +72,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_ENABLED;
 
 /**
  * The primary class to run an extension.
@@ -179,11 +180,21 @@ public class ExtensionsRunner {
         // These must have getters from this class to be accessible via createComponents
         // If they require later initialization, create a concrete wrapper class and update the internals
         ExtensionSettings extensionSettings = extension.getExtensionSettings();
-        this.settings = Settings.builder()
+        Settings.Builder settingsBuilder = Settings.builder()
             .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
             .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
-            .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort())
-            .build();
+            .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort());
+        boolean sslEnabled = extensionSettings.getSecuritySettings().containsKey(SSL_TRANSPORT_ENABLED)
+            && "true".equals(extensionSettings.getSecuritySettings().get(SSL_TRANSPORT_ENABLED));
+        if (sslEnabled) {
+            for (String settingsKey : ExtensionSettings.SECURITY_SETTINGS_KEYS) {
+                addSettingsToBuilder(settingsBuilder, settingsKey, extensionSettings);
+            }
+        }
+        String sslText = sslEnabled ? "enabled" : "disabled";
+        logger.info("SSL is " + sslText + " for transport");
+        this.settings = settingsBuilder.build();
+
         final List<ExecutorBuilder<?>> executorBuilders = extension.getExecutorBuilders(settings);
 
         this.runnableTaskListener = new AtomicReference<>();
@@ -246,6 +257,12 @@ public class ExtensionsRunner {
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
                 extensionRestPathRegistry.registerHandler(extensionRestHandler);
             }
+        }
+    }
+
+    private void addSettingsToBuilder(Settings.Builder settingsBuilder, String settingKey, ExtensionSettings extensionSettings) {
+        if (extensionSettings.getSecuritySettings().containsKey(settingKey)) {
+            settingsBuilder.put(settingKey, extensionSettings.getSecuritySettings().get(settingKey));
         }
     }
 
