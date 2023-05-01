@@ -127,7 +127,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         // Set mocked transport service
         extensionsRunner.setExtensionTransportService(this.transportService);
-        doNothing().when(this.transportService).connectToNode(sourceNode);
+        doNothing().when(this.transportService).connectToNodeAsExtension(sourceNode, "opensearch-sdk-1");
 
         InitializeExtensionRequest extensionInitRequest = new InitializeExtensionRequest(sourceNode, extension);
 
