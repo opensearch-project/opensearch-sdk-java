@@ -79,5 +79,7 @@ Optionally change the `routes()` to `routeHandlers()`.  Change `prepareRequest()
 ### Replace Return Type for SDKRestClient
 
 While most SDKRestClient client return types match existing classes, some changes may be necessary to conform to the new method signatures. Examples include:
-- Replace the return type to `ParsedStringTerms` from `StringTerms` to fetch the aggregation for a specific index.
+- InternalAggregation/Min/Max should be replaced with the corresponding Parsed class. For example:
+  1. `ParsedStringTerms` from `StringTerms` to fetch the aggregation for a specific index.
+  2. `ParsedMax` from `InternalMax` to fetch max agg result parsed between nodes.
 - Replace `ObjectObjectCursor<String, List<AliasMetadata>> entry` with `Entry<String, Set<AliasMetadata>> entry`
