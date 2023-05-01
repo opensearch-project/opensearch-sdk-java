@@ -10,7 +10,6 @@
 package org.opensearch.sdk.sample.helloworld.transport;
 
 import org.opensearch.action.ActionType;
-import org.opensearch.sdk.sample.helloworld.transport.SampleResponse;
 
 /**
  * A sample {@link ActionType} used as they key for the action map

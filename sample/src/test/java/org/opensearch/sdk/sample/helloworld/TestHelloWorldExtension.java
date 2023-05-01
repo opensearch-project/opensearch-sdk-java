@@ -28,7 +28,6 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.sdk.SDKNamedXContentRegistry;
 import org.opensearch.sdk.api.ActionExtension.ActionHandler;
 import org.opensearch.sdk.rest.ExtensionRestHandler;
-import org.opensearch.sdk.rest.SDKRestRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleResponse;

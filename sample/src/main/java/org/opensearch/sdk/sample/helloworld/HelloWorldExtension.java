@@ -27,7 +27,6 @@ import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.SDKClient;
 import org.opensearch.sdk.api.ActionExtension;
 import org.opensearch.sdk.rest.ExtensionRestHandler;
-import org.opensearch.sdk.sample.helloworld.ExampleCustomSettingConfig;
 import org.opensearch.sdk.sample.helloworld.rest.RestHelloAction;
 import org.opensearch.sdk.sample.helloworld.rest.RestRemoteHelloAction;
 import org.opensearch.sdk.sample.helloworld.schedule.GreetJob;
