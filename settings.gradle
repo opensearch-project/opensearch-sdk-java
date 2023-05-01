@@ -1,1 +1,5 @@
 rootProject.name = 'opensearch-sdk-java'
+
+
+include "sample"
+project(":sample").name = rootProject.name + "-sample-extension"

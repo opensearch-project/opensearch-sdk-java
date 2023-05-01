@@ -14,6 +14,7 @@ import org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestFram
 
 plugins {
     id 'java'
+    id 'java-library'
     id "com.diffplug.spotless" version "6.18.0" apply false
     id 'jacoco'
     id "com.form.diff-coverage" version "0.9.5"
@@ -32,12 +33,6 @@ ext {
 apply plugin: 'application'
 apply from: 'gradle/formatting.gradle'
 apply plugin: 'maven-publish'
-
-// Temporary to keep "gradle run" working
-// TODO: change this to an extension designed for testing instead of duplicating a sample
-// https://github.com/opensearch-project/opensearch-sdk-java/issues/175
-mainClassName = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
-
 
 group 'org.opensearch.sdk'
 version '2.0.0-SNAPSHOT'
@@ -77,6 +72,15 @@ repositories {
     maven { url "https://d1nvenhzbhpy0q.cloudfront.net/snapshots/lucene/"}
 }
 
+subprojects {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
+        maven { url "https://d1nvenhzbhpy0q.cloudfront.net/snapshots/lucene/"}
+    }
+}
+
 dependencies {
 
     def opensearchVersion = "3.0.0-SNAPSHOT"
@@ -91,18 +95,14 @@ dependencies {
     def junitPlatform = "1.9.3"
     def jaxbVersion = "2.3.1"
 
-    implementation("org.opensearch:opensearch:${opensearchVersion}")
-    // job-scheduler dependency is added for hello world sample extension
-    implementation("org.opensearch.plugin:opensearch-job-scheduler:${jobSchedulerVersion}")
-    implementation("org.opensearch:opensearch-job-scheduler:${jobSchedulerVersion}")
-    implementation "org.opensearch:opensearch-job-scheduler-spi:${jobSchedulerVersion}"
+    api("org.opensearch:opensearch:${opensearchVersion}")
 
     implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
     implementation("org.apache.logging.log4j:log4j-core:${log4jVersion}")
     implementation("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
-    implementation("org.opensearch.client:opensearch-rest-high-level-client:${opensearchVersion}")
-    implementation("org.opensearch.client:opensearch-rest-client:${opensearchVersion}")
-    implementation("org.opensearch.client:opensearch-java:${opensearchVersion}")
+    api("org.opensearch.client:opensearch-rest-high-level-client:${opensearchVersion}")
+    api("org.opensearch.client:opensearch-rest-client:${opensearchVersion}")
+    api("org.opensearch.client:opensearch-java:${opensearchVersion}")
     implementation("org.opensearch.plugin:transport-netty4-client:${opensearchVersion}")
     implementation("io.netty:netty-all:${nettyVersion}")
     testCompileOnly("junit:junit:${junit4Version}") {
@@ -115,23 +115,15 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonDatabindVersion}")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava:${jacksonDatabindVersion}")
     constraints {
-        implementation("com.google.guava:guava:${guavaVersion}") {
+        api("com.google.guava:guava:${guavaVersion}") {
             because 'versions below 30.0 have active CVE'
         }
     }
-    implementation("com.google.inject:guice:${guiceVersion}")
+    api("com.google.inject:guice:${guiceVersion}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junit5Version}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junit5Version}")
     testImplementation("org.opensearch.test:framework:${opensearchVersion}")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:${junitPlatform}")
-}
-
-// this task runs the helloworld sample extension
-task helloWorld(type: JavaExec) {
-    group = 'Execution'
-    description = 'Run HelloWorld Extension.'
-    mainClass = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
-    classpath = sourceSets.main.runtimeClasspath
 }
 
 test {

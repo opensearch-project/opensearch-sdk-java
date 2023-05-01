@@ -1,0 +1,86 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * The OpenSearch Contributors require contributions made to
+ * this file be licensed under the Apache-2.0 license or a
+ * compatible open source license.
+ *
+ * Modifications Copyright OpenSearch Contributors. See
+ * GitHub history for details.
+ */
+
+import java.nio.file.Files
+
+plugins {
+    id 'java'
+    id "com.diffplug.spotless" version "6.18.0" apply false
+    id 'jacoco'
+    id "com.form.diff-coverage" version "0.9.5"
+    // for javadocs and checks spotless doesn't do
+    id 'checkstyle'
+}
+
+
+ext {
+    projectSubstitutions = [:]
+    licenseFile = rootProject.file('LICENSE.txt')
+    noticeFile = rootProject.file('NOTICE.txt')
+}
+
+
+apply plugin: 'application'
+apply plugin: 'maven-publish'
+
+// Temporary to keep "gradle run" working
+// TODO: change this to an extension designed for testing instead of duplicating a sample
+// https://github.com/opensearch-project/opensearch-sdk-java/issues/175
+mainClassName = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
+
+
+group 'org.opensearch.sdk.sample'
+version '2.0.0-SNAPSHOT'
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    publications {
+        group = "${group}"
+        version = "${version}"
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+        sourceCompatibility = 11
+        targetCompatibility = 11
+    }
+
+    repositories {
+        maven {
+            name = "Snapshots" //  optional target repository name
+            url = "https://aws.oss.sonatype.org/content/repositories/snapshots"
+            credentials {
+                username "$System.env.SONATYPE_USERNAME"
+                password "$System.env.SONATYPE_PASSWORD"
+            }
+        }
+    }
+}
+
+dependencies {
+    def opensearchVersion = "3.0.0-SNAPSHOT"
+    def jobSchedulerVersion = "3.0.0.0-SNAPSHOT"
+    implementation project(':')
+    implementation("org.opensearch.plugin:opensearch-job-scheduler:${jobSchedulerVersion}")
+    implementation("org.opensearch:opensearch-job-scheduler:${jobSchedulerVersion}")
+    implementation "org.opensearch:opensearch-job-scheduler-spi:${jobSchedulerVersion}"
+}
+
+// this task runs the helloworld sample extension
+task helloWorld(type: JavaExec) {
+    group = 'Execution'
+    description = 'Run HelloWorld Extension.'
+    mainClass = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
+    classpath = sourceSets.main.runtimeClasspath
+}
