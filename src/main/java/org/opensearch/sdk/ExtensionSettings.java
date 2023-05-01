@@ -98,36 +98,6 @@ public class ExtensionSettings {
      * @param hostPort  The port to bind this extension to.
      * @param opensearchAddress  The IP Address on which OpenSearch is running.
      * @param opensearchPort  The port on which OpenSearch is running.
-     * @param securitySettings A generic map of any settings set in the config file that are not default setting keys
-     */
-    public ExtensionSettings(
-        String extensionName,
-        String shortName,
-        String hostAddress,
-        String hostPort,
-        String opensearchAddress,
-        String opensearchPort,
-        Map<String, String> securitySettings
-    ) {
-        super();
-        this.extensionName = extensionName;
-        this.shortName = shortName;
-        this.hostAddress = hostAddress;
-        this.hostPort = hostPort;
-        this.opensearchAddress = opensearchAddress;
-        this.opensearchPort = opensearchPort;
-        this.securitySettings = securitySettings;
-    }
-
-    /**
-     * Instantiate this class using the specified parameters.
-     *
-     * @param extensionName  The extension name. Provided to OpenSearch as a response to initialization query. Must match the defined extension name in OpenSearch.
-     * @param shortName  The shortened name for the extension
-     * @param hostAddress  The IP Address to bind this extension to.
-     * @param hostPort  The port to bind this extension to.
-     * @param opensearchAddress  The IP Address on which OpenSearch is running.
-     * @param opensearchPort  The port on which OpenSearch is running.
      */
     public ExtensionSettings(
         String extensionName,
@@ -145,6 +115,30 @@ public class ExtensionSettings {
         this.opensearchAddress = opensearchAddress;
         this.opensearchPort = opensearchPort;
         this.securitySettings = Map.of();
+    }
+
+    /**
+     * Instantiate this class using the specified parameters.
+     *
+     * @param extensionName  The extension name. Provided to OpenSearch as a response to initialization query. Must match the defined extension name in OpenSearch.
+     * @param shortName  The shortened name for the extension
+     * @param hostAddress  The IP Address to bind this extension to.
+     * @param hostPort  The port to bind this extension to.
+     * @param opensearchAddress  The IP Address on which OpenSearch is running.
+     * @param opensearchPort  The port on which OpenSearch is running.
+     * @param securitySettings A generic map of any settings set in the config file that are not default setting keys
+     */
+    public ExtensionSettings(
+        String extensionName,
+        String shortName,
+        String hostAddress,
+        String hostPort,
+        String opensearchAddress,
+        String opensearchPort,
+        Map<String, String> securitySettings
+    ) {
+        this(extensionName, shortName, hostAddress, hostPort, opensearchAddress, opensearchPort);
+        this.securitySettings = securitySettings;
     }
 
     public String getExtensionName() {
