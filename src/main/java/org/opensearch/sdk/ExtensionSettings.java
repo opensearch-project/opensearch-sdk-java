@@ -97,23 +97,15 @@ public class ExtensionSettings {
      * @param hostPort  The port to bind this extension to.
      * @param opensearchAddress  The IP Address on which OpenSearch is running.
      * @param opensearchPort  The port on which OpenSearch is running.
-     * @param securitySettings A generic map of any settings set in the config file that are not default setting keys
      */
-    public ExtensionSettings(
-        String extensionName,
-        String hostAddress,
-        String hostPort,
-        String opensearchAddress,
-        String opensearchPort,
-        Map<String, String> securitySettings
-    ) {
+    public ExtensionSettings(String extensionName, String hostAddress, String hostPort, String opensearchAddress, String opensearchPort) {
         super();
         this.extensionName = extensionName;
         this.hostAddress = hostAddress;
         this.hostPort = hostPort;
         this.opensearchAddress = opensearchAddress;
         this.opensearchPort = opensearchPort;
-        this.securitySettings = securitySettings;
+        this.securitySettings = Map.of();
     }
 
     /**
@@ -124,15 +116,18 @@ public class ExtensionSettings {
      * @param hostPort  The port to bind this extension to.
      * @param opensearchAddress  The IP Address on which OpenSearch is running.
      * @param opensearchPort  The port on which OpenSearch is running.
+     * @param securitySettings A generic map of any settings set in the config file that are not default setting keys
      */
-    public ExtensionSettings(String extensionName, String hostAddress, String hostPort, String opensearchAddress, String opensearchPort) {
-        super();
-        this.extensionName = extensionName;
-        this.hostAddress = hostAddress;
-        this.hostPort = hostPort;
-        this.opensearchAddress = opensearchAddress;
-        this.opensearchPort = opensearchPort;
-        this.securitySettings = Map.of();
+    public ExtensionSettings(
+        String extensionName,
+        String hostAddress,
+        String hostPort,
+        String opensearchAddress,
+        String opensearchPort,
+        Map<String, String> securitySettings
+    ) {
+        this(extensionName, hostAddress, hostPort, opensearchAddress, opensearchPort);
+        this.securitySettings = securitySettings;
     }
 
     public String getExtensionName() {

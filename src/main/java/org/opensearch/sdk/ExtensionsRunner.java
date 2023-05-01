@@ -191,6 +191,8 @@ public class ExtensionsRunner {
                 addSettingsToBuilder(settingsBuilder, settingsKey, extensionSettings);
             }
         }
+        String sslText = sslEnabled ? "enabled" : "disabled";
+        logger.info("SSL is " + sslText + " for transport");
         this.settings = settingsBuilder.build();
 
         final List<ExecutorBuilder<?>> executorBuilders = extension.getExecutorBuilders(settings);
