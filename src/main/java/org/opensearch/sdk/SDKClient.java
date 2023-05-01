@@ -473,7 +473,7 @@ public class SDKClient implements Closeable {
          * @param listener A listener to be notified with a result
          *
          */
-        public void deleteByQueryAsync(DeleteByQueryRequest request, ActionListener<BulkByScrollResponse> listener) {
+        public void deleteByQuery(DeleteByQueryRequest request, ActionListener<BulkByScrollResponse> listener) {
             restHighLevelClient.deleteByQueryAsync(request, options, listener);
         }
 
