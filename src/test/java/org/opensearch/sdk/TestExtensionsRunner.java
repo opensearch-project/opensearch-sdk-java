@@ -80,6 +80,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     public void setUp() throws Exception {
         super.setUp();
         this.extensionsRunner = new ExtensionsRunnerForTest();
+        extensionsRunner.setUniqueId("opensearch-sdk-1");
         this.extensionsInitRequestHandler = new ExtensionsInitRequestHandler(extensionsRunner);
 
         this.transportService = spy(
@@ -126,7 +127,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         // Set mocked transport service
         extensionsRunner.setExtensionTransportService(this.transportService);
-        doNothing().when(this.transportService).connectToNode(sourceNode);
+        doNothing().when(this.transportService).connectToNodeAsExtension(sourceNode, "opensearch-sdk-1");
 
         InitializeExtensionRequest extensionInitRequest = new InitializeExtensionRequest(sourceNode, extension);
 

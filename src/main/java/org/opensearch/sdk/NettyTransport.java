@@ -9,6 +9,7 @@
 
 package org.opensearch.sdk;
 
+import java.nio.file.Path;
 import java.util.Collections;
 
 import org.opensearch.Version;
@@ -18,6 +19,10 @@ import org.opensearch.common.settings.Settings;
 import org.opensearch.common.util.PageCacheRecycler;
 import org.opensearch.indices.breaker.CircuitBreakerService;
 import org.opensearch.indices.breaker.NoneCircuitBreakerService;
+import org.opensearch.sdk.ssl.DefaultSslKeyStore;
+import org.opensearch.sdk.ssl.SSLConfigConstants;
+import org.opensearch.sdk.ssl.SSLNettyTransport;
+import org.opensearch.sdk.ssl.SslKeyStore;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.transport.TransportInterceptor;
@@ -57,6 +62,11 @@ public class NettyTransport {
 
         final CircuitBreakerService circuitBreakerService = new NoneCircuitBreakerService();
 
+        boolean transportSSLEnabled = settings.getAsBoolean(
+            SSLConfigConstants.SSL_TRANSPORT_ENABLED,
+            SSLConfigConstants.SSL_TRANSPORT_ENABLED_DEFAULT
+        );
+
         Netty4Transport transport = new Netty4Transport(
             settings,
             Version.CURRENT,
@@ -67,6 +77,22 @@ public class NettyTransport {
             circuitBreakerService,
             new SharedGroupFactory(settings)
         );
+
+        if (transportSSLEnabled) {
+            Path configPath = Path.of("").toAbsolutePath().resolve("config");
+            SslKeyStore sks = new DefaultSslKeyStore(settings, configPath);
+            transport = new SSLNettyTransport(
+                settings,
+                Version.CURRENT,
+                threadPool,
+                networkService,
+                pageCacheRecycler,
+                extensionsRunner.getNamedWriteableRegistry().getRegistry(),
+                circuitBreakerService,
+                sks,
+                new SharedGroupFactory(settings)
+            );
+        }
 
         return transport;
     }

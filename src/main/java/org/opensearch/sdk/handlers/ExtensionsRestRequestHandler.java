@@ -41,7 +41,7 @@ public class ExtensionsRestRequestHandler {
      * Instantiate this class with an existing registry
      *
      * @param restPathRegistry The ExtensionsRunnerer's REST path registry
-     * @param sdkNamedXContentRegistry
+     * @param sdkNamedXContentRegistry The SDKNamedXContentRegistry wrapper
      */
     public ExtensionsRestRequestHandler(ExtensionRestPathRegistry restPathRegistry, SDKNamedXContentRegistry sdkNamedXContentRegistry) {
         this.sdkNamedXContentRegistry = sdkNamedXContentRegistry;

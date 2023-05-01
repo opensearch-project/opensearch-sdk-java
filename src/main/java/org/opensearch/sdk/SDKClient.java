@@ -37,6 +37,8 @@ import org.opensearch.action.ActionType;
 import org.opensearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
+import org.opensearch.action.bulk.BulkRequest;
+import org.opensearch.action.bulk.BulkResponse;
 import org.opensearch.action.delete.DeleteRequest;
 import org.opensearch.action.delete.DeleteResponse;
 import org.opensearch.action.get.GetRequest;
@@ -81,6 +83,8 @@ import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
+import org.opensearch.index.reindex.BulkByScrollResponse;
+import org.opensearch.index.reindex.DeleteByQueryRequest;
 
 import javax.net.ssl.SSLEngine;
 
@@ -463,6 +467,17 @@ public class SDKClient implements Closeable {
         }
 
         /**
+         * Deletes a document from the index based on the query.
+         *
+         * @param request The delete by query request
+         * @param listener A listener to be notified with a result
+         *
+         */
+        public void deleteByQuery(DeleteByQueryRequest request, ActionListener<BulkByScrollResponse> listener) {
+            restHighLevelClient.deleteByQueryAsync(request, options, listener);
+        }
+
+        /**
          * Search across one or more indices with a query.
          *
          * @param request The search request
@@ -481,6 +496,16 @@ public class SDKClient implements Closeable {
          */
         public void multiSearch(MultiSearchRequest request, ActionListener<MultiSearchResponse> listener) {
             restHighLevelClient.msearchAsync(request, options, listener);
+        }
+
+        /**
+         * Executes a bulk request using the Bulk API.
+         *
+         * @param request the request
+         * @param listener A listener to be notified of a result
+         */
+        public void bulk(BulkRequest request, ActionListener<BulkResponse> listener) {
+            restHighLevelClient.bulkAsync(request, options, listener);
         }
 
         /**
