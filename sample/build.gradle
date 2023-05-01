@@ -68,6 +68,8 @@ publishing {
 }
 
 test {
+    getTestFrameworkProperty().convention(getProviderFactory().provider(() -> new JUnitPlatformTestFramework(it.getFilter(), false)))
+    jvmArgs '--enable-preview'
     systemProperty 'tests.security.manager', 'false'
 }
 

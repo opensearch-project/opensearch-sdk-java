@@ -25,8 +25,10 @@ import org.opensearch.action.ActionResponse;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.sdk.SDKNamedXContentRegistry;
 import org.opensearch.sdk.api.ActionExtension.ActionHandler;
 import org.opensearch.sdk.rest.ExtensionRestHandler;
+import org.opensearch.sdk.rest.SDKRestRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleResponse;
@@ -73,11 +75,17 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         Settings settings = Settings.builder().put(ExtensionsRunner.NODE_NAME_SETTING, "test").build();
         ThreadPool threadPool = new ThreadPool(settings);
         TaskManager taskManager = new TaskManager(settings, threadPool, Collections.emptySet());
+        SDKNamedXContentRegistry xContentRegistry = SDKNamedXContentRegistry.EMPTY;
         this.sdkClient = new SDKClient(extensionSettings);
-        this.injector = Guice.createInjector(new SDKActionModule(extension), b -> {
+        sdkClient.initialize(Map.of());
+        SDKRestClient restClient = sdkClient.initializeRestClient("localhost", 9200);
+        SDKActionModule actionModule = new SDKActionModule(extension);
+        this.injector = Guice.createInjector(actionModule, b -> {
             b.bind(ThreadPool.class).toInstance(threadPool);
             b.bind(TaskManager.class).toInstance(taskManager);
             b.bind(SDKClient.class).toInstance(sdkClient);
+            b.bind(SDKNamedXContentRegistry.class).toInstance(xContentRegistry);
+            b.bind(SDKClient.SDKRestClient.class).toInstance(restClient);
         });
         initializeSdkClient();
         this.sdkRestClient = sdkClient.initializeRestClient("localhost", 9200);
@@ -112,13 +120,13 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         List<ExtensionRestHandler> extensionRestHandlers = extension.getExtensionRestHandlers();
         assertEquals(2, extensionRestHandlers.size());
         assertEquals(4, extensionRestHandlers.get(0).routes().size());
-        assertEquals(1, extensionRestHandlers.get(1).routes().size());
+        assertEquals(2, extensionRestHandlers.get(1).routes().size());
     }
 
     @Test
     public void testGetActions() {
         List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> actions = extension.getActions();
-        assertEquals(1, actions.size());
+        assertEquals(3, actions.size());
     }
 
     @Test
