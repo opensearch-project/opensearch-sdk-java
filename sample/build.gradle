@@ -81,6 +81,7 @@ dependencies {
 
     implementation project(':')
     implementation("org.opensearch.plugin:opensearch-job-scheduler:${jobSchedulerVersion}")
+    implementation("org.opensearch.plugin:opensearch-job-scheduler-spi:${jobSchedulerVersion}")
     implementation("org.opensearch:opensearch-job-scheduler-spi:${jobSchedulerVersion}")
 
     testImplementation project(':').sourceSets.test.output
