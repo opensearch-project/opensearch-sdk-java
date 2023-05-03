@@ -421,9 +421,11 @@ public interface SearchExtension {
          *        is the name by under which the reader is registered. So it is the name that the {@link AggregationBuilder} should return
          *        from {@link NamedWriteable#getWriteableName()}. It is an error if {@link ParseField#getPreferredName()} conflicts with
          *        another registered name, including names from other Extensions.
+         * @param <T> This is the type parameter
          * @param reader the reader registered for this aggregation's builder. Typically, a reference to a constructor that takes a
          *        {@link StreamInput}
          * @param parser the parser the reads the aggregation builder from xcontent
+         *
          */
         public <T extends AggregationBuilder> AggregationSpec(
             ParseField name,
@@ -436,6 +438,7 @@ public interface SearchExtension {
         /**
          * Specification for an {@link Aggregation}.
          *
+         * @param <T> This is the type parameter
          * @param name the name by which this aggregation might be parsed or deserialized. Make sure that the {@link AggregationBuilder}
          *        returns this from {@link NamedWriteable#getWriteableName()}.  It is an error if this name conflicts with another
          *        registered name, including names from other Extensions.
@@ -483,6 +486,7 @@ public interface SearchExtension {
         /**
          * Add a reader for the shard level results of the aggregation with {@linkplain #getName}'s {@link ParseField#getPreferredName()} as
          * the {@link NamedWriteable#getWriteableName()}.
+         * @param resultReader reader registered for internal aggregation.
          */
         public AggregationSpec addResultReader(Writeable.Reader<? extends InternalAggregation> resultReader) {
             return addResultReader(getName().getPreferredName(), resultReader);
@@ -490,6 +494,8 @@ public interface SearchExtension {
 
         /**
          * Add a reader for the shard level results of the aggregation.
+         * @param resultReader reader registered for internal aggregation.
+         * @param writeableName name of the writeable string.
          */
         public AggregationSpec addResultReader(String writeableName, Writeable.Reader<? extends InternalAggregation> resultReader) {
             resultReaders.put(writeableName, resultReader);
@@ -514,6 +520,7 @@ public interface SearchExtension {
         /**
          * Set the function to register the {@link org.opensearch.search.aggregations.support.ValuesSource} to aggregator mappings for
          * this aggregation
+         * @param aggregatorRegistrar register ValuesSourceRegistry.
          */
         public AggregationSpec setAggregatorRegistrar(Consumer<ValuesSourceRegistry.Builder> aggregatorRegistrar) {
             this.aggregatorRegistrar = aggregatorRegistrar;
@@ -668,6 +675,7 @@ public interface SearchExtension {
          *        names from other Extensions.
          * @param builderReader the reader registered for this aggregation's builder. Typically, a reference to a constructor that takes a
          *        {@link StreamInput}
+         * @param parser parser for PipelineAggregator.
          * @deprecated prefer the ctor that takes a {@link ContextParser}
          */
         @Deprecated
@@ -682,6 +690,7 @@ public interface SearchExtension {
         /**
          * Add a reader for the shard level results of the aggregation with {@linkplain #getName()}'s {@link ParseField#getPreferredName()}
          * as the {@link NamedWriteable#getWriteableName()}.
+         * @param resultReader reader for InternalAggregation.
          */
         public PipelineAggregationSpec addResultReader(Writeable.Reader<? extends InternalAggregation> resultReader) {
             return addResultReader(getName().getPreferredName(), resultReader);
@@ -689,6 +698,8 @@ public interface SearchExtension {
 
         /**
          * Add a reader for the shard level results of the aggregation.
+         * @param writeableName name of the writeable string.
+         * @param resultReader reader for InternalAggregation.
          */
         public PipelineAggregationSpec addResultReader(String writeableName, Writeable.Reader<? extends InternalAggregation> resultReader) {
             resultReaders.put(writeableName, resultReader);
