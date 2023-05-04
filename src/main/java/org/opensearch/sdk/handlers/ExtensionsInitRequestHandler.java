@@ -48,6 +48,7 @@ public class ExtensionsInitRequestHandler {
     public InitializeExtensionResponse handleExtensionInitRequest(InitializeExtensionRequest extensionInitRequest) {
         logger.info("Registering Extension Request received from OpenSearch");
         extensionsRunner.opensearchNode = extensionInitRequest.getSourceNode();
+        extensionsRunner.getThreadPool().getThreadContext().putHeader("extension_unique_id", extensionInitRequest.getExtension().getId());
         extensionsRunner.setUniqueId(extensionInitRequest.getExtension().getId());
         // TODO: Remove above two lines in favor of the below when refactoring
         SDKTransportService sdkTransportService = extensionsRunner.getSdkTransportService();
@@ -65,7 +66,10 @@ public class ExtensionsInitRequestHandler {
             extensionsRunner.setExtensionNode(extensionInitRequest.getExtension());
             // TODO: replace with sdkTransportService.getTransportService()
             TransportService extensionTransportService = extensionsRunner.getExtensionTransportService();
-            extensionTransportService.connectToNode(extensionsRunner.opensearchNode);
+            extensionTransportService.connectToNodeAsExtension(
+                extensionsRunner.opensearchNode,
+                extensionInitRequest.getExtension().getId()
+            );
             extensionsRunner.sendRegisterRestActionsRequest(extensionTransportService);
             extensionsRunner.sendRegisterCustomSettingsRequest(extensionTransportService);
             sdkTransportService.sendRegisterTransportActionsRequest(extensionsRunner.getSdkActionModule().getActions());

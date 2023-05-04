@@ -75,6 +75,9 @@ public interface IndexStoreExtension {
     interface RecoveryStateFactory {
         /**
          * Creates a new {@link RecoveryState} per shard. This method is called once per shard on shard creation.
+         * @param shardRouting immutably encapsulates information about shard.
+         * @param targetNode the target node.
+         * @param sourceNode the source node.
          * @return a new RecoveryState instance
          */
         RecoveryState newRecoveryState(ShardRouting shardRouting, DiscoveryNode targetNode, @Nullable DiscoveryNode sourceNode);

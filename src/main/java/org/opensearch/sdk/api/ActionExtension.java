@@ -125,6 +125,9 @@ public interface ActionExtension {
         /**
          * Create a record of an action, the {@linkplain TransportAction} that handles it, and any supporting {@linkplain TransportActions}
          * that are needed by that {@linkplain TransportAction}.
+         * @param action the action for the handler.
+         * @param transportAction transport action.
+         * @param supportTransportActions supported transport actions.
          */
         public ActionHandler(
             ActionType<Response> action,

@@ -42,6 +42,10 @@ mainClassName = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
 group 'org.opensearch.sdk'
 version '2.0.0-SNAPSHOT'
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
 
 publishing {
     publications {
@@ -77,13 +81,13 @@ dependencies {
 
     def opensearchVersion = "3.0.0-SNAPSHOT"
     def log4jVersion = "2.20.0"
-    def nettyVersion = "4.1.91.Final"
-    def jacksonDatabindVersion = "2.14.2"
+    def nettyVersion = "4.1.92.Final"
+    def jacksonDatabindVersion = "2.15.0"
     def guavaVersion = "31.1-jre"
     def guiceVersion = "5.1.0"
     def junit4Version = "4.13.2"
-    def junit5Version = "5.9.2"
-    def junitPlatform = "1.9.2"
+    def junit5Version = "5.9.3"
+    def junitPlatform = "1.9.3"
     def jaxbVersion = "2.3.1"
 
     implementation("org.opensearch:opensearch:${opensearchVersion}")
@@ -118,15 +122,14 @@ dependencies {
 
 // this task runs the helloworld sample extension
 task helloWorld(type: JavaExec) {
-  group = 'Execution'
-  description = 'Run HelloWorld Extension.'
-  mainClass = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
-  classpath = sourceSets.main.runtimeClasspath
+    group = 'Execution'
+    description = 'Run HelloWorld Extension.'
+    mainClass = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
+    classpath = sourceSets.main.runtimeClasspath
 }
 
 test {
-    // Temporary workaround for https://github.com/gradle/gradle/issues/23995
-    getTestFrameworkProperty().convention(getProviderFactory().provider(() -> new JUnitPlatformTestFramework(it.getFilter(), false)))
+    useJUnitPlatform()
     jvmArgs '--enable-preview'
     systemProperty 'tests.security.manager', 'false'
     testLogging {
