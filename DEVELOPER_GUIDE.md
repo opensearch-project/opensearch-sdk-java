@@ -9,6 +9,7 @@
         - [Enable Extensions Feature Flag](#enable-extensions-feature-flag)
         - [Create extensions.yml file](#create-extensions-yml-file)
         - [Run OpenSearch](#run-opensearch)
+        - [Run Sample Extension with Security](#run-sample-extension-with-security)
     - [Publish OpenSearch SDK for Java to Maven Local](#publish-opensearch-sdk-for-java-to-maven-local)
     - [Perform a REST Request on the Extension](#perform-a-rest-request-on-the-extension)
     - [Run Tests](#run-tests)
@@ -192,6 +193,20 @@ MESSAGE RECEIVED:ES-ǣ!internal:discovery/extensionsnode_extensionQSt9oKXFTSWqgX
 ```
 
 It is important that the OpenSearch SDK for Java is already up and running on a separate process prior to starting OpenSearch, since extension discovery occurs only if the OpenSearch SDK for Java is already listening on a pre-defined port. Once discovery is complete and the data transfer connection between both nodes has been established, OpenSearch and the OpenSearch SDK for Java will now be able to communicate.
+
+## Run Sample Extension with Security
+
+1. Uncomment the ssl settings from [resources/sample/helloworld-settings.yml](src/main/resources/sample/helloworld-settings.yml)
+```
+ssl.transport.enabled: true
+ssl.transport.pemcert_filepath: certs/extension-01.pem
+ssl.transport.pemkey_filepath: certs/extension-01-key.pem
+ssl.transport.pemtrustedcas_filepath: certs/root-ca.pem
+ssl.transport.enforce_hostname_verification: false
+path.home: <path/to/extension>
+```
+2. Follow [CERTIFICATE_GENERATION.md](Docs/CERTIFICATE_GENERATION.md) to generate the certificates.
+3. Run `./gradlew run`
 
 ## Perform a REST Request on the Extension
 
