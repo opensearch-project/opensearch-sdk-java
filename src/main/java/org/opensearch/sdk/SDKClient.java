@@ -138,7 +138,7 @@ public class SDKClient implements Closeable {
         this.extensionSettings.setOpensearchPort(Integer.toString(address.getPort()));
         // Update the settings on the already-initialized SDKRestClient (Deprecated -- for migration use)
         if (this.sdkRestClient != null) {
-            sdkRestClient.getRestHighLevelClient()
+            this.sdkRestClient.getRestHighLevelClient()
                 .getLowLevelClient()
                 .setNodes(List.of(new Node(new HttpHost(address.getAddress(), address.getPort()))));
         }
@@ -302,8 +302,8 @@ public class SDKClient implements Closeable {
      * @throws IOException if closing the restClient fails
      */
     public void doCloseJavaClients() throws IOException {
-        if (restClient != null) {
-            restClient.close();
+        if (this.restClient != null) {
+            this.restClient.close();
         }
     }
 
@@ -314,7 +314,7 @@ public class SDKClient implements Closeable {
      */
     public void doCloseHighLevelClient() throws IOException {
         if (this.sdkRestClient != null) {
-            sdkRestClient.close();
+            this.sdkRestClient.close();
         }
     }
 
@@ -375,7 +375,6 @@ public class SDKClient implements Closeable {
 
         private final SDKClient sdkClient;
         private final RestHighLevelClient restHighLevelClient;
-
         private RequestOptions options = RequestOptions.DEFAULT;
 
         /**
