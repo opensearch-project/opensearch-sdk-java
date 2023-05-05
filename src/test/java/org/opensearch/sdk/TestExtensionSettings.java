@@ -33,6 +33,11 @@ public class TestExtensionSettings extends OpenSearchTestCase {
         assertEquals("4532", extensionSettings.getHostPort());
         assertEquals("127.0.0.1", extensionSettings.getOpensearchAddress());
         assertEquals("9200", extensionSettings.getOpensearchPort());
+
+        extensionSettings.setOpensearchAddress("localhost");
+        assertEquals("localhost", extensionSettings.getOpensearchAddress());
+        extensionSettings.setOpensearchPort("9300");
+        assertEquals("9300", extensionSettings.getOpensearchPort());
     }
 
     @Test

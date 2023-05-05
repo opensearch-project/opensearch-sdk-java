@@ -142,8 +142,16 @@ public class ExtensionSettings {
         return hostPort;
     }
 
+    public void setOpensearchAddress(String opensearchAddress) {
+        this.opensearchAddress = opensearchAddress;
+    }
+
     public String getOpensearchAddress() {
         return opensearchAddress;
+    }
+
+    public void setOpensearchPort(String opensearchPort) {
+        this.opensearchPort = opensearchPort;
     }
 
     public String getOpensearchPort() {
