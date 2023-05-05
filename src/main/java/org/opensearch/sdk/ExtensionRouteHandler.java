@@ -18,12 +18,11 @@ import java.util.function.Function;
 public class ExtensionRouteHandler extends RouteHandler {
 
     public ExtensionRouteHandler(
-        String extensionShortName,
         String handlerName,
         RestRequest.Method method,
         String path,
         Function<RestRequest, ExtensionRestResponse> handler
     ) {
-        super("extension:" + extensionShortName + "/" + handlerName, method, path, handler);
+        super(ExtensionRouteHandlerFactory.getInstance().generateRouteName(handlerName), method, path, handler);
     }
 }

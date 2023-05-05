@@ -197,6 +197,12 @@ public class ExtensionsRunner {
         logger.info("SSL is " + sslText + " for transport");
         this.settings = settingsBuilder.build();
 
+        if (extensionSettings.getShortName() != null) {
+            // initialize ExtensionRouteHandlerFactory
+            ExtensionRouteHandlerFactory factory = ExtensionRouteHandlerFactory.getInstance();
+            factory.init(extensionSettings.getShortName());
+        }
+
         final List<ExecutorBuilder<?>> executorBuilders = extension.getExecutorBuilders(settings);
 
         this.runnableTaskListener = new AtomicReference<>();

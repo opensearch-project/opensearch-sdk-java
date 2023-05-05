@@ -17,6 +17,7 @@ import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.extensions.rest.RouteHandler;
 import org.opensearch.rest.RestRequest;
+import org.opensearch.sdk.ExtensionRouteHandlerFactory;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler;
 import org.opensearch.sdk.rest.ExtensionRestHandler;
 import org.opensearch.sdk.ExtensionRouteHandler;
@@ -52,24 +53,21 @@ public class RestHelloAction extends BaseExtensionRestHandler {
     private List<String> worldAdjectives = new ArrayList<>();
     private Random rand = new Random();
 
-    private String extensionShortName;
-
     /**
      * Instantiate this action
      *
      * @param runner The ExtensionsRunner instance
      */
-    public RestHelloAction(String extensionShortName) {
-        this.extensionShortName = extensionShortName;
+    public RestHelloAction() {
     }
 
     @Override
     public List<RouteHandler> routeHandlers() {
         return List.of(
-            new ExtensionRouteHandler(this.extensionShortName, "greet", GET, "/hello", handleGetRequest),
-            new ExtensionRouteHandler(this.extensionShortName, "greet_with_adjective", POST, "/hello", handlePostRequest),
-            new ExtensionRouteHandler(this.extensionShortName, "greet_with_name", PUT, "/hello/{name}", handlePutRequest),
-            new ExtensionRouteHandler(this.extensionShortName, "goodbye", DELETE, "/goodbye", handleDeleteRequest)
+            new ExtensionRouteHandler("greet", GET, "/hello", handleGetRequest),
+            new ExtensionRouteHandler("greet_with_adjective", POST, "/hello", handlePostRequest),
+            new ExtensionRouteHandler("greet_with_name", PUT, "/hello/{name}", handlePutRequest),
+            new ExtensionRouteHandler("goodbye", DELETE, "/goodbye", handleDeleteRequest)
         );
     }
 
