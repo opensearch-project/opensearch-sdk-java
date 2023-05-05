@@ -12,6 +12,7 @@ package org.opensearch.sdk;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -52,6 +53,7 @@ import org.opensearch.client.ClusterAdminClient;
 import org.opensearch.client.ClusterClient;
 import org.opensearch.client.GetAliasesResponse;
 import org.opensearch.client.IndicesClient;
+import org.opensearch.client.Node;
 import org.opensearch.client.RequestOptions;
 import org.opensearch.client.Requests;
 import org.apache.http.HttpHost;
@@ -76,6 +78,7 @@ import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
+import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.index.reindex.BulkByScrollResponse;
 import org.opensearch.index.reindex.DeleteByQueryRequest;
 
@@ -85,7 +88,7 @@ import org.opensearch.index.reindex.DeleteByQueryRequest;
 public class SDKClient implements Closeable {
     private OpenSearchClient javaClient;
     private RestClient restClient;
-    private RestHighLevelClient sdkRestClient;
+    private SDKRestClient sdkRestClient;
     private OpenSearchAsyncClient javaAsyncClient;
     private final ExtensionSettings extensionSettings;
 
@@ -114,6 +117,22 @@ public class SDKClient implements Closeable {
     public void initialize(Map<ActionType, TransportAction> actions) {
         this.actions = actions;
         this.actionClassToInstanceMap = actions.keySet().stream().collect(Collectors.toMap(a -> a.getClass().getName(), a -> a));
+    }
+
+    /**
+     * Update the ExtensionSettings with a new OpenSearch address and port
+     * @param address the TransportAddress associated with the OpenSearchNode
+     */
+    public void updateOpenSearchNodeSettings(TransportAddress address) {
+        // Update the settings for future initialization of new clients
+        this.extensionSettings.setOpensearchAddress(address.getAddress());
+        this.extensionSettings.setOpensearchPort(Integer.toString(address.getPort()));
+        // Update the settings on the already-initialized SDKRestClient (Deprecated -- for migration use)
+        if (this.sdkRestClient != null) {
+            this.sdkRestClient.getRestHighLevelClient()
+                .getLowLevelClient()
+                .setNodes(List.of(new Node(new HttpHost(address.getAddress(), address.getPort()))));
+        }
     }
 
     /**
@@ -242,7 +261,13 @@ public class SDKClient implements Closeable {
      */
     @Deprecated
     public SDKRestClient initializeRestClient(String hostAddress, int port) {
-        return new SDKRestClient(this, new RestHighLevelClient(builder(hostAddress, port)));
+        this.sdkRestClient = new SDKRestClient(this, new RestHighLevelClient(builder(hostAddress, port)));
+        return this.sdkRestClient;
+    }
+
+    @Deprecated
+    public SDKRestClient getSdkRestClient() {
+        return this.sdkRestClient;
     }
 
     /**
@@ -251,8 +276,8 @@ public class SDKClient implements Closeable {
      * @throws IOException if closing the restClient fails
      */
     public void doCloseJavaClients() throws IOException {
-        if (restClient != null) {
-            restClient.close();
+        if (this.restClient != null) {
+            this.restClient.close();
         }
     }
 
@@ -262,8 +287,8 @@ public class SDKClient implements Closeable {
      * @throws IOException if closing the highLevelClient fails
      */
     public void doCloseHighLevelClient() throws IOException {
-        if (sdkRestClient != null) {
-            sdkRestClient.close();
+        if (this.sdkRestClient != null) {
+            this.sdkRestClient.close();
         }
     }
 
@@ -335,6 +360,10 @@ public class SDKClient implements Closeable {
         public SDKRestClient(SDKClient sdkClient, RestHighLevelClient restHighLevelClient) {
             this.sdkClient = sdkClient;
             this.restHighLevelClient = restHighLevelClient;
+        }
+
+        public RestHighLevelClient getRestHighLevelClient() {
+            return restHighLevelClient;
         }
 
         public void setOptions(RequestOptions options) {
