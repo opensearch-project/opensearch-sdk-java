@@ -42,7 +42,6 @@ public interface AnalysisExtension {
     /**
      * Override to add additional {@link CharFilter}s. See {@link #requiresAnalysisSettings(AnalysisModule.AnalysisProvider)}
      * how to on get the configuration from the index.
-     * @return a map of additional {@link CharFilter} providers. The key is a string representing the provider name, and the value is the provider itself.
      */
     default Map<String, AnalysisModule.AnalysisProvider<CharFilterFactory>> getCharFilters() {
         return emptyMap();
@@ -51,7 +50,6 @@ public interface AnalysisExtension {
     /**
      * Override to add additional {@link TokenFilter}s. See {@link #requiresAnalysisSettings(AnalysisModule.AnalysisProvider)}
      * how to on get the configuration from the index.
-     * @return a map of additional {@link TokenFilter} providers. The key is a string representing the provider name, and the value is the provider itself.
      */
     default Map<String, AnalysisModule.AnalysisProvider<TokenFilterFactory>> getTokenFilters() {
         return emptyMap();
@@ -60,7 +58,6 @@ public interface AnalysisExtension {
     /**
      * Override to add additional {@link Tokenizer}s. See {@link #requiresAnalysisSettings(AnalysisModule.AnalysisProvider)}
      * how to on get the configuration from the index.
-     * @return a map of additional {@link Tokenizer} providers. The key is a string representing the provider name, and the value is the provider itself.
      */
     default Map<String, AnalysisModule.AnalysisProvider<TokenizerFactory>> getTokenizers() {
         return emptyMap();
@@ -69,7 +66,6 @@ public interface AnalysisExtension {
     /**
      * Override to add additional {@link Analyzer}s. See {@link #requiresAnalysisSettings(AnalysisModule.AnalysisProvider)}
      * how to on get the configuration from the index.
-     * @return a map of additional {@link Analyzer} providers. The key is a string representing the provider name, and the value is the provider itself.
      */
     default Map<String, AnalysisModule.AnalysisProvider<AnalyzerProvider<? extends Analyzer>>> getAnalyzers() {
         return emptyMap();
@@ -77,7 +73,6 @@ public interface AnalysisExtension {
 
     /**
      * Override to add additional pre-configured {@link Analyzer}s.
-     * @return a list of additional pre-configured {@link PreBuiltAnalyzerProviderFactory} instances.
      */
     default List<PreBuiltAnalyzerProviderFactory> getPreBuiltAnalyzerProviderFactories() {
         return emptyList();
@@ -85,7 +80,6 @@ public interface AnalysisExtension {
 
     /**
      * Override to add additional pre-configured {@link CharFilter}s.
-     * @return a list of additional pre-configured {@link PreConfiguredCharFilter} instances.
      */
     default List<PreConfiguredCharFilter> getPreConfiguredCharFilters() {
         return emptyList();
@@ -93,7 +87,6 @@ public interface AnalysisExtension {
 
     /**
      * Override to add additional pre-configured {@link TokenFilter}s.
-     * @return a list of additional pre-configured {@link PreConfiguredTokenFilter} instances.
      */
     default List<PreConfiguredTokenFilter> getPreConfiguredTokenFilters() {
         return emptyList();
@@ -101,7 +94,6 @@ public interface AnalysisExtension {
 
     /**
      * Override to add additional pre-configured {@link Tokenizer}.
-     * @return a list of additional pre-configured {@link PreConfiguredTokenizer} instances.
      */
     default List<PreConfiguredTokenizer> getPreConfiguredTokenizers() {
         return emptyList();
@@ -119,7 +111,6 @@ public interface AnalysisExtension {
      * Mark an {@link AnalysisModule.AnalysisProvider} as requiring the index's settings.
      * @param provider this is an instance of the basic interface for analysis components.
      * @param <T> is a type parameter that specifies the type of the analysis module that will be returned by the provider.
-     * @return an {@link AnalysisModule.AnalysisProvider} instance that requires analysis settings.
      */
     static <T> AnalysisModule.AnalysisProvider<T> requiresAnalysisSettings(AnalysisModule.AnalysisProvider<T> provider) {
         return new AnalysisModule.AnalysisProvider<T>() {
