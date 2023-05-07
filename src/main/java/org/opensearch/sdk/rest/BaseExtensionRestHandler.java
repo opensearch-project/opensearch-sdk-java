@@ -207,6 +207,16 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     }
 
     /**
+    * Creates a new plain text response with OK status and empty JSON content
+    *
+    * @param request the REST request being responded to
+    * @return ExtensionRestResponse with OK status response
+    */
+    protected ExtensionRestResponse okNoContent(RestRequest request) {
+        return new ExtensionRestResponse(request, RestStatus.OK, "application/json; charset=UTF-8", "{}");
+    }
+
+    /**
      * A subclass of {@link Route} that includes a handler method for that route.
      */
     public static class RouteHandler extends Route {
@@ -310,16 +320,6 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
             deprecationLogger.deprecate("deprecated_route", deprecationMessage);
 
             return handler.handleRequest(restRequest);
-        }
-
-        /**
-        * Creates a new plain text response with OK status and empty JSON content
-        *
-        * @param request the REST request being responded to
-        * @return ExtensionRestResponse with OK status response
-        */
-        protected ExtensionRestResponse okNoContent(RestRequest request) {
-            return new ExtensionRestResponse(request, RestStatus.OK, "application/json; charset=UTF-8", "{}");
         }
 
         ExtensionRestHandler getHandler() {

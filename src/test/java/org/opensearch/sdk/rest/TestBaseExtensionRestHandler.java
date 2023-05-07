@@ -264,4 +264,31 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
             response.content().utf8ToString()
         );
     }
+
+    @Test
+    public void testOkNoContentResponse() {
+        BaseExtensionRestHandler handlerWithNoContent = new BaseExtensionRestHandler() {
+            @Override
+            public List<RouteHandler> routeHandlers() {
+                return List.of(new RouteHandler(Method.GET, "/nocontent", handleNoContent));
+            }
+
+            private Function<RestRequest, ExtensionRestResponse> handleNoContent = (request) -> { return okNoContent(request); };
+        };
+
+        RestRequest noContentRequest = TestSDKRestRequest.createTestRestRequest(
+            Method.GET,
+            "/nocontent",
+            "/nocontent",
+            Collections.emptyMap(),
+            Collections.emptyMap(),
+            null,
+            new BytesArray(new byte[0]),
+            "",
+            null
+        );
+        ExtensionRestResponse response = handlerWithNoContent.handleRequest(noContentRequest);
+        assertEquals(RestStatus.OK, response.status());
+        assertEquals("", response.content().utf8ToString());
+    }
 }
