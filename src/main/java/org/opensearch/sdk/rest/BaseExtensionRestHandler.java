@@ -312,6 +312,16 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
             return handler.handleRequest(restRequest);
         }
 
+        /**
+        * Creates a new plain text response with OK status and empty JSON content
+        *
+        * @param request the REST request being responded to
+        * @return ExtensionRestResponse with OK status response
+        */
+        protected ExtensionRestResponse okNoContent(RestRequest request) {
+            return new ExtensionRestResponse(request, RestStatus.OK, "application/json; charset=UTF-8", "{}");
+        }
+
         ExtensionRestHandler getHandler() {
             return handler;
         }
