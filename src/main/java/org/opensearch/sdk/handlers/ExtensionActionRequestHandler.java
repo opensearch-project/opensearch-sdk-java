@@ -83,15 +83,17 @@ public class ExtensionActionRequestHandler {
         logger.debug("Found matching action [" + action.name() + "], an instance of [" + action.getClass().getName() + "]");
 
         // Extract request class name from bytes and instantiate request
-        int nullPos = indexOf(request.getRequestBytes(), RemoteExtensionActionRequest.UNIT_SEPARATOR);
-        String requestClassName = new String(Arrays.copyOfRange(request.getRequestBytes(), 0, nullPos + 1), StandardCharsets.UTF_8)
-            .stripTrailing();
+        int nullPos = indexOf(request.getRequestBytes().toByteArray(), RemoteExtensionActionRequest.UNIT_SEPARATOR);
+        String requestClassName = new String(
+            Arrays.copyOfRange(request.getRequestBytes().toByteArray(), 0, nullPos + 1),
+            StandardCharsets.UTF_8
+        ).stripTrailing();
         ActionRequest actionRequest = null;
         try {
             Class<?> clazz = Class.forName(requestClassName);
             Constructor<?> constructor = clazz.getConstructor(StreamInput.class);
             StreamInput requestByteStream = StreamInput.wrap(
-                Arrays.copyOfRange(request.getRequestBytes(), nullPos + 1, request.getRequestBytes().length)
+                Arrays.copyOfRange(request.getRequestBytes().toByteArray(), nullPos + 1, request.getRequestBytes().toByteArray().length)
             );
             actionRequest = (ActionRequest) constructor.newInstance(requestByteStream);
         } catch (Exception e) {
