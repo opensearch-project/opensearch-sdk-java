@@ -36,6 +36,10 @@ import org.opensearch.rest.RestStatus;
  * Provides convenience methods to reduce boilerplate code in an {@link ExtensionRestHandler} implementation.
  */
 public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
+    /**
+     * Constant for JSON content type
+     */
+    public static final String JSON_CONTENT_TYPE = "application/json";
 
     /**
      * Defines a list of methods which handle each rest {@link Route}. Override this in a subclass to use the functional syntax.
@@ -212,8 +216,8 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     * @param request the REST request being responded to
     * @return ExtensionRestResponse with OK status response
     */
-    protected ExtensionRestResponse okNoContent(RestRequest request) {
-        return new ExtensionRestResponse(request, RestStatus.OK, "application/json; charset=UTF-8", "{}");
+    protected ExtensionRestResponse createEmptyJsonResponse(RestRequest request, RestStatus status) {
+        return new ExtensionRestResponse(request, status, JSON_CONTENT_TYPE, "{}");
     }
 
     /**
