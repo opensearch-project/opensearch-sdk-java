@@ -200,8 +200,7 @@ task helloWorld(type: JavaExec) {
 }
 
 test {
-    // Temporary workaround for https://github.com/gradle/gradle/issues/23995
-    getTestFrameworkProperty().convention(getProviderFactory().provider(() -> new JUnitPlatformTestFramework(it.getFilter(), false)))
+    useJUnitPlatform()
     jvmArgs '--enable-preview'
     systemProperty 'tests.security.manager', 'false'
     testLogging {
