@@ -214,6 +214,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     * Creates a new plain text response with OK status and empty JSON content
     *
     * @param request the REST request being responded to
+     * @param status the REST response status
     * @return ExtensionRestResponse with OK status response
     */
     protected ExtensionRestResponse createEmptyJsonResponse(RestRequest request, RestStatus status) {

@@ -273,7 +273,10 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
                 return List.of(new RouteHandler(Method.GET, "/emptyJsonResponse", handleEmptyJsonResponse));
             }
 
-            private final Function<RestRequest, ExtensionRestResponse> handleEmptyJsonResponse = (request) -> createEmptyJsonResponse(request, RestStatus.OK);
+            private final Function<RestRequest, ExtensionRestResponse> handleEmptyJsonResponse = (request) -> createEmptyJsonResponse(
+                request,
+                RestStatus.OK
+            );
         };
 
         RestRequest emptyJsonResponseRequest = TestSDKRestRequest.createTestRestRequest(
