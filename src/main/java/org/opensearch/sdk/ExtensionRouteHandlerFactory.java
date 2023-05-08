@@ -25,6 +25,6 @@ public class ExtensionRouteHandlerFactory {
     }
 
     public String generateRouteName(String handlerName) {
-        return "extension:" + extensionShortName + "/" + handlerName;
+        return extensionShortName + ":" + handlerName;
     }
 }
