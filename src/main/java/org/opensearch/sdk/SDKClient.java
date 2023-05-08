@@ -26,6 +26,8 @@ import org.opensearch.action.ActionListener;
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
 import org.opensearch.action.ActionType;
+import org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
+import org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsResponse;
 import org.opensearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
@@ -556,6 +558,11 @@ public class SDKClient implements Closeable {
     public static class SDKClusterAdminClient {
 
         private final ClusterClient clusterClient;
+        private RequestOptions options = RequestOptions.DEFAULT;
+
+        public void setOptions(RequestOptions options) {
+            this.options = options;
+        }
 
         /**
          * Instantiate this class using a {@link ClusterClient}.
@@ -566,9 +573,22 @@ public class SDKClient implements Closeable {
             this.clusterClient = clusterClient;
         }
 
+        /**
+         * Asynchronously updates cluster wide specific settings using the Cluster Update Settings API.
+         *
+         * @param clusterUpdateSettingsRequest the request
+         * @param listener the listener to be notified upon request completion
+         * @return cancellable that may be used to cancel the request
+         */
+        public Cancellable updateSettings(
+            ClusterUpdateSettingsRequest clusterUpdateSettingsRequest,
+            ActionListener<ClusterUpdateSettingsResponse> listener
+        ) {
+            return clusterClient.putSettingsAsync(clusterUpdateSettingsRequest, options, listener);
+        }
+
         // TODO: Implement state()
         // https://github.com/opensearch-project/opensearch-sdk-java/issues/354
-
     }
 
     /**
