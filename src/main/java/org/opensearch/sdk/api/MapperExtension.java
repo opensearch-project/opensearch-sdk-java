@@ -29,8 +29,8 @@ public interface MapperExtension {
      * The key of the returned {@link Map} is the unique name for the mapper which will be used
      * as the mapping {@code type}, and the value is a {@link Mapper.TypeParser} to parse the
      * mapper settings into a {@link Mapper}.
+     * @return a map of unique mapper names to their corresponding type parsers.
      */
-
     default Map<String, Mapper.TypeParser> getMappers() {
         return Collections.emptyMap();
     }
@@ -42,18 +42,18 @@ public interface MapperExtension {
      * is used in the mapping json to configure the metadata mapper, and the value is a
      * {@link MetadataFieldMapper.TypeParser} to parse the mapper settings into a
      * {@link MetadataFieldMapper}.
+     * @return a map of metadata mapper names to their corresponding type parsers.
      */
-
     default Map<String, MetadataFieldMapper.TypeParser> getMetadataMappers() {
         return Collections.emptyMap();
     }
 
     /**
-     * Returns a function that given an index name returns a predicate which fields must match in order to be returned by get mappings,
-     * get index, get field mappings and field capabilities API. Useful to filter the fields that such API return. The predicate receives
-     * the field name as input argument and should return true to show the field and false to hide it.
+     * Returns a function that filters the fields returned by get mappings, get index, get field mappings, and field capabilities API.
+     * The returned function takes an index name as input and returns a predicate that specifies which fields should be returned by the API.
+     * The predicate takes a field name as input and returns true to include the field or false to exclude it.
+     * @return a function that filters the fields returned by certain APIs.
      */
-
     default Function<String, Predicate<String>> getFieldFilter() {
         return NOOP_FIELD_FILTER;
     }
@@ -62,13 +62,11 @@ public interface MapperExtension {
      * The default field predicate applied, which doesn't filter anything. That means that by default get mappings, get index
      * get field mappings and field capabilities API will return every field that's present in the mappings.
      */
-
     Predicate<String> NOOP_FIELD_PREDICATE = field -> true;
 
     /**
      * The default field filter applied, which doesn't filter anything. That means that by default get mappings, get index
      * get field mappings and field capabilities API will return every field that's present in the mappings.
      */
-
     Function<String, Predicate<String>> NOOP_FIELD_FILTER = index -> NOOP_FIELD_PREDICATE;
 }
