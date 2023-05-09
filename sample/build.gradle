@@ -80,7 +80,6 @@ dependencies {
     def junitPlatform = "1.9.3"
 
     implementation project(':')
-    implementation("org.opensearch.plugin:opensearch-job-scheduler:${jobSchedulerVersion}")
     implementation("org.opensearch:opensearch-job-scheduler:${jobSchedulerVersion}")
     implementation("org.opensearch:opensearch-job-scheduler-spi:${jobSchedulerVersion}")
 
