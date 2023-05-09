@@ -9,6 +9,7 @@
 
 package org.opensearch.sdk.rest;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +40,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     /**
      * Constant for JSON content type
      */
-    public static final String JSON_CONTENT_TYPE = "application/json";
+    public static final String JSON_CONTENT_TYPE = org.apache.hc.core5.http.ContentType.APPLICATION_JSON.withCharset(StandardCharsets.UTF_8).toString();
 
     /**
      * Defines a list of methods which handle each rest {@link Route}. Override this in a subclass to use the functional syntax.
