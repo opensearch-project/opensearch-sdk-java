@@ -9,6 +9,7 @@
 
 package org.opensearch.sdk.rest;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Function;
 
+import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
@@ -36,6 +38,10 @@ import org.opensearch.rest.RestStatus;
  * Provides convenience methods to reduce boilerplate code in an {@link ExtensionRestHandler} implementation.
  */
 public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
+    /**
+     * Constant for JSON content type
+     */
+    public static final String JSON_CONTENT_TYPE = APPLICATION_JSON.withCharset(StandardCharsets.UTF_8).toString();
 
     /**
      * Defines a list of methods which handle each rest {@link Route}. Override this in a subclass to use the functional syntax.
@@ -204,6 +210,17 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
         final String detail
     ) {
         return BaseRestHandler.unrecognizedStrings(request, invalids, candidates, detail);
+    }
+
+    /**
+    * Creates a new plain text response with OK status and empty JSON content
+    *
+    * @param request the REST request being responded to
+     * @param status the REST response status
+    * @return ExtensionRestResponse with OK status response
+    */
+    protected ExtensionRestResponse createEmptyJsonResponse(RestRequest request, RestStatus status) {
+        return new ExtensionRestResponse(request, status, JSON_CONTENT_TYPE, "{}");
     }
 
     /**
