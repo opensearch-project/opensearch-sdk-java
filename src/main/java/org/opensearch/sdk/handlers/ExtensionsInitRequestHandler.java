@@ -62,12 +62,14 @@ public class ExtensionsInitRequestHandler {
             );
         } finally {
             // After sending successful response to initialization, send the REST API and Settings
-            extensionsRunner.setOpensearchNode(extensionsRunner.opensearchNode);
+            extensionsRunner.setOpensearchNode(extensionInitRequest.getSourceNode());
             extensionsRunner.setExtensionNode(extensionInitRequest.getExtension());
+            extensionsRunner.getSdkClient().updateOpenSearchNodeSettings(extensionInitRequest.getSourceNode().getAddress());
+
             // TODO: replace with sdkTransportService.getTransportService()
             TransportService extensionTransportService = extensionsRunner.getExtensionTransportService();
             extensionTransportService.connectToNodeAsExtension(
-                extensionsRunner.opensearchNode,
+                extensionInitRequest.getSourceNode(),
                 extensionInitRequest.getExtension().getId()
             );
             extensionsRunner.sendRegisterRestActionsRequest(extensionTransportService);
