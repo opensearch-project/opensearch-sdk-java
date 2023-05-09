@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static org.apache.hc.core5.http.ContentType.APPLICATION_JSON;
+import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
