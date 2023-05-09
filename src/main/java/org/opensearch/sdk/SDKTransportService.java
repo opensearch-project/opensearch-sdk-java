@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import com.google.protobuf.ByteString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.cluster.node.DiscoveryNode;
@@ -79,11 +80,13 @@ public class SDKTransportService {
         logger.info("Sending Remote Extension Action request to OpenSearch for [" + request.getAction() + "]");
         // Combine class name string and request bytes
         byte[] requestClassBytes = request.getRequestClass().getBytes(StandardCharsets.UTF_8);
-        byte[] proxyRequestBytes = ByteBuffer.allocate(requestClassBytes.length + 1 + request.getRequestBytes().length)
-            .put(requestClassBytes)
-            .put(RemoteExtensionActionRequest.UNIT_SEPARATOR)
-            .put(request.getRequestBytes())
-            .array();
+        ByteString proxyRequestBytes = ByteString.copyFrom(
+            ByteBuffer.allocate(requestClassBytes.length + 1 + request.getRequestBytes().length)
+                .put(requestClassBytes)
+                .put(RemoteExtensionActionRequest.UNIT_SEPARATOR)
+                .put(request.getRequestBytes())
+                .array()
+        );
         ExtensionActionResponseHandler extensionActionResponseHandler = new ExtensionActionResponseHandler();
         try {
             transportService.sendRequest(
