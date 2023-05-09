@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Function;
 
+import static org.apache.hc.core5.http.ContentType.APPLICATION_JSON;
 import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
@@ -40,7 +41,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     /**
      * Constant for JSON content type
      */
-    public static final String JSON_CONTENT_TYPE = org.apache.hc.core5.http.ContentType.APPLICATION_JSON.withCharset(StandardCharsets.UTF_8).toString();
+    public static final String JSON_CONTENT_TYPE = APPLICATION_JSON.withCharset(StandardCharsets.UTF_8).toString();
 
     /**
      * Defines a list of methods which handle each rest {@link Route}. Override this in a subclass to use the functional syntax.

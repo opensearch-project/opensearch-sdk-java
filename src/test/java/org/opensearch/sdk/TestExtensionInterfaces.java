@@ -14,10 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import java.util.Collections;
 import java.util.Map;
 
-<<<<<<< HEAD
 import org.junit.jupiter.api.Assertions;
-=======
->>>>>>> 2420d90 (Tests for IndexStoreExtension added.)
 import org.junit.jupiter.api.Test;
 import org.opensearch.common.breaker.CircuitBreaker;
 import org.opensearch.common.settings.Settings;
@@ -121,10 +118,7 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         assertTrue(searchExtension.getIndexSearcherExecutorProvider().isEmpty());
     }
 
-<<<<<<< Upstream, based on a0bf257df9f470d22a5b10a9eeb7f42706b46f83
-<<<<<<< Upstream, based on a0bf257df9f470d22a5b10a9eeb7f42706b46f83
     @Test
-<<<<<<< HEAD
     public void testGetMappers() {
         MapperExtension mapperExtension = new MapperExtension() {
         };
@@ -158,8 +152,6 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
     }
 
     @Test
-=======
->>>>>>> 2420d90 (Tests for IndexStoreExtension added.)
     void testIndexStoreExtension() {
         IndexStoreExtension indexStoreExtension = new IndexStoreExtension() {
             @Override
@@ -170,7 +162,6 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         assertTrue(indexStoreExtension.getDirectoryFactories().isEmpty());
         assertTrue(indexStoreExtension.getRecoveryStateFactories().isEmpty());
     }
-<<<<<<< HEAD
 
     @Test
     void testSystemIndexExtension() {
@@ -231,45 +222,4 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
         assertTrue(analysisExtension.getHunspellDictionaries().isEmpty());
         assertTrue(analysisProvider.requiresAnalysisSettings());
     }
-=======
->>>>>>> 2420d90 (Tests for IndexStoreExtension added.)
-=======
-=======
-    @Test
->>>>>>> 4b10f3b returned @Test annotation
-    public void testGetMappers() {
-        MapperExtension mapperExtension = new MapperExtension() {
-        };
-        Map<String, Mapper.TypeParser> mappers = mapperExtension.getMappers();
-        Assertions.assertTrue(mappers.isEmpty());
-    }
-
-    @Test
-    public void testGetMetadataMappers() {
-        MapperExtension mapperExtension = new MapperExtension() {
-        };
-        Map<String, MetadataFieldMapper.TypeParser> metadataMappers = mapperExtension.getMetadataMappers();
-        Assertions.assertTrue(metadataMappers.isEmpty());
-    }
-
-    @Test
-    public void testGetFieldFilter() {
-        MapperExtension extension = new MapperExtension() {
-        };
-        Predicate<String> predicate = extension.getFieldFilter().apply("myIndex");
-        Assertions.assertNotNull(predicate);
-    }
-
-    @Test
-    void testIndexStoreExtension() {
-        IndexStoreExtension indexStoreExtension = new IndexStoreExtension() {
-            @Override
-            public Map<String, DirectoryFactory> getDirectoryFactories() {
-                return Collections.emptyMap();
-            }
-        };
-        assertTrue(indexStoreExtension.getDirectoryFactories().isEmpty());
-        assertTrue(indexStoreExtension.getRecoveryStateFactories().isEmpty());
-    }
->>>>>>> 8cefe79 merge conflicts with MapperExtension fixed
 }
