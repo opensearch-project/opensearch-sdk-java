@@ -45,7 +45,7 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
             );
         }
 
-        private Function<RestRequest, ExtensionRestResponse> handleFoo = (request) -> {
+        private final Function<RestRequest, ExtensionRestResponse> handleFoo = (request) -> {
             try {
                 if ("bar".equals(request.content().utf8ToString())) {
                     return createJsonResponse(request, RestStatus.OK, "success", "bar");
@@ -263,5 +263,35 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
                 + "]\"}",
             response.content().utf8ToString()
         );
+    }
+
+    @Test
+    public void testCreateEmptyJsonResponse() {
+        BaseExtensionRestHandler handlerWithEmptyJsonResponse = new BaseExtensionRestHandler() {
+            @Override
+            public List<RouteHandler> routeHandlers() {
+                return List.of(new RouteHandler(Method.GET, "/emptyJsonResponse", handleEmptyJsonResponse));
+            }
+
+            private final Function<RestRequest, ExtensionRestResponse> handleEmptyJsonResponse = (request) -> createEmptyJsonResponse(
+                request,
+                RestStatus.OK
+            );
+        };
+
+        RestRequest emptyJsonResponseRequest = TestSDKRestRequest.createTestRestRequest(
+            Method.GET,
+            "/emptyJsonResponse",
+            "/emptyJsonResponse",
+            Collections.emptyMap(),
+            Collections.emptyMap(),
+            null,
+            new BytesArray(new byte[0]),
+            "",
+            null
+        );
+        ExtensionRestResponse response = handlerWithEmptyJsonResponse.handleRequest(emptyJsonResponseRequest);
+        assertEquals(RestStatus.OK, response.status());
+        assertEquals("{}", response.content().utf8ToString());
     }
 }

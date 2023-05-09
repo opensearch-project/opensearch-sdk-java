@@ -11,6 +11,7 @@ package org.opensearch.sdk;
 
 import org.junit.jupiter.api.Test;
 import org.opensearch.action.ActionListener;
+import org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.opensearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
@@ -115,6 +116,19 @@ public class TestSDKClient extends OpenSearchTestCase {
 
         }));
         expectThrows(ConnectException.class, () -> restClient.performRequest(new Request("GET", "/")));
+
+        sdkClient.doCloseHighLevelClient();
+    }
+
+    @Test
+    public void testSDKClusterAdminClient() throws Exception {
+        SDKRestClient restClient = sdkClient.initializeRestClient();
+        SDKClusterAdminClient clusterAdminClient = restClient.cluster();
+
+        assertInstanceOf(
+            Cancellable.class,
+            clusterAdminClient.updateSettings(new ClusterUpdateSettingsRequest(), ActionListener.wrap(r -> {}, e -> {}))
+        );
 
         sdkClient.doCloseHighLevelClient();
     }
