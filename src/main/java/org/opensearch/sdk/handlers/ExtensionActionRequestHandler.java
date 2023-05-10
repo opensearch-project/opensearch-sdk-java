@@ -72,6 +72,7 @@ public class ExtensionActionRequestHandler {
      */
     public RemoteExtensionActionResponse handleRemoteExtensionActionRequest(ExtensionActionRequest request) {
         logger.debug("Received request to execute action [" + request.getAction() + "]");
+        byte[] requestBytes = request.getRequestBytes().toByteArray();
         final RemoteExtensionActionResponse response = new RemoteExtensionActionResponse(false, new byte[0]);
 
         // Find matching ActionType instance
@@ -83,16 +84,13 @@ public class ExtensionActionRequestHandler {
         logger.debug("Found matching action [" + action.name() + "], an instance of [" + action.getClass().getName() + "]");
 
         // Extract request class name from bytes and instantiate request
-        int nullPos = indexOf(request.getRequestBytes(), RemoteExtensionActionRequest.UNIT_SEPARATOR);
-        String requestClassName = new String(Arrays.copyOfRange(request.getRequestBytes(), 0, nullPos + 1), StandardCharsets.UTF_8)
-            .stripTrailing();
+        int nullPos = indexOf(requestBytes, RemoteExtensionActionRequest.UNIT_SEPARATOR);
+        String requestClassName = new String(Arrays.copyOfRange(requestBytes, 0, nullPos + 1), StandardCharsets.UTF_8).stripTrailing();
         ActionRequest actionRequest = null;
         try {
             Class<?> clazz = Class.forName(requestClassName);
             Constructor<?> constructor = clazz.getConstructor(StreamInput.class);
-            StreamInput requestByteStream = StreamInput.wrap(
-                Arrays.copyOfRange(request.getRequestBytes(), nullPos + 1, request.getRequestBytes().length)
-            );
+            StreamInput requestByteStream = StreamInput.wrap(Arrays.copyOfRange(requestBytes, nullPos + 1, requestBytes.length));
             actionRequest = (ActionRequest) constructor.newInstance(requestByteStream);
         } catch (Exception e) {
             response.setResponseBytesAsString("No request class [" + requestClassName + "] is available: " + e.getMessage());

@@ -370,14 +370,30 @@ public class ExtensionsRunner {
         this.uniqueId = id;
     }
 
+    /**
+     * Returns the unique identifier for this object.
+     *
+     * @return The unique identifier for this object.
+     */
     public String getUniqueId() {
         return uniqueId;
     }
 
+    /**
+     * Sets the DiscoveryNode object for the OpenSearch node. This is used to establish a connection to the OpenSearch cluster.
+     *
+     * @param opensearchNode The DiscoveryNode object for the OpenSearch node.
+     */
     public void setOpensearchNode(DiscoveryNode opensearchNode) {
         this.opensearchNode = opensearchNode;
     }
 
+    /**
+     * Sets the {@link DiscoveryExtensionNode} instance for this object.
+     * This method must be called before any other method that depends on the extension node is invoked.
+     *
+     * @param extensionNode The {@link DiscoveryExtensionNode} instance to be set.
+     */
     public void setExtensionNode(DiscoveryExtensionNode extensionNode) {
         this.extensionNode = extensionNode;
     }
@@ -391,18 +407,40 @@ public class ExtensionsRunner {
         return this.extensionNode;
     }
 
+    /**
+     * Returns the DiscoveryNode object representing the OpenSearch node that this instance is connected to.
+     *
+     * @return The DiscoveryNode object representing the OpenSearch node.
+     */
     public DiscoveryNode getOpensearchNode() {
         return this.opensearchNode;
     }
 
+    /**
+     * Returns the custom NamedXContent registry entries registered by this module.
+     * These entries are used to deserialize custom JSON content in requests and responses.
+     *
+     * @return The list of custom NamedXContent registry entries.
+     */
     public List<NamedXContentRegistry.Entry> getCustomNamedXContent() {
         return this.customNamedXContent;
     }
 
+    /**
+     * Returns a list of custom named writeable registry entries.
+     * These entries represent custom objects that can be serialized and deserialized using the NamedWriteable API in OpenSearch.
+     *
+     * @return A list of NamedWriteableRegistry.Entry objects representing custom named writeable registry entries.
+     */
     public List<NamedWriteableRegistry.Entry> getCustomNamedWriteables() {
         return this.customNamedWriteables;
     }
 
+    /**
+     * Returns the {@link IndexNameExpressionResolver} instance associated with this object.
+     *
+     * @return the {@link IndexNameExpressionResolver} instance.
+     */
     public IndexNameExpressionResolver getIndexNameExpressionResolver() {
         return this.indexNameExpressionResolver;
     }
@@ -706,22 +744,46 @@ public class ExtensionsRunner {
         }
     }
 
+    /**
+     * Returns the settings object associated with this instance.
+     * The settings object contains the configuration options for this instance, such as the cluster name and node name.
+     *
+     * @return The settings object for this instance.
+     */
     public Settings getSettings() {
         return settings;
     }
 
+    /**
+     * Returns the thread pool associated with this object.
+     *
+     * @return The thread pool instance.
+     */
     public ThreadPool getThreadPool() {
         return threadPool;
     }
 
+    /**
+     * Returns the TaskManager instance associated with this object.
+     *
+     * @return The TaskManager instance.
+     */
     public TaskManager getTaskManager() {
         return taskManager;
     }
 
+    /**
+     * Returns the SDK client instance used by this class.
+     *
+     * @return The SDK client instance.
+     */
     public SDKClient getSdkClient() {
         return sdkClient;
     }
 
+    /**
+     * @return The SDKClusterService instance associated with this object.
+     */
     public SDKClusterService getSdkClusterService() {
         return sdkClusterService;
     }
@@ -733,14 +795,30 @@ public class ExtensionsRunner {
         this.sdkClusterService.updateSdkClusterSettings();
     }
 
+    /**
+     * Returns the {@link SDKActionModule} associated with this instance.
+     * This module provides access to SDK-specific actions and functionality.
+     *
+     * @return The {@link SDKActionModule} associated with this instance.
+     */
     public SDKActionModule getSdkActionModule() {
         return sdkActionModule;
     }
 
+    /**
+     * Returns the TransportService instance used by the extension for communication with other nodes in the cluster.
+     *
+     * @return the extension TransportService instance.
+     */
     public TransportService getExtensionTransportService() {
         return extensionTransportService;
     }
 
+    /**
+     * Returns the SDKTransportService instance associated with this class.
+     *
+     * @return The SDKTransportService instance.
+     */
     public SDKTransportService getSdkTransportService() {
         return sdkTransportService;
     }

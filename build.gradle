@@ -33,7 +33,7 @@ buildscript {
 }
 
 plugins {
-    id 'java'
+    id 'java-library'
     id "com.diffplug.spotless" version "6.18.0" apply false
     id 'jacoco'
     id "com.form.diff-coverage" version "0.9.5"
@@ -154,13 +154,13 @@ dependencies {
     def junitPlatform = "1.9.3"
     def jaxbVersion = "2.3.1"
 
-    implementation("org.opensearch:opensearch:${opensearchVersion}")
+    api("org.opensearch:opensearch:${opensearchVersion}")
     implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
     implementation("org.apache.logging.log4j:log4j-core:${log4jVersion}")
     implementation("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
     implementation("org.opensearch.client:opensearch-rest-high-level-client:${opensearchVersion}")
-    implementation("org.opensearch.client:opensearch-rest-client:${opensearchVersion}")
-    implementation("org.opensearch.client:opensearch-java:${opensearchVersion}")
+    api("org.opensearch.client:opensearch-rest-client:${opensearchVersion}")
+    api("org.opensearch.client:opensearch-java:${opensearchVersion}")
     implementation("org.opensearch.plugin:transport-netty4-client:${opensearchVersion}")
     implementation("io.netty:netty-all:${nettyVersion}")
     testCompileOnly("junit:junit:${junit4Version}") {
