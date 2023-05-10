@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
 public interface ActionExtension {
     /**
      * Actions added by this extension.
+     * @return a list of ActionHandler instances representing the added actions.
      */
     default List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
         return Collections.emptyList();
@@ -54,6 +55,7 @@ public interface ActionExtension {
     /**
      * Client actions added by this extension. This defaults to all of the {@linkplain ActionType} in
      * {@linkplain ActionExtension#getActions()}.
+     * @return a list of ActionType instances representing the added client actions.
      */
     default List<ActionType<? extends ActionResponse>> getClientActions() {
         return getActions().stream().map(a -> a.action).collect(Collectors.toList());
@@ -61,6 +63,7 @@ public interface ActionExtension {
 
     /**
      * ActionType filters added by this extension.
+     * @return a list of ActionFilter instances representing the added action filters.
      */
     default List<ActionFilter> getActionFilters() {
         return Collections.emptyList();
@@ -77,6 +80,7 @@ public interface ActionExtension {
 
     /**
      * Returns headers which should be copied through rest requests on to internal requests.
+     * @return a collection of RestHeaderDefinition instances representing the headers to be copied.
      */
     default Collection<RestHeaderDefinition> getRestHeaders() {
         return Collections.emptyList();
@@ -84,6 +88,7 @@ public interface ActionExtension {
 
     /**
      * Returns headers which should be copied from internal requests into tasks.
+     * @return a collection of String instances representing the headers to be copied.
      */
     default Collection<String> getTaskHeaders() {
         return Collections.emptyList();
@@ -109,6 +114,7 @@ public interface ActionExtension {
      * </pre>
      *
      * @param threadContext The Thread Context which can be used by the operator
+     * @return a function used to wrap each rest request
      */
     default UnaryOperator<ExtensionRestHandler> getRestHandlerWrapper(ThreadContext threadContext) {
         return null;
@@ -139,14 +145,29 @@ public interface ActionExtension {
             this.supportTransportActions = supportTransportActions;
         }
 
+        /**
+         * Returns the ActionType associated with this ActionHandler.
+         *
+         * @return the ActionType associated with this ActionHandler
+         */
         public ActionType<Response> getAction() {
             return action;
         }
 
+        /**
+         * Returns the TransportAction associated with this ActionHandler.
+         *
+         * @return the TransportAction associated with this ActionHandler
+         */
         public Class<? extends TransportAction<Request, Response>> getTransportAction() {
             return transportAction;
         }
 
+        /**
+         * Returns the array of supporting TransportActions associated with this ActionHandler.
+         *
+         * @return the array of supporting TransportActions associated with this ActionHandler
+         */
         public Class<?>[] getSupportTransportActions() {
             return supportTransportActions;
         }
