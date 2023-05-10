@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
 public interface ActionExtension {
     /**
      * Actions added by this extension.
+     *
      * @return a list of ActionHandler instances representing the added actions.
      */
     default List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
@@ -55,6 +56,7 @@ public interface ActionExtension {
     /**
      * Client actions added by this extension. This defaults to all of the {@linkplain ActionType} in
      * {@linkplain ActionExtension#getActions()}.
+     *
      * @return a list of ActionType instances representing the added client actions.
      */
     default List<ActionType<? extends ActionResponse>> getClientActions() {
@@ -63,6 +65,7 @@ public interface ActionExtension {
 
     /**
      * ActionType filters added by this extension.
+     *
      * @return a list of ActionFilter instances representing the added action filters.
      */
     default List<ActionFilter> getActionFilters() {
@@ -80,6 +83,7 @@ public interface ActionExtension {
 
     /**
      * Returns headers which should be copied through rest requests on to internal requests.
+     *
      * @return a collection of RestHeaderDefinition instances representing the headers to be copied.
      */
     default Collection<RestHeaderDefinition> getRestHeaders() {
@@ -88,6 +92,7 @@ public interface ActionExtension {
 
     /**
      * Returns headers which should be copied from internal requests into tasks.
+     *
      * @return a collection of String instances representing the headers to be copied.
      */
     default Collection<String> getTaskHeaders() {
