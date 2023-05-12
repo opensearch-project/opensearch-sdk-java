@@ -50,7 +50,7 @@ apply plugin: 'opensearch.testclusters'
 opensearchplugin {
     name 'opensearch-sdk-java'
     description 'OpenSearch Software Development Kit'
-    classname 'Sample Class'
+    classname 'org.opensearch.sdk.ExtensionsRunner'
 }
 
 ext {
@@ -149,6 +149,7 @@ dependencies {
     def junit5Version = "5.9.3"
     def junitPlatform = "1.9.3"
     def jaxbVersion = "2.3.1"
+    def jakartaVersion="2.1.1"
 
     api("org.opensearch:opensearch:${opensearchVersion}")
     implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
@@ -187,7 +188,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:${junitPlatform}")
 
     configurations.all {
-        resolutionStrategy.force("jakarta.json:jakarta.json-api:2.1.1")
+        resolutionStrategy.force("jakarta.json:jakarta.json-api:${jakartaVersion}")
         resolutionStrategy.force("com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}")
         resolutionStrategy.force("com.fasterxml.jackson.core:jackson-core:${jacksonDatabindVersion}")
     }
