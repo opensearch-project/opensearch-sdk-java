@@ -99,7 +99,7 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
     implementation("org.apache.logging.log4j:log4j-core:${log4jVersion}")
     implementation("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
-    api("org.opensearch.client:opensearch-rest-high-level-client:${opensearchVersion}")
+    implementation("org.opensearch.client:opensearch-rest-high-level-client:${opensearchVersion}")
     api("org.opensearch.client:opensearch-rest-client:${opensearchVersion}")
     api("org.opensearch.client:opensearch-java:${opensearchVersion}")
     implementation("org.opensearch.plugin:transport-netty4-client:${opensearchVersion}")

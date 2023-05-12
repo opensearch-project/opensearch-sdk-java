@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import com.google.protobuf.ByteString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.cluster.node.DiscoveryNode;
@@ -89,7 +90,7 @@ public class SDKTransportService {
             transportService.sendRequest(
                 opensearchNode,
                 ExtensionsManager.TRANSPORT_ACTION_REQUEST_FROM_EXTENSION,
-                new TransportActionRequestFromExtension(request.getAction(), proxyRequestBytes, uniqueId),
+                new TransportActionRequestFromExtension(request.getAction(), ByteString.copyFrom(proxyRequestBytes), uniqueId),
                 extensionActionResponseHandler
             );
             // Wait on response
