@@ -137,10 +137,6 @@ repositories {
     maven { url "https://d1nvenhzbhpy0q.cloudfront.net/snapshots/lucene/"}
 }
 
-configurations.all {
-    resolutionStrategy.force("jakarta.json:jakarta.json-api:2.1.1")
-}
-
 dependencies {
 
     def opensearchVersion = "3.0.0-SNAPSHOT"
@@ -189,6 +185,12 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junit5Version}")
     testImplementation("org.opensearch.test:framework:${opensearchVersion}")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:${junitPlatform}")
+
+    configurations.all {
+        resolutionStrategy.force("jakarta.json:jakarta.json-api:2.1.1")
+        resolutionStrategy.force("com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}")
+        resolutionStrategy.force("com.fasterxml.jackson.core:jackson-core:${jacksonDatabindVersion}")
+    }
 }
 
 // this task runs the helloworld sample extension
