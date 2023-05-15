@@ -144,7 +144,7 @@ dependencies {
     def nettyVersion = "4.1.92.Final"
     def jacksonDatabindVersion = "2.15.0"
     def guavaVersion = "31.1-jre"
-    def guiceVersion = "5.1.0"
+    def guiceVersion = "7.0.0"
     def junit4Version = "4.13.2"
     def junit5Version = "5.9.3"
     def junitPlatform = "1.9.3"
