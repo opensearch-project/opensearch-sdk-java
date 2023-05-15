@@ -160,6 +160,7 @@ dependencies {
     api("org.opensearch.client:opensearch-java:${opensearchVersion}")
     implementation("org.opensearch.plugin:transport-netty4-client:${opensearchVersion}")
     implementation("io.netty:netty-all:${nettyVersion}")
+    implementation("jakarta.inject:jakarta.inject-api:2.0.0")
     testCompileOnly("junit:junit:${junit4Version}") {
         exclude module : 'hamcrest'
         exclude module : 'hamcrest-core'
