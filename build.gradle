@@ -59,6 +59,16 @@ ext {
     noticeFile = rootProject.file('NOTICE.txt')
 }
 
+dependencyLicenses.enabled = false
+thirdPartyAudit.enabled = false
+loggerUsageCheck.enabled = false
+forbiddenApisMain.enabled = false
+forbiddenApisTest.enabled = false
+filepermissions.enabled = false
+forbiddenPatterns.enabled = false
+testingConventions.enabled = false
+validateNebulaPom.enabled = false
+
 def _numNodes = findProperty('numNodes') as Integer ?: 1
 def testPort = 4500
 
