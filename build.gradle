@@ -50,7 +50,7 @@ apply plugin: 'opensearch.testclusters'
 opensearchplugin {
     name 'opensearch-sdk-java'
     description 'OpenSearch Software Development Kit'
-    classname 'org.opensearch.sdk.ExtensionsRunner'
+    classname 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
 }
 
 ext {
