@@ -60,7 +60,6 @@ ext {
 }
 
 dependencyLicenses.enabled = false
-thirdPartyAudit.enabled = false
 loggerUsageCheck.enabled = false
 forbiddenApisMain.enabled = false
 forbiddenApisTest.enabled = false
@@ -69,7 +68,8 @@ forbiddenPatterns.enabled = false
 testingConventions.enabled = false
 validateNebulaPom.enabled = false
 
-def _numNodes = 1
+def _numNodes = findProperty('numNodes') as Integer ?: 1
+def testPort = 4500
 
 allprojects {
     project.ext.licenseName = 'The Apache Software License, Version 2.0'
@@ -112,7 +112,7 @@ publishing {
                         license.appendNode('url', project.licenseUrl)
 
                         Node developer = node.appendNode('developers').appendNode('developer')
-                        developer.appendNode('name', 'OpenSearch')
+                        developer.appendNode('name', 'opensearch-sdk-java')
                         developer.appendNode('url', 'https://github.com/opensearch-project/opensearch-sdk-java')
                     }
                 }
@@ -149,7 +149,11 @@ dependencies {
     def junit5Version = "5.9.3"
     def junitPlatform = "1.9.3"
     def jaxbVersion = "2.3.1"
-    def jakartaVersion="2.1.1"
+    def jakartaVersion = "2.1.1"
+    def jakartaInjectVersion = "2.0.1"
+    def javaxVersion  = "1"
+    def guavaFailureAccessVersion = "1.0.1"
+    def aopallianceVersion = "1.0"
 
     api("org.opensearch:opensearch:${opensearchVersion}")
     implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
@@ -160,7 +164,7 @@ dependencies {
     api("org.opensearch.client:opensearch-java:${opensearchVersion}")
     implementation("org.opensearch.plugin:transport-netty4-client:${opensearchVersion}")
     implementation("io.netty:netty-all:${nettyVersion}")
-    implementation("jakarta.inject:jakarta.inject-api:2.0.0")
+    implementation("jakarta.inject:jakarta.inject-api:${jakartaInjectVersion}")
     testCompileOnly("junit:junit:${junit4Version}") {
         exclude module : 'hamcrest'
         exclude module : 'hamcrest-core'
@@ -173,9 +177,9 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonDatabindVersion}")
 
     implementation("com.google.guava:guava:${guavaVersion}")
-    implementation('javax.inject:javax.inject:1')
-    implementation('com.google.guava:failureaccess:1.0.1')
-    implementation('aopalliance:aopalliance:1.0')
+    implementation("javax.inject:javax.inject:${javaxVersion}")
+    implementation("com.google.guava:failureaccess:${guavaFailureAccessVersion}")
+    implementation("aopalliance:aopalliance:${aopallianceVersion}")
 
     constraints {
         implementation("com.google.guava:guava:${guavaVersion}") {
@@ -271,6 +275,8 @@ task startTestExtension(type: Exec) {
 
 integTest {
     dependsOn(startTestExtension)
+
+    //TODO: find a way to add permissions for the tests
     systemProperty 'tests.security.manager', 'false'
 
     systemProperty "https", System.getProperty("https")
@@ -299,13 +305,13 @@ integTest {
 }
 
 task closeTestExtension (type: Exec) {
-    commandLine 'bash', '-c', "kill \$(lsof -i:4532)"
+    commandLine 'bash', '-c', "kill \$(lsof -i:${testPort})"
 }
 
 tasks.named("integTest").configure { finalizedBy(closeTestExtension) }
 
 testClusters.integTest {
-    extension(new ExtensionsProperties("hello-world", "opensearch-sdk-java-1", "127.0.0.1", "4532", "1.0", "3.0.0", "3.0.0"))
+    extension(new ExtensionsProperties("hello-world", "opensearch-sdk-java-1", "127.0.0.1", "${testPort}", "1.0", "3.0.0", "3.0.0"))
     testDistribution = "ARCHIVE"
     // Cluster shrink exception thrown if we try to set numberOfNodes to 1, so only apply if > 1
     if (_numNodes > 1) numberOfNodes = _numNodes
