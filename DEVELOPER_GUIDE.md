@@ -221,6 +221,16 @@ Run tests :
 ```
 ./gradlew clean build test
 ```
+
+Run integration tests :
+```
+./gradlew clean build integTest
+```
+
+## Launching and debugging from an IDE
+
+See [Launching and debugging from an IDE in OpenSearch](https://github.com/opensearch-project/OpenSearch/blob/main/TESTING.md#launching-and-debugging-from-an-ide)
+
 ## Generate Artifact
 
 In opensearch-sdk-java navigate to build/distributions. Look for tar ball in the form `opensearch-sdk-java-1.0.0-SNAPSHOT.tar`. If not found follow the below steps to create one:
