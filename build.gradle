@@ -44,13 +44,14 @@ plugins {
 
 apply from: 'gradle/formatting.gradle'
 apply plugin: 'maven-publish'
+apply plugin: 'java'
 apply plugin: 'opensearch.opensearchplugin'
 apply plugin: 'opensearch.testclusters'
 
 opensearchplugin {
     name 'opensearch-sdk-java'
     description 'OpenSearch Software Development Kit'
-    classname 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
+    classname 'src.main.java.org.opensearch.sdk.SDKPlugin'
 }
 
 ext {
