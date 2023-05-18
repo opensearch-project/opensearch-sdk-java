@@ -11,7 +11,7 @@ package org.opensearch.sdk.ssl.util;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opensearch.common.Strings;
+import org.opensearch.core.common.Strings;
 
 import java.security.Key;
 import java.security.KeyStore;
