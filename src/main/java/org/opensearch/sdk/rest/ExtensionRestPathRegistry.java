@@ -16,6 +16,7 @@ import java.util.Optional;
 import org.opensearch.common.Nullable;
 import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.path.PathTrie;
+import org.opensearch.extensions.rest.RouteHandler;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestUtils;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler.ExtensionDeprecationRestHandler;
@@ -39,7 +40,13 @@ public class ExtensionRestPathRegistry {
      * @param restHandler The RestHandler to register routes.
      */
     public void registerHandler(ExtensionRestHandler restHandler) {
-        restHandler.routes().forEach(route -> registerHandler(route.getMethod(), route.getPath(), restHandler));
+        restHandler.routes().forEach(route -> {
+            Optional<String> routeActionName = Optional.empty();
+            if (route instanceof RouteHandler && ((RouteHandler) route).name() != null) {
+                routeActionName = Optional.of(((RouteHandler) route).name());
+            }
+            registerHandler(route.getMethod(), route.getPath(), routeActionName, restHandler);
+        });
         restHandler.deprecatedRoutes()
             .forEach(route -> registerAsDeprecatedHandler(route.getMethod(), route.getPath(), restHandler, route.getDeprecationMessage()));
         restHandler.replacedRoutes()
