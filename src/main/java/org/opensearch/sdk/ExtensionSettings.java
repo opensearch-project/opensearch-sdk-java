@@ -259,7 +259,7 @@ public class ExtensionSettings {
             }
             return new ExtensionSettings(
                 extensionMap.get("extensionName").toString(),
-                extensionMap.get("shortName").toString(),
+                extensionMap.get("shortExtensionName").toString(),
                 extensionMap.get("hostAddress").toString(),
                 extensionMap.get("hostPort").toString(),
                 extensionMap.get("opensearchAddress").toString(),
