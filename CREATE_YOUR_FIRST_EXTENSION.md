@@ -14,8 +14,10 @@ In your dependency management, set up a dependency on OpenSearch SDK for Java.  
  - Group ID: org.opensearch.sdk
  - Artifact ID: opensearch-sdk-java
  - Version: 1.0.0-SNAPSHOT (compatible with OpenSearch 2.x) or 2.0.0-SNAPSHOT (compatible with OpenSearch 3.x)
- - GA repository: Not yet released
- - SNAPSHOT repository: https://aws.oss.sonatype.org/content/repositories/snapshots/
+
+After GA, dependencies will be released to the Central Repository. To use SNAPSHOT versions, add these repositories:
+ - OpenSearch SNAPSHOT repository: https://aws.oss.sonatype.org/content/repositories/snapshots/
+ - Lucene snapshot repository: https://d1nvenhzbhpy0q.cloudfront.net/snapshots/lucene/
 
 If you use Maven, the following POM entries will work.
 
@@ -25,12 +27,11 @@ If you use Maven, the following POM entries will work.
     <id>opensearch.snapshots</id>
     <name>OpenSearch Snapshot Repository</name>
     <url>https://aws.oss.sonatype.org/content/repositories/snapshots/</url>
-    <releases>
-      <enabled>false</enabled>
-    </releases>
-    <snapshots>
-      <enabled>true</enabled>
-    </snapshots>
+  </repository>
+  <repository>
+    <id>lucene.snapshots</id>
+    <name>Lucene Snapshot Repository</name>
+    <url>https://d1nvenhzbhpy0q.cloudfront.net/snapshots/lucene/</url>
   </repository>
 </repositories>
 
@@ -42,6 +43,21 @@ If you use Maven, the following POM entries will work.
   </dependency>
 </dependencies>
 ```
+
+For Gradle:
+
+```groovy
+repositories {
+  mavenCentral()
+  maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots/" }
+  maven { url "https://d1nvenhzbhpy0q.cloudfront.net/snapshots/lucene/"}
+}
+
+dependencies {
+  implementation("org.opensearch.sdk:opensearch-sdk-java:2.0.0-SNAPSHOT")
+}
+```
+
 
 ## Obtain network address and port information
 
@@ -120,7 +136,7 @@ public class CRUDExtension extends BaseExtension implements ActionExtension {
 }
 ```
 
-These classes must `implement ExtensionRestHandler`, which is a functional interface which requires the implementation of `public ExtensionRestResponse handleRequest(ExtensionRestRequest request)`.
+These classes must `implement ExtensionRestHandler`, which is a functional interface which requires the implementation of `public ExtensionRestResponse handleRequest(RestRequest request)`.
 
 However the `BaseExtensionRestHandler` provides many useful methods for exception handling in requests including a `RouteHandler` class which eases logical separation of multiple `Route` choices.
 
@@ -130,12 +146,11 @@ For the CRUD extension example, we'll implement one REST Route for each option a
 import java.util.List;
 import java.util.function.Function;
 
-import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestRequest.Method;
+import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestStatus;
-import org.opensearch.sdk.BaseExtensionRestHandler;
-import org.opensearch.sdk.RouteHandler;
+import org.opensearch.sdk.rest.BaseExtensionRestHandler;
 
 public class CrudAction extends BaseExtensionRestHandler {
 
@@ -149,19 +164,19 @@ public class CrudAction extends BaseExtensionRestHandler {
         );
     }
 
-    Function<ExtensionRestRequest, ExtensionRestResponse> createHandler = (request) -> {
+    Function<RestRequest, ExtensionRestResponse> createHandler = (request) -> {
         return new ExtensionRestResponse(request, RestStatus.OK, "To be implemented");
     };
 
-    Function<ExtensionRestRequest, ExtensionRestResponse> readHandler = (request) -> {
+    Function<RestRequest, ExtensionRestResponse> readHandler = (request) -> {
         return new ExtensionRestResponse(request, RestStatus.OK, "To be implemented");
     };
 
-    Function<ExtensionRestRequest, ExtensionRestResponse> updateHandler = (request) -> {
+    Function<RestRequest, ExtensionRestResponse> updateHandler = (request) -> {
         return new ExtensionRestResponse(request, RestStatus.OK, "To be implemented");
     };
 
-    Function<ExtensionRestRequest, ExtensionRestResponse> deleteHandler = (request) -> {
+    Function<RestRequest, ExtensionRestResponse> deleteHandler = (request) -> {
         return new ExtensionRestResponse(request, RestStatus.OK, "To be implemented");
     };
 }
@@ -224,7 +239,7 @@ return createJsonResponse(request, RestStatus.OK, "_id", response.id());
 Putting it all together:
 
 ```java
-Function<ExtensionRestRequest, ExtensionRestResponse> createHandler = (request) -> {
+Function<RestRequest, ExtensionRestResponse> createHandler = (request) -> {
     IndexResponse response;
     try {
         BooleanResponse exists = client.indices().exists(new ExistsRequest.Builder().index("crudsample").build());

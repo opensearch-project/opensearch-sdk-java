@@ -32,18 +32,38 @@ public class CertFileProps {
         this.pemKeyPassword = pemKeyPassword;
     }
 
+    /**
+     * Returns the path to the certificate file in the .pem format.
+     *
+     * @return the path to the certificate file
+     */
     public String getPemCertFilePath() {
         return pemCertFilePath;
     }
 
+    /**
+     * Returns the path to the private key file in the .pem format.
+     *
+     * @return the path to the private key file
+     */
     public String getPemKeyFilePath() {
         return pemKeyFilePath;
     }
 
+    /**
+     * Returns the path to the trusted CA file.
+     *
+     * @return the path to the trusted CA file
+     */
     public String getTrustedCasFilePath() {
         return trustedCasFilePath;
     }
 
+    /**
+     * Returns the password for the private key file.
+     *
+     * @return the password for the private key file
+     */
     public String getPemKeyPassword() {
         return pemKeyPassword;
     }
