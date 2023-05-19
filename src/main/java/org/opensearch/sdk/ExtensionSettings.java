@@ -49,11 +49,11 @@ import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_TRUSTSTORE
 public class ExtensionSettings {
 
     private String extensionName;
+    private String shortName;
     private String hostAddress;
     private String hostPort;
     private String opensearchAddress;
     private String opensearchPort;
-    private String shortName;
     private Map<String, String> securitySettings;
 
     /**

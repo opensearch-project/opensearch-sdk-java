@@ -55,7 +55,7 @@ import java.net.ConnectException;
 @SuppressWarnings("deprecation")
 public class TestSDKClient extends OpenSearchTestCase {
     private SDKClient sdkClient;
-    private final ExtensionSettings extensionSettings = new ExtensionSettings("", "", "", "localhost", "9200");
+    private final ExtensionSettings extensionSettings = new ExtensionSettings("", "", "", "", "localhost", "9200");
 
     @Override
     @BeforeEach
