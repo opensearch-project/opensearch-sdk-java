@@ -201,7 +201,9 @@ public class ExtensionsRunner {
         if (extensionSettings.getShortExtensionName() != null) {
             // initialize ExtensionRouteHandlerFactory
             ExtensionRouteHandlerFactory factory = ExtensionRouteHandlerFactory.getInstance();
-            factory.init(extensionSettings.getShortExtensionName());
+            if (!factory.isInitialized()) {
+                factory.init(extensionSettings.getShortExtensionName());
+            }
         }
 
         final List<ExecutorBuilder<?>> executorBuilders = extension.getExecutorBuilders(settings);

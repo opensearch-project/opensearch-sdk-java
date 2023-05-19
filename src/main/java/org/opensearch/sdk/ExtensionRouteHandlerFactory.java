@@ -38,6 +38,14 @@ public class ExtensionRouteHandlerFactory {
     }
 
     /**
+     *
+     * @return Indicates whether this class has previously been initialized
+     */
+    public boolean isInitialized() {
+        return INSTANCE != null && this.extensionShortName != null;
+    }
+
+    /**
      * Initializes this ExtensionRouteHandlerFactory
      * @param extensionShortName The shortName for the extension
      */
