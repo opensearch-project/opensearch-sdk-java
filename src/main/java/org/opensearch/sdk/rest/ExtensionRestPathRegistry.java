@@ -189,7 +189,7 @@ public class ExtensionRestPathRegistry {
      *
      * @param method  the method.
      * @param path  the path.
-     * @param path  the name corresponding to this route.
+     * @param name  the name corresponding to this route.
      * @return A string appending the method and path.
      */
     public static String restPathToString(Method method, String path, Optional<String> name) {
