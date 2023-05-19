@@ -15,8 +15,20 @@ import org.opensearch.extensions.rest.RouteHandler;
 
 import java.util.function.Function;
 
+/**
+ * Subclass of RouteHandler that utilizes a naming convention for extension routes that prepends
+ * the extension's shortName (abbreviation) before any name for a route. i.e. hw:greet for the
+ * HelloWorldExtension greet REST api
+ */
 public class ExtensionRouteHandler extends RouteHandler {
 
+    /**
+     *
+     * @param handlerName A shortened name for this REST api's handler
+     * @param method HTTP Method
+     * @param path The path of the api
+     * @param handler The REST handler
+     */
     public ExtensionRouteHandler(
         String handlerName,
         RestRequest.Method method,

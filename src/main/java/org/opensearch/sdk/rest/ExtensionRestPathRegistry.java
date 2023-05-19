@@ -57,7 +57,7 @@ public class ExtensionRestPathRegistry {
      * Registers a REST handler to be executed when one of the provided methods and path match the request.
      *
      * @param path Path to handle (e.g., "/{index}/{type}/_bulk")
-     * @param handler The handler to actually execute
+     * @param extensionRestHandler The handler to actually execute
      * @param method GET, POST, etc.
      */
     public void registerHandler(Method method, String path, ExtensionRestHandler extensionRestHandler) {
