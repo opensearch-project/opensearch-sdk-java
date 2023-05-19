@@ -69,6 +69,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -197,10 +198,10 @@ public class ExtensionsRunner {
         logger.info("SSL is " + sslText + " for transport");
         this.settings = settingsBuilder.build();
 
-        if (extensionSettings.getShortName() != null) {
+        if (extensionSettings.getShortExtensionName() != null) {
             // initialize ExtensionRouteHandlerFactory
             ExtensionRouteHandlerFactory factory = ExtensionRouteHandlerFactory.getInstance();
-            factory.init(extensionSettings.getShortName());
+            factory.init(extensionSettings.getShortExtensionName());
         }
 
         final List<ExecutorBuilder<?>> executorBuilders = extension.getExecutorBuilders(settings);
@@ -264,16 +265,11 @@ public class ExtensionsRunner {
             // store REST handlers in the registry
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
                 for (RestHandler.Route route : extensionRestHandler.routes()) {
+                    Optional<String> routeActionName = Optional.empty();
                     if (route instanceof RouteHandler && ((RouteHandler) route).name() != null) {
-                        extensionRestPathRegistry.registerHandler(
-                            route.getMethod(),
-                            route.getPath(),
-                            ((RouteHandler) route).name(),
-                            extensionRestHandler
-                        );
-                    } else {
-                        extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), extensionRestHandler);
+                        routeActionName = Optional.of(((RouteHandler) route).name());
                     }
+                    extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), routeActionName, extensionRestHandler);
                 }
             }
         }

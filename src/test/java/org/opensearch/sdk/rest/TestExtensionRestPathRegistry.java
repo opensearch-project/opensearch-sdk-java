@@ -10,6 +10,7 @@
 package org.opensearch.sdk.rest;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -181,6 +182,11 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
 
     @Test
     public void testRestPathToString() {
-        assertEquals("GET /foo", ExtensionRestPathRegistry.restPathToString(Method.GET, "/foo"));
+        assertEquals("GET /foo", ExtensionRestPathRegistry.restPathToString(Method.GET, "/foo", Optional.empty()));
+    }
+
+    @Test
+    public void testRestPathWithNameToString() {
+        assertEquals("GET /foo foo", ExtensionRestPathRegistry.restPathToString(Method.GET, "/foo", Optional.of("foo")));
     }
 }

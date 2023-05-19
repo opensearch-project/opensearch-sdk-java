@@ -11,6 +11,7 @@ package org.opensearch.sdk.rest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.opensearch.common.Nullable;
 import org.opensearch.common.logging.DeprecationLogger;
@@ -58,19 +59,24 @@ public class ExtensionRestPathRegistry {
      *
      * @param path Path to handle (e.g., "/{index}/{type}/_bulk")
      * @param extensionRestHandler The handler to actually execute
+     * @param name The name corresponding to this handler
      * @param method GET, POST, etc.
      */
-    public void registerHandler(Method method, String path, ExtensionRestHandler extensionRestHandler) {
+    public void registerHandler(Method method, String path, Optional<String> name, ExtensionRestHandler extensionRestHandler) {
         pathTrie.insertOrUpdate(
             path,
             new SDKMethodHandlers(path, extensionRestHandler, method),
             (mHandlers, newMHandler) -> mHandlers.addMethods(extensionRestHandler, method)
         );
         if (extensionRestHandler instanceof ExtensionDeprecationRestHandler) {
-            registeredDeprecatedPaths.add(restPathToString(method, path));
+            registeredDeprecatedPaths.add(restPathToString(method, path, name));
             registeredDeprecatedPaths.add(((ExtensionDeprecationRestHandler) extensionRestHandler).getDeprecationMessage());
         } else {
-            registeredPaths.add(restPathToString(method, path));
+            if (name.isPresent()) {
+                registeredPaths.add(restPathToString(method, path, name));
+            } else {
+                registeredPaths.add(restPathToString(method, path, name));
+            }
         }
     }
 
@@ -85,7 +91,12 @@ public class ExtensionRestPathRegistry {
     private void registerAsDeprecatedHandler(Method method, String path, ExtensionRestHandler handler, String deprecationMessage) {
         assert (handler instanceof ExtensionDeprecationRestHandler) == false;
 
-        registerHandler(method, path, new ExtensionDeprecationRestHandler(handler, deprecationMessage, deprecationLogger));
+        registerHandler(
+            method,
+            path,
+            Optional.empty(),
+            new ExtensionDeprecationRestHandler(handler, deprecationMessage, deprecationLogger)
+        );
     }
 
     /**
@@ -129,26 +140,8 @@ public class ExtensionRestPathRegistry {
             + path
             + "] instead.";
 
-        registerHandler(method, path, handler);
+        registerHandler(method, path, Optional.empty(), handler);
         registerAsDeprecatedHandler(deprecatedMethod, deprecatedPath, handler, deprecationMessage);
-    }
-
-    /**
-     * Register a REST handler to handle a method and route in this extension's path registry.
-     *
-     * @param method  The method to register.
-     * @param path  The path to register. May include named wildcards.
-     * @param name  An optional name of the REST handler
-     * @param extensionRestHandler  The RestHandler to handle this route
-     */
-    public void registerHandler(Method method, String path, String name, ExtensionRestHandler extensionRestHandler) {
-        pathTrie.insertOrUpdate(
-            path,
-            new SDKMethodHandlers(path, extensionRestHandler, method),
-            (mHandlers, newMHandler) -> mHandlers.addMethods(extensionRestHandler, method)
-        );
-        String restPathWithName = restPathToString(method, path, name);
-        registeredPaths.add(restPathWithName);
     }
 
     /**
@@ -189,21 +182,13 @@ public class ExtensionRestPathRegistry {
      *
      * @param method  the method.
      * @param path  the path.
+     * @param path  the name corresponding to this route.
      * @return A string appending the method and path.
      */
-    public static String restPathToString(Method method, String path) {
+    public static String restPathToString(Method method, String path, Optional<String> name) {
+        if (name.isPresent()) {
+            return method.name() + " " + path + " " + name.get();
+        }
         return method.name() + " " + path;
-    }
-
-    /**
-     * Converts a REST method and path to a space delimited string to be used as a map lookup key.
-     *
-     * @param method  the method.
-     * @param path  the path.
-     * @param name  the name.
-     * @return A string appending the method and path.
-     */
-    public static String restPathToString(Method method, String path, String name) {
-        return method.name() + " " + path + " " + name;
     }
 }
