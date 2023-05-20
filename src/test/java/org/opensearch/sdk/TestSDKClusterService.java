@@ -12,16 +12,23 @@ package org.opensearch.sdk;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Setting.Property;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.sdk.SDKClusterService.SDKClusterSettings;
 import org.opensearch.test.OpenSearchTestCase;
+import org.opensearch.transport.TransportRequest;
+import org.opensearch.transport.TransportRequestOptions;
+import org.opensearch.transport.TransportResponseHandler;
 import org.opensearch.transport.TransportService;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -109,20 +116,44 @@ public class TestSDKClusterService extends OpenSearchTestCase {
 
         // Before initialization should store pending update but do nothing
         sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(boolSetting, boolConsumer);
-        verify(extensionsRunner.getSdkTransportService(), times(0)).getTransportService();
+        verify(extensionsRunner.getSdkTransportService().getTransportService(), times(0)).sendRequest(
+            any(DiscoveryNode.class),
+            anyString(),
+            any(TransportRequest.class),
+            any(TransportRequestOptions.class),
+            ArgumentMatchers.<TransportResponseHandler<?>>any()
+        );
 
         // After initialization should be able to send pending updates
         extensionsRunner.setInitialized();
         sdkClusterService.getClusterSettings().sendPendingSettingsUpdateConsumers();
-        verify(extensionsRunner.getSdkTransportService(), times(1)).getTransportService();
+        verify(extensionsRunner.getSdkTransportService().getTransportService(), times(1)).sendRequest(
+            any(DiscoveryNode.class),
+            anyString(),
+            any(TransportRequest.class),
+            any(TransportRequestOptions.class),
+            ArgumentMatchers.<TransportResponseHandler<?>>any()
+        );
 
         // Once updates sent, map is empty, shouldn't send on retry (keep cumulative 1)
         sdkClusterService.getClusterSettings().sendPendingSettingsUpdateConsumers();
-        verify(extensionsRunner.getSdkTransportService(), times(1)).getTransportService();
+        verify(extensionsRunner.getSdkTransportService().getTransportService(), times(1)).sendRequest(
+            any(DiscoveryNode.class),
+            anyString(),
+            any(TransportRequest.class),
+            any(TransportRequestOptions.class),
+            ArgumentMatchers.<TransportResponseHandler<?>>any()
+        );
 
         // Sending a new update should send immediately (cumulative now 2)
         sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(boolSetting, boolConsumer);
-        verify(extensionsRunner.getSdkTransportService(), times(2)).getTransportService();
+        verify(extensionsRunner.getSdkTransportService().getTransportService(), times(2)).sendRequest(
+            any(DiscoveryNode.class),
+            anyString(),
+            any(TransportRequest.class),
+            any(TransportRequestOptions.class),
+            ArgumentMatchers.<TransportResponseHandler<?>>any()
+        );
 
         ArgumentCaptor<TransportService> transportServiceArgumentCaptor = ArgumentCaptor.forClass(TransportService.class);
         @SuppressWarnings("unchecked")
