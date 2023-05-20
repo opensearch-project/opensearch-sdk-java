@@ -54,10 +54,10 @@ public class TestSDKClusterService extends OpenSearchTestCase {
         // After initialization should be successful
         when(extensionsRunner.isInitialized()).thenReturn(true);
         sdkClusterService.state();
-        verify(extensionsRunner, times(1)).getExtensionTransportService();
+        verify(extensionsRunner, times(1)).getSdkTransportService().getTransportService();
 
         ArgumentCaptor<TransportService> argumentCaptor = ArgumentCaptor.forClass(TransportService.class);
-        verify(extensionsRunner, times(1)).sendClusterStateRequest(argumentCaptor.capture());
+        verify(extensionsRunner, times(1)).sendClusterStateRequest();
         assertNull(argumentCaptor.getValue());
     }
 
@@ -105,32 +105,29 @@ public class TestSDKClusterService extends OpenSearchTestCase {
         Consumer<Boolean> boolConsumer = b -> {};
 
         TransportService mockTransportService = mock(TransportService.class);
-        extensionsRunner.setExtensionTransportService(mockTransportService);
+        extensionsRunner.getSdkTransportService().setTransportService(mockTransportService);
 
         // Before initialization should store pending update but do nothing
         sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(boolSetting, boolConsumer);
-        verify(extensionsRunner, times(0)).getExtensionTransportService();
+        verify(extensionsRunner, times(0)).getSdkTransportService().getTransportService();
 
         // After initialization should be able to send pending updates
         extensionsRunner.setInitialized();
         sdkClusterService.getClusterSettings().sendPendingSettingsUpdateConsumers();
-        verify(extensionsRunner, times(1)).getExtensionTransportService();
+        verify(extensionsRunner, times(1)).getSdkTransportService().getTransportService();
 
         // Once updates sent, map is empty, shouldn't send on retry (keep cumulative 1)
         sdkClusterService.getClusterSettings().sendPendingSettingsUpdateConsumers();
-        verify(extensionsRunner, times(1)).getExtensionTransportService();
+        verify(extensionsRunner, times(1)).getSdkTransportService().getTransportService();
 
         // Sending a new update should send immediately (cumulative now 2)
         sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(boolSetting, boolConsumer);
-        verify(extensionsRunner, times(2)).getExtensionTransportService();
+        verify(extensionsRunner, times(2)).getSdkTransportService().getTransportService();
 
         ArgumentCaptor<TransportService> transportServiceArgumentCaptor = ArgumentCaptor.forClass(TransportService.class);
         @SuppressWarnings("unchecked")
         ArgumentCaptor<Map<Setting<?>, Consumer<?>>> updateConsumerArgumentCaptor = ArgumentCaptor.forClass(Map.class);
-        verify(extensionsRunner, times(2)).sendAddSettingsUpdateConsumerRequest(
-            transportServiceArgumentCaptor.capture(),
-            updateConsumerArgumentCaptor.capture()
-        );
+        verify(extensionsRunner, times(2)).sendAddSettingsUpdateConsumerRequest(updateConsumerArgumentCaptor.capture());
         assertEquals(mockTransportService, transportServiceArgumentCaptor.getValue());
         // Map will be cleared following this call
         assertTrue(updateConsumerArgumentCaptor.getValue().isEmpty());

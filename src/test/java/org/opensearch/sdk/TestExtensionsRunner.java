@@ -80,7 +80,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     public void setUp() throws Exception {
         super.setUp();
         this.extensionsRunner = new ExtensionsRunnerForTest();
-        extensionsRunner.setUniqueId("opensearch-sdk-1");
+        extensionsRunner.getSdkTransportService().setUniqueId("opensearch-sdk-1");
         this.extensionsInitRequestHandler = new ExtensionsInitRequestHandler(extensionsRunner);
 
         this.transportService = spy(
@@ -126,7 +126,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         );
 
         // Set mocked transport service
-        extensionsRunner.setExtensionTransportService(this.transportService);
+        extensionsRunner.getSdkTransportService().setTransportService(this.transportService);
         doNothing().when(this.transportService).connectToNodeAsExtension(sourceNode, "opensearch-sdk-1");
 
         InitializeExtensionRequest extensionInitRequest = new InitializeExtensionRequest(sourceNode, extension);
@@ -134,9 +134,9 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         InitializeExtensionResponse response = extensionsInitRequestHandler.handleExtensionInitRequest(extensionInitRequest);
         // Test if name and unique ID are set
         assertEquals(EXTENSION_NAME, response.getName());
-        assertEquals("opensearch-sdk-1", extensionsRunner.getUniqueId());
+        assertEquals("opensearch-sdk-1", extensionsRunner.getSdkTransportService().getUniqueId());
         // Test if the source node is set after handleExtensionInitRequest() is called during OpenSearch bootstrap
-        assertEquals(sourceNode, extensionsRunner.getOpensearchNode());
+        assertEquals(sourceNode, extensionsRunner.getSdkTransportService().getOpensearchNode());
     }
 
     @Test
@@ -181,7 +181,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testClusterStateRequest() {
 
-        extensionsRunner.sendClusterStateRequest(transportService);
+        extensionsRunner.sendClusterStateRequest();
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ClusterStateResponseHandler.class));
     }
@@ -189,14 +189,14 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testClusterSettingRequest() {
 
-        extensionsRunner.sendClusterSettingsRequest(transportService);
+        extensionsRunner.sendClusterSettingsRequest();
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ClusterSettingsResponseHandler.class));
     }
 
     @Test
     public void testEnvironmentSettingsRequest() {
-        extensionsRunner.sendEnvironmentSettingsRequest(transportService);
+        extensionsRunner.sendEnvironmentSettingsRequest();
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(EnvironmentSettingsResponseHandler.class));
     }
@@ -204,14 +204,14 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testRegisterRestActionsRequest() {
 
-        extensionsRunner.sendRegisterRestActionsRequest(transportService);
+        extensionsRunner.sendRegisterRestActionsRequest();
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(AcknowledgedResponseHandler.class));
     }
 
     @Test
     public void testRegisterCustomSettingsRequest() {
-        extensionsRunner.sendRegisterCustomSettingsRequest(transportService);
+        extensionsRunner.sendRegisterCustomSettingsRequest();
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(AcknowledgedResponseHandler.class));
     }
