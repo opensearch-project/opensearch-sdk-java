@@ -19,14 +19,13 @@ import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportException;
 import org.opensearch.transport.TransportResponseHandler;
-import org.opensearch.transport.TransportService;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendClusterStateRequest(TransportService)} call.
+ * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendClusterStateRequest()} call.
  */
 public class ClusterStateResponseHandler implements TransportResponseHandler<ClusterStateResponse> {
     private static final Logger logger = LogManager.getLogger(ClusterStateResponseHandler.class);
