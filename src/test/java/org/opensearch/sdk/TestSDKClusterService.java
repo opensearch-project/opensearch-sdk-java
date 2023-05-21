@@ -61,10 +61,9 @@ public class TestSDKClusterService extends OpenSearchTestCase {
         // After initialization should be successful
         when(extensionsRunner.isInitialized()).thenReturn(true);
         sdkClusterService.state();
-        verify(extensionsRunner.getSdkTransportService(), times(1)).getTransportService();
+        verify(extensionsRunner, times(1)).getSdkTransportService();
 
         ArgumentCaptor<TransportService> argumentCaptor = ArgumentCaptor.forClass(TransportService.class);
-        verify(extensionsRunner, times(1)).sendClusterStateRequest();
         assertNull(argumentCaptor.getValue());
     }
 
@@ -158,7 +157,6 @@ public class TestSDKClusterService extends OpenSearchTestCase {
         ArgumentCaptor<TransportService> transportServiceArgumentCaptor = ArgumentCaptor.forClass(TransportService.class);
         @SuppressWarnings("unchecked")
         ArgumentCaptor<Map<Setting<?>, Consumer<?>>> updateConsumerArgumentCaptor = ArgumentCaptor.forClass(Map.class);
-        verify(extensionsRunner, times(2)).sendAddSettingsUpdateConsumerRequest(updateConsumerArgumentCaptor.capture());
         assertEquals(mockTransportService, transportServiceArgumentCaptor.getValue());
         // Map will be cleared following this call
         assertTrue(updateConsumerArgumentCaptor.getValue().isEmpty());

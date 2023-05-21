@@ -181,7 +181,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testClusterStateRequest() {
 
-        extensionsRunner.sendClusterStateRequest();
+        extensionsRunner.getSdkTransportService().sendClusterStateRequest();
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ClusterStateResponseHandler.class));
     }
@@ -189,14 +189,14 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testClusterSettingRequest() {
 
-        extensionsRunner.sendClusterSettingsRequest();
+        extensionsRunner.getSdkTransportService().sendClusterSettingsRequest();
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ClusterSettingsResponseHandler.class));
     }
 
     @Test
     public void testEnvironmentSettingsRequest() {
-        extensionsRunner.sendEnvironmentSettingsRequest();
+        extensionsRunner.getSdkTransportService().sendEnvironmentSettingsRequest();
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(EnvironmentSettingsResponseHandler.class));
     }
@@ -204,14 +204,14 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testRegisterRestActionsRequest() {
 
-        extensionsRunner.sendRegisterRestActionsRequest();
+        extensionsRunner.getSdkTransportService().sendRegisterRestActionsRequest(extensionsRunner.getExtensionRestPathRegistry());
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(AcknowledgedResponseHandler.class));
     }
 
     @Test
     public void testRegisterCustomSettingsRequest() {
-        extensionsRunner.sendRegisterCustomSettingsRequest();
+        extensionsRunner.getSdkTransportService().sendRegisterCustomSettingsRequest(extensionsRunner.getCustomSettings());
 
         verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(AcknowledgedResponseHandler.class));
     }

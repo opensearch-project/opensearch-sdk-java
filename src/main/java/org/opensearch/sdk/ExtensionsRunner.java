@@ -17,32 +17,21 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
-import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
-import org.opensearch.extensions.proto.ExtensionRequestProto;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
-import org.opensearch.extensions.rest.RegisterRestActionsRequest;
-import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.discovery.InitializeExtensionRequest;
-import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
 import org.opensearch.extensions.DiscoveryExtensionNode;
-import org.opensearch.extensions.ExtensionRequest;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.UpdateSettingsRequest;
 import org.opensearch.extensions.action.ExtensionActionRequest;
 import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.sdk.action.SDKActionModule;
-import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.sdk.api.ActionExtension;
-import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
-import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
-import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionActionRequestHandler;
-import org.opensearch.sdk.handlers.ExtensionDependencyResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionsIndicesModuleNameRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
@@ -54,8 +43,6 @@ import org.opensearch.tasks.TaskManager;
 import org.opensearch.threadpool.ExecutorBuilder;
 import org.opensearch.threadpool.RunnableTaskExecutionListener;
 import org.opensearch.threadpool.ThreadPool;
-import org.opensearch.transport.TransportResponse;
-import org.opensearch.transport.TransportResponseHandler;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.TransportSettings;
 
@@ -67,9 +54,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_ENABLED;
@@ -499,200 +484,6 @@ public class ExtensionsRunner {
     }
 
     /**
-     * Requests that OpenSearch register the REST Actions for this extension.
-     */
-    public void sendRegisterRestActionsRequest() {
-        TransportService transportService = sdkTransportService.getTransportService();
-        List<String> extensionRestPaths = extensionRestPathRegistry.getRegisteredPaths();
-        List<String> extensionDeprecatedRestPaths = extensionRestPathRegistry.getRegisteredDeprecatedPaths();
-        logger.info(
-            "Sending Register REST Actions request to OpenSearch for "
-                + extensionRestPaths
-                + " and deprecated paths "
-                + extensionDeprecatedRestPaths
-        );
-        AcknowledgedResponseHandler registerActionsResponseHandler = new AcknowledgedResponseHandler();
-        try {
-            transportService.sendRequest(
-                sdkTransportService.getOpensearchNode(),
-                ExtensionsManager.REQUEST_EXTENSION_REGISTER_REST_ACTIONS,
-                new RegisterRestActionsRequest(sdkTransportService.getUniqueId(), extensionRestPaths, extensionDeprecatedRestPaths),
-                registerActionsResponseHandler
-            );
-        } catch (Exception e) {
-            logger.info("Failed to send Register REST Actions request to OpenSearch", e);
-        }
-    }
-
-    /**
-     * Requests that OpenSearch register the custom settings for this extension.
-     */
-    public void sendRegisterCustomSettingsRequest() {
-        TransportService transportService = sdkTransportService.getTransportService();
-        logger.info("Sending Settings request to OpenSearch");
-        AcknowledgedResponseHandler registerCustomSettingsResponseHandler = new AcknowledgedResponseHandler();
-        try {
-            transportService.sendRequest(
-                sdkTransportService.getOpensearchNode(),
-                ExtensionsManager.REQUEST_EXTENSION_REGISTER_CUSTOM_SETTINGS,
-                new RegisterCustomSettingsRequest(sdkTransportService.getUniqueId(), customSettings),
-                registerCustomSettingsResponseHandler
-            );
-        } catch (Exception e) {
-            logger.info("Failed to send Register Settings request to OpenSearch", e);
-        }
-    }
-
-    private void sendGenericRequestWithExceptionHandling(
-        ExtensionRequestProto.RequestType requestType,
-        String orchestratorNameString,
-        TransportResponseHandler<? extends TransportResponse> responseHandler
-    ) {
-        TransportService transportService = sdkTransportService.getTransportService();
-        logger.info("Sending " + requestType + " request to OpenSearch");
-        try {
-            transportService.sendRequest(
-                sdkTransportService.getOpensearchNode(),
-                orchestratorNameString,
-                new ExtensionRequest(requestType),
-                responseHandler
-            );
-        } catch (Exception e) {
-            logger.info("Failed to send " + requestType + " request to OpenSearch", e);
-        }
-    }
-
-    /**
-     * Requests the cluster state from OpenSearch.  The result will be handled by a {@link ClusterStateResponseHandler}.
-     *
-     * @return The cluster state of OpenSearch
-     */
-
-    public ClusterState sendClusterStateRequest() {
-        TransportService transportService = sdkTransportService.getTransportService();
-        logger.info("Sending Cluster State request to OpenSearch");
-        ClusterStateResponseHandler clusterStateResponseHandler = new ClusterStateResponseHandler();
-        try {
-            transportService.sendRequest(
-                sdkTransportService.getOpensearchNode(),
-                ExtensionsManager.REQUEST_EXTENSION_CLUSTER_STATE,
-                new ExtensionRequest(ExtensionRequestProto.RequestType.REQUEST_EXTENSION_CLUSTER_STATE),
-                clusterStateResponseHandler
-            );
-            // Wait on cluster state response
-            clusterStateResponseHandler.awaitResponse();
-        } catch (TimeoutException e) {
-            logger.info("Failed to receive Cluster State response from OpenSearch", e);
-        } catch (Exception e) {
-            logger.info("Failed to send Cluster State request to OpenSearch", e);
-        }
-
-        // At this point, response handler has read in the cluster state
-        return clusterStateResponseHandler.getClusterState();
-    }
-
-    /**
-     * Request the Dependency Information from Opensearch. The result will be handled by a {@link ExtensionDependencyResponseHandler}.
-     *
-     * @return A List contains details of this extension's dependencies
-     */
-    public List<DiscoveryExtensionNode> sendExtensionDependencyRequest() {
-        TransportService transportService = sdkTransportService.getTransportService();
-        logger.info("Sending Extension Dependency Information request to Opensearch");
-        ExtensionDependencyResponseHandler extensionDependencyResponseHandler = new ExtensionDependencyResponseHandler();
-        try {
-            transportService.sendRequest(
-                sdkTransportService.getOpensearchNode(),
-                ExtensionsManager.REQUEST_EXTENSION_DEPENDENCY_INFORMATION,
-                new ExtensionRequest(
-                    ExtensionRequestProto.RequestType.REQUEST_EXTENSION_DEPENDENCY_INFORMATION,
-                    sdkTransportService.getUniqueId()
-                ),
-                extensionDependencyResponseHandler
-            );
-            // Wait on Extension Dependency response
-            extensionDependencyResponseHandler.awaitResponse();
-        } catch (TimeoutException e) {
-            logger.info("Failed to receive Extension Dependency response from OpenSearch", e);
-        } catch (Exception e) {
-            logger.info("Failed to send Extension Dependency request to OpenSearch", e);
-        }
-
-        // At this point, response handler has read in the extension dependency
-        return extensionDependencyResponseHandler.getExtensionDependencies();
-    }
-
-    /**
-     * Requests the cluster settings from OpenSearch.  The result will be handled by a {@link ClusterSettingsResponseHandler}.
-     */
-    public void sendClusterSettingsRequest() {
-        sendGenericRequestWithExceptionHandling(
-            ExtensionRequestProto.RequestType.REQUEST_EXTENSION_CLUSTER_SETTINGS,
-            ExtensionsManager.REQUEST_EXTENSION_CLUSTER_SETTINGS,
-            new ClusterSettingsResponseHandler()
-        );
-    }
-
-    /**
-     * Requests the environment settings from OpenSearch. The result will be handled by a {@link EnvironmentSettingsResponseHandler}.
-     *
-     * @return A Setting object from the OpenSearch Node environment
-     */
-    public Settings sendEnvironmentSettingsRequest() {
-        TransportService transportService = sdkTransportService.getTransportService();
-        logger.info("Sending Environment Settings request to OpenSearch");
-        EnvironmentSettingsResponseHandler environmentSettingsResponseHandler = new EnvironmentSettingsResponseHandler();
-        try {
-            transportService.sendRequest(
-                sdkTransportService.getOpensearchNode(),
-                ExtensionsManager.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS,
-                new ExtensionRequest(ExtensionRequestProto.RequestType.REQUEST_EXTENSION_ENVIRONMENT_SETTINGS),
-                environmentSettingsResponseHandler
-            );
-            // Wait on environment settings response
-            environmentSettingsResponseHandler.awaitResponse();
-        } catch (TimeoutException e) {
-            logger.info("Failed to receive Environment Settings response from OpenSearch", e);
-        } catch (Exception e) {
-            logger.info("Failed to send Environment Settings request to OpenSearch", e);
-        }
-
-        // At this point, response handler has read in the environment settings
-        return environmentSettingsResponseHandler.getEnvironmentSettings();
-    }
-
-    /**
-     * Registers settings and setting consumers with the {@link UpdateSettingsRequestHandler} and then sends a request to OpenSearch to register these Setting objects with a callback to this extension.
-     * The result will be handled by a {@link AcknowledgedResponseHandler}.
-     *
-     * @param settingUpdateConsumers A map of setting objects and their corresponding consumers
-     */
-    public void sendAddSettingsUpdateConsumerRequest(Map<Setting<?>, Consumer<?>> settingUpdateConsumers) {
-        // Determine if there are setting update consumers to be registered
-        if (!settingUpdateConsumers.isEmpty()) {
-            TransportService transportService = sdkTransportService.getTransportService();
-            // Register setting update consumers to UpdateSettingsRequestHandler
-            this.updateSettingsRequestHandler.registerSettingUpdateConsumer(settingUpdateConsumers);
-
-            // Extract registered settings from setting update consumer map
-            List<Setting<?>> componentSettings = new ArrayList<>(settingUpdateConsumers.size());
-            componentSettings.addAll(settingUpdateConsumers.keySet());
-            logger.info(
-                "Sending Add Settings Update Consumer request to OpenSearch for {}",
-                componentSettings.stream().map(Setting::getKey).toArray()
-            );
-
-            AcknowledgedResponseHandler acknowledgedResponseHandler = new AcknowledgedResponseHandler();
-            transportService.sendRequest(
-                sdkTransportService.getOpensearchNode(),
-                ExtensionsManager.REQUEST_EXTENSION_ADD_SETTINGS_UPDATE_CONSUMER,
-                new AddSettingsUpdateConsumerRequest(this.extensionNode, componentSettings),
-                acknowledgedResponseHandler
-            );
-        }
-    }
-
-    /**
      * Returns the settings object associated with this instance.
      * The settings object contains the configuration options for this instance, such as the cluster name and node name.
      *
@@ -700,6 +491,33 @@ public class ExtensionsRunner {
      */
     public Settings getSettings() {
         return settings;
+    }
+
+    /**
+     * Returns the custom settings from the extension's getSettings.
+     *
+     * @return The custom settings object for this instance.
+     */
+    public List<Setting<?>> getCustomSettings() {
+        return customSettings;
+    }
+
+    /**
+     * Returns the routes and classes which handle the REST requests
+     *
+     * @return The ExtensionRestPathRegistry object for this instance.
+     */
+    public ExtensionRestPathRegistry getExtensionRestPathRegistry() {
+        return extensionRestPathRegistry;
+    }
+
+    /**
+     * Returns the update settings request handler
+     *
+     * @return The UpdateSettingsRequestHandler object for this instance.
+     */
+    public UpdateSettingsRequestHandler getUpdateSettingsRequestHandler() {
+        return updateSettingsRequestHandler;
     }
 
     /**
