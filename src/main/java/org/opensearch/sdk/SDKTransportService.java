@@ -281,6 +281,8 @@ public class SDKTransportService {
      * The result will be handled by a {@link AcknowledgedResponseHandler}.
      *
      * @param settingUpdateConsumers A map of setting objects and their corresponding consumers
+     * @param updateSettingsRequestHandler A update settings request handler
+     * @param extensionNode A extension node
      */
     public void sendAddSettingsUpdateConsumerRequest(
         Map<Setting<?>, Consumer<?>> settingUpdateConsumers,
