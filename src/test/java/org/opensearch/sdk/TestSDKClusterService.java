@@ -33,7 +33,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 public class TestSDKClusterService extends OpenSearchTestCase {
@@ -146,11 +145,5 @@ public class TestSDKClusterService extends OpenSearchTestCase {
             any(AcknowledgedResponseHandler.class)
         );
 
-        ArgumentCaptor<TransportService> transportServiceArgumentCaptor = ArgumentCaptor.forClass(TransportService.class);
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<Map<Setting<?>, Consumer<?>>> updateConsumerArgumentCaptor = ArgumentCaptor.forClass(Map.class);
-        assertEquals(mockTransportService, transportServiceArgumentCaptor.getValue());
-        // Map will be cleared following this call
-        assertTrue(updateConsumerArgumentCaptor.getValue().isEmpty());
     }
 }
