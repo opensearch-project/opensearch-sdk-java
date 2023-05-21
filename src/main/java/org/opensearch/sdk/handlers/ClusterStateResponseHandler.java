@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * This class handles the response from OpenSearch to a {@link SDKTransportService#sendClusterStateRequest()} call.
+ * This class handles the response from OpenSearch to a {@link org.opensearch.sdk.SDKTransportService#sendClusterStateRequest()} call.
  */
 public class ClusterStateResponseHandler implements TransportResponseHandler<ClusterStateResponse> {
     private static final Logger logger = LogManager.getLogger(ClusterStateResponseHandler.class);

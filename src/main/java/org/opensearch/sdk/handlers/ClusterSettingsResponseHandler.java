@@ -20,7 +20,7 @@ import org.opensearch.transport.TransportResponseHandler;
 import java.io.IOException;
 
 /**
- * This class handles the response from OpenSearch to a {@link SDKTransportService#sendClusterSettingsRequest()} call.
+ * This class handles the response from OpenSearch to a {@link org.opensearch.sdk.SDKTransportService#sendClusterSettingsRequest()} call.
  */
 public class ClusterSettingsResponseHandler implements TransportResponseHandler<ClusterSettingsResponse> {
     private static final Logger logger = LogManager.getLogger(ClusterSettingsResponseHandler.class);
