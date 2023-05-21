@@ -129,6 +129,8 @@ public class SDKTransportService {
 
     /**
      * Requests that OpenSearch register the REST Actions for this extension.
+     * 
+     * @param extensionRestPathRegistry The routes and classes which handle the REST requests
      */
     public void sendRegisterRestActionsRequest(ExtensionRestPathRegistry extensionRestPathRegistry) {
         List<String> extensionRestPaths = extensionRestPathRegistry.getRegisteredPaths();
@@ -154,6 +156,8 @@ public class SDKTransportService {
 
     /**
      * Requests that OpenSearch register the custom settings for this extension.
+     * 
+     * @param customSettings A list of custom settings
      */
     public void sendRegisterCustomSettingsRequest(List<Setting<?>> customSettings) {
         logger.info("Sending Settings request to OpenSearch");
