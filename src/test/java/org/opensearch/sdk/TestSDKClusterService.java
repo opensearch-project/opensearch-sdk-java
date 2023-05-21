@@ -11,7 +11,6 @@ package org.opensearch.sdk;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Setting.Property;
 import org.opensearch.common.settings.Settings;
@@ -58,8 +57,6 @@ public class TestSDKClusterService extends OpenSearchTestCase {
         sdkClusterService.state();
         verify(extensionsRunner, times(1)).getSdkTransportService();
 
-        ArgumentCaptor<TransportService> argumentCaptor = ArgumentCaptor.forClass(TransportService.class);
-        assertNull(argumentCaptor.getValue());
     }
 
     @Test
