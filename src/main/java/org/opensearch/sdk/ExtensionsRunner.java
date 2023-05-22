@@ -89,6 +89,14 @@ public class ExtensionsRunner {
      * The key for the extension runner's node name in its settings.
      */
     public static final String NODE_NAME_SETTING = "node.name";
+    /**
+     * OpenSearch default host name.
+     */
+    public static final String OPENSEARCH_HOST_SETTING = "opensearch.host";
+    /**
+     * OpenSearch default host port.
+     */
+    public static final String OPENSEARCH_PORT_SETTING = "opensearch.port";
 
     // The extension being run
     private final Extension extension;
@@ -182,6 +190,8 @@ public class ExtensionsRunner {
         ExtensionSettings extensionSettings = extension.getExtensionSettings();
         Settings.Builder settingsBuilder = Settings.builder()
             .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
+            .put(OPENSEARCH_HOST_SETTING, extensionSettings.getOpensearchAddress())
+            .put(OPENSEARCH_PORT_SETTING, extensionSettings.getOpensearchPort())
             .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort());
         boolean sslEnabled = extensionSettings.getSecuritySettings().containsKey(SSL_TRANSPORT_ENABLED)
