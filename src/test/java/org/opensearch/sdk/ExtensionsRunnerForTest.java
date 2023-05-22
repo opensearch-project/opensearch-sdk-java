@@ -26,7 +26,7 @@ public class ExtensionsRunnerForTest extends ExtensionsRunner {
      * @throws IOException if the runner failed to read settings or API.
      */
     public ExtensionsRunnerForTest() throws IOException {
-        super(new BaseExtension(new ExtensionSettings(NODE_NAME, NODE_HOST, NODE_PORT, "127.0.0.1", "9200")) {
+        super(new BaseExtension(new ExtensionSettings(NODE_NAME, NODE_HOST, NODE_PORT, "10.10.10.10", "9200")) {
         });
     }
 
