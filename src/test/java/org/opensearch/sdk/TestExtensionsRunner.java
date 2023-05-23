@@ -110,7 +110,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     public void testHandleExtensionInitRequest() throws UnknownHostException {
         DiscoveryNode sourceNode = new DiscoveryNode(
             "test_node",
-            new TransportAddress(InetAddress.getByName("localhost"), 9876),
+            new TransportAddress(InetAddress.getByName("10.10.10.10"), 9876),
             emptyMap(),
             emptySet(),
             Version.CURRENT
@@ -137,6 +137,48 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         assertEquals("opensearch-sdk-1", extensionsRunner.getUniqueId());
         // Test if the source node is set after handleExtensionInitRequest() is called during OpenSearch bootstrap
         assertEquals(sourceNode, extensionsRunner.getOpensearchNode());
+    }
+
+    @Test
+    public void testHandleExtensionInitRequestFromLocalHost() throws UnknownHostException {
+        DiscoveryNode sourceNode = new DiscoveryNode(
+            "test_node",
+            new TransportAddress(InetAddress.getByName("127.0.0.1"), 9876),
+            emptyMap(),
+            emptySet(),
+            Version.CURRENT
+        );
+        DiscoveryExtensionNode extension = new DiscoveryExtensionNode(
+            EXTENSION_NAME,
+            "opensearch-sdk-1",
+            sourceNode.getAddress(),
+            new HashMap<String, String>(),
+            Version.fromString("3.0.0"),
+            Version.fromString("3.0.0"),
+            new ArrayList<ExtensionDependency>()
+        );
+
+        // Set mocked transport service
+        extensionsRunner.setExtensionTransportService(this.transportService);
+        doNothing().when(this.transportService).connectToNodeAsExtension(sourceNode, "opensearch-sdk-1");
+
+        InitializeExtensionRequest extensionInitRequest = new InitializeExtensionRequest(sourceNode, extension);
+
+        InitializeExtensionResponse response = extensionsInitRequestHandler.handleExtensionInitRequest(extensionInitRequest);
+        // Test if name and unique ID are set
+        assertEquals(EXTENSION_NAME, response.getName());
+        assertEquals("opensearch-sdk-1", extensionsRunner.getUniqueId());
+        // Test that the source node is NOT set after handleExtensionInitRequest() is called during OpenSearch bootstrap
+        assertNotEquals(sourceNode, extensionsRunner.getOpensearchNode());
+        // It should keep the original opensearch node
+        assertEquals(
+            extensionsRunner.getSettings().get(ExtensionsRunner.OPENSEARCH_HOST_SETTING),
+            extensionsRunner.getOpensearchNode().getAddress().address().getHostName()
+        );
+        assertEquals(
+            extensionsRunner.getSettings().get(ExtensionsRunner.OPENSEARCH_PORT_SETTING),
+            Integer.toString(extensionsRunner.getOpensearchNode().getAddress().address().getPort())
+        );
     }
 
     @Test
