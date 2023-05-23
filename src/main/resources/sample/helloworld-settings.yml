@@ -1,3 +1,4 @@
+# This name is only used as a response string during init and is purely cosmetic
 extensionName: hello-world
 hostAddress: 127.0.0.1
 hostPort: 4500
