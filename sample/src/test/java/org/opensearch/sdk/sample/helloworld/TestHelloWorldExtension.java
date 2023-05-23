@@ -112,7 +112,7 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
     public void testExtensionSettings() {
         // This effectively tests the Extension interface helper method
         ExtensionSettings extensionSettings = extension.getExtensionSettings();
-        ExtensionSettings expected = new ExtensionSettings("hello-world", "127.0.0.1", "4532", "127.0.0.1", "9200");
+        ExtensionSettings expected = new ExtensionSettings("hello-world", "0.0.0.0", "4532", "127.0.0.1", "9200");
         assertEquals(expected.getExtensionName(), extensionSettings.getExtensionName());
         assertEquals(expected.getHostAddress(), extensionSettings.getHostAddress());
         assertEquals(expected.getHostPort(), extensionSettings.getHostPort());
