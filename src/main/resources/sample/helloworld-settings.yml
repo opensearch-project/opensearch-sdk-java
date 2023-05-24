@@ -1,10 +1,6 @@
-# This name is only used as a response string during init and is purely cosmetic
 extensionName: hello-world
-# The listening port is bound to the interface with this IP. Set to 0.0.0.0 to listen on all interfaces
-hostAddress: 0.0.0.0
-# The port the Extension listens on
+hostAddress: 127.0.0.1
 hostPort: 4532
-# Default opensearch address and port to connect to if the values received during handshake are wrong
 opensearchAddress: 127.0.0.1
 opensearchPort: 9200
 #ssl.transport.enabled: true
