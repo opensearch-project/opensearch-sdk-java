@@ -150,7 +150,7 @@ public class SDKTransportService {
                 registerActionsResponseHandler
             );
         } catch (Exception e) {
-            logger.info("Failed to send Register REST Actions request to OpenSearch", e);
+            logger.error("Failed to send Register REST Actions request to OpenSearch", e);
         }
     }
 
@@ -170,7 +170,7 @@ public class SDKTransportService {
                 registerCustomSettingsResponseHandler
             );
         } catch (Exception e) {
-            logger.info("Failed to send Register Settings request to OpenSearch", e);
+            logger.error("Failed to send Register Settings request to OpenSearch", e);
         }
     }
 
@@ -183,7 +183,7 @@ public class SDKTransportService {
         try {
             transportService.sendRequest(opensearchNode, orchestratorNameString, new ExtensionRequest(requestType), responseHandler);
         } catch (Exception e) {
-            logger.info("Failed to send " + requestType + " request to OpenSearch", e);
+            logger.error("Failed to send " + requestType + " request to OpenSearch", e);
         }
     }
 
@@ -206,9 +206,9 @@ public class SDKTransportService {
             // Wait on cluster state response
             clusterStateResponseHandler.awaitResponse();
         } catch (TimeoutException e) {
-            logger.info("Failed to receive Cluster State response from OpenSearch", e);
+            logger.error("Failed to receive Cluster State response from OpenSearch", e);
         } catch (Exception e) {
-            logger.info("Failed to send Cluster State request to OpenSearch", e);
+            logger.error("Failed to send Cluster State request to OpenSearch", e);
         }
 
         // At this point, response handler has read in the cluster state
@@ -233,9 +233,9 @@ public class SDKTransportService {
             // Wait on Extension Dependency response
             extensionDependencyResponseHandler.awaitResponse();
         } catch (TimeoutException e) {
-            logger.info("Failed to receive Extension Dependency response from OpenSearch", e);
+            logger.error("Failed to receive Extension Dependency response from OpenSearch", e);
         } catch (Exception e) {
-            logger.info("Failed to send Extension Dependency request to OpenSearch", e);
+            logger.error("Failed to send Extension Dependency request to OpenSearch", e);
         }
 
         // At this point, response handler has read in the extension dependency
@@ -271,9 +271,9 @@ public class SDKTransportService {
             // Wait on environment settings response
             environmentSettingsResponseHandler.awaitResponse();
         } catch (TimeoutException e) {
-            logger.info("Failed to receive Environment Settings response from OpenSearch", e);
+            logger.error("Failed to receive Environment Settings response from OpenSearch", e);
         } catch (Exception e) {
-            logger.info("Failed to send Environment Settings request to OpenSearch", e);
+            logger.error("Failed to send Environment Settings request to OpenSearch", e);
         }
 
         // At this point, response handler has read in the environment settings

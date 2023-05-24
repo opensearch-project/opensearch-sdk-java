@@ -48,7 +48,6 @@ public class ExtensionsInitRequestHandler {
     public InitializeExtensionResponse handleExtensionInitRequest(InitializeExtensionRequest extensionInitRequest) {
         logger.info("Registering Extension Request received from OpenSearch");
         extensionsRunner.getThreadPool().getThreadContext().putHeader("extension_unique_id", extensionInitRequest.getExtension().getId());
-        // TODO: Remove above two lines in favor of the below when refactoring
         SDKTransportService sdkTransportService = extensionsRunner.getSdkTransportService();
         sdkTransportService.setOpensearchNode(extensionInitRequest.getSourceNode());
         sdkTransportService.setUniqueId(extensionInitRequest.getExtension().getId());
