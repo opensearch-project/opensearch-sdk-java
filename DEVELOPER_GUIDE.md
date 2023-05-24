@@ -13,6 +13,7 @@
     - [Publish OpenSearch SDK for Java to Maven Local](#publish-opensearch-sdk-for-java-to-maven-local)
     - [Perform a REST Request on the Extension](#perform-a-rest-request-on-the-extension)
     - [Run Tests](#run-tests)
+    - [Launching and debugging from an IDE](#launching-and-debugging-from-an-ide)
     - [Submitting Changes](#submitting-changes)
 
 ## Introduction
