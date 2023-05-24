@@ -1,6 +1,6 @@
 # This name is only used as a response string during init and is purely cosmetic
 extensionName: hello-world
-hostAddress: 127.0.0.1
+hostAddress: 0.0.0.0
 hostPort: 4500
 opensearchAddress: 127.0.0.1
 opensearchPort: 9200
