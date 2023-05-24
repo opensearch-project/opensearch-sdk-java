@@ -1,5 +1,6 @@
 # This name is only used as a response string during init and is purely cosmetic
 extensionName: hello-world
+# The listening port is bound to the interface with this IP. Set to 0.0.0.0 to listen on all interfaces
 hostAddress: 0.0.0.0
 hostPort: 4500
 opensearchAddress: 127.0.0.1
