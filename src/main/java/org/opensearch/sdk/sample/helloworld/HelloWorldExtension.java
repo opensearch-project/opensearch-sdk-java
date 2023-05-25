@@ -79,7 +79,6 @@ public class HelloWorldExtension extends BaseExtension implements ActionExtensio
      */
     public static void main(String[] args) throws IOException {
         // Execute this extension by instantiating it and passing to ExtensionsRunner
-        System.out.println("Hi");
         ExtensionsRunner.run(new HelloWorldExtension());
     }
 }
