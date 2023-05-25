@@ -142,7 +142,7 @@ repositories {
 dependencies {
 
     def opensearchVersion = "3.0.0-SNAPSHOT"
-    def log4jVersion = "2.17.1"
+    def log4jVersion = "2.20.0"
     def nettyVersion = "4.1.92.Final"
     def jacksonDatabindVersion = "2.15.1"
     def guavaVersion = "31.1-jre"
@@ -198,6 +198,9 @@ dependencies {
         resolutionStrategy.force("jakarta.json:jakarta.json-api:${jakartaVersion}")
         resolutionStrategy.force("com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}")
         resolutionStrategy.force("com.fasterxml.jackson.core:jackson-core:${jacksonDatabindVersion}")
+        resolutionStrategy.force("org.apache.logging.log4j:log4j-api:${log4jVersion}")
+        resolutionStrategy.force("org.apache.logging.log4j:log4j-core:${log4jVersion}")
+        resolutionStrategy.force("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
     }
 }
 
