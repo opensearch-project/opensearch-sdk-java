@@ -14,13 +14,13 @@
 
 This document outlines how to create a new custom extension. For migration of existing plugins, see [PLUGIN_MIGRATION](PLUGIN_MIGRATION.md).
 
-For this example, we will create a CRUD Extension, demonstrating the create, read, update, and delete operations on an index.
+For this example, you will create a CRUD extension, demonstrating the create, read, update, and delete operations on an index.
 
 ## Initial setup
 
 Create a new repository at a location of your choice.
 
-In your dependency management, set up a dependency on OpenSearch SDK for Java.  Here is the key information that you need:
+In your dependency management, set up a dependency on the OpenSearch SDK for Java. Here is the required key information:
  - Group ID: `org.opensearch.sdk`
  - Artifact ID: `opensearch-sdk-java`
  - Version: `1.0.0-SNAPSHOT` (compatible with OpenSearch 2.x) or `2.0.0-SNAPSHOT` (compatible with OpenSearch 3.x)
@@ -96,7 +96,7 @@ opensearchPort: 9200
 
 Create a class that implements _`Extension`_. You may prefer to create a class that extends `BaseExtension`, which provides some helper methods.
 
-Implementing the _`Extension`_ interface requires you to implement the `getExtensionSettings()` and `setExtensionsRunner()` methods. The `BaseExtension` class implements these and only requires that you call `super()` with either the `ExtensionSettings` object you created, or a path to the YAML file (either absolute or classpath-based).
+Implementing the _`Extension`_ interface requires you to implement the `getExtensionSettings()` and `setExtensionsRunner()` methods. The `BaseExtension` class implements these and only requires that you call `super()` with either the `ExtensionSettings` object you created or a path to the YAML file (either absolute or classpath-based).
 
 Implement a `main()` method that instantiates your object and passes an instance of itself to `ExtensionsRunner`. You will need to either handle or throw an `IOException` from this method.
 
@@ -122,13 +122,13 @@ public class CRUDExtension extends BaseExtension {
 }
 ```
 
-At this point, you have a working extension!  Start it up by executing the `main()` method, and then start up your OpenSearch cluster.
+At this point, you have a working extension! Start it by executing the `main()` method, and then start your OpenSearch cluster.
 
 But it doesn't _do_ anything yet.  Here is where you can start defining your own functionality.
 
 ## Implement other interfaces and extension points
 
-If you want to handle REST requests, implement the `ActionExtension` interface and override the `getExtensionRestHandlers()` method.  Pass a list of classes that will handle those requests:
+If you want to handle REST requests, implement the `ActionExtension` interface and override the `getExtensionRestHandlers()` method. Pass a list of classes that will handle those requests:
 
 ```java
 import org.opensearch.sdk.api.ActionExtension;
@@ -149,7 +149,7 @@ These classes must implement _`ExtensionRestHandler`_, which is a functional int
 
 The `BaseExtensionRestHandler` class provides many useful methods for exception handling in requests, including a `RouteHandler` class that eases logical separation of multiple `Route` choices.
 
-For the CRUD extension example, we'll implement one REST route for each option and delegate to the appropriate handler function, although each one could be in its own file:
+For the CRUD extension example, you'll implement one REST route for each option and delegate it to the appropriate handler function, although each one could be in its own file:
 
 ```java
 import java.util.List;
@@ -193,7 +193,7 @@ public class CrudAction extends BaseExtensionRestHandler {
 
 ## Use OpenSearch clients to implement functionality
 
-During the initial creation of the extension, you either implemented `setExtensionsRunner()` yourself or used the `BaseExtension` class which does it for you. This gives you access to the `ExtensionsRunner` object that is running this extension. The `ExtensionsRunner` has getters that provide access to many objects you will need, one of which is the `SDKClient`.  The `SDKClient` class allows initialization of the OpenSearch Java client, which has a synchronous and asynchronous versions.  For simplicity, we'll use the synchronous client for this example.
+During the initial creation of the extension, you either implemented `setExtensionsRunner()` yourself or used the `BaseExtension` class, which does it for you. This gives you access to the `ExtensionsRunner` object that is running this extension. The `ExtensionsRunner` has getters that provide access to many objects you will need, one of which is the `SDKClient`. The `SDKClient` class allows initialization of the OpenSearch Java client, which has synchronous and asynchronous versions. For simplicity, this example uses the synchronous client.
 
 First, we update `CRUDExtension` to send a copy of this `ExtensionsRunner` instance to our handler class:
 
@@ -204,7 +204,7 @@ public List<ExtensionRestHandler> getExtensionRestHandlers() {
 }
 ```
 
-Next, in our handler class we'll create an instance field for the client and set its value in the constructor:
+Next, you'll create an instance field for the client in the handler class and set its value in the constructor:
 
 ```java
 private OpenSearchClient client;
@@ -225,7 +225,7 @@ if (!exists.value()) {
 }
 ```
 
-Next, we add a document to it:
+Next, you add a document to it:
 
 ```java
 Document doc = new Document();
@@ -233,19 +233,19 @@ doc.add(new StringField("field", "value", Field.Store.YES));
 IndexResponse response = client.index(new IndexRequest.Builder<Document>().index("crudsample").document(doc).build());
 ```
 
-We need some exception handling.  The `BaseExtensionRestHandler` provides an `exceptionalRequest()` method to handle exceptions:
+We need some exception handling. The `BaseExtensionRestHandler` provides an `exceptionalRequest()` method to handle exceptions:
 
 ```java
 return exceptionalRequest(request, e);
 ```
 
-The user needs the ID of the created document (`response.id()`) for further handling.  The `BaseExtensionRestHandler` provides a `createJsonResponse()` method for this:
+The user needs the ID of the created document (`response.id()`) for further handling. The `BaseExtensionRestHandler` provides a `createJsonResponse()` method for this:
 
 ```java
 return createJsonResponse(request, RestStatus.OK, "_id", response.id());
 ```
 
-Putting it all together, we have the following code:
+Finally, you have the following code:
 
 ```java
 Function<RestRequest, ExtensionRestResponse> createHandler = (request) -> {

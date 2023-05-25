@@ -2,7 +2,7 @@
 
 *Note*: This document is evolving and is in draft state.
 
-OpenSearch supports many kinds of plugins that extend its core features. However, plugin architecture has significant problems because plugins can fatally impact the cluster in case of failure. For example, critical workloads like ingestion or search traffic may be affected by a failure in a non-critical plugin like `s3-repository`. Moreover, running third-party plugins in the same process as OpenSearch poses a security risk, causes dependency conflicts, and complicates the release process.
+OpenSearch supports many kinds of plugins that extend its core features. However, the plugin architecture presents significant problems because plugins can fatally impact a cluster in the event of failure. For example, critical workloads like ingestion or search traffic may be affected by a failure in a non-critical plugin, like `s3-repository`. Moreover, running third-party plugins by using the same process as OpenSearch poses a security risk, causes dependency conflicts, and complicates the release process.
 
 Extensions support all plugin functionality and let you easily build features on top of OpenSearch. Using the OpenSearch SDK for Java, you can develop a plugin for OpenSearch that runs in a separate process or on another node.
 
@@ -19,13 +19,13 @@ For more information, explore the following resources:
 ![Plugin architecture](Docs/plugins.png)
 
 You can install plugins using the [`opensearch-plugin`](https://github.com/opensearch-project/OpenSearch/blob/main/distribution/tools/plugin-cli/src/main/java/org/opensearch/plugins/InstallPluginCommand.java) command line tool. The plugin classes are then loaded into OpenSearch.
-Each plugin runs within OpenSearch as a single process. Plugins interface with OpenSearch via extension points that plug into the core modules of OpenSearch.
+Each plugin runs within OpenSearch as a single process. Plugins interface with OpenSearch through extension points that plug in to the core OpenSearch modules.
 For more information about how plugins work, see [Introduction to OpenSearch plugins](https://opensearch.org/blog/technical-post/2021/12/plugins-intro/).
 
 For example, consider a plugin that would like to register a custom setting, which a user can toggle through the Rest API.
 The plugin is compiled with the OpenSearch x.y.z version, generating a `.zip` file.
 This `.zip` file is installed using the `opensearch-plugin` tool, which unpacks the code and places it in the `~/plugins/<plugin-name>` directory.
-During the bootstrap of the OpenSearch node, the class loader loads all the code in the `~/plugins/` directory. The `Node` object makes a call to `PluginsService` to get all settings the plugins would like to register and adds them to the `additionalSettings` list. The list is used to create a `SettingsModule` instance which tracks all settings.
+During the bootstrap of the OpenSearch node, the class loader loads all the code in the `~/plugins/` directory. The `Node` object makes a call to `PluginsService` to get all the settings the plugins would like to register and adds them to the `additionalSettings` list. The list is used to create a `SettingsModule` instance that tracks all settings.
 
 ## Extensions Architecture
 
@@ -58,15 +58,15 @@ Extensions use a `ServerSocket`, which binds them to listen on a host address an
 
 OpenSearch has its own `extensions.yml` configuration file that matches the extensions' addresses and ports. On startup, the `ExtensionsManager` uses the node's `TransportService` to send requests to each extension, with the first request initializing the extension and validating the host and port.
 
-Immediately following initialization, each extension establishes a connection to OpenSearch on its own transport service, and sends its REST API to OpenSearch. The API contains a list of methods and URIs to which the extension will respond. These are registered with the `RestController`.
+Immediately following initialization, each extension establishes a connection to OpenSearch on its own transport service and sends its REST API to OpenSearch. The API contains a list of methods and URIs to which the extension will respond. These are registered with the `RestController`.
 
-When OpenSearch receives a registered method and URI, it sends a request to the extension. The extension handles the request, using the API to determine which action to execute.
+When OpenSearch receives a registered method and URI, it sends a request to the extension. The extension handles the request, using the API to determine which action to run.
 
 ### OpenSearch SDK for Java
 
-Currently, plugins rely on extension points to communicate with OpenSearch. These extension points are loaded into the class loader as `Action` objects which implement _`RestHandler`_. The key part of this loading is each action's `routes()` method, which registers REST methods and URIs. Upon receiving a matching request from a user, the registered action handles the request.
+Currently, plugins rely on extension points to communicate with OpenSearch. These extension points are loaded into the class loader as `Action` objects that implement _`RestHandler`_. The key part of this loading is each action's `routes()` method, which registers REST methods and URIs. Upon receiving a matching request from a user, the registered action handles the request.
 
-Extensions use a similar registration feature, but extensions do not need or use many of the features of the _`RestHandler`_ interface because they run as separate processes.  Instead, extension actions must implement the _`ExtensionAction`_ interface. This requires the extension developer to implement the `routes()` method to register REST methods (similar to plugins) and the `getExtensionResponse()` method to take action on the corresponding REST calls.
+Extensions use a similar registration feature, but extensions do not need or use many of the features of the _`RestHandler`_ interface because they run as separate processes. Instead, extension actions must implement the _`ExtensionAction`_ interface. This requires the extension developer to implement the `routes()` method to register REST methods (similar to plugins) and the `getExtensionResponse()` method to take action on the corresponding REST calls.
 
 #### Wire compatibility
 
@@ -74,7 +74,7 @@ Extensions will be wire compatible across minor and patch versions. The configur
 
 #### Extension REST actions walkthrough
 
-The following sequence diagram shows initializing an extension, registering its REST actions (API) with OpenSearch, and responding to a user's REST request.  A detailed description of the steps follows the diagram.
+The following sequence diagram depicts initializing an extension, registering its REST actions (API) with OpenSearch, and responding to a user's REST request. A detailed description of the steps follows the diagram.
 
 ![Extension REST actions](Docs/ExtensionRestActions.svg)
 
@@ -82,11 +82,11 @@ The `org.opensearch.sdk.sample.helloworld` package contains a sample `HelloWorld
 
 ##### Extension startup
 
-(1) Extensions must implement the `Extension` interface, which requires extensions to define their settings (name, host address, and port) and a list of `ExtensionRestHandler` implementations they will handle.  Extensions are started up using a `main()` method, which passes an instance of the extension to the `ExtensionsRunner` by invoking `ExtensionsRunner.run(this)`.
+(1) Extensions must implement the `Extension` interface, which requires extensions to define their settings (name, host address, and port) and a list of `ExtensionRestHandler` implementations they will handle. Extensions are started using a `main()` method, which passes an instance of the extension to the `ExtensionsRunner` by invoking `ExtensionsRunner.run(this)`.
 
 (2, 3, 4) Using the extension's `ExtensionSettings`, the `ExtensionsRunner` binds to the configured host and port.
 
-(5, 6, 7) Using the extension's `List<ExtensionRestHandler>`, the `ExtensionsRunner` stores each handler (REST action)'s REST path (method and URI) in the `ExtensionRestPathRegistry`, identifying the action to perform when the extension receives this combination. This registry internally uses the same `PathTrie` implementation as OpenSearch's `RestController`.
+(5, 6, 7) Using the extension's `List<ExtensionRestHandler>`, the `ExtensionsRunner` stores each handler's (REST action) REST path (method and URI) in the `ExtensionRestPathRegistry`, identifying the action to perform when the extension receives this combination. This registry internally uses the same `PathTrie` implementation as OpenSearch's `RestController`.
 
 ##### OpenSearch Startup, Extension Initialization, and REST Action Registration
 
@@ -98,7 +98,7 @@ The `ExtensionsManager` reads a list of extensions present in `extensions.yml`. 
 
 (13) Each extension retrieves all of its REST paths from its `ExtensionRestPathRegistry`.
 
-(14, 15, 16) Each extension sends a `RegisterRestActionsRequest` to the `RestActionsRequestHandler`, which registers a `RestSendToExtensionAction` with the `RestController` to handle each REST path (`Route`). These routes rely on the extension's `uniqueId`---a globally unique identifier, which users provide in REST requests.
+(14, 15, 16) Each extension sends a `RegisterRestActionsRequest` to the `RestActionsRequestHandler`, which registers a `RestSendToExtensionAction` with the `RestController` to handle each REST path (`Route`). These routes rely on the extension's `uniqueId`---a globally unique identifier that users provide in REST requests.
 
 ##### Responding to user REST requests
 
@@ -134,7 +134,7 @@ The following is an example of a more complex extension point, `getNamedXContent
 
 (1, 2) Extensions initialize by passing an instance of themselves to the `ExtensionsRunner`. The first step in the constructor is for the `ExtensionsRunner` to pass its own instance back to the extension using the `setExtensionsRunner` method.
 
-(3, 4) The _`Extension`_ interface includes extensions points such as `getNamedXContent()`, which by default returns an empty list. If `getNamedXContent()` is overridden, the extension will return a list of `NamedXContentRegistry.Entry`, which will be saved as `customNamedXContent`. Other extension points operate in a similar manner.
+(3, 4) The _`Extension`_ interface includes extensions points such as `getNamedXContent()`, which returns an empty list by default. If `getNamedXContent()` is overridden, the extension will return a list of `NamedXContentRegistry.Entry`, which will be saved as `customNamedXContent`. Other extension points operate in a similar manner.
 
 (5) The `ExtensionsRunner` registers an `ExtensionInitRequestHandler`, which will complete the initialization process on OpenSearch startup.
 
@@ -142,7 +142,7 @@ The following is an example of a more complex extension point, `getNamedXContent
 
 (6) Upon receipt of an `InitializeExtensionRequest`, the `ExtensionInitRequestHandler` performs the following actions (among other actions):
 
-(7, 8) Obtains environment settings from OpenSearch, necessary for some core `XContent`.
+(7, 8) Obtains environment settings from OpenSearch that are necessary for some core `XContent`.
 
 (9, 10) Instantiates a new `SDKNamedXContentRegistry`, which is set on the `ExtensionsRunner`.
 This registry uses the OpenSearch environment settings along with `NamedXContent` from several OpenSearch modules
@@ -153,6 +153,6 @@ Because the extension has an instance of the `ExtensionsRunner`, it can now acce
 ## FAQ
 
 - Will extensions replace plugins?
-  Plugins will continue to be supported in the near future but are on a path to deprecation. New development should consider using extensions because they will be easier to develop, deploy, and operate.
+  Plugins will continue to be supported in the near future but are on a path to deprecation. Extensions are recommended for new development because they will be easier to develop, deploy, and operate.
 - What is the latency for extensions?
   See [benchmarking tests](https://github.com/opensearch-project/OpenSearch/issues/3012#issuecomment-1122682444).

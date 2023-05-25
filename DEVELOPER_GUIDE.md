@@ -24,20 +24,20 @@
 In general, running and using an extension can be broken down into the following steps:
 
 1. Start the extension:
-    - [Clone the OpenSearch SDK for Java repository](#clone-the-opensearch-sdk-for-java-repository)
+    - [Clone the OpenSearch SDK for Java repository](#clone-the-opensearch-sdk-for-java-repository).
     - Run your own extension or the sample Hello World extension:
-      - [Run the sample extension](#run-the-sample-extension)
-      - [Run the sample extension with security](#run-the-sample-extension-with-security)
+      - [Run the sample extension](#run-the-sample-extension).
+      - [Run the sample extension with security](#run-the-sample-extension-with-security).
 1. Start OpenSearch:
-    - [Clone the OpenSearch repository](#clone-the-opensearch-repository)
-    - [Enable the extensions feature flag](#enable-the-extensions-feature-flag)
-    - Create the [`extensions.yml` file](#the-extensionsyml-file) and [run OpenSearch](#run-opensearch)
+    - [Clone the OpenSearch repository](#clone-the-opensearch-repository).
+    - [Enable the extensions feature flag](#enable-the-extensions-feature-flag).
+    - Create the [`extensions.yml` file](#the-extensionsyml-file) and [run OpenSearch](#run-opensearch).
 1. Use the extension:
-    - [Send a REST request to the extension](#send-a-rest-request-to-the-extension)
+    - [Send a REST request to the extension](#send-a-rest-request-to-the-extension).
 
 Note: You need to first start the extension or extensions and then start OpenSearch.
 
-This tutorial uses the sample Hello World extension that is included in the `opensearch-sdk-java` repository.
+This tutorial uses the sample Hello World extension included in the `opensearch-sdk-java` repository.
 
 ### Start the extension
 
@@ -70,7 +70,7 @@ Bound addresses will then be logged to the terminal:
 
 #### Run the sample extension with security
 
-1. Uncomment the ssl settings from [resources/sample/helloworld-settings.yml](src/main/resources/sample/helloworld-settings.yml):
+1. Uncomment the SSL settings from [resources/sample/helloworld-settings.yml](src/main/resources/sample/helloworld-settings.yml):
 ```
 ssl.transport.enabled: true
 ssl.transport.pemcert_filepath: certs/extension-01.pem
@@ -79,7 +79,7 @@ ssl.transport.pemtrustedcas_filepath: certs/root-ca.pem
 ssl.transport.enforce_hostname_verification: false
 path.home: <path/to/extension>
 ```
-2. Follow instructions in [CERTIFICATE_GENERATION](Docs/CERTIFICATE_GENERATION.md) to generate the certificates.
+2. Follow the instructions in [CERTIFICATE_GENERATION](Docs/CERTIFICATE_GENERATION.md) to generate the certificates.
 3. Run the extension using `./gradlew run`.
 
 ### Start OpenSearch
@@ -100,7 +100,7 @@ git clone https://github.com/<your username>/OpenSearch.git
 
 #### Enable the extensions feature flag
 
-Extensions is an experimental feature so you must enable the extensions feature either before or when you run OpenSearch. You can enable the feature flag using one of the following options.
+Extensions is an experimental feature, so you must enable the extensions feature either before or when you run OpenSearch. You can enable the feature flag using one of the following options.
 
 ##### Option 1
 
@@ -160,18 +160,18 @@ To **run OpenSearch from a compiled binary**, follow these steps:
 - Start a separate terminal and navigate to the directory where OpenSearch has been cloned using `cd OpenSearch`.
 - Run `./gradlew assemble` to create a local distribution.
 - Navigate to the project root directory (for example, `cd distribution/archives/linux-tar/build/install/opensearch-3.0.0-SNAPSHOT/`). Note: On macOS, replace `linux-tar` with `darwin-tar`.
-- Check if the `extensions` directory exists in OpenSearch using `ls`.
+- Check whether the `extensions` directory exists in OpenSearch using `ls`.
 - If the directory does not exist, create it using `mkdir extensions`.
 - Navigate to the extensions folder using `cd extensions`.
-- Manually create a file titled `extensions.yml` within the extensions directory using an IDE or an in-line text editor.
+- Manually create a file titled `extensions.yml` within the extensions directory using an IDE or an inline text editor.
 - Return to the OpenSearch directory using `cd ..`.
 - Start OpenSearch using `./bin/opensearch`.
 
 To **run OpenSearch from Gradle**, follow these steps:
-- Copy the `extensions.yml` file to the same directory as indicated in the previous section.
+- Copy the `extensions.yml` file to the same directory indicated in the previous section.
 - Run `./gradlew run` to start OpenSearch. A log entry will indicate where OpenSearch is searching for `extensions.yml`.
 
-During OpenSearch bootstrap, `ExtensionsManager` discovers the extension listenening on a predefined port and executes the TCP handshake protocol to establish a data transfer connection. Then OpenSearch sends a request to OpenSearch SDK for Java and upon acknowledgment, the extension responds with its name. This name is logged in the terminal where OpenSearch is running:
+During OpenSearch bootstrap, `ExtensionsManager` discovers the extension listening on a predefined port and executes the TCP handshake protocol to establish a data transfer connection. Then OpenSearch sends a request to the OpenSearch SDK for Java and, upon acknowledgment, the extension responds with its name. This name is logged in the terminal where OpenSearch is running:
 
 ```
 [2022-06-16T21:30:18,857][INFO ][o.o.t.TransportService   ] [runTask-0] publish_address {127.0.0.1:9300}, bound_addresses {[::1]:9300}, {127.0.0.1:9300}
@@ -237,7 +237,7 @@ MESSAGE RECEIVED:ES-ǣ!internal:discovery/extensionsnode_extensionQSt9oKXFTSWqgX
 21:30:18.999 [opensearch[extension][transport_worker][T#6]] TRACE org.opensearch.transport.TransportService.tracer - [3][internal:discovery/extensions] sent response
 ```
 
-It is important to ensure that the OpenSearch SDK for Java is already up and running on a separate process prior to starting OpenSearch because extension discovery occurs only if the OpenSearch SDK for Java is already listening on a predefined port. Once the discovery is complete and the data transfer connection between both nodes has been established, OpenSearch and the OpenSearch SDK for Java can communicate with each other.
+It is important to ensure that the OpenSearch SDK for Java is already running on a separate process prior to starting OpenSearch because extension discovery occurs only if the OpenSearch SDK for Java is already listening on a predefined port. Once the discovery is complete and the data transfer connection between both nodes has been established, OpenSearch and the OpenSearch SDK for Java can communicate with each other.
 
 ### Send a REST request to the extension
 
@@ -248,7 +248,7 @@ curl -X GET localhost:9200/_extensions/_opensearch-sdk-java-1/hello
 
 ## Developing your own extension
 
-Before you write your own extension, read through the [design documentation](DESIGN.md) to learn about extension architecture and class hierarchy. Then follow the [this guide](CREATE_YOUR_FIRST_EXTENSION.md) to develop your own extension. For an example, see the sample Hello World extension in the `org.opensearch.sdk.sample.helloworld` package. 
+Before you write your own extension, read through the [design documentation](DESIGN.md) to learn about extension architecture and class hierarchy. Then follow [this guide](CREATE_YOUR_FIRST_EXTENSION.md) to develop your own extension. For an example, see the sample Hello World extension in the `org.opensearch.sdk.sample.helloworld` package. 
 
 Refer to the following sections for information about post-development tasks. 
 
@@ -256,9 +256,9 @@ Refer to the following sections for information about post-development tasks.
 
 To run an extension that uses the SDK, use `./gradlew run` on that extension.
 
-### Publish OpenSearch SDK for Java to Maven local
+### Publish the OpenSearch SDK for Java repo to the Maven local repo
 
-Until we publish this repo to Maven Central, publishing to the Maven local repository is the way for extensions (outside of sample packages) to import the artifacts:
+Until we publish this repo to the Maven Central Repository, publishing to the Maven local repository is how extensions (outside of sample packages) import the artifacts:
 
 ```bash
 ./gradlew publishToMavenLocal
@@ -277,7 +277,7 @@ In `opensearch-sdk-java`, navigate to `build/distributions`. Look for the tarbal
 ```
 ./gradlew clean && ./gradlew build
 ```
-Once the tarball is generated, navigate to `/src/test/resources/sample` and look for `extension-settings.yml`. If it is not present, create one.
+Once the tarball is generated, navigate to `/src/test/resources/sample` and look for `extension-settings.yml`. If the file is not present, create it.
 The tarball is generated in `/build/distributions`. To run the artifact (the tarball), use the following command:
 ```
 tar -xvf opensearch-sdk-java-1.0.0-SNAPSHOT.tar

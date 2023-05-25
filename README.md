@@ -15,12 +15,12 @@
   * [Code of Conduct](#code-of-conduct)
 
 ## Introduction
-With OpenSearch plugins, you can extend and enhance various core features. However, the current plugin architecture may fatally impact clusters in case of failure. To ensure that plugins run safely without impacting the system, our goal is to isolate plugin interactions with OpenSearch. The OpenSearch SDK for Java modularizes the [extension points](https://opensearch.org/blog/technical-post/2021/12/plugins-intro/) onto which plugins hook. 
+With OpenSearch plugins, you can extend and enhance various core features. However, the current plugin architecture may fatally impact clusters in the event of failure. To ensure that plugins run safely without impacting the system, our goal is to isolate plugin interactions with OpenSearch. The OpenSearch SDK for Java modularizes the [extension points](https://opensearch.org/blog/technical-post/2021/12/plugins-intro/) onto which plugins hook. 
 
-For more information about extensibility, see [the GitHub issue](https://github.com/opensearch-project/OpenSearch/issues/1422).
+For more information about extensibility, see [this GitHub issue](https://github.com/opensearch-project/OpenSearch/issues/1422).
 
 ## Design
-For the overview of extension architecture and information about how extensions work, see [DESIGN](DESIGN.md).
+For an overview of extension architecture and information about how extensions work, see [DESIGN](DESIGN.md).
 
 ## Creating an extension
 For information about developing an extension, see [CREATE_YOUR_FIRST_EXTENSION](CREATE_YOUR_FIRST_EXTENSION.md).
@@ -29,7 +29,7 @@ For information about developing an extension, see [CREATE_YOUR_FIRST_EXTENSION]
 For instructions on building, testing, and running an extension, see the [DEVELOPER_GUIDE](DEVELOPER_GUIDE.md).
 
 ## Plugin migration
-For tips about migrating an existing plugin to an extension, see [PLUGIN_MIGRATION](PLUGIN_MIGRATION.md).
+For tips on migrating an existing plugin to an extension, see [PLUGIN_MIGRATION](PLUGIN_MIGRATION.md).
 
 ## Contributing
 For information about contributing, see [CONTRIBUTING](CONTRIBUTING.md).
