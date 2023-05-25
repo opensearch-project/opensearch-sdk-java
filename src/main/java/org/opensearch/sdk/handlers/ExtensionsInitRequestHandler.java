@@ -64,7 +64,6 @@ public class ExtensionsInitRequestHandler {
             // After sending successful response to initialization, send the REST API and Settings
             extensionsRunner.setOpensearchNode(extensionInitRequest.getSourceNode());
             extensionsRunner.setExtensionNode(extensionInitRequest.getExtension());
-            extensionsRunner.getSdkClient().updateOpenSearchNodeSettings(extensionInitRequest.getSourceNode().getAddress());
 
             // TODO: replace with sdkTransportService.getTransportService()
             TransportService extensionTransportService = extensionsRunner.getExtensionTransportService();
