@@ -129,7 +129,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         extensionsRunner.setExtensionTransportService(this.transportService);
         doNothing().when(this.transportService).connectToNodeAsExtension(sourceNode, "opensearch-sdk-1");
 
-        InitializeExtensionRequest extensionInitRequest = new InitializeExtensionRequest(sourceNode, extension);
+        InitializeExtensionRequest extensionInitRequest = new InitializeExtensionRequest(sourceNode, extension, "9204");
 
         InitializeExtensionResponse response = extensionsInitRequestHandler.handleExtensionInitRequest(extensionInitRequest);
         // Test if name and unique ID are set
@@ -137,6 +137,8 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         assertEquals("opensearch-sdk-1", extensionsRunner.getUniqueId());
         // Test if the source node is set after handleExtensionInitRequest() is called during OpenSearch bootstrap
         assertEquals(sourceNode, extensionsRunner.getOpensearchNode());
+        // Verify opensearch http port is updated
+        assertEquals("9204", extensionsRunner.getExtension().getExtensionSettings().getOpensearchPort());
     }
 
     @Test
