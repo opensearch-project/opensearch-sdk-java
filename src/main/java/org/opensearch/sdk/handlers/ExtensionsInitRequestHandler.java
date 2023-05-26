@@ -28,6 +28,12 @@ import static org.opensearch.sdk.ExtensionsRunner.NODE_NAME_SETTING;
 public class ExtensionsInitRequestHandler {
     private static final Logger logger = LogManager.getLogger(ExtensionsInitRequestHandler.class);
 
+    // The default http port setting of OpenSearch
+    private static final String DEFAULT_HTTP_PORT = "9200";
+
+    // The configured http port setting of opensearch.yml
+    private static final String HTTP_PORT_SETTING = "http.port";
+
     private final ExtensionsRunner extensionsRunner;
 
     /**
@@ -79,6 +85,10 @@ public class ExtensionsInitRequestHandler {
             extensionsRunner.setEnvironmentSettings(settings);
             extensionsRunner.updateNamedXContentRegistry();
             extensionsRunner.updateSdkClusterService();
+            // Use OpenSearch Settings to update client REST Connections
+            String openSearchNodeAddress = extensionInitRequest.getSourceNode().getAddress().getAddress();
+            String openSearchNodeHttpPort = settings.get(HTTP_PORT_SETTING) != null ? settings.get(HTTP_PORT_SETTING) : DEFAULT_HTTP_PORT;
+            extensionsRunner.getSdkClient().updateOpenSearchNodeSettings(openSearchNodeAddress, openSearchNodeHttpPort);
 
             // Last step of initialization
             // TODO: make sure all the other sendX methods have completed

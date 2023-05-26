@@ -87,7 +87,6 @@ import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
-import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.index.reindex.BulkByScrollResponse;
 import org.opensearch.index.reindex.DeleteByQueryRequest;
 
@@ -132,17 +131,26 @@ public class SDKClient implements Closeable {
 
     /**
      * Update the ExtensionSettings with a new OpenSearch address and port
-     * @param address the TransportAddress associated with the OpenSearchNode
+     * @param address the host address associated with the OpenSearchNode
+     * @param httpPort the http port associated with the OpenSearchNOde
      */
-    public void updateOpenSearchNodeSettings(TransportAddress address) {
+    public void updateOpenSearchNodeSettings(String address, String httpPort) {
         // Update the settings for future initialization of new clients
-        this.extensionSettings.setOpensearchAddress(address.getAddress());
-        this.extensionSettings.setOpensearchPort(Integer.toString(address.getPort()));
+        this.extensionSettings.setOpensearchAddress(address);
+        this.extensionSettings.setOpensearchPort(httpPort);
         // Update the settings on the already-initialized SDKRestClient (Deprecated -- for migration use)
         if (this.sdkRestClient != null) {
             this.sdkRestClient.getRestHighLevelClient()
                 .getLowLevelClient()
-                .setNodes(List.of(new Node(new HttpHost(address.getAddress(), address.getPort()))));
+                .setNodes(List.of(new Node(new HttpHost(address, Integer.parseInt(httpPort)))));
+        }
+        // Update the settings on the already-initialized OpenSearchAsyncClient
+        if (this.javaAsyncClient != null) {
+            OpenSearchTransport javaAsyncClientTransport = this.javaAsyncClient._transport();
+            if (javaAsyncClientTransport instanceof RestClientTransport) {
+                RestClientTransport restClientTransport = (RestClientTransport) javaAsyncClientTransport;
+                restClientTransport.restClient().setNodes(List.of(new Node(new HttpHost(address, Integer.parseInt(httpPort)))));
+            }
         }
     }
 
