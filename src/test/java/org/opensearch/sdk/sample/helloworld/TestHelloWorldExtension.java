@@ -119,7 +119,7 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         assertEquals("localhost", host.getHostName());
         assertEquals(9200, host.getPort());
 
-        this.sdkClient.updateOpenSearchNodeSettings(new TransportAddress(new InetSocketAddress("10.10.10.10", 9204)), "9204");
+        this.sdkClient.updateOpenSearchNodeSettings(new TransportAddress(new InetSocketAddress("10.10.10.10", 9300)), "9204");
         nodes = this.sdkClient.getSdkRestClient().getRestHighLevelClient().getLowLevelClient().getNodes();
         assertEquals(1, nodes.size());
         host = nodes.get(0).getHost();
