@@ -9,7 +9,11 @@
 
 package org.opensearch.sdk.action;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+
 import java.io.IOException;
+import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,11 +26,14 @@ import org.opensearch.common.io.stream.BytesStreamInput;
 import org.opensearch.common.io.stream.BytesStreamOutput;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.common.io.stream.StreamOutput;
+import org.opensearch.common.settings.Settings;
 import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.ExtensionsRunnerForTest;
 import org.opensearch.sdk.SDKTransportService;
 import org.opensearch.test.OpenSearchTestCase;
+import org.opensearch.transport.Transport;
+import org.opensearch.transport.TransportService;
 
 public class TestProxyActionRequest extends OpenSearchTestCase {
     private ExtensionsRunner extensionsRunner;
@@ -38,6 +45,20 @@ public class TestProxyActionRequest extends OpenSearchTestCase {
         super.setUp();
         this.extensionsRunner = new ExtensionsRunnerForTest();
         extensionsRunner.getSdkTransportService().setUniqueId("opensearch-sdk-1");
+
+        this.sdkTransportService.setTransportService(
+            spy(
+                new TransportService(
+                    Settings.EMPTY,
+                    mock(Transport.class),
+                    null,
+                    TransportService.NOOP_TRANSPORT_INTERCEPTOR,
+                    x -> null,
+                    null,
+                    Collections.emptySet()
+                )
+            )
+        );
     }
 
     @Test
