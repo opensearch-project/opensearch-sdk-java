@@ -39,7 +39,6 @@ public class TestProxyActionRequest extends OpenSearchTestCase {
     @Override
     @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         this.sdkTransportService.setTransportService(
             spy(
                 new TransportService(
