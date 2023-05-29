@@ -73,7 +73,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         SDKNamedXContentRegistry.EMPTY
     );
     private ExtensionsRunner extensionsRunner;
-    private TransportService transportService;
+    private SDKTransportService sdkTransportService;
 
     @Override
     @BeforeEach
@@ -82,30 +82,37 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         this.extensionsRunner = new ExtensionsRunnerForTest();
         extensionsRunner.getSdkTransportService().setUniqueId("opensearch-sdk-1");
         this.extensionsInitRequestHandler = new ExtensionsInitRequestHandler(extensionsRunner);
-
-        this.transportService = spy(
-            new TransportService(
-                Settings.EMPTY,
-                mock(Transport.class),
-                null,
-                TransportService.NOOP_TRANSPORT_INTERCEPTOR,
-                x -> null,
-                null,
-                Collections.emptySet()
+        this.sdkTransportService = extensionsRunner.getSdkTransportService();
+        this.sdkTransportService.setTransportService(
+            spy(
+                new TransportService(
+                    Settings.EMPTY,
+                    mock(Transport.class),
+                    null,
+                    TransportService.NOOP_TRANSPORT_INTERCEPTOR,
+                    x -> null,
+                    null,
+                    Collections.emptySet()
+                )
             )
         );
-
-        extensionsRunner.getSdkTransportService().setTransportService(this.transportService);
     }
 
     @Test
     public void testStartTransportService() {
-        extensionsRunner.startTransportService(transportService);
+        extensionsRunner.startTransportService(sdkTransportService.getTransportService());
         // test manager method invokes start on transport service
-        verify(transportService, times(1)).start();
+        verify(sdkTransportService.getTransportService(), times(1)).start();
         // cannot verify acceptIncomingRequests as it is a final method
         // test registerRequestHandlers
-        verify(transportService, times(5)).registerRequestHandler(anyString(), anyString(), anyBoolean(), anyBoolean(), any(), any());
+        verify(sdkTransportService.getTransportService(), times(5)).registerRequestHandler(
+            anyString(),
+            anyString(),
+            anyBoolean(),
+            anyBoolean(),
+            any(),
+            any()
+        );
     }
 
     @Test
@@ -127,7 +134,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
             new ArrayList<ExtensionDependency>()
         );
 
-        doNothing().when(this.transportService).connectToNodeAsExtension(sourceNode, "opensearch-sdk-1");
+        doNothing().when(sdkTransportService.getTransportService()).connectToNodeAsExtension(sourceNode, "opensearch-sdk-1");
 
         InitializeExtensionRequest extensionInitRequest = new InitializeExtensionRequest(sourceNode, extension);
 
@@ -181,39 +188,64 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
     @Test
     public void testClusterStateRequest() {
 
-        extensionsRunner.getSdkTransportService().sendClusterStateRequest();
+        sdkTransportService.sendClusterStateRequest();
 
-        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ClusterStateResponseHandler.class));
+        verify(sdkTransportService.getTransportService(), times(1)).sendRequest(
+            any(),
+            anyString(),
+            any(),
+            any(ClusterStateResponseHandler.class)
+        );
     }
 
     @Test
     public void testClusterSettingRequest() {
 
-        extensionsRunner.getSdkTransportService().sendClusterSettingsRequest();
+        sdkTransportService.sendClusterSettingsRequest();
 
-        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(ClusterSettingsResponseHandler.class));
+        verify(sdkTransportService.getTransportService(), times(1)).sendRequest(
+            any(),
+            anyString(),
+            any(),
+            any(ClusterSettingsResponseHandler.class)
+        );
     }
 
     @Test
     public void testEnvironmentSettingsRequest() {
-        extensionsRunner.getSdkTransportService().sendEnvironmentSettingsRequest();
+        sdkTransportService.sendEnvironmentSettingsRequest();
 
-        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(EnvironmentSettingsResponseHandler.class));
+        verify(sdkTransportService.getTransportService(), times(1)).sendRequest(
+            any(),
+            anyString(),
+            any(),
+            any(EnvironmentSettingsResponseHandler.class)
+        );
     }
 
     @Test
     public void testRegisterRestActionsRequest() {
 
-        extensionsRunner.getSdkTransportService().sendRegisterRestActionsRequest(extensionsRunner.getExtensionRestPathRegistry());
+        sdkTransportService.sendRegisterRestActionsRequest(extensionsRunner.getExtensionRestPathRegistry());
 
-        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(AcknowledgedResponseHandler.class));
+        verify(sdkTransportService.getTransportService(), times(1)).sendRequest(
+            any(),
+            anyString(),
+            any(),
+            any(AcknowledgedResponseHandler.class)
+        );
     }
 
     @Test
     public void testRegisterCustomSettingsRequest() {
-        extensionsRunner.getSdkTransportService().sendRegisterCustomSettingsRequest(extensionsRunner.getCustomSettings());
+        sdkTransportService.sendRegisterCustomSettingsRequest(extensionsRunner.getCustomSettings());
 
-        verify(transportService, times(1)).sendRequest(any(), anyString(), any(), any(AcknowledgedResponseHandler.class));
+        verify(sdkTransportService.getTransportService(), times(1)).sendRequest(
+            any(),
+            anyString(),
+            any(),
+            any(AcknowledgedResponseHandler.class)
+        );
     }
 
     @Test
@@ -237,6 +269,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         assertNotNull(extensionsRunner.getTaskManager());
         assertNotNull(extensionsRunner.getSdkClient());
         assertNotNull(extensionsRunner.getSdkClusterService());
+        assertNotNull(extensionsRunner.getSdkTransportService());
         assertNotNull(extensionsRunner.getIndexNameExpressionResolver());
 
         settings = extensionsRunner.getSettings();
