@@ -44,8 +44,8 @@ public class TestProxyActionRequest extends OpenSearchTestCase {
     public void setUp() throws Exception {
         super.setUp();
         this.extensionsRunner = new ExtensionsRunnerForTest();
-        extensionsRunner.getSdkTransportService().setUniqueId("opensearch-sdk-1");
-
+        this.sdkTransportService = extensionsRunner.getSdkTransportService();
+        this.sdkTransportService.setUniqueId("opensearch-sdk-1");
         this.sdkTransportService.setTransportService(
             spy(
                 new TransportService(
