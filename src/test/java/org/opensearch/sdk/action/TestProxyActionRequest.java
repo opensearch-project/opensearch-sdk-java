@@ -42,6 +42,8 @@ public class TestProxyActionRequest extends OpenSearchTestCase {
 
     @Test
     public void testProxyActionRequest() throws Exception {
+        extensionsRunner.startTransportService(sdkTransportService.getTransportService());
+        
         TestRequest testRequest = new TestRequest("test-action");
 
         String expectedAction = TestAction.class.getName();
