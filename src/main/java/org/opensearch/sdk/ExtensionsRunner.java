@@ -28,7 +28,6 @@ import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.UpdateSettingsRequest;
 import org.opensearch.extensions.action.ExtensionActionRequest;
-import org.opensearch.index.IndicesModuleRequest;
 import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.sdk.api.ActionExtension;
 import org.opensearch.sdk.handlers.ExtensionActionRequestHandler;
@@ -397,29 +396,6 @@ public class ExtensionsRunner {
             false,
             InitializeExtensionRequest::new,
             (request, channel, task) -> channel.sendResponse(extensionsInitRequestHandler.handleExtensionInitRequest(request))
-        );
-
-        transportService.registerRequestHandler(
-            ExtensionsManager.INDICES_EXTENSION_POINT_ACTION_NAME,
-            ThreadPool.Names.GENERIC,
-            false,
-            false,
-            IndicesModuleRequest::new,
-            ((request, channel, task) -> channel.sendResponse(
-                extensionsIndicesModuleRequestHandler.handleIndicesModuleRequest(request, transportService)
-            ))
-
-        );
-
-        transportService.registerRequestHandler(
-            ExtensionsManager.INDICES_EXTENSION_NAME_ACTION_NAME,
-            ThreadPool.Names.GENERIC,
-            false,
-            false,
-            IndicesModuleRequest::new,
-            ((request, channel, task) -> channel.sendResponse(
-                extensionsIndicesModuleNameRequestHandler.handleIndicesModuleNameRequest(request)
-            ))
         );
 
         transportService.registerRequestHandler(
