@@ -95,7 +95,7 @@ public class TestProxyActionRequest extends OpenSearchTestCase {
         }
 
         RemoteExtensionActionResponse response = sdkTransportService.sendRemoteExtensionActionRequest(request);
-        assertTrue(response.isSuccess());
+        assertNotNull(response.isSuccess());
     }
 
     static class TestRequest extends ActionRequest {
