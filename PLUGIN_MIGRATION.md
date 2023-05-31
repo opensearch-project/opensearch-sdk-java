@@ -22,12 +22,14 @@ Use the notes in the following sections to help migrate a plugin to an extension
 
 ## Use wrapper classes
 
+Refer to the following notes for using wrapper classes.
+
 ### Replace `ClusterService` with `SDKClusterService`
 
  - Calls to `clusterService.getClusterSettings().addSettingsUpdateConsumer()` with a single consumer do not require changes. However, this method has an overloaded version that takes a map parameter and can perform multiple consumer updates more efficiently.
  - Calls to `clusterService.state()` do not require changes.
 
-### Replace `Client` with `SDKClient`, either `OpenSearchClient` (`JavaClient`) or `SDKRestClient`
+### Replace `Client` with `SDKClient`: either `OpenSearchClient` (`JavaClient`) or `SDKRestClient`
 
 The `SDKClient` provides two (eventually three) client options.
 
@@ -42,9 +44,9 @@ The `client.execute(action, request, responseListener)` method is implemented in
 
 For TransportActions internal to the plugin (registered with `getActions()`), change the transport action inheritance from `HandledTransportAction` to directly inherit from `TransportAction`.
 
-TransportActions on OpenSearch are not accessible to extensions and will need to be replaced with functionality from either a client (OpenSearch client for Java or the `SDKRestClient`) or some other functionality directly provided by the Extensions SDK. The following are a few examples of the types of changes needed:
+OpenSearch TransportActions are not accessible to extensions and will need to be replaced with functionality from either a client (OpenSearch client for Java or the `SDKRestClient`) or some other functionality directly provided by the Extensions SDK. The following are a few examples of the types of changes needed:
  - Some transport actions on OpenSearch, such as the `GetFieldMappingsAction`, are exposed via the REST API and should be called using those clients.
- - Some information available from services on OpenSearch, such as the state on `ClusterService`, stats on the `IndexingPressure` object, and others, are designed for local access and would transfer far more data than needed if implemented directly. Calls to these services should be replaced by REST API calls to endpoints, which filter to just the information required. For example, cluster state associated with indexes should use one of the Index API endpoints. Indexing Pressure can be retrieved by Node API endpoints.
+ - Some information available from OpenSearch services, such as the state on `ClusterService`, stats on the `IndexingPressure` object, and others, are designed for local access and would transfer far more data than needed if implemented directly. Calls to these services should be replaced by REST API calls to endpoints, which filter to just the information required. For example, cluster state associated with indexes should use one of the Index API endpoints. Indexing Pressure can be retrieved by Node API endpoints.
 
 ### Replace `RestHandler` with `ExtensionRestHandler`
 

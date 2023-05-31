@@ -139,7 +139,7 @@ public class CRUDExtension extends BaseExtension implements ActionExtension {
 
     @Override
     public List<ExtensionRestHandler> getExtensionRestHandlers() {
-        // we need to create this class next!
+        // you need to create this class next!
         return List.of(new CrudAction());
     }
 }
@@ -149,7 +149,7 @@ These classes must implement _`ExtensionRestHandler`_, which is a functional int
 
 The `BaseExtensionRestHandler` class provides many useful methods for exception handling in requests, including a `RouteHandler` class that eases logical separation of multiple `Route` choices.
 
-For the CRUD extension example, you'll implement one REST route for each option and delegate it to the appropriate handler function, although each one could be in its own file:
+For the CRUD extension example, you'll implement one REST route for each option and delegate it to the appropriate handler function, although each one could be stored in its own file:
 
 ```java
 import java.util.List;
@@ -195,7 +195,7 @@ public class CrudAction extends BaseExtensionRestHandler {
 
 During the initial creation of the extension, you either implemented `setExtensionsRunner()` yourself or used the `BaseExtension` class, which does it for you. This gives you access to the `ExtensionsRunner` object that is running this extension. The `ExtensionsRunner` has getters that provide access to many objects you will need, one of which is the `SDKClient`. The `SDKClient` class allows initialization of the OpenSearch Java client, which has synchronous and asynchronous versions. For simplicity, this example uses the synchronous client.
 
-First, we update `CRUDExtension` to send a copy of this `ExtensionsRunner` instance to our handler class:
+First, update `CRUDExtension` to send a copy of this `ExtensionsRunner` instance to our handler class:
 
 ```java
 @Override
@@ -216,7 +216,7 @@ public CrudAction(ExtensionsRunner extensionsRunner) {
 
 ### Creating (PUT) a document in an index
 
-Now in our handler function, we create an index (if it doesn't exist):
+Now in our handler function, create an index (if it doesn't exist):
 
 ```java
 BooleanResponse exists = client.indices().exists(new ExistsRequest.Builder().index("crudsample").build());
@@ -233,7 +233,7 @@ doc.add(new StringField("field", "value", Field.Store.YES));
 IndexResponse response = client.index(new IndexRequest.Builder<Document>().index("crudsample").document(doc).build());
 ```
 
-We need some exception handling. The `BaseExtensionRestHandler` provides an `exceptionalRequest()` method to handle exceptions:
+The `BaseExtensionRestHandler` provides an `exceptionalRequest()` method to handle exceptions:
 
 ```java
 return exceptionalRequest(request, e);

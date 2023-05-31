@@ -2,7 +2,7 @@
 
 *Note*: This document is evolving and is in draft state.
 
-OpenSearch supports many kinds of plugins that extend its core features. However, the plugin architecture presents significant problems because plugins can fatally impact a cluster in the event of failure. For example, critical workloads like ingestion or search traffic may be affected by a failure in a non-critical plugin, like `s3-repository`. Moreover, running third-party plugins by using the same process as OpenSearch poses a security risk, causes dependency conflicts, and complicates the release process.
+OpenSearch supports many kinds of plugins that extend its core features. However, the plugin architecture presents significant problems because plugins can fatally impact a cluster in the event of failure. For example, critical workloads like ingestion or search traffic may be affected by a failure in a non-critical plugin, like `s3-repository`. Moreover, running third-party plugins in the same process as OpenSearch poses a security risk, causes dependency conflicts, and complicates the release process.
 
 Extensions support all plugin functionality and let you easily build features on top of OpenSearch. Using the OpenSearch SDK for Java, you can develop a plugin for OpenSearch that runs in a separate process or on another node.
 
@@ -64,7 +64,7 @@ When OpenSearch receives a registered method and URI, it sends a request to the 
 
 ### OpenSearch SDK for Java
 
-Currently, plugins rely on extension points to communicate with OpenSearch. These extension points are loaded into the class loader as `Action` objects that implement _`RestHandler`_. The key part of this loading is each action's `routes()` method, which registers REST methods and URIs. Upon receiving a matching request from a user, the registered action handles the request.
+Currently, plugins rely on extension points to communicate with OpenSearch. These extension points are loaded into the class loader as `Action` objects that implement _`RestHandler`_. The key part of the loading is each action's `routes()` method, which registers REST methods and URIs. Upon receiving a matching request from a user, the registered action handles the request.
 
 Extensions use a similar registration feature, but extensions do not need or use many of the features of the _`RestHandler`_ interface because they run as separate processes. Instead, extension actions must implement the _`ExtensionAction`_ interface. This requires the extension developer to implement the `routes()` method to register REST methods (similar to plugins) and the `getExtensionResponse()` method to take action on the corresponding REST calls.
 
@@ -78,7 +78,7 @@ The following sequence diagram depicts initializing an extension, registering it
 
 ![Extension REST actions](Docs/ExtensionRestActions.svg)
 
-The `org.opensearch.sdk.sample.helloworld` package contains a sample `HelloWorldExtension` that implements the preceding steps. You can run the sample extension by following the steps in the [developer guide](DEVELOPER_GUIDE.md).
+The `org.opensearch.sdk.sample.helloworld` package contains a sample `HelloWorldExtension` that implements the preceding steps. You can run the sample extension by following the steps in the [Developer Guide](DEVELOPER_GUIDE.md).
 
 ##### Extension startup
 
@@ -155,4 +155,4 @@ Because the extension has an instance of the `ExtensionsRunner`, it can now acce
 - Will extensions replace plugins?
   Plugins will continue to be supported in the near future but are on a path to deprecation. Extensions are recommended for new development because they will be easier to develop, deploy, and operate.
 - What is the latency for extensions?
-  See [benchmarking tests](https://github.com/opensearch-project/OpenSearch/issues/3012#issuecomment-1122682444).
+  For latency information, see [benchmarking tests](https://github.com/opensearch-project/OpenSearch/issues/3012#issuecomment-1122682444).

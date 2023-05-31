@@ -100,7 +100,7 @@ git clone https://github.com/<your username>/OpenSearch.git
 
 #### Enable the extensions feature flag
 
-Extensions is an experimental feature, so you must enable the extensions feature either before or when you run OpenSearch. You can enable the feature flag using one of the following options.
+Extensions are experimental in OpenSearch 2.8, so you must enable them either before or when you run OpenSearch. You can enable the feature flag using one of the following options.
 
 ##### Option 1
 
@@ -126,7 +126,7 @@ Add the experimental feature flag as a command line argument:
 
 ##### Option 3
 
-Enable the experimental feature flag by setting it to true in `opensearch.yml`:
+Enable the experimental feature flag by setting it to `true` in `opensearch.yml`:
 - `cd` to your local distribution build for OpenSearch.
 - `cd` into the OpenSearch `config` folder and open `opensearch.yml` in your local editor.
 - Search for `opensearch.experimental.feature.extensions.enabled`, uncomment it, and set it to `true`.
