@@ -25,7 +25,10 @@ buildscript {
         mavenLocal()
         mavenCentral()
         maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
+<<<<<<< HEAD
         maven { url "https://d1nvenhzbhpy0q.cloudfront.net/snapshots/lucene/"}
+=======
+>>>>>>> main
     }
 
     dependencies {
@@ -44,6 +47,10 @@ plugins {
 
 
 apply from: 'gradle/formatting.gradle'
+<<<<<<< HEAD
+=======
+apply plugin: 'maven-publish'
+>>>>>>> main
 apply plugin: 'java'
 apply plugin: 'opensearch.opensearchplugin'
 apply plugin: 'opensearch.testclusters'
@@ -87,8 +94,6 @@ allprojects {
 }
 
 
-
-
 group 'org.opensearch.sdk'
 version '2.0.0-SNAPSHOT'
 
@@ -103,9 +108,9 @@ dependencies {
 
     def opensearchVersion = "3.0.0-SNAPSHOT"
     def log4jVersion = "2.20.0"
-    def nettyVersion = "4.1.92.Final"
+    def nettyVersion = "4.1.93.Final"
     def jacksonDatabindVersion = "2.15.1"
-    def guavaVersion = "31.1-jre"
+    def guavaVersion = "32.0.0-jre"
     def guiceVersion = "7.0.0"
     def junit4Version = "4.13.2"
     def junit5Version = "5.9.3"
