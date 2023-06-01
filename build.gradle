@@ -25,10 +25,6 @@ buildscript {
         mavenLocal()
         mavenCentral()
         maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
-<<<<<<< HEAD
-        maven { url "https://d1nvenhzbhpy0q.cloudfront.net/snapshots/lucene/"}
-=======
->>>>>>> main
     }
 
     dependencies {
@@ -47,10 +43,6 @@ plugins {
 
 
 apply from: 'gradle/formatting.gradle'
-<<<<<<< HEAD
-=======
-apply plugin: 'maven-publish'
->>>>>>> main
 apply plugin: 'java'
 apply plugin: 'opensearch.opensearchplugin'
 apply plugin: 'opensearch.testclusters'
