@@ -106,9 +106,9 @@ The `ExtensionsManager` reads a list of extensions present in `extensions.yml`. 
 
 (18) If the requests match the registered path/URI and `routes()` of an extension, the `RestController` invokes the registered `RestSendToExtensionAction`.
 
-(19) The `RestSendToExtensionAction` forwards the method and URI to the extension in a `RestExecuteOnExtensionRequest` (this class will be expanded iteratively as we add more features to include parameters, identity IDs or access tokens, and other information).
+(19) The `RestSendToExtensionAction` forwards the method and URI to the extension in a `ExtensionRestRequest` (this class will be expanded iteratively as we add more features to include parameters, identity IDs or access tokens, and other information).
 
-(20) The extension matches the method and URI to its pathMap to retrieve the `ExtensionRestHandler` registered to handle that combination.
+(20) The `ExtensionRestPathRegistry` matches the method and URI to its path registry to retrieve the `ExtensionRestHandler` registered to handle that combination.
 
 (21, 22) The appropriate `ExtensionRestHandler` handles the request, possibly executing complex logic, and eventually provides a response string.
 
