@@ -177,6 +177,8 @@ dependencies {
         resolutionStrategy.force("com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}")
         resolutionStrategy.force("com.fasterxml.jackson.core:jackson-core:${jacksonDatabindVersion}")
         resolutionStrategy.force("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonDatabindVersion}")
+        resolutionStrategy.force("com.fasterxml.jackson.dataformat:jackson-dataformat-smile:${jacksonDatabindVersion}")
+        resolutionStrategy.force("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:${jacksonDatabindVersion}")
         resolutionStrategy.force("org.apache.logging.log4j:log4j-api:${log4jVersion}")
         resolutionStrategy.force("org.apache.logging.log4j:log4j-core:${log4jVersion}")
         resolutionStrategy.force("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
