@@ -89,6 +89,25 @@ allprojects {
 group 'org.opensearch.sdk'
 version '2.0.0-SNAPSHOT'
 
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            name = "Snapshots" //  optional target repository name
+            url = "https://aws.oss.sonatype.org/content/repositories/snapshots"
+            credentials {
+                username "$System.env.SONATYPE_USERNAME"
+                password "$System.env.SONATYPE_PASSWORD"
+            }
+        }
+    }
+}
+
 repositories {
     mavenLocal()
     mavenCentral()
