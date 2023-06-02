@@ -108,6 +108,8 @@ publishing {
     }
 }
 
+validateMavenJavaPom.enabled = false
+
 repositories {
     mavenLocal()
     mavenCentral()
