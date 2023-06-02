@@ -43,7 +43,6 @@ plugins {
 
 
 apply from: 'gradle/formatting.gradle'
-apply plugin: 'maven-publish'
 apply plugin: 'java'
 apply plugin: 'opensearch.opensearchplugin'
 apply plugin: 'opensearch.testclusters'
@@ -87,50 +86,8 @@ allprojects {
 }
 
 
-
-
 group 'org.opensearch.sdk'
 version '2.0.0-SNAPSHOT'
-
-java {
-    withSourcesJar()
-    withJavadocJar()
-}
-
-publishing {
-    publications {
-                // add license information to generated poms
-                all {
-                    pom {
-                        name = "opensearch-sdk-java"
-                        description = "OpenSearch SDK"
-                    }
-                    pom.withXml { XmlProvider xml ->
-                        Node node = xml.asNode()
-                        node.appendNode('inceptionYear', '2022')
-
-                        Node license = node.appendNode('licenses').appendNode('license')
-                        license.appendNode('name', project.licenseName)
-                        license.appendNode('url', project.licenseUrl)
-
-                        Node developer = node.appendNode('developers').appendNode('developer')
-                        developer.appendNode('name', 'opensearch-sdk-java')
-                        developer.appendNode('url', 'https://github.com/opensearch-project/opensearch-sdk-java')
-                    }
-                }
-            }
-
-    repositories {
-        maven {
-            name = "Snapshots" //  optional target repository name
-            url = "https://aws.oss.sonatype.org/content/repositories/snapshots"
-            credentials {
-                username "$System.env.SONATYPE_USERNAME"
-                password "$System.env.SONATYPE_PASSWORD"
-            }
-        }
-    }
-}
 
 repositories {
     mavenLocal()
