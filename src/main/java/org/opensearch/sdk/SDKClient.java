@@ -77,6 +77,7 @@ import org.opensearch.client.indices.CreateIndexRequest;
 import org.opensearch.client.indices.CreateIndexResponse;
 import org.opensearch.client.indices.GetFieldMappingsRequest;
 import org.opensearch.client.indices.GetFieldMappingsResponse;
+import org.opensearch.client.indices.GetIndexRequest;
 import org.opensearch.client.indices.GetMappingsRequest;
 import org.opensearch.client.indices.GetMappingsResponse;
 import org.opensearch.client.indices.PutMappingRequest;
@@ -737,6 +738,28 @@ public class SDKClient implements Closeable {
          */
         public Cancellable getAliases(GetAliasesRequest getAliasesRequest, ActionListener<GetAliasesResponse> listener) {
             return this.indicesClient.getAliasAsync(getAliasesRequest, options, listener);
+        }
+
+        /**
+         * Asynchronously checks if one or more aliases exist using the Aliases Exist API.
+         *
+         * @param getAliasesRequest the request
+         * @param listener the listener to be notified upon request completion
+         * @return cancellable that may be used to cancel the request
+         */
+        public Cancellable existsAlias(GetAliasesRequest getAliasesRequest, ActionListener<Boolean> listener) {
+            return this.indicesClient.existsAliasAsync(getAliasesRequest, options, listener);
+        }
+
+        /**
+         * Asynchronously checks if the index (indices) exists or not.
+         *
+         * @param getIndexRequest the request
+         * @param listener the listener to be notified upon request completion
+         * @return cancellable that may be used to cancel the request
+         */
+        public Cancellable exists(GetIndexRequest getIndexRequest, ActionListener<Boolean> listener) {
+            return this.indicesClient.existsAsync(getIndexRequest, options, listener);
         }
     }
 }
