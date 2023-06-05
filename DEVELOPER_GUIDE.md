@@ -1,6 +1,7 @@
 
 # OpenSearch SDK for Java Developer Guide
 
+[OpenSearch SDK for Java Developer Guide](#opensearch-sdk-for-java-developer-guide)
 * [Getting started](#getting-started)
   * [Start the extension](#start-the-extension)
     * [Clone the OpenSearch SDK for Java repository](#clone-the-opensearch-sdk-for-java-repository)
@@ -9,15 +10,19 @@
   * [Start OpenSearch](#start-opensearch)
     * [Clone the OpenSearch repository](#clone-the-opensearch-repository)
     * [Enable the extensions feature flag](#enable-the-extensions-feature-flag)
+      * [Option 1](#option-1)
+      * [Option 2](#option-2)
+      * [Option 3](#option-3)
     * [The `extensions.yml` file](#the-extensionsyml-file)
     * [Run OpenSearch](#run-opensearch)
   * [Send a REST request to the extension](#send-a-rest-request-to-the-extension)
 * [Developing your own extension](#developing-your-own-extension)
-  * [Run a custom extension](#run-a-custom-extension)
-  * [Publish OpenSearch SDK for Java to Maven local](#publish-opensearch-sdk-for-java-to-maven-local)
-  * [Run tests](#run-tests)
-  * [Generate an artifact](#generate-an-artifact)
-  * [Submit changes](#submit-changes)
+  * [Running a custom extension](#running-a-custom-extension)
+  * [Publishing the OpenSearch SDK for Java repo to the Maven local repo](#publishing-the-opensearch-sdk-for-java-repo-to-the-maven-local-repo)
+  * [Running tests](#running-tests)
+  * [Launching and debugging from an IDE](#launching-and-debugging-from-an-ide)
+  * [Generating an artifact](#generating-an-artifact)
+  * [Submitting changes](#submitting-changes)
 
 ## Getting started
 
@@ -252,11 +257,11 @@ Before you write your own extension, read through the [design documentation](DES
 
 Refer to the following sections for information about post-development tasks. 
 
-### Run a custom extension
+### Running a custom extension
 
 To run an extension that uses the SDK, use `./gradlew run` on that extension.
 
-### Publish the OpenSearch SDK for Java repo to the Maven local repo
+### Publishing the OpenSearch SDK for Java repo to the Maven local repo
 
 Until we publish this repo to the Maven Central Repository, publishing to the Maven local repository is how extensions (outside of sample packages) import the artifacts:
 
@@ -264,14 +269,19 @@ Until we publish this repo to the Maven Central Repository, publishing to the Ma
 ./gradlew publishToMavenLocal
 ```
 
-### Run tests
+### Running tests
 
 Use the following command to run tests:
+
 ```
-./gradlew clean build test
+./gradlew clean build integTest
 ```
 
-### Generate an artifact
+### Launching and debugging from an IDE
+
+For information about launching and debugging from an IDE in OpenSearch, see [this document](https://github.com/opensearch-project/OpenSearch/blob/main/TESTING.md#launching-and-debugging-from-an-ide)
+
+### Generating an artifact
 
 In `opensearch-sdk-java`, navigate to `build/distributions`. Look for the tarball in the form `opensearch-sdk-java-1.0.0-SNAPSHOT.tar`. If there is no such tarball, use the following command to create one:
 ```
@@ -292,8 +302,9 @@ The artifact will include extension settings for the sample Hello World extensio
   opensearchAddress: 127.0.0.1
   opensearchPort: 9200
 ```
-- Start the sample extension with `./bin/opensearch-sdk-java`
 
-### Submit changes
+Start the sample extension with `./bin/opensearch-sdk-java`
+
+### Submitting changes
 
 To learn how to submit your changes, see [CONTRIBUTING](CONTRIBUTING.md).

@@ -1,6 +1,6 @@
 extensionName: hello-world
 hostAddress: 127.0.0.1
-hostPort: 4532
+hostPort: 4500
 opensearchAddress: 127.0.0.1
 opensearchPort: 9200
 #ssl.transport.enabled: true
