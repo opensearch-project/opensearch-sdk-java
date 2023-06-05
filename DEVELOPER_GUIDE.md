@@ -97,7 +97,7 @@ Follow these steps to start OpenSearch:
 
 #### Clone the OpenSearch repository
 
-Fork the [OpenSearch](https://github.com/opensearch-project/OpenSearch/) repository and clone it locally using the following command: 
+Fork the [OpenSearch](https://github.com/opensearch-project/OpenSearch/) repository and clone it locally using the following command:
 
 ```bash
 git clone https://github.com/<your username>/OpenSearch.git
@@ -253,9 +253,9 @@ curl -X GET localhost:9200/_extensions/_opensearch-sdk-java-1/hello
 
 ## Developing your own extension
 
-Before you write your own extension, read through the [design documentation](DESIGN.md) to learn about extension architecture and class hierarchy. Then follow [this guide](CREATE_YOUR_FIRST_EXTENSION.md) to develop your own extension. For an example, see the sample Hello World extension in the `org.opensearch.sdk.sample.helloworld` package. 
+Before you write your own extension, read through the [design documentation](DESIGN.md) to learn about extension architecture and class hierarchy. Then follow [this guide](CREATE_YOUR_FIRST_EXTENSION.md) to develop your own extension. For an example, see the sample Hello World extension in the `org.opensearch.sdk.sample.helloworld` package.
 
-Refer to the following sections for information about post-development tasks. 
+Refer to the following sections for information about post-development tasks.
 
 ### Running a custom extension
 
@@ -293,7 +293,7 @@ The tarball is generated in `/build/distributions`. To run the artifact (the tar
 tar -xvf opensearch-sdk-java-1.0.0-SNAPSHOT.tar
 ```
 
-The artifact will include extension settings for the sample Hello World extension on the class path under the path `/sample/extension-settings.yml`: 
+The artifact will include extension settings for the sample Hello World extension on the class path under the path `/sample/extension-settings.yml`:
 
 ```yaml
   extensionName: hello-world

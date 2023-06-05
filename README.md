@@ -15,7 +15,7 @@
   * [Code of Conduct](#code-of-conduct)
 
 ## Introduction
-With OpenSearch plugins, you can extend and enhance various core features. However, the current plugin architecture may fatally impact clusters in the event of failure. To ensure that plugins run safely without impacting the system, our goal is to isolate plugin interactions with OpenSearch. The OpenSearch SDK for Java modularizes the [extension points](https://opensearch.org/blog/technical-post/2021/12/plugins-intro/) onto which plugins hook. 
+With OpenSearch plugins, you can extend and enhance various core features. However, the current plugin architecture may fatally impact clusters in the event of failure. To ensure that plugins run safely without impacting the system, our goal is to isolate plugin interactions with OpenSearch. The OpenSearch SDK for Java modularizes the [extension points](https://opensearch.org/blog/technical-post/2021/12/plugins-intro/) onto which plugins hook.
 
 For more information about extensibility, see [this GitHub issue](https://github.com/opensearch-project/OpenSearch/issues/1422).
 
