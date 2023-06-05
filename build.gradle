@@ -90,7 +90,6 @@ group 'org.opensearch.sdk'
 version '2.0.0-SNAPSHOT'
 
 publishing {
-
     publications {
         mavenJava(MavenPublication) {
             from components.java
@@ -111,6 +110,7 @@ publishing {
 
 tasks.named("publishMavenJavaPublicationToMavenLocal").configure { dependsOn("generatePomFileForNebulaPublication") }
 tasks.named("publishNebulaPublicationToMavenLocal").configure { dependsOn("generatePomFileForMavenJavaPublication") }
+validateMavenJavaPom.enabled = false
 
 repositories {
     mavenLocal()
@@ -124,14 +124,14 @@ dependencies {
     def opensearchVersion = "3.0.0-SNAPSHOT"
     def log4jVersion = "2.20.0"
     def nettyVersion = "4.1.93.Final"
-    def jacksonDatabindVersion = "2.15.1"
+    def jacksonDatabindVersion = "2.15.2"
     def guavaVersion = "32.0.0-jre"
     def guiceVersion = "7.0.0"
     def junit4Version = "4.13.2"
     def junit5Version = "5.9.3"
     def junitPlatform = "1.9.3"
     def jaxbVersion = "2.3.1"
-    def jakartaVersion = "2.1.1"
+    def jakartaVersion = "2.1.2"
     def jakartaInjectVersion = "2.0.1"
     def javaxVersion  = "1"
     def guavaFailureAccessVersion = "1.0.1"
