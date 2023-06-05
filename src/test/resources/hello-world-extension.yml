@@ -3,5 +3,5 @@ uniqueId: opensearch-sdk-java-1
 hostAddress: '127.0.0.1'
 port: '4500'
 version: '1.0'
-opensearchVersion: '3.0.0'
-minimumCompatibleVersion: '3.0.0'
+opensearchVersion: '2.9.0'
+minimumCompatibleVersion: '2.9.0'
