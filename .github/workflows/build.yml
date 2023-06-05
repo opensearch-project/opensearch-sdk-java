@@ -39,3 +39,10 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           file: ./build/reports/jacoco/test/jacocoTestReport.xml
+  publish:
+    needs: [check]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Publish to Maven Local
+      run: ./gradlew publishToMavenLocal
