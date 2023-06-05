@@ -16,7 +16,7 @@ import org.opensearch.gradle.testclusters.ExtensionsProperties
 
 buildscript {
     ext {
-        opensearch_version = System.getProperty("opensearch.version", "2.+")
+        opensearch_version = System.getProperty("opensearch.version", "2.9.0-SNAPSHOT")
         isSnapshot = "true" == System.getProperty("build.snapshot", "true")
         buildVersionQualifier = System.getProperty("build.version_qualifier", "")
     }
@@ -141,7 +141,7 @@ repositories {
 
 dependencies {
 
-    def opensearchVersion = "2.+"
+    def opensearchVersion = "${opensearch_version}"
     def opensearchJavaClientVersion = "2.1.0-SNAPSHOT"
     def log4jVersion = "2.20.0"
     def nettyVersion = "4.1.93.Final"
@@ -203,9 +203,7 @@ dependencies {
         resolutionStrategy.force("org.apache.logging.log4j:log4j-api:${log4jVersion}")
         resolutionStrategy.force("org.apache.logging.log4j:log4j-core:${log4jVersion}")
         resolutionStrategy.force("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
-        resolutionStrategy.force("org.opensearch:opensearch:${opensearchVersion}")
         resolutionStrategy.force("org.opensearch.client:opensearch-rest-client:${opensearchVersion}")
-        resolutionStrategy.force("org.opensearch.test:framework:${opensearchVersion}")
     }
 }
 
