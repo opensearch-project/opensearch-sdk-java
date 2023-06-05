@@ -90,6 +90,7 @@ group 'org.opensearch.sdk'
 version '2.0.0-SNAPSHOT'
 
 publishing {
+
     publications {
         mavenJava(MavenPublication) {
             from components.java
@@ -108,7 +109,8 @@ publishing {
     }
 }
 
-validateMavenJavaPom.enabled = false
+tasks.named("publishMavenJavaPublicationToMavenLocal").configure { dependsOn("generatePomFileForNebulaPublication") }
+tasks.named("publishNebulaPublicationToMavenLocal").configure { dependsOn("generatePomFileForMavenJavaPublication") }
 
 repositories {
     mavenLocal()
