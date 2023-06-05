@@ -108,6 +108,8 @@ publishing {
     }
 }
 
+tasks.named("publishMavenJavaPublicationToMavenLocal").configure { dependsOn("generatePomFileForNebulaPublication") }
+tasks.named("publishNebulaPublicationToMavenLocal").configure { dependsOn("generatePomFileForMavenJavaPublication") }
 validateMavenJavaPom.enabled = false
 
 repositories {
