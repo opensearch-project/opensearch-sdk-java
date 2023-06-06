@@ -121,7 +121,7 @@ repositories {
 
 dependencies {
 
-    def opensearchVersion = "3.0.0-SNAPSHOT"
+    def opensearchVersion = "${opensearch_version}"
     def log4jVersion = "2.20.0"
     def nettyVersion = "4.1.93.Final"
     def jacksonDatabindVersion = "2.15.2"
@@ -184,6 +184,7 @@ dependencies {
         resolutionStrategy.force("org.apache.logging.log4j:log4j-api:${log4jVersion}")
         resolutionStrategy.force("org.apache.logging.log4j:log4j-core:${log4jVersion}")
         resolutionStrategy.force("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
+        resolutionStrategy.force("org.opensearch.client:opensearch-rest-client:${opensearchVersion}")
     }
 }
 
