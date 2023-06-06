@@ -43,7 +43,6 @@ plugins {
 
 
 apply from: 'gradle/formatting.gradle'
-apply plugin: 'maven-publish'
 apply plugin: 'java'
 apply plugin: 'opensearch.opensearchplugin'
 apply plugin: 'opensearch.testclusters'
@@ -87,38 +86,15 @@ allprojects {
 }
 
 
-
-
 group 'org.opensearch.sdk'
 version '1.0.0-SNAPSHOT'
 
-java {
-    withSourcesJar()
-    withJavadocJar()
-}
-
 publishing {
     publications {
-                // add license information to generated poms
-                all {
-                    pom {
-                        name = "opensearch-sdk-java"
-                        description = "OpenSearch SDK"
-                    }
-                    pom.withXml { XmlProvider xml ->
-                        Node node = xml.asNode()
-                        node.appendNode('inceptionYear', '2022')
-
-                        Node license = node.appendNode('licenses').appendNode('license')
-                        license.appendNode('name', project.licenseName)
-                        license.appendNode('url', project.licenseUrl)
-
-                        Node developer = node.appendNode('developers').appendNode('developer')
-                        developer.appendNode('name', 'opensearch-sdk-java')
-                        developer.appendNode('url', 'https://github.com/opensearch-project/opensearch-sdk-java')
-                    }
-                }
-            }
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
 
     repositories {
         maven {
@@ -131,6 +107,10 @@ publishing {
         }
     }
 }
+
+tasks.named("publishMavenJavaPublicationToMavenLocal").configure { dependsOn("generatePomFileForNebulaPublication") }
+tasks.named("publishNebulaPublicationToMavenLocal").configure { dependsOn("generatePomFileForMavenJavaPublication") }
+validateMavenJavaPom.enabled = false
 
 repositories {
     mavenLocal()
@@ -200,6 +180,9 @@ dependencies {
         resolutionStrategy.force("jakarta.json:jakarta.json-api:${jakartaVersion}")
         resolutionStrategy.force("com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}")
         resolutionStrategy.force("com.fasterxml.jackson.core:jackson-core:${jacksonDatabindVersion}")
+        resolutionStrategy.force("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonDatabindVersion}")
+        resolutionStrategy.force("com.fasterxml.jackson.dataformat:jackson-dataformat-smile:${jacksonDatabindVersion}")
+        resolutionStrategy.force("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:${jacksonDatabindVersion}")
         resolutionStrategy.force("org.apache.logging.log4j:log4j-api:${log4jVersion}")
         resolutionStrategy.force("org.apache.logging.log4j:log4j-core:${log4jVersion}")
         resolutionStrategy.force("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
