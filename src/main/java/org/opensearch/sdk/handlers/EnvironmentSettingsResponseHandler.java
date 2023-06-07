@@ -15,7 +15,6 @@ import org.opensearch.env.EnvironmentSettingsResponse;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.common.settings.Settings;
-import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportException;
 import org.opensearch.transport.TransportResponseHandler;
@@ -25,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendEnvironmentSettingsRequest} call.
+ * This class handles the response from OpenSearch to a {@link org.opensearch.sdk.SDKTransportService#sendEnvironmentSettingsRequest} call.
  */
 public class EnvironmentSettingsResponseHandler implements TransportResponseHandler<EnvironmentSettingsResponse> {
 

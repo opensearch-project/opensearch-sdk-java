@@ -11,17 +11,19 @@ package org.opensearch.sdk;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Setting.Property;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.sdk.SDKClusterService.SDKClusterSettings;
+import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.TransportService;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -30,7 +32,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 public class TestSDKClusterService extends OpenSearchTestCase {
@@ -54,11 +55,8 @@ public class TestSDKClusterService extends OpenSearchTestCase {
         // After initialization should be successful
         when(extensionsRunner.isInitialized()).thenReturn(true);
         sdkClusterService.state();
-        verify(extensionsRunner, times(1)).getExtensionTransportService();
+        verify(extensionsRunner, times(1)).getSdkTransportService();
 
-        ArgumentCaptor<TransportService> argumentCaptor = ArgumentCaptor.forClass(TransportService.class);
-        verify(extensionsRunner, times(1)).sendClusterStateRequest(argumentCaptor.capture());
-        assertNull(argumentCaptor.getValue());
     }
 
     @Test
@@ -105,34 +103,44 @@ public class TestSDKClusterService extends OpenSearchTestCase {
         Consumer<Boolean> boolConsumer = b -> {};
 
         TransportService mockTransportService = mock(TransportService.class);
-        extensionsRunner.setExtensionTransportService(mockTransportService);
+        extensionsRunner.getSdkTransportService().setTransportService(mockTransportService);
 
         // Before initialization should store pending update but do nothing
         sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(boolSetting, boolConsumer);
-        verify(extensionsRunner, times(0)).getExtensionTransportService();
+        verify(extensionsRunner.getSdkTransportService().getTransportService(), times(0)).sendRequest(
+            any(),
+            anyString(),
+            any(),
+            any(AcknowledgedResponseHandler.class)
+        );
 
         // After initialization should be able to send pending updates
         extensionsRunner.setInitialized();
         sdkClusterService.getClusterSettings().sendPendingSettingsUpdateConsumers();
-        verify(extensionsRunner, times(1)).getExtensionTransportService();
+        verify(extensionsRunner.getSdkTransportService().getTransportService(), times(1)).sendRequest(
+            any(),
+            anyString(),
+            any(),
+            any(AcknowledgedResponseHandler.class)
+        );
 
         // Once updates sent, map is empty, shouldn't send on retry (keep cumulative 1)
         sdkClusterService.getClusterSettings().sendPendingSettingsUpdateConsumers();
-        verify(extensionsRunner, times(1)).getExtensionTransportService();
+        verify(extensionsRunner.getSdkTransportService().getTransportService(), times(1)).sendRequest(
+            any(),
+            anyString(),
+            any(),
+            any(AcknowledgedResponseHandler.class)
+        );
 
         // Sending a new update should send immediately (cumulative now 2)
         sdkClusterService.getClusterSettings().addSettingsUpdateConsumer(boolSetting, boolConsumer);
-        verify(extensionsRunner, times(2)).getExtensionTransportService();
-
-        ArgumentCaptor<TransportService> transportServiceArgumentCaptor = ArgumentCaptor.forClass(TransportService.class);
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<Map<Setting<?>, Consumer<?>>> updateConsumerArgumentCaptor = ArgumentCaptor.forClass(Map.class);
-        verify(extensionsRunner, times(2)).sendAddSettingsUpdateConsumerRequest(
-            transportServiceArgumentCaptor.capture(),
-            updateConsumerArgumentCaptor.capture()
+        verify(extensionsRunner.getSdkTransportService().getTransportService(), times(2)).sendRequest(
+            any(),
+            anyString(),
+            any(),
+            any(AcknowledgedResponseHandler.class)
         );
-        assertEquals(mockTransportService, transportServiceArgumentCaptor.getValue());
-        // Map will be cleared following this call
-        assertTrue(updateConsumerArgumentCaptor.getValue().isEmpty());
+
     }
 }
