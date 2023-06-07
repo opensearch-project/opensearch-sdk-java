@@ -11,6 +11,7 @@ package org.opensearch.sdk;
 
 import org.junit.jupiter.api.Test;
 import org.opensearch.action.ActionListener;
+import org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.opensearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -130,6 +131,7 @@ public class TestSDKClient extends OpenSearchTestCase {
             Cancellable.class,
             clusterAdminClient.updateSettings(new ClusterUpdateSettingsRequest(), ActionListener.wrap(r -> {}, e -> {}))
         );
+        assertInstanceOf(Cancellable.class, clusterAdminClient.health(new ClusterHealthRequest(), ActionListener.wrap(r -> {}, e -> {})));
 
         sdkClient.doCloseHighLevelClient();
     }
