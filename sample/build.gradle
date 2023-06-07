@@ -13,7 +13,7 @@ import org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestFram
 
 plugins {
     id 'java'
-    id "com.diffplug.spotless" version "6.18.0" apply false
+    id "com.diffplug.spotless" version "6.19.0" apply false
     id 'jacoco'
     id "com.form.diff-coverage" version "0.9.5"
     // for javadocs and checks spotless doesn't do

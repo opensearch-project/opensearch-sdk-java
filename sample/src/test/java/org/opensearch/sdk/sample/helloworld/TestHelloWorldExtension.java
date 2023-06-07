@@ -30,7 +30,6 @@ import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.sdk.SDKNamedXContentRegistry;
-import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.sdk.api.ActionExtension.ActionHandler;
 import org.opensearch.sdk.rest.ExtensionRestHandler;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
