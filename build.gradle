@@ -168,7 +168,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava:${jacksonDatabindVersion}")
     implementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonDatabindVersion}")
 
-    implementation("com.google.guava:guava:${guavaVersion}")
+    api("com.google.guava:guava:${guavaVersion}")
     implementation("javax.inject:javax.inject:${javaxVersion}")
     implementation("com.google.guava:failureaccess:${guavaFailureAccessVersion}")
     implementation("aopalliance:aopalliance:${aopallianceVersion}")
