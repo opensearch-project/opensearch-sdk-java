@@ -52,7 +52,7 @@ public class SDKClusterService {
      */
     public ClusterState state() {
         if (extensionsRunner.isInitialized()) {
-            return extensionsRunner.sendClusterStateRequest(extensionsRunner.getExtensionTransportService());
+            return extensionsRunner.getSdkTransportService().sendClusterStateRequest();
         }
         throw new IllegalStateException("The Extensions Runner has not been initialized.");
     }
@@ -133,10 +133,12 @@ public class SDKClusterService {
         public synchronized void sendPendingSettingsUpdateConsumers() {
             // Do nothing until ExtensionsRunner initialized
             if (extensionsRunner.isInitialized() && !pendingSettingsUpdateConsumers.isEmpty()) {
-                extensionsRunner.sendAddSettingsUpdateConsumerRequest(
-                    extensionsRunner.getExtensionTransportService(),
-                    pendingSettingsUpdateConsumers
-                );
+                extensionsRunner.getSdkTransportService()
+                    .sendAddSettingsUpdateConsumerRequest(
+                        pendingSettingsUpdateConsumers,
+                        extensionsRunner.getUpdateSettingsRequestHandler(),
+                        extensionsRunner.getExtensionNode()
+                    );
                 pendingSettingsUpdateConsumers.clear();
             }
         }
