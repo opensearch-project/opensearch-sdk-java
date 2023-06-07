@@ -484,29 +484,6 @@ public class ExtensionsRunner {
         );
 
         transportService.registerRequestHandler(
-            ExtensionsManager.INDICES_EXTENSION_POINT_ACTION_NAME,
-            ThreadPool.Names.GENERIC,
-            false,
-            false,
-            IndicesModuleRequest::new,
-            ((request, channel, task) -> channel.sendResponse(
-                extensionsIndicesModuleRequestHandler.handleIndicesModuleRequest(request, transportService)
-            ))
-
-        );
-
-        transportService.registerRequestHandler(
-            ExtensionsManager.INDICES_EXTENSION_NAME_ACTION_NAME,
-            ThreadPool.Names.GENERIC,
-            false,
-            false,
-            IndicesModuleRequest::new,
-            ((request, channel, task) -> channel.sendResponse(
-                extensionsIndicesModuleNameRequestHandler.handleIndicesModuleNameRequest(request)
-            ))
-        );
-
-        transportService.registerRequestHandler(
             ExtensionsManager.REQUEST_REST_EXECUTE_ON_EXTENSION_ACTION,
             ThreadPool.Names.GENERIC,
             false,

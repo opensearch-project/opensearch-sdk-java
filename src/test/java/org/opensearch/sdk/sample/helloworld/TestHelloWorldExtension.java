@@ -9,7 +9,6 @@
 
 package org.opensearch.sdk.sample.helloworld;
 
-import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +26,9 @@ import org.opensearch.action.ActionResponse;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.client.Node;
+import org.opensearch.client.opensearch.OpenSearchAsyncClient;
+import org.opensearch.client.transport.rest_client.RestClientTransport;
 import org.opensearch.common.settings.Settings;
-import org.opensearch.common.transport.TransportAddress;
 import org.opensearch.sdk.api.ActionExtension.ActionHandler;
 import org.opensearch.sdk.rest.ExtensionRestHandler;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
@@ -56,6 +56,7 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
     private Injector injector;
     private SDKClient sdkClient;
     private SDKRestClient sdkRestClient;
+    private OpenSearchAsyncClient javaAsyncClient;
     private final ExtensionSettings extensionSettings = new ExtensionSettings("", "hw", "", "", "localhost", "9200");
 
     static class UnregisteredAction extends ActionType<SampleResponse> {
@@ -85,6 +86,7 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
         });
         initializeSdkClient();
         this.sdkRestClient = sdkClient.initializeRestClient("localhost", 9200);
+        this.javaAsyncClient = sdkClient.initalizeJavaAsyncClient("localhost", 9200);
     }
 
     @SuppressWarnings("rawtypes")
@@ -98,6 +100,7 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
     public void tearDown() throws Exception {
         super.tearDown();
         this.sdkRestClient.close();
+        this.sdkClient.doCloseJavaClients();
         this.injector = null;
     }
 
@@ -113,18 +116,35 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
 
     @Test
     public void testExtensionSettingsUpdate() {
-        List<Node> nodes = this.sdkClient.getSdkRestClient().getRestHighLevelClient().getLowLevelClient().getNodes();
-        assertEquals(1, nodes.size());
-        HttpHost host = nodes.get(0).getHost();
-        assertEquals("localhost", host.getHostName());
-        assertEquals(9200, host.getPort());
+        List<Node> sdkRestClientNodes = this.sdkClient.getSdkRestClient().getRestHighLevelClient().getLowLevelClient().getNodes();
+        List<Node> javaAsyncClientNodes = ((RestClientTransport) this.javaAsyncClient._transport()).restClient().getNodes();
 
-        this.sdkClient.updateOpenSearchNodeSettings(new TransportAddress(new InetSocketAddress("10.10.10.10", 9300)));
-        nodes = this.sdkClient.getSdkRestClient().getRestHighLevelClient().getLowLevelClient().getNodes();
-        assertEquals(1, nodes.size());
-        host = nodes.get(0).getHost();
-        assertEquals("10.10.10.10", host.getHostName());
-        assertEquals(9300, host.getPort());
+        // Test rest client nodes
+        assertEquals(1, sdkRestClientNodes.size());
+        assertEquals(1, javaAsyncClientNodes.size());
+
+        // Test client http hosts
+        HttpHost sdkRestClientHost = sdkRestClientNodes.get(0).getHost();
+        assertEquals("localhost", sdkRestClientHost.getHostName());
+        assertEquals(9200, sdkRestClientHost.getPort());
+        HttpHost javaAsyncClientHost = javaAsyncClientNodes.get(0).getHost();
+        assertEquals("localhost", javaAsyncClientHost.getHostName());
+        assertEquals(9200, javaAsyncClientHost.getPort());
+
+        // Test updated hosts
+        this.sdkClient.updateOpenSearchNodeSettings("10.10.10.10", "9204");
+
+        sdkRestClientNodes = this.sdkClient.getSdkRestClient().getRestHighLevelClient().getLowLevelClient().getNodes();
+        assertEquals(1, sdkRestClientNodes.size());
+        sdkRestClientHost = sdkRestClientNodes.get(0).getHost();
+        assertEquals("10.10.10.10", sdkRestClientHost.getHostName());
+        assertEquals(9204, sdkRestClientHost.getPort());
+
+        javaAsyncClientNodes = ((RestClientTransport) this.javaAsyncClient._transport()).restClient().getNodes();
+        assertEquals(1, javaAsyncClientNodes.size());
+        javaAsyncClientHost = javaAsyncClientNodes.get(0).getHost();
+        assertEquals("10.10.10.10", javaAsyncClientHost.getHostName());
+        assertEquals(9204, javaAsyncClientHost.getPort());
     }
 
     @Test

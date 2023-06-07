@@ -29,6 +29,7 @@ import org.opensearch.client.Response;
 import org.opensearch.client.ResponseListener;
 import org.opensearch.client.indices.CreateIndexRequest;
 import org.opensearch.client.indices.GetFieldMappingsRequest;
+import org.opensearch.client.indices.GetIndexRequest;
 import org.opensearch.client.indices.GetMappingsRequest;
 import org.opensearch.client.indices.PutMappingRequest;
 import org.opensearch.client.indices.rollover.RolloverRequest;
@@ -153,6 +154,8 @@ public class TestSDKClient extends OpenSearchTestCase {
             indicesClient.rolloverIndex(new RolloverRequest("", ""), ActionListener.wrap(r -> {}, e -> {}))
         );
         assertInstanceOf(Cancellable.class, indicesClient.getAliases(new GetAliasesRequest(), ActionListener.wrap(r -> {}, e -> {})));
+        assertInstanceOf(Cancellable.class, indicesClient.existsAlias(new GetAliasesRequest(), ActionListener.wrap(r -> {}, e -> {})));
+        assertInstanceOf(Cancellable.class, indicesClient.exists(new GetIndexRequest(), ActionListener.wrap(r -> {}, e -> {})));
 
         sdkClient.doCloseHighLevelClient();
     }
