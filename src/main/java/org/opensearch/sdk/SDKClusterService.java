@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
+import org.opensearch.cluster.ClusterName;
 import org.opensearch.cluster.ClusterState;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.SettingUpgrader;
@@ -31,6 +32,7 @@ public class SDKClusterService {
 
     private final ExtensionsRunner extensionsRunner;
     private final SDKClusterSettings clusterSettings;
+    private ClusterName clusterName;
 
     /**
      * Create an instance of this object.
@@ -43,6 +45,8 @@ public class SDKClusterService {
         Settings nodeSettings = extensionsRunner.getEnvironmentSettings();
         Set<Setting<?>> settingsSet = new HashSet<>(extensionsRunner.getExtension().getSettings());
         this.clusterSettings = new SDKClusterSettings(nodeSettings, settingsSet);
+        // Set to default on initialization but updated later once connected to OpenSearch
+        this.clusterName = ClusterName.DEFAULT;
     }
 
     /**
@@ -74,8 +78,19 @@ public class SDKClusterService {
         extensionsRunner.getExtension().getSettings().stream().forEach(clusterSettings::registerSetting);
     }
 
+    /**
+     * Updates cluster name with current environment settings value on the extensions runner or default.
+     */
+    public void updateSdkClusterName() {
+        this.clusterName = ClusterName.CLUSTER_NAME_SETTING.get(extensionsRunner.getEnvironmentSettings());
+    }
+
     public SDKClusterSettings getClusterSettings() {
         return clusterSettings;
+    }
+
+    public ClusterName getClusterName() {
+        return clusterName;
     }
 
     /**
