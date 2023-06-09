@@ -511,6 +511,7 @@ public class ExtensionsRunner {
      */
     public void updateSdkClusterService() {
         this.sdkClusterService.updateSdkClusterSettings();
+        this.sdkClusterService.updateSdkClusterName();
     }
 
     public SDKActionModule getSdkActionModule() {
