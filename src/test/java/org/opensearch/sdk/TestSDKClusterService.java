@@ -11,6 +11,7 @@ package org.opensearch.sdk;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opensearch.cluster.ClusterName;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Setting.Property;
 import org.opensearch.common.settings.Settings;
@@ -69,6 +70,33 @@ public class TestSDKClusterService extends OpenSearchTestCase {
     @Test
     public void testGetClusterSettings() {
         assertInstanceOf(SDKClusterSettings.class, sdkClusterService.getClusterSettings());
+    }
+
+    @Test
+    public void testGetClusterName() {
+        assertInstanceOf(ClusterName.class, sdkClusterService.getClusterName());
+    }
+
+    @Test
+    public void testUpdateSdkClusterName() {
+        String updatedClusterName = "updatedClusterName";
+        ExtensionsRunner mockRunner = mock(ExtensionsRunner.class);
+        Extension mockExtension = mock(Extension.class);
+        Settings updatedSettings = Settings.builder().put("cluster.name", updatedClusterName).build();
+        when(mockRunner.getExtension()).thenReturn(mockExtension);
+        when(mockRunner.getEnvironmentSettings()).thenReturn(Settings.EMPTY) // first invocation during initialization
+            .thenReturn(updatedSettings); // second invocation during update
+        when(mockExtension.getSettings()).thenReturn(Collections.emptyList());
+        SDKClusterService clusterService = new SDKClusterService(mockRunner);
+
+        // Before update
+        ClusterName clusterName = clusterService.getClusterName();
+        assertEquals(ClusterName.DEFAULT, clusterName);
+
+        clusterService.updateSdkClusterName();
+        // After update
+        clusterName = clusterService.getClusterName();
+        assertEquals(updatedClusterName, clusterName.value());
     }
 
     @Test
