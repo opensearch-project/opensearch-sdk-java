@@ -34,7 +34,7 @@ import org.opensearch.sdk.sample.helloworld.transport.SampleTransportAction;
  * To create your own extension, implement the {@link #getExtensionSettings()} and {@link #getExtensionRestHandlers()} methods.
  * You may either create an {@link ExtensionSettings} object directly with the constructor, or read it from a YAML file on your class path.
  * <p>
- * To execute, pass an instatiated object of this class to {@link ExtensionsRunner#run(Extension)}.
+ * To execute, pass an instantiated object of this class to {@link ExtensionsRunner#run(Extension)}.
  */
 public class HelloWorldExtension extends BaseExtension implements ActionExtension {
 

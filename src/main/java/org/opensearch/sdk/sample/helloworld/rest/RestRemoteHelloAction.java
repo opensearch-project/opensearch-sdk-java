@@ -33,7 +33,7 @@ import static org.opensearch.rest.RestRequest.Method.GET;
 import static org.opensearch.rest.RestStatus.OK;
 
 /**
- * Sample REST Handler demostrating proxy actions to another extension
+ * Sample REST Handler demonstrating proxy actions to another extension
  */
 public class RestRemoteHelloAction extends BaseExtensionRestHandler {
 
