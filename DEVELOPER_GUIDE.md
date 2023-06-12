@@ -66,7 +66,7 @@ You can run the sample Hello World extension using the `helloWorld` task:
 
 Bound addresses will then be logged to the terminal:
 
-```
+```bash
 [main] INFO  transportservice.TransportService - publish_address {127.0.0.1:3333}, bound_addresses {[::1]:3333}, {127.0.0.1:3333}
 [main] INFO  transportservice.TransportService - profile [test]: publish_address {127.0.0.1:5555}, bound_addresses {[::1]:5555}, {127.0.0.1:5555}
 ```
@@ -108,7 +108,7 @@ Extensions are experimental in OpenSearch 2.8, so you must enable them either be
 
 Add the experimental feature system property to `gradle/run.gradle`:
 
-```
+```bash
 testClusters {
   runTask {
     testDistribution = 'archive'
@@ -144,21 +144,39 @@ To **run OpenSearch from a compiled binary**, follow these steps:
 - Start a separate terminal and navigate to the directory where OpenSearch has been cloned using `cd OpenSearch`.
 - Run `./gradlew assemble` to create a local distribution.
 - Start OpenSearch using `./bin/opensearch`.
-- Hit the below sample REST API to initialize an extension
-```
- curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data '{"name":"ad-extension","uniqueId":"ad-extension","hostAddress":"127.0.0.1","port":"4532","version":"1.0","opensearchVersion":"3.0.0","minimumCompatibleVersion":"3.0.0","dependencies":[{"uniqueId":"test1","version":"2.0.0"},{"uniqueId":"test2","version":"3.0.0"}]}'
+- Send the below sample REST API to initialize an extension
+```bash
+curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data '{ \
+"name":"hello-world", \
+"uniqueId":"hello-world", \
+"hostAddress":"127.0.0.1", \
+"port":"4532", \
+"version":"1.0", \
+"opensearchVersion":"3.0.0", \
+"minimumCompatibleVersion":"3.0.0", \
+"dependencies":[{"uniqueId":"test1","version":"2.0.0"},{"uniqueId":"test2","version":"3.0.0"}] \
+}'
 ```
 
 To **run OpenSearch from Gradle**, follow these steps:
 - Run `./gradlew run` to start OpenSearch.
-- Hit the below sample REST API to initialize an extension
-```
- curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data '{"name":"ad-extension","uniqueId":"ad-extension","hostAddress":"127.0.0.1","port":"4532","version":"1.0","opensearchVersion":"3.0.0","minimumCompatibleVersion":"3.0.0","dependencies":[{"uniqueId":"test1","version":"2.0.0"},{"uniqueId":"test2","version":"3.0.0"}]}'
+- Send the below sample REST API to initialize an extension
+```bash
+curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data '{ \
+"name":"hello-world", \
+"uniqueId":"hello-world", \
+"hostAddress":"127.0.0.1", \
+"port":"4532", \
+"version":"1.0", \
+"opensearchVersion":"3.0.0", \
+"minimumCompatibleVersion":"3.0.0", \
+"dependencies":[{"uniqueId":"test1","version":"2.0.0"},{"uniqueId":"test2","version":"3.0.0"}] \
+}'
 ```
 
-`ExtensionsManager` discovers the extension listening on a predefined port and executes the TCP handshake protocol to establish a data transfer connection. Then OpenSearch sends a request to the OpenSearch SDK for Java and, upon acknowledgment, the extension responds with its name. This name is logged in the terminal where OpenSearch is running:
+In response to the REST `/initialize` request, `ExtensionsManager` discovers the extension listening on a predefined port and executes the TCP handshake protocol to establish a data transfer connection. Then OpenSearch sends a request to the OpenSearch SDK for Java and, upon acknowledgment, the extension responds with its name. This name is logged in the terminal where OpenSearch is running:
 
-```
+```bash
 [2022-06-16T21:30:18,857][INFO ][o.o.t.TransportService   ] [runTask-0] publish_address {127.0.0.1:9300}, bound_addresses {[::1]:9300}, {127.0.0.1:9300}
 [2022-06-16T21:30:18,978][INFO ][o.o.t.TransportService   ] [runTask-0] Action: internal:transport/handshake
 [2022-06-16T21:30:18,989][INFO ][o.o.t.TransportService   ] [runTask-0] TransportService:sendRequest action=internal:discovery/extensions
@@ -170,7 +188,7 @@ The OpenSearch SDK terminal also logs all requests and responses it receives fro
 
 - TCP handshake request:
 
-```
+```bash
 21:30:18.943 [opensearch[extension][transport_worker][T#7]] TRACE org.opensearch.latencytester.transportservice.netty4.OpenSearchLoggingHandler - [id: 0x37b22600, L:/127.0.0.1:4532 - R:/127.0.0.1:47766] READ: 55B
          +-------------------------------------------------+
          |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
@@ -185,7 +203,7 @@ MESSAGE RECEIVED:E«󀀀internal:tcp/handshake£·A
 
 - Extension name request/response:
 
-```
+```bash
 21:30:18.992 [opensearch[extension][transport_worker][T#6]] TRACE org.opensearch.latencytester.transportservice.netty4.OpenSearchLoggingHandler - [id: 0xb2be651b, L:/127.0.0.1:4532 - R:/127.0.0.1:47782] READ: 204B
          +-------------------------------------------------+
          |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
@@ -227,7 +245,7 @@ It is important to ensure that the OpenSearch SDK for Java is already running on
 ### Send a REST request to the extension
 
 The following request is configured to be handled by the sample `HelloWorldExtension` (note that its matching `uniqueId` is `opensearch-sdk-java-1`):
-```
+```bash
 curl -X GET localhost:9200/_extensions/_opensearch-sdk-java-1/hello
 ```
 
@@ -264,12 +282,12 @@ For information about launching and debugging from an IDE in OpenSearch, see [th
 ### Generating an artifact
 
 In `opensearch-sdk-java`, navigate to `build/distributions`. Look for the tarball in the form `opensearch-sdk-java-1.0.0-SNAPSHOT.tar`. If there is no such tarball, use the following command to create one:
-```
+```bash
 ./gradlew clean && ./gradlew build
 ```
 Once the tarball is generated, navigate to `/src/test/resources/sample` and look for `extension-settings.yml`. If the file is not present, create it.
 The tarball is generated in `/build/distributions`. To run the artifact (the tarball), use the following command:
-```
+```bash
 tar -xvf opensearch-sdk-java-1.0.0-SNAPSHOT.tar
 ```
 
