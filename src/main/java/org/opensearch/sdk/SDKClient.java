@@ -35,6 +35,8 @@ import org.opensearch.action.ActionListener;
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
 import org.opensearch.action.ActionType;
+import org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsResponse;
 import org.opensearch.action.admin.indices.alias.get.GetAliasesRequest;
@@ -620,6 +622,18 @@ public class SDKClient implements Closeable {
             ActionListener<ClusterUpdateSettingsResponse> listener
         ) {
             return clusterClient.putSettingsAsync(clusterUpdateSettingsRequest, options, listener);
+        }
+
+        /**
+         * Asynchronously get cluster health using the Cluster Health API.
+         *
+         * If timeout occurred, {@link ClusterHealthResponse} will have isTimedOut() == true and status() == RestStatus.REQUEST_TIMEOUT
+         * @param clusterHealthRequest the request
+         * @param listener the listener to be notified upon request completion
+         * @return cancellable that may be used to cancel the request
+         */
+        public Cancellable health(ClusterHealthRequest clusterHealthRequest, ActionListener<ClusterHealthResponse> listener) {
+            return clusterClient.healthAsync(clusterHealthRequest, options, listener);
         }
 
         // TODO: Implement state()

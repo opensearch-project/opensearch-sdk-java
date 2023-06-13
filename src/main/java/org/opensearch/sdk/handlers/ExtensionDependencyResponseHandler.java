@@ -20,13 +20,12 @@ import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.extensions.ExtensionDependencyResponse;
 import org.opensearch.extensions.ExtensionsManager;
-import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportException;
 import org.opensearch.transport.TransportResponseHandler;
 
 /**
- * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendExtensionDependencyRequest} call.
+ * This class handles the response from OpenSearch to a {@link org.opensearch.sdk.SDKTransportService#sendExtensionDependencyRequest} call.
  */
 public class ExtensionDependencyResponseHandler implements TransportResponseHandler<ExtensionDependencyResponse> {
     private static final Logger logger = LogManager.getLogger(ExtensionDependencyResponseHandler.class);
