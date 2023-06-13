@@ -79,11 +79,7 @@ public class ExtensionRestPathRegistry {
             registeredDeprecatedPaths.add(restPathToString(method, path, name));
             registeredDeprecatedPaths.add(((ExtensionDeprecationRestHandler) extensionRestHandler).getDeprecationMessage());
         } else {
-            if (name.isPresent()) {
-                registeredPaths.add(restPathToString(method, path, name));
-            } else {
-                registeredPaths.add(restPathToString(method, path, name));
-            }
+            registeredPaths.add(restPathToString(method, path, name));
         }
     }
 

@@ -40,6 +40,9 @@ import org.opensearch.rest.RestStatus;
  * Provides convenience methods to reduce boilerplate code in an {@link ExtensionRestHandler} implementation.
  */
 public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
+
+    private String extensionShortName;
+
     /**
      * Constant for JSON content type
      */
@@ -80,6 +83,19 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
      */
     protected List<ReplacedRouteHandler> replacedRouteHandlers() {
         return Collections.emptyList();
+    }
+
+    public void setExtensionShortName(String extensionShortName) {
+        this.extensionShortName = extensionShortName;
+    }
+
+    /**
+     * Generates a name for the handler prepended with the extension's shortName
+     * @param name The human-readable name for a route registered by this extension
+     * @return Returns a name prepended with the extension's shortName
+     */
+    protected String routePrefix(String name) {
+        return extensionShortName + ":" + name;
     }
 
     @Override

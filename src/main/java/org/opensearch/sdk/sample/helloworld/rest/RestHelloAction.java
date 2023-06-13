@@ -19,7 +19,6 @@ import org.opensearch.extensions.rest.RouteHandler;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler;
 import org.opensearch.sdk.rest.ExtensionRestHandler;
-import org.opensearch.sdk.ExtensionRouteHandler;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
@@ -60,10 +59,10 @@ public class RestHelloAction extends BaseExtensionRestHandler {
     @Override
     public List<RouteHandler> routeHandlers() {
         return List.of(
-            new ExtensionRouteHandler("greet", GET, "/hello", handleGetRequest),
-            new ExtensionRouteHandler("greet_with_adjective", POST, "/hello", handlePostRequest),
-            new ExtensionRouteHandler("greet_with_name", PUT, "/hello/{name}", handlePutRequest),
-            new ExtensionRouteHandler("goodbye", DELETE, "/goodbye", handleDeleteRequest)
+            new RouteHandler(routePrefix("greet"), GET, "/hello", handleGetRequest),
+            new RouteHandler(routePrefix("greet_with_adjective"), POST, "/hello", handlePostRequest),
+            new RouteHandler(routePrefix("greet_with_name"), PUT, "/hello/{name}", handlePutRequest),
+            new RouteHandler(routePrefix("goodbye"), DELETE, "/goodbye", handleDeleteRequest)
         );
     }
 

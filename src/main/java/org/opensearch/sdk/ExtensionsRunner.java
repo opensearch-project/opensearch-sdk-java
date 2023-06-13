@@ -38,6 +38,7 @@ import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
+import org.opensearch.sdk.rest.BaseExtensionRestHandler;
 import org.opensearch.sdk.rest.ExtensionRestHandler;
 import org.opensearch.sdk.rest.ExtensionRestPathRegistry;
 import org.opensearch.tasks.TaskManager;
@@ -175,14 +176,6 @@ public class ExtensionsRunner {
         logger.info("SSL is " + sslText + " for transport");
         this.settings = settingsBuilder.build();
 
-        if (extensionSettings.getShortExtensionName() != null) {
-            // initialize ExtensionRouteHandlerFactory
-            ExtensionRouteHandlerFactory factory = ExtensionRouteHandlerFactory.getInstance();
-            if (!factory.isInitialized()) {
-                factory.init(extensionSettings.getShortExtensionName());
-            }
-        }
-
         final List<ExecutorBuilder<?>> executorBuilders = extension.getExecutorBuilders(settings);
 
         this.runnableTaskListener = new AtomicReference<>();
@@ -243,6 +236,9 @@ public class ExtensionsRunner {
         if (extension instanceof ActionExtension) {
             // store REST handlers in the registry
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
+                if (extensionRestHandler instanceof BaseExtensionRestHandler) {
+                    ((BaseExtensionRestHandler) extensionRestHandler).setExtensionShortName(extensionSettings.getShortExtensionName());
+                }
                 for (RestHandler.Route route : extensionRestHandler.routes()) {
                     Optional<String> routeActionName = Optional.empty();
                     if (route instanceof RouteHandler && ((RouteHandler) route).name() != null) {
