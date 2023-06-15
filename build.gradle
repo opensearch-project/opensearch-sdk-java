@@ -112,6 +112,11 @@ tasks.named("publishMavenJavaPublicationToMavenLocal").configure { dependsOn("ge
 tasks.named("publishNebulaPublicationToMavenLocal").configure { dependsOn("generatePomFileForMavenJavaPublication") }
 validateMavenJavaPom.enabled = false
 
+javadoc {
+    source = sourceSets.main.allJava
+    classpath = sourceSets.main.compileClasspath
+}
+
 repositories {
     mavenLocal()
     mavenCentral()
