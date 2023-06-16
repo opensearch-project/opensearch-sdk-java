@@ -14,13 +14,14 @@ import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.function.Function;
 
 /**
  * A subclass of {@link Route} that includes a handler method for that route.
  */
-public class RouteHandler extends Route {
+public class NamedRouteHandler extends Route {
 
     private final String name;
 
@@ -37,7 +38,7 @@ public class RouteHandler extends Route {
      * @param path The path to handle.
      * @param handler The method which handles the method and path.
      */
-    public RouteHandler(
+    public NamedRouteHandler(
         Method method,
         String path,
         String name,
@@ -50,7 +51,7 @@ public class RouteHandler extends Route {
             throw new IllegalArgumentException("Expected route handler to have a unique name, found none.");
         }
         this.name = name;
-        this.actionNames = actionNames;
+        this.actionNames = actionNames == null ? Collections.emptySet() : actionNames;
     }
 
     /**

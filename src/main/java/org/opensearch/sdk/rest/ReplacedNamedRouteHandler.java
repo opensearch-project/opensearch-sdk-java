@@ -9,6 +9,7 @@
 
 package org.opensearch.sdk.rest;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -21,7 +22,7 @@ import org.opensearch.rest.RestRequest.Method;
 /**
  * A subclass of {@link ReplacedRoute} that includes a handler method for that route.
  */
-public class ReplacedRouteHandler extends ReplacedRoute {
+public class ReplacedNamedRouteHandler extends ReplacedRoute {
 
     private final String name;
     private final Set<String> actionNames;
@@ -36,7 +37,7 @@ public class ReplacedRouteHandler extends ReplacedRoute {
      * @param deprecatedPath deprecated path
      * @param handler The method which handles the method and path.
      */
-    public ReplacedRouteHandler(
+    public ReplacedNamedRouteHandler(
         Method method,
         String path,
         String name,
@@ -48,7 +49,7 @@ public class ReplacedRouteHandler extends ReplacedRoute {
         super(method, path, deprecatedMethod, deprecatedPath);
         this.responseHandler = handler;
         this.name = name;
-        this.actionNames = actionNames;
+        this.actionNames = actionNames == null ? Collections.emptySet() : actionNames;
     }
 
     /**
@@ -60,7 +61,7 @@ public class ReplacedRouteHandler extends ReplacedRoute {
      * @param deprecatedPath deprecated path
      * @param handler The method which handles the method and path.
      */
-    public ReplacedRouteHandler(
+    public ReplacedNamedRouteHandler(
         Method method,
         String path,
         String name,
@@ -79,7 +80,7 @@ public class ReplacedRouteHandler extends ReplacedRoute {
      * @param deprecatedPrefix deprecated prefix
      * @param handler The method which handles the method and path.
      */
-    public ReplacedRouteHandler(
+    public ReplacedNamedRouteHandler(
         Route route,
         String name,
         Set<String> actionNames,

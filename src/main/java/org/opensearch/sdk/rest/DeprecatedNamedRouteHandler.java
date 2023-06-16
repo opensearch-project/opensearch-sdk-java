@@ -13,18 +13,19 @@ import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestHandler;
 import org.opensearch.rest.RestRequest;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.function.Function;
 
 /**
  * A subclass of {@link RestHandler.DeprecatedRoute} .
  */
-public class DeprecatedRouteHandler extends RestHandler.DeprecatedRoute {
+public class DeprecatedNamedRouteHandler extends RestHandler.DeprecatedRoute {
     private final String name;
     private final Set<String> actionNames;
     private final Function<RestRequest, ExtensionRestResponse> responseHandler;
 
-    public DeprecatedRouteHandler(
+    public DeprecatedNamedRouteHandler(
         RestRequest.Method method,
         String path,
         String name,
@@ -34,7 +35,7 @@ public class DeprecatedRouteHandler extends RestHandler.DeprecatedRoute {
     ) {
         super(method, path, deprecationMessage);
         this.name = name;
-        this.actionNames = actionNames;
+        this.actionNames = actionNames == null ? Collections.emptySet() : actionNames;
         this.responseHandler = handler;
     }
 

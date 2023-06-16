@@ -48,23 +48,23 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     /**
      * Defines a list of methods which handle each rest {@link Route}. Override this in a subclass to use the functional syntax.
      *
-     * @return a list of {@link RouteHandler} with corresponding methods to each route.
+     * @return a list of {@link NamedRouteHandler} with corresponding methods to each route.
      */
-    protected List<RouteHandler> routeHandlers() {
+    protected List<NamedRouteHandler> namedRouteHandlers() {
         return Collections.emptyList();
     }
 
     @Override
     public List<Route> routes() {
-        return List.copyOf(routeHandlers());
+        return List.copyOf(namedRouteHandlers());
     }
 
     /**
      * Defines a list of methods which handle each rest {@link DeprecatedRoute}. Override this in a subclass to use the functional syntax.
      *
-     * @return a list of {@link DeprecatedRouteHandler} with corresponding methods to each route.
+     * @return a list of {@link DeprecatedNamedRouteHandler} with corresponding methods to each route.
      */
-    protected List<DeprecatedRouteHandler> deprecatedRouteHandlers() {
+    protected List<DeprecatedNamedRouteHandler> deprecatedRouteHandlers() {
         return Collections.emptyList();
     }
 
@@ -76,9 +76,9 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     /**
      * Defines a list of methods which handle each rest {@link ReplacedRoute}. Override this in a subclass to use the functional syntax.
      *
-     * @return a list of {@link ReplacedRouteHandler} with corresponding methods to each route.
+     * @return a list of {@link ReplacedNamedRouteHandler} with corresponding methods to each route.
      */
-    protected List<ReplacedRouteHandler> replacedRouteHandlers() {
+    protected List<ReplacedNamedRouteHandler> replacedRouteHandlers() {
         return Collections.emptyList();
     }
 
@@ -102,21 +102,21 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
 
     @Override
     public ExtensionRestResponse handleRequest(RestRequest request) {
-        Optional<RouteHandler> handler = routeHandlers().stream()
+        Optional<NamedRouteHandler> handler = namedRouteHandlers().stream()
             .filter(rh -> rh.getMethod().equals(request.method()))
             .filter(rh -> restPathMatches(request.path(), rh.getPath()))
             .findFirst();
         if (handler.isPresent()) {
             return handler.get().handleRequest(request);
         }
-        Optional<DeprecatedRouteHandler> deprecatedHandler = deprecatedRouteHandlers().stream()
+        Optional<DeprecatedNamedRouteHandler> deprecatedHandler = deprecatedRouteHandlers().stream()
             .filter(rh -> rh.getMethod().equals(request.method()))
             .filter(rh -> restPathMatches(request.path(), rh.getPath()))
             .findFirst();
         if (deprecatedHandler.isPresent()) {
             return deprecatedHandler.get().handleRequest(request);
         }
-        Optional<ReplacedRouteHandler> replacedHandler = replacedRouteHandlers().stream()
+        Optional<ReplacedNamedRouteHandler> replacedHandler = replacedRouteHandlers().stream()
             .filter(rh -> rh.getMethod().equals(request.method()))
             .filter(rh -> restPathMatches(request.path(), rh.getPath()))
             .findFirst();
@@ -137,7 +137,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
      * Determines if the request's path is a match for the configured handler path.
      *
      * @param requestPath The path from the {@link RestRequest}
-     * @param handlerPath The path from the {@link RouteHandler} or {@link DeprecatedRouteHandler}
+     * @param handlerPath The path from the {@link NamedRouteHandler} or {@link DeprecatedNamedRouteHandler}
      * @return true if the request path matches the route
      */
     private boolean restPathMatches(String requestPath, String handlerPath) {

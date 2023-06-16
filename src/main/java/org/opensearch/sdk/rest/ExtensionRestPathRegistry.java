@@ -41,16 +41,16 @@ public class ExtensionRestPathRegistry {
      */
     public void registerHandler(ExtensionRestHandler restHandler) {
         restHandler.routes().forEach(route -> {
-            RouteHandler routeHandler = ((RouteHandler) route);
-            String routeActionName = routeHandler.name();
+            NamedRouteHandler namedRouteHandler = ((NamedRouteHandler) route);
+            String routeActionName = namedRouteHandler.name();
             if (routeActionName == null) {
                 throw new IllegalArgumentException("Route handler must have a name associated with it.");
             }
-            Set<String> associatedActions = routeHandler.actionNames();
+            Set<String> associatedActions = namedRouteHandler.actionNames();
             registerHandler(route.getMethod(), route.getPath(), routeActionName, associatedActions, restHandler);
         });
         restHandler.deprecatedRoutes().forEach(route -> {
-            DeprecatedRouteHandler routeHandler = ((DeprecatedRouteHandler) route);
+            DeprecatedNamedRouteHandler routeHandler = ((DeprecatedNamedRouteHandler) route);
             String routeActionName = routeHandler.name();
             if (routeActionName == null) {
                 throw new IllegalArgumentException("Route handler must have a name associated with it.");
@@ -67,7 +67,7 @@ public class ExtensionRestPathRegistry {
             );
         });
         restHandler.replacedRoutes().forEach(route -> {
-            ReplacedRouteHandler routeHandler = ((ReplacedRouteHandler) route);
+            ReplacedNamedRouteHandler routeHandler = ((ReplacedNamedRouteHandler) route);
             String routeActionName = routeHandler.name();
             if (routeActionName == null) {
                 throw new IllegalArgumentException("Route handler must have a name associated with it.");

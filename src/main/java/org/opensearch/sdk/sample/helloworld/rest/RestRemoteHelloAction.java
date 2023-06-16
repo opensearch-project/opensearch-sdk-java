@@ -20,7 +20,7 @@ import org.opensearch.sdk.SDKClient;
 import org.opensearch.sdk.action.RemoteExtensionAction;
 import org.opensearch.sdk.action.RemoteExtensionActionRequest;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler;
-import org.opensearch.sdk.rest.RouteHandler;
+import org.opensearch.sdk.rest.NamedRouteHandler;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleResponse;
@@ -51,9 +51,9 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
     }
 
     @Override
-    public List<RouteHandler> routeHandlers() {
+    public List<NamedRouteHandler> namedRouteHandlers() {
         return List.of(
-            new RouteHandler(GET, "/hello/{name}", routePrefix("remote_greet_with_name"), Collections.emptySet(), handleRemoteGetRequest)
+            new NamedRouteHandler(GET, "/hello/{name}", routePrefix("remote_greet_with_name"), Collections.emptySet(), handleRemoteGetRequest)
         );
     }
 

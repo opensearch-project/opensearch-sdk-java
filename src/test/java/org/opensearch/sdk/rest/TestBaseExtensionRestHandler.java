@@ -27,23 +27,23 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
 
     private final BaseExtensionRestHandler handler = new BaseExtensionRestHandler() {
         @Override
-        public List<RouteHandler> routeHandlers() {
-            return List.of(new RouteHandler(Method.GET, "/foo", "foo", Collections.emptySet(), handleFoo));
+        public List<NamedRouteHandler> namedRouteHandlers() {
+            return List.of(new NamedRouteHandler(Method.GET, "/foo", "foo", Collections.emptySet(), handleFoo));
         }
 
         @Override
-        public List<DeprecatedRouteHandler> deprecatedRouteHandlers() {
+        public List<DeprecatedNamedRouteHandler> deprecatedRouteHandlers() {
             return List.of(
-                new DeprecatedRouteHandler(Method.GET, "/deprecated/foo", "newfoo", Collections.emptySet(), "It's deprecated", handleFoo)
+                new DeprecatedNamedRouteHandler(Method.GET, "/deprecated/foo", "newfoo", Collections.emptySet(), "It's deprecated", handleFoo)
             );
         }
 
         @Override
-        public List<ReplacedRouteHandler> replacedRouteHandlers() {
+        public List<ReplacedNamedRouteHandler> replacedRouteHandlers() {
             return List.of(
-                new ReplacedRouteHandler(Method.GET, "/new/foo", "getnewfoo", Collections.emptySet(), Method.GET, "/old/foo", handleFoo),
-                new ReplacedRouteHandler(Method.PUT, "/new/put/foo", "putnewfoo", Collections.emptySet(), "/old/put/foo", handleFoo),
-                new ReplacedRouteHandler(new Route(Method.POST, "/foo"), "newfoo", Collections.emptySet(), "/new", "/old", handleFoo)
+                new ReplacedNamedRouteHandler(Method.GET, "/new/foo", "getnewfoo", Collections.emptySet(), Method.GET, "/old/foo", handleFoo),
+                new ReplacedNamedRouteHandler(Method.PUT, "/new/put/foo", "putnewfoo", Collections.emptySet(), "/old/put/foo", handleFoo),
+                new ReplacedNamedRouteHandler(new Route(Method.POST, "/foo"), "newfoo", Collections.emptySet(), "/new", "/old", handleFoo)
             );
         }
 
@@ -64,7 +64,7 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
         BaseExtensionRestHandler defaultHandler = new BaseExtensionRestHandler() {
         };
         assertTrue(defaultHandler.routes().isEmpty());
-        assertTrue(defaultHandler.routeHandlers().isEmpty());
+        assertTrue(defaultHandler.namedRouteHandlers().isEmpty());
     }
 
     @Test
@@ -271,9 +271,9 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
     public void testCreateEmptyJsonResponse() {
         BaseExtensionRestHandler handlerWithEmptyJsonResponse = new BaseExtensionRestHandler() {
             @Override
-            public List<RouteHandler> routeHandlers() {
+            public List<NamedRouteHandler> namedRouteHandlers() {
                 return List.of(
-                    new RouteHandler(Method.GET, "/emptyJsonResponse", "emptyresponse", Collections.emptySet(), handleEmptyJsonResponse)
+                    new NamedRouteHandler(Method.GET, "/emptyJsonResponse", "emptyresponse", Collections.emptySet(), handleEmptyJsonResponse)
                 );
             }
 

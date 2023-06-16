@@ -17,11 +17,11 @@ import org.opensearch.test.OpenSearchTestCase;
 import java.util.Collections;
 import java.util.Set;
 
-public class RouteHandlerTests extends OpenSearchTestCase {
+public class NamedRouteHandlerTests extends OpenSearchTestCase {
     public void testUnnamedRouteHandler() {
         assertThrows(
             IllegalArgumentException.class,
-            () -> new RouteHandler(
+            () -> new NamedRouteHandler(
                 RestRequest.Method.GET,
                 "/foo/bar",
                 "",
@@ -32,7 +32,7 @@ public class RouteHandlerTests extends OpenSearchTestCase {
     }
 
     public void testNamedRouteHandler() {
-        RouteHandler rh = new RouteHandler(
+        NamedRouteHandler rh = new NamedRouteHandler(
             RestRequest.Method.GET,
             "/foo/bar",
             "foo",

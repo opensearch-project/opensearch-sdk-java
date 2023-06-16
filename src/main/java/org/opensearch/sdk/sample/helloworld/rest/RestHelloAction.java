@@ -18,7 +18,7 @@ import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler;
 import org.opensearch.sdk.rest.ExtensionRestHandler;
-import org.opensearch.sdk.rest.RouteHandler;
+import org.opensearch.sdk.rest.NamedRouteHandler;
 
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -60,18 +60,18 @@ public class RestHelloAction extends BaseExtensionRestHandler {
     public RestHelloAction() {}
 
     @Override
-    public List<RouteHandler> routeHandlers() {
+    public List<NamedRouteHandler> namedRouteHandlers() {
         return List.of(
-            new RouteHandler(GET, "/hello", routePrefix("greet"), Set.of("cluster:admin/opensearch/hw/greet"), handleGetRequest),
-            new RouteHandler(POST, "/hello", routePrefix("greet_with_adjective"), Collections.emptySet(), handlePostRequest),
-            new RouteHandler(
+            new NamedRouteHandler(GET, "/hello", routePrefix("greet"), Set.of("cluster:admin/opensearch/hw/greet"), handleGetRequest),
+            new NamedRouteHandler(POST, "/hello", routePrefix("greet_with_adjective"), Collections.emptySet(), handlePostRequest),
+            new NamedRouteHandler(
                 PUT,
                 "/hello/{name}",
                 routePrefix("greet_with_name"),
                 Set.of("cluster:admin/opensearch/hw/greet_with_name"),
                 handlePutRequest
             ),
-            new RouteHandler(DELETE, "/goodbye", routePrefix("goodbye"), Collections.emptySet(), handleDeleteRequest)
+            new NamedRouteHandler(DELETE, "/goodbye", routePrefix("goodbye"), Collections.emptySet(), handleDeleteRequest)
         );
     }
 
