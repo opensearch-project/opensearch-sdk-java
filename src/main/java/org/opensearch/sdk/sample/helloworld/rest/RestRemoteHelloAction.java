@@ -14,17 +14,18 @@ import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
-import org.opensearch.extensions.rest.RouteHandler;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.SDKClient;
 import org.opensearch.sdk.action.RemoteExtensionAction;
 import org.opensearch.sdk.action.RemoteExtensionActionRequest;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler;
+import org.opensearch.sdk.rest.RouteHandler;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleResponse;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -51,7 +52,9 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
 
     @Override
     public List<RouteHandler> routeHandlers() {
-        return List.of(new RouteHandler(GET, "/hello/{name}", handleRemoteGetRequest));
+        return List.of(
+            new RouteHandler(GET, "/hello/{name}", routePrefix("remote_greet_with_name"), Collections.emptySet(), handleRemoteGetRequest)
+        );
     }
 
     private Function<RestRequest, ExtensionRestResponse> handleRemoteGetRequest = (request) -> {

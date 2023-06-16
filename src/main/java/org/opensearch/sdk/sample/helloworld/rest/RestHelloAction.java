@@ -15,17 +15,20 @@ import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
-import org.opensearch.extensions.rest.RouteHandler;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler;
 import org.opensearch.sdk.rest.ExtensionRestHandler;
+import org.opensearch.sdk.rest.RouteHandler;
+
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Function;
 
 import static org.opensearch.rest.RestRequest.Method.DELETE;
@@ -59,10 +62,16 @@ public class RestHelloAction extends BaseExtensionRestHandler {
     @Override
     public List<RouteHandler> routeHandlers() {
         return List.of(
-            new RouteHandler(routePrefix("greet"), GET, "/hello", handleGetRequest),
-            new RouteHandler(routePrefix("greet_with_adjective"), POST, "/hello", handlePostRequest),
-            new RouteHandler(routePrefix("greet_with_name"), PUT, "/hello/{name}", handlePutRequest),
-            new RouteHandler(routePrefix("goodbye"), DELETE, "/goodbye", handleDeleteRequest)
+            new RouteHandler(GET, "/hello", routePrefix("greet"), Set.of("cluster:admin/opensearch/hw/greet"), handleGetRequest),
+            new RouteHandler(POST, "/hello", routePrefix("greet_with_adjective"), Collections.emptySet(), handlePostRequest),
+            new RouteHandler(
+                PUT,
+                "/hello/{name}",
+                routePrefix("greet_with_name"),
+                Set.of("cluster:admin/opensearch/hw/greet_with_name"),
+                handlePutRequest
+            ),
+            new RouteHandler(DELETE, "/goodbye", routePrefix("goodbye"), Collections.emptySet(), handleDeleteRequest)
         );
     }
 
