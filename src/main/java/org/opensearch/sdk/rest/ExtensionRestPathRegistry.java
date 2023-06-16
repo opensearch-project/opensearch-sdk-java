@@ -11,12 +11,12 @@ package org.opensearch.sdk.rest;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 import org.opensearch.common.Nullable;
 import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.path.PathTrie;
-import org.opensearch.extensions.rest.RouteHandler;
+
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestUtils;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler.ExtensionDeprecationRestHandler;
@@ -41,24 +41,48 @@ public class ExtensionRestPathRegistry {
      */
     public void registerHandler(ExtensionRestHandler restHandler) {
         restHandler.routes().forEach(route -> {
-            Optional<String> routeActionName = Optional.empty();
-            if (route instanceof RouteHandler && ((RouteHandler) route).name() != null) {
-                routeActionName = Optional.of(((RouteHandler) route).name());
+            RouteHandler routeHandler = ((RouteHandler) route);
+            String routeActionName = routeHandler.name();
+            if (routeActionName == null) {
+                throw new IllegalArgumentException("Route handler must have a name associated with it.");
             }
-            registerHandler(route.getMethod(), route.getPath(), routeActionName, restHandler);
+            Set<String> associatedActions = routeHandler.actionNames();
+            registerHandler(route.getMethod(), route.getPath(), routeActionName, associatedActions, restHandler);
         });
-        restHandler.deprecatedRoutes()
-            .forEach(route -> registerAsDeprecatedHandler(route.getMethod(), route.getPath(), restHandler, route.getDeprecationMessage()));
-        restHandler.replacedRoutes()
-            .forEach(
-                route -> registerWithDeprecatedHandler(
-                    route.getMethod(),
-                    route.getPath(),
-                    restHandler,
-                    route.getDeprecatedMethod(),
-                    route.getDeprecatedPath()
-                )
+        restHandler.deprecatedRoutes().forEach(route -> {
+            DeprecatedRouteHandler routeHandler = ((DeprecatedRouteHandler) route);
+            String routeActionName = routeHandler.name();
+            if (routeActionName == null) {
+                throw new IllegalArgumentException("Route handler must have a name associated with it.");
+            }
+            Set<String> associatedActions = routeHandler.actionNames();
+
+            registerAsDeprecatedHandler(
+                route.getMethod(),
+                route.getPath(),
+                routeActionName,
+                associatedActions,
+                restHandler,
+                route.getDeprecationMessage()
             );
+        });
+        restHandler.replacedRoutes().forEach(route -> {
+            ReplacedRouteHandler routeHandler = ((ReplacedRouteHandler) route);
+            String routeActionName = routeHandler.name();
+            if (routeActionName == null) {
+                throw new IllegalArgumentException("Route handler must have a name associated with it.");
+            }
+            Set<String> associatedActions = routeHandler.actionNames();
+            registerWithDeprecatedHandler(
+                route.getMethod(),
+                route.getPath(),
+                routeActionName,
+                associatedActions,
+                restHandler,
+                route.getDeprecatedMethod(),
+                route.getDeprecatedPath()
+            );
+        });
     }
 
     /**
@@ -69,17 +93,23 @@ public class ExtensionRestPathRegistry {
      * @param name The name corresponding to this handler
      * @param method GET, POST, etc.
      */
-    public void registerHandler(Method method, String path, Optional<String> name, ExtensionRestHandler extensionRestHandler) {
+    public void registerHandler(
+        Method method,
+        String path,
+        String name,
+        Set<String> legacyActionNames,
+        ExtensionRestHandler extensionRestHandler
+    ) {
         pathTrie.insertOrUpdate(
             path,
             new SDKMethodHandlers(path, extensionRestHandler, method),
             (mHandlers, newMHandler) -> mHandlers.addMethods(extensionRestHandler, method)
         );
         if (extensionRestHandler instanceof ExtensionDeprecationRestHandler) {
-            registeredDeprecatedPaths.add(restPathToString(method, path, name));
+            registeredDeprecatedPaths.add(restPathToString(method, path, name, legacyActionNames));
             registeredDeprecatedPaths.add(((ExtensionDeprecationRestHandler) extensionRestHandler).getDeprecationMessage());
         } else {
-            registeredPaths.add(restPathToString(method, path, name));
+            registeredPaths.add(restPathToString(method, path, name, legacyActionNames));
         }
     }
 
@@ -91,13 +121,21 @@ public class ExtensionRestPathRegistry {
      * @param handler The handler to actually execute
      * @param deprecationMessage The message to log and send as a header in the response
      */
-    private void registerAsDeprecatedHandler(Method method, String path, ExtensionRestHandler handler, String deprecationMessage) {
+    private void registerAsDeprecatedHandler(
+        Method method,
+        String path,
+        String name,
+        Set<String> actionNames,
+        ExtensionRestHandler handler,
+        String deprecationMessage
+    ) {
         assert (handler instanceof ExtensionDeprecationRestHandler) == false;
 
         registerHandler(
             method,
             path,
-            Optional.empty(),
+            name,
+            actionNames,
             new ExtensionDeprecationRestHandler(handler, deprecationMessage, deprecationLogger)
         );
     }
@@ -128,6 +166,8 @@ public class ExtensionRestPathRegistry {
     private void registerWithDeprecatedHandler(
         Method method,
         String path,
+        String name,
+        Set<String> actionNames,
         ExtensionRestHandler handler,
         Method deprecatedMethod,
         String deprecatedPath
@@ -143,8 +183,8 @@ public class ExtensionRestPathRegistry {
             + path
             + "] instead.";
 
-        registerHandler(method, path, Optional.empty(), handler);
-        registerAsDeprecatedHandler(deprecatedMethod, deprecatedPath, handler, deprecationMessage);
+        registerHandler(method, path, name, actionNames, handler);
+        registerAsDeprecatedHandler(deprecatedMethod, deprecatedPath, name, actionNames, handler, deprecationMessage);
     }
 
     /**
@@ -188,10 +228,9 @@ public class ExtensionRestPathRegistry {
      * @param name  the name corresponding to this route.
      * @return A string appending the method and path.
      */
-    public static String restPathToString(Method method, String path, Optional<String> name) {
-        if (name.isPresent()) {
-            return method.name() + " " + path + " " + name.get();
-        }
-        return method.name() + " " + path;
+    public static String restPathToString(Method method, String path, String name, Set<String> legacyActionNames) {
+        StringBuilder sb = new StringBuilder(method.name() + " " + path + " " + name);
+        legacyActionNames.forEach(act -> sb.append(" " + act));
+        return sb.toString();
     }
 }

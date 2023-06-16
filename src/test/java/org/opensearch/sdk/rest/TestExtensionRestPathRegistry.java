@@ -9,8 +9,8 @@
 
 package org.opensearch.sdk.rest;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,11 +47,20 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
         @Override
         public List<ReplacedRoute> replacedRoutes() {
             return List.of(
-                new ReplacedRouteHandler(Method.GET, "/new/foo", Method.GET, "/old/foo", r -> { return null; }),
-                new ReplacedRouteHandler(Method.PUT, "/new/put/foo", "/old/put/foo", r -> {
+                new ReplacedRouteHandler(Method.GET, "/new/foo", "getnewfoo", Collections.emptySet(), Method.GET, "/old/foo", r -> {
                     return null;
                 }),
-                new ReplacedRouteHandler(new Route(Method.POST, "/foo"), "/new", "/old", r -> { return null; })
+                new ReplacedRouteHandler(
+                    Method.PUT,
+                    "/new/put/foo",
+                    "putnewfoo",
+                    Collections.emptySet(),
+                    "/old/put/foo",
+                    r -> { return null; }
+                ),
+                new ReplacedRouteHandler(new Route(Method.POST, "/foo"), "replacefoo", Collections.emptySet(), "/new", "/old", r -> {
+                    return null;
+                })
             );
         }
     };
@@ -182,11 +191,11 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
 
     @Test
     public void testRestPathToString() {
-        assertEquals("GET /foo", ExtensionRestPathRegistry.restPathToString(Method.GET, "/foo", Optional.empty()));
+        assertEquals("GET /foo", ExtensionRestPathRegistry.restPathToString(Method.GET, "/foo", "", Collections.emptySet()));
     }
 
     @Test
     public void testRestPathWithNameToString() {
-        assertEquals("GET /foo foo", ExtensionRestPathRegistry.restPathToString(Method.GET, "/foo", Optional.of("foo")));
+        assertEquals("GET /foo foo", ExtensionRestPathRegistry.restPathToString(Method.GET, "/foo", "foo", Collections.emptySet()));
     }
 }

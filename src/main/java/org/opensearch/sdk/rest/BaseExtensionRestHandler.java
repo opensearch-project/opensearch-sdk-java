@@ -15,14 +15,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.opensearch.extensions.rest.RouteHandler;
 import org.opensearch.rest.BaseRestHandler;
 import static org.opensearch.rest.RestStatus.INTERNAL_SERVER_ERROR;
 import static org.opensearch.rest.RestStatus.NOT_FOUND;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.function.Function;
 
 import static org.apache.hc.core5.http.ContentType.APPLICATION_JSON;
 import org.opensearch.common.logging.DeprecationLogger;
@@ -31,7 +29,6 @@ import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestHandler.DeprecatedRoute;
 import org.opensearch.rest.RestHandler.ReplacedRoute;
 import org.opensearch.rest.RestHandler.Route;
-import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.DeprecationRestHandler;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestStatus;
@@ -239,42 +236,6 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     */
     protected ExtensionRestResponse createEmptyJsonResponse(RestRequest request, RestStatus status) {
         return new ExtensionRestResponse(request, status, JSON_CONTENT_TYPE, "{}");
-    }
-
-    /**
-     * A subclass of {@link DeprecatedRoute} that includes a handler method for that route.
-     */
-    public static class DeprecatedRouteHandler extends DeprecatedRoute {
-
-        private final Function<RestRequest, ExtensionRestResponse> responseHandler;
-
-        /**
-         * Handle the method and path with the specified handler.
-         *
-         * @param method The {@link Method} to handle.
-         * @param path The path to handle.
-         * @param deprecationMessage The message to log with the deprecation logger
-         * @param handler The method which handles the method and path.
-         */
-        public DeprecatedRouteHandler(
-            Method method,
-            String path,
-            String deprecationMessage,
-            Function<RestRequest, ExtensionRestResponse> handler
-        ) {
-            super(method, path, deprecationMessage);
-            this.responseHandler = handler;
-        }
-
-        /**
-         * Executes the handler for this route.
-         *
-         * @param request The request to handle
-         * @return the {@link ExtensionRestResponse} result from the handler for this route.
-         */
-        public ExtensionRestResponse handleRequest(RestRequest request) {
-            return responseHandler.apply(request);
-        }
     }
 
     /**

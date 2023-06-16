@@ -9,6 +9,7 @@
 
 package org.opensearch.sdk.rest;
 
+import java.util.Set;
 import java.util.function.Function;
 
 import org.opensearch.extensions.rest.ExtensionRestResponse;
@@ -22,6 +23,8 @@ import org.opensearch.rest.RestRequest.Method;
  */
 public class ReplacedRouteHandler extends ReplacedRoute {
 
+    private final String name;
+    private final Set<String> actionNames;
     private final Function<RestRequest, ExtensionRestResponse> responseHandler;
 
     /**
@@ -36,12 +39,16 @@ public class ReplacedRouteHandler extends ReplacedRoute {
     public ReplacedRouteHandler(
         Method method,
         String path,
+        String name,
+        Set<String> actionNames,
         Method deprecatedMethod,
         String deprecatedPath,
         Function<RestRequest, ExtensionRestResponse> handler
     ) {
         super(method, path, deprecatedMethod, deprecatedPath);
         this.responseHandler = handler;
+        this.name = name;
+        this.actionNames = actionNames;
     }
 
     /**
@@ -53,8 +60,15 @@ public class ReplacedRouteHandler extends ReplacedRoute {
      * @param deprecatedPath deprecated path
      * @param handler The method which handles the method and path.
      */
-    public ReplacedRouteHandler(Method method, String path, String deprecatedPath, Function<RestRequest, ExtensionRestResponse> handler) {
-        this(method, path, method, deprecatedPath, handler);
+    public ReplacedRouteHandler(
+        Method method,
+        String path,
+        String name,
+        Set<String> actionNames,
+        String deprecatedPath,
+        Function<RestRequest, ExtensionRestResponse> handler
+    ) {
+        this(method, path, name, actionNames, method, deprecatedPath, handler);
     }
 
     /**
@@ -65,8 +79,15 @@ public class ReplacedRouteHandler extends ReplacedRoute {
      * @param deprecatedPrefix deprecated prefix
      * @param handler The method which handles the method and path.
      */
-    public ReplacedRouteHandler(Route route, String prefix, String deprecatedPrefix, Function<RestRequest, ExtensionRestResponse> handler) {
-        this(route.getMethod(), prefix + route.getPath(), deprecatedPrefix + route.getPath(), handler);
+    public ReplacedRouteHandler(
+        Route route,
+        String name,
+        Set<String> actionNames,
+        String prefix,
+        String deprecatedPrefix,
+        Function<RestRequest, ExtensionRestResponse> handler
+    ) {
+        this(route.getMethod(), prefix + route.getPath(), name, actionNames, deprecatedPrefix + route.getPath(), handler);
     }
 
     /**
@@ -77,5 +98,19 @@ public class ReplacedRouteHandler extends ReplacedRoute {
      */
     public ExtensionRestResponse handleRequest(RestRequest request) {
         return responseHandler.apply(request);
+    }
+
+    /**
+     * The name of the RouteHandler. Must be unique across route handlers.
+     */
+    public String name() {
+        return this.name;
+    }
+
+    /**
+     * The action names associate with the RouteHandler.
+     */
+    public Set<String> actionNames() {
+        return this.actionNames;
     }
 }

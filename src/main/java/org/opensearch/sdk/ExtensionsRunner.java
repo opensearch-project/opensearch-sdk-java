@@ -20,7 +20,6 @@ import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
 import org.opensearch.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
-import org.opensearch.extensions.rest.RouteHandler;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.core.xcontent.NamedXContentRegistry;
@@ -29,7 +28,6 @@ import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.UpdateSettingsRequest;
 import org.opensearch.extensions.action.ExtensionActionRequest;
-import org.opensearch.rest.RestHandler;
 import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.sdk.api.ActionExtension;
 import org.opensearch.sdk.handlers.ExtensionActionRequestHandler;
@@ -55,7 +53,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -239,13 +236,7 @@ public class ExtensionsRunner {
                 if (extensionRestHandler instanceof BaseExtensionRestHandler) {
                     ((BaseExtensionRestHandler) extensionRestHandler).setExtensionShortName(extensionSettings.getShortExtensionName());
                 }
-                for (RestHandler.Route route : extensionRestHandler.routes()) {
-                    Optional<String> routeActionName = Optional.empty();
-                    if (route instanceof RouteHandler && ((RouteHandler) route).name() != null) {
-                        routeActionName = Optional.of(((RouteHandler) route).name());
-                    }
-                    extensionRestPathRegistry.registerHandler(route.getMethod(), route.getPath(), routeActionName, extensionRestHandler);
-                }
+                extensionRestPathRegistry.registerHandler(extensionRestHandler);
             }
         }
     }
