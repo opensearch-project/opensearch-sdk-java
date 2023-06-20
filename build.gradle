@@ -112,6 +112,11 @@ tasks.named("publishMavenJavaPublicationToMavenLocal").configure { dependsOn("ge
 tasks.named("publishNebulaPublicationToMavenLocal").configure { dependsOn("generatePomFileForMavenJavaPublication") }
 validateMavenJavaPom.enabled = false
 
+javadoc {
+    source = sourceSets.main.allJava
+    classpath = sourceSets.main.compileClasspath
+}
+
 repositories {
     mavenLocal()
     mavenCentral()
@@ -125,7 +130,7 @@ dependencies {
     def log4jVersion = "2.20.0"
     def nettyVersion = "4.1.93.Final"
     def jacksonDatabindVersion = "2.15.2"
-    def guavaVersion = "32.0.0-jre"
+    def guavaVersion = "32.0.1-jre"
     def guiceVersion = "7.0.0"
     def junit4Version = "4.13.2"
     def junit5Version = "5.9.3"
