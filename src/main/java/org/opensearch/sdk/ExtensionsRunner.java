@@ -159,7 +159,8 @@ public class ExtensionsRunner {
         ExtensionSettings extensionSettings = extension.getExtensionSettings();
         Settings.Builder settingsBuilder = Settings.builder()
             .put(NODE_NAME_SETTING, extensionSettings.getExtensionName())
-            .put(TransportSettings.BIND_HOST.getKey(), extensionSettings.getHostAddress())
+            .put(TransportSettings.PUBLISH_HOST.getKey(), extensionSettings.getHostAddress())
+            .putList(TransportSettings.BIND_HOST.getKey(), Collections.emptyList())
             .put(TransportSettings.PORT.getKey(), extensionSettings.getHostPort());
         boolean sslEnabled = extensionSettings.getSecuritySettings().containsKey(SSL_TRANSPORT_ENABLED)
             && "true".equals(extensionSettings.getSecuritySettings().get(SSL_TRANSPORT_ENABLED));
