@@ -1,0 +1,45 @@
+name: Release drafter
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  draft-a-release:
+    name: Draft a release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - id: get_data
+        run: |
+          echo "approvers=$(cat .github/CODEOWNERS | grep @ | tr -d '* ' | sed 's/@/,/g' | sed 's/,//1')" >> $GITHUB_OUTPUT
+          echo "version=$(./gradlew getVersion  -Dbuild.snapshot=false -Dbuild -q | grep version= | cut -d'=' -f2)" >> $GITHUB_OUTPUT
+      - uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: ${{ steps.get_data.outputs.approvers }}
+          minimum-approvals: 2
+          issue-title: 'Release opensearch-sdk-java : ${{ steps.get_data.outputs.version }}'
+          issue-body: "Please approve or deny the release of opensearch-sdk-java. **VERSION**: ${{ steps.get_data.outputs.version }} **TAG**: ${{ github.ref_name }}  **COMMIT**: ${{ github.sha }}"
+          exclude-workflow-initiator-as-approver: true
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: 'gradle'
+      - name: Build with Gradle
+        run: |
+          ./gradlew --no-daemon -Dbuild.snapshot=false publishNebulaPublicationToLocalRepoRepository && tar -C build -cvf artifacts.tar.gz localRepo
+      - name: Draft a release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          generate_release_notes: true
+          files: |
+            artifacts.tar.gz
