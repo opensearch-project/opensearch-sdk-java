@@ -76,7 +76,7 @@ allprojects {
     project.ext.licenseName = 'The Apache Software License, Version 2.0'
     project.ext.licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
     group = 'org.opensearch'
-    version = opensearch_version.tokenize('-')[0] + '.0'
+    version = '2.0.0'
     if (buildVersionQualifier) {
         version += "-${buildVersionQualifier}"
     }
@@ -87,7 +87,6 @@ allprojects {
 
 
 group 'org.opensearch.sdk'
-version '2.0.0-SNAPSHOT'
 
 publishing {
     publications {
@@ -97,13 +96,19 @@ publishing {
     }
 
     repositories {
-        maven {
-            name = "Snapshots" //  optional target repository name
-            url = "https://aws.oss.sonatype.org/content/repositories/snapshots"
-            credentials {
-                username "$System.env.SONATYPE_USERNAME"
-                password "$System.env.SONATYPE_PASSWORD"
+        if (version.toString().endsWith("SNAPSHOT")) {
+            maven {
+                name = "Snapshots" //  optional target repository name
+                url = "https://aws.oss.sonatype.org/content/repositories/snapshots"
+                credentials {
+                    username "$System.env.SONATYPE_USERNAME"
+                    password "$System.env.SONATYPE_PASSWORD"
+                }
             }
+        }
+        maven {
+            name = "localRepo"
+            url = "$buildDir/localRepo"
         }
     }
 }
@@ -128,7 +133,7 @@ dependencies {
 
     def opensearchVersion = "${opensearch_version}"
     def log4jVersion = "2.20.0"
-    def nettyVersion = "4.1.93.Final"
+    def nettyVersion = "4.1.94.Final"
     def jacksonDatabindVersion = "2.15.2"
     def guavaVersion = "32.0.1-jre"
     def guiceVersion = "7.0.0"
@@ -199,6 +204,12 @@ task helloWorld(type: JavaExec) {
     description = 'Run HelloWorld Extension.'
     mainClass = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
     classpath = sourceSets.main.runtimeClasspath
+}
+
+task getVersion() {
+    doLast {
+        println("version=${version}")
+    }
 }
 
 test {
