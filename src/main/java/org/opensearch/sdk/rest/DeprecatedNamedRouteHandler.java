@@ -25,6 +25,16 @@ public class DeprecatedNamedRouteHandler extends RestHandler.DeprecatedRoute {
     private final Set<String> actionNames;
     private final Function<RestRequest, ExtensionRestResponse> responseHandler;
 
+    /**
+     * Handle deprecated routes using route method, deprecated path and deprecation message.
+     *
+     * @param method route method
+     * @param path route path
+     * @param name The name of this handler
+     * @param actionNames The list of action names to be registered for this handler.
+     * @param deprecationMessage Message to be shown for this deprecated route
+     * @param handler The method which handles the REST method and path.
+     */
     public DeprecatedNamedRouteHandler(
         RestRequest.Method method,
         String path,
@@ -51,6 +61,7 @@ public class DeprecatedNamedRouteHandler extends RestHandler.DeprecatedRoute {
 
     /**
      * The name of the RouteHandler. Must be unique across route handlers.
+     * @return the name of this handler
      */
     public String name() {
         return this.name;
@@ -58,6 +69,7 @@ public class DeprecatedNamedRouteHandler extends RestHandler.DeprecatedRoute {
 
     /**
      * The action names associate with the RouteHandler.
+     * @return the set of action names registered for this route handler
      */
     public Set<String> actionNames() {
         return this.actionNames;

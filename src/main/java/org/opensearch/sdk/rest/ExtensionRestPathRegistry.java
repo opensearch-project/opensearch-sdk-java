@@ -91,13 +91,14 @@ public class ExtensionRestPathRegistry {
      * @param path Path to handle (e.g., "/{index}/{type}/_bulk")
      * @param extensionRestHandler The handler to actually execute
      * @param name The name corresponding to this handler
+     * @param actionNames The set of actions to be registered with this handler
      * @param method GET, POST, etc.
      */
     public void registerHandler(
         Method method,
         String path,
         String name,
-        Set<String> legacyActionNames,
+        Set<String> actionNames,
         ExtensionRestHandler extensionRestHandler
     ) {
         pathTrie.insertOrUpdate(
@@ -106,10 +107,10 @@ public class ExtensionRestPathRegistry {
             (mHandlers, newMHandler) -> mHandlers.addMethods(extensionRestHandler, method)
         );
         if (extensionRestHandler instanceof ExtensionDeprecationRestHandler) {
-            registeredDeprecatedPaths.add(restPathToString(method, path, name, legacyActionNames));
+            registeredDeprecatedPaths.add(restPathToString(method, path, name, actionNames));
             registeredDeprecatedPaths.add(((ExtensionDeprecationRestHandler) extensionRestHandler).getDeprecationMessage());
         } else {
-            registeredPaths.add(restPathToString(method, path, name, legacyActionNames));
+            registeredPaths.add(restPathToString(method, path, name, actionNames));
         }
     }
 
@@ -118,6 +119,8 @@ public class ExtensionRestPathRegistry {
      *
      * @param method GET, POST, etc.
      * @param path Path to handle (e.g., "/{index}/{type}/_bulk")
+     * @param name The name corresponding to this handler
+     * @param actionNames The set of actions to be registered with this handler
      * @param handler The handler to actually execute
      * @param deprecationMessage The message to log and send as a header in the response
      */
@@ -159,6 +162,8 @@ public class ExtensionRestPathRegistry {
      *
      * @param method GET, POST, etc.
      * @param path Path to handle (e.g., "/_forcemerge")
+     * @param name The name corresponding to this handler
+     * @param actionNames The set of actions to be registered with this handler
      * @param handler The handler to actually execute
      * @param deprecatedMethod GET, POST, etc.
      * @param deprecatedPath <em>Deprecated</em> path to handle (e.g., "/_optimize")
@@ -226,11 +231,12 @@ public class ExtensionRestPathRegistry {
      * @param method  the method.
      * @param path  the path.
      * @param name  the name corresponding to this route.
+     * @param actionNames the set of actions registered with this route
      * @return A string appending the method and path.
      */
-    public static String restPathToString(Method method, String path, String name, Set<String> legacyActionNames) {
+    public static String restPathToString(Method method, String path, String name, Set<String> actionNames) {
         StringBuilder sb = new StringBuilder(method.name() + " " + path + " " + name);
-        legacyActionNames.forEach(act -> sb.append(" " + act));
+        actionNames.forEach(act -> sb.append(" ").append(act));
         return sb.toString();
     }
 }

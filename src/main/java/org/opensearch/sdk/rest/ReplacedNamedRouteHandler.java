@@ -33,9 +33,11 @@ public class ReplacedNamedRouteHandler extends ReplacedRoute {
      *
      * @param method route method
      * @param path new route path
+     * @param name The name of the handler.
+     * @param actionNames The list of action names to be registered for this handler.
      * @param deprecatedMethod deprecated method
      * @param deprecatedPath deprecated path
-     * @param handler The method which handles the method and path.
+     * @param handler The method which handles the REST method and path.
      */
     public ReplacedNamedRouteHandler(
         Method method,
@@ -58,8 +60,10 @@ public class ReplacedNamedRouteHandler extends ReplacedRoute {
      *
      * @param method route method
      * @param path new route path
+     * @param name The name of the handler.
+     * @param actionNames The list of action names to be registered for this handler.
      * @param deprecatedPath deprecated path
-     * @param handler The method which handles the method and path.
+     * @param handler The method which handles the REST method and path.
      */
     public ReplacedNamedRouteHandler(
         Method method,
@@ -76,9 +80,11 @@ public class ReplacedNamedRouteHandler extends ReplacedRoute {
      * Handle replaced routes using route, new and deprecated prefixes.
      *
      * @param route route
+     * @param name The name of the handler.
+     * @param actionNames The list of action names to be registered for this handler.
      * @param prefix new route prefix
      * @param deprecatedPrefix deprecated prefix
-     * @param handler The method which handles the method and path.
+     * @param handler The method which handles the REST method and path.
      */
     public ReplacedNamedRouteHandler(
         Route route,
@@ -103,6 +109,7 @@ public class ReplacedNamedRouteHandler extends ReplacedRoute {
 
     /**
      * The name of the RouteHandler. Must be unique across route handlers.
+     * @return the name of this handler
      */
     public String name() {
         return this.name;
@@ -110,6 +117,7 @@ public class ReplacedNamedRouteHandler extends ReplacedRoute {
 
     /**
      * The action names associate with the RouteHandler.
+     * @return the set of action names registered for this route handler
      */
     public Set<String> actionNames() {
         return this.actionNames;

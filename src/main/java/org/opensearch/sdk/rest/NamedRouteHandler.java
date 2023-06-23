@@ -32,11 +32,11 @@ public class NamedRouteHandler extends Route {
     /**
      * Handle the method and path with the specified handler.
      *
-     * @param name The name of the handler.
-     * @param actionNames The list of action names to be registered for thishandler.
      * @param method The {@link Method} to handle.
      * @param path The path to handle.
-     * @param handler The method which handles the method and path.
+     * @param name The name of the handler.
+     * @param actionNames The list of action names to be registered for this handler.
+     * @param handler The method which handles the REST method and path.
      */
     public NamedRouteHandler(
         Method method,
@@ -66,6 +66,7 @@ public class NamedRouteHandler extends Route {
 
     /**
      * The name of the RouteHandler. Must be unique across route handlers.
+     * @return the name of this handler
      */
     public String name() {
         return this.name;
@@ -73,6 +74,7 @@ public class NamedRouteHandler extends Route {
 
     /**
      * The action names associate with the RouteHandler.
+     * @return the set of action names registered for this route handler
      */
     public Set<String> actionNames() {
         return this.actionNames;
