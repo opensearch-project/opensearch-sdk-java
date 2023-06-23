@@ -34,14 +34,29 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
         @Override
         public List<DeprecatedNamedRouteHandler> deprecatedRouteHandlers() {
             return List.of(
-                new DeprecatedNamedRouteHandler(Method.GET, "/deprecated/foo", "newfoo", Collections.emptySet(), "It's deprecated", handleFoo)
+                new DeprecatedNamedRouteHandler(
+                    Method.GET,
+                    "/deprecated/foo",
+                    "newfoo",
+                    Collections.emptySet(),
+                    "It's deprecated",
+                    handleFoo
+                )
             );
         }
 
         @Override
         public List<ReplacedNamedRouteHandler> replacedRouteHandlers() {
             return List.of(
-                new ReplacedNamedRouteHandler(Method.GET, "/new/foo", "getnewfoo", Collections.emptySet(), Method.GET, "/old/foo", handleFoo),
+                new ReplacedNamedRouteHandler(
+                    Method.GET,
+                    "/new/foo",
+                    "getnewfoo",
+                    Collections.emptySet(),
+                    Method.GET,
+                    "/old/foo",
+                    handleFoo
+                ),
                 new ReplacedNamedRouteHandler(Method.PUT, "/new/put/foo", "putnewfoo", Collections.emptySet(), "/old/put/foo", handleFoo),
                 new ReplacedNamedRouteHandler(new Route(Method.POST, "/foo"), "newfoo", Collections.emptySet(), "/new", "/old", handleFoo)
             );
@@ -273,7 +288,13 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
             @Override
             public List<NamedRouteHandler> namedRouteHandlers() {
                 return List.of(
-                    new NamedRouteHandler(Method.GET, "/emptyJsonResponse", "emptyresponse", Collections.emptySet(), handleEmptyJsonResponse)
+                    new NamedRouteHandler(
+                        Method.GET,
+                        "/emptyJsonResponse",
+                        "emptyresponse",
+                        Collections.emptySet(),
+                        handleEmptyJsonResponse
+                    )
                 );
             }
 

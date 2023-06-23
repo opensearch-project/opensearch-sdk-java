@@ -53,7 +53,13 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
     @Override
     public List<NamedRouteHandler> namedRouteHandlers() {
         return List.of(
-            new NamedRouteHandler(GET, "/hello/{name}", routePrefix("remote_greet_with_name"), Collections.emptySet(), handleRemoteGetRequest)
+            new NamedRouteHandler(
+                GET,
+                "/hello/{name}",
+                routePrefix("remote_greet_with_name"),
+                Collections.emptySet(),
+                handleRemoteGetRequest
+            )
         );
     }
 
