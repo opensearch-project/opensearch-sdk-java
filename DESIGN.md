@@ -37,26 +37,26 @@ Extensions are designed to extend features through transport APIs, which are exp
 
 ### Discovery
 
-Extensions are discovered and configured in the `extensions.yml` file, which is similar to the `plugin-descriptor.properties` file that is read by OpenSearch during the node bootstrap. `ExtensionsManager` reads through the config file in the `~/extensions` directory and registers extensions within OpenSearch.
+Extensions are registered through the below REST request within OpenSearch.
 
-The following is an example extension configuration in `extensions.yml`:
-
-```yaml
-extensions:
-  - name: sample-extension // extension name
-    uniqueId: opensearch-sdk-1 // identifier for the extension
-    hostAddress: '127.0.0.1' // host address
-    port: '4532' // port number
-    version: '1.0' // extension version
-    opensearchVersion: '3.0.0' // the OpenSearch version with which the extension is compiled
-    minimumCompatibleVersion: '3.0.0' // minimum version of OpenSearch with which the extension is wire compatible
+```bash
+curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data '{ \
+"name":"hello-world", \                 // extension name
+"uniqueId":"hello-world", \             // identifier for the extension
+"hostAddress":"127.0.0.1", \            // host address
+"port":"4532", \                        // port number
+"version":"1.0", \                      // extension version
+"opensearchVersion":"3.0.0", \          // the OpenSearch version with which the extension is compiled
+"minimumCompatibleVersion":"3.0.0", \   // minimum version of OpenSearch with which the extension is wire compatible
+"dependencies":[{"uniqueId":"test1","version":"2.0.0"},{"uniqueId":"test2","version":"3.0.0"}] \  // required extensions for the host extension
+}'
 ```
 
 ### Communication
 
 Extensions use a `ServerSocket`, which binds them to listen on a host address and port defined in each extension's configuration file. Each type of incoming request invokes code from an associated handler.
 
-OpenSearch has its own `extensions.yml` configuration file that matches the extensions' addresses and ports. On startup, the `ExtensionsManager` uses the node's `TransportService` to send requests to each extension, with the first request initializing the extension and validating the host and port.
+`ExtensionsManager` uses the node's `TransportService` to send requests to each extension when the REST request to initialize an extension is invoked, with the first request initializing the extension and validating the host and port.
 
 Immediately following initialization, each extension establishes a connection to OpenSearch on its own transport service and sends its REST API to OpenSearch. The API contains a list of methods and URIs to which the extension will respond. These are registered with the `RestController`.
 
@@ -92,7 +92,7 @@ The `org.opensearch.sdk.sample.helloworld` package contains a sample `HelloWorld
 
 (8, 9, 10) During bootstrap, the OpenSearch `Node` instantiates a `RestController`, passing this to the `ExtensionsManager`, which subsequently passes it to a `RestActionsRequestHandler`.
 
-The `ExtensionsManager` reads a list of extensions present in `extensions.yml`. For each configured extension:
+The `ExtensionsManager` reads a list of extensions loaded through the REST request . For each configured extension:
 
 (11, 12) The `ExtensionsManager` initializes the extension using an `InitializeExtensionsRequest`/`InitializeExtensionsResponse`, establishing a two-way transport mechanism.
 
