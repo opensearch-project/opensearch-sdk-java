@@ -56,9 +56,9 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
             new NamedRouteHandler(
                 GET,
                 "/hello/{name}",
+                handleRemoteGetRequest,
                 routePrefix("remote_greet_with_name"),
-                Collections.emptySet(),
-                handleRemoteGetRequest
+                Collections.emptySet()
             )
         );
     }
@@ -90,7 +90,7 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
                 TimeUnit.SECONDS
             ).get();
             if (!response.isSuccess()) {
-                return new ExtensionRestResponse(request, OK, "Remote extension reponse failed: " + response.getResponseBytesAsString());
+                return new ExtensionRestResponse(request, OK, "Remote extension response failed: " + response.getResponseBytesAsString());
             }
             // Parse out the expected response class from the bytes
             SampleResponse sampleResponse = new SampleResponse(StreamInput.wrap(response.getResponseBytes()));

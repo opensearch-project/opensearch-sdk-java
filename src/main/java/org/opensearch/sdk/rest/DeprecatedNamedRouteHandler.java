@@ -10,6 +10,7 @@
 package org.opensearch.sdk.rest;
 
 import org.opensearch.extensions.rest.ExtensionRestResponse;
+import org.opensearch.rest.DeprecatedNamedRoute;
 import org.opensearch.rest.RestHandler;
 import org.opensearch.rest.RestRequest;
 
@@ -20,7 +21,7 @@ import java.util.function.Function;
 /**
  * A subclass of {@link RestHandler.DeprecatedRoute} .
  */
-public class DeprecatedNamedRouteHandler extends RestHandler.DeprecatedRoute {
+public class DeprecatedNamedRouteHandler extends DeprecatedNamedRoute implements RouteHandlerWrapper {
     private final String name;
     private final Set<String> actionNames;
     private final Function<RestRequest, ExtensionRestResponse> responseHandler;
@@ -30,20 +31,20 @@ public class DeprecatedNamedRouteHandler extends RestHandler.DeprecatedRoute {
      *
      * @param method route method
      * @param path route path
-     * @param name The name of this handler
-     * @param actionNames The list of action names to be registered for this handler.
      * @param deprecationMessage Message to be shown for this deprecated route
      * @param handler The method which handles the REST method and path.
+     * @param name The name of this handler
+     * @param actionNames The list of action names to be registered for this handler.
      */
     public DeprecatedNamedRouteHandler(
         RestRequest.Method method,
         String path,
-        String name,
-        Set<String> actionNames,
         String deprecationMessage,
-        Function<RestRequest, ExtensionRestResponse> handler
+        Function<RestRequest, ExtensionRestResponse> handler,
+        String name,
+        Set<String> actionNames
     ) {
-        super(method, path, deprecationMessage);
+        super(method, path, deprecationMessage, name);
         this.name = name;
         this.actionNames = actionNames == null ? Collections.emptySet() : actionNames;
         this.responseHandler = handler;

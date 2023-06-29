@@ -62,16 +62,16 @@ public class RestHelloAction extends BaseExtensionRestHandler {
     @Override
     public List<NamedRouteHandler> namedRouteHandlers() {
         return List.of(
-            new NamedRouteHandler(GET, "/hello", routePrefix("greet"), Set.of("cluster:admin/opensearch/hw/greet"), handleGetRequest),
-            new NamedRouteHandler(POST, "/hello", routePrefix("greet_with_adjective"), Collections.emptySet(), handlePostRequest),
+            new NamedRouteHandler(GET, "/hello", handleGetRequest, routePrefix("greet"), Set.of("cluster:admin/opensearch/hw/greet")),
+            new NamedRouteHandler(POST, "/hello", handlePostRequest, routePrefix("greet_with_adjective"), Collections.emptySet()),
             new NamedRouteHandler(
                 PUT,
                 "/hello/{name}",
+                handlePutRequest,
                 routePrefix("greet_with_name"),
-                Set.of("cluster:admin/opensearch/hw/greet_with_name"),
-                handlePutRequest
+                Set.of("cluster:admin/opensearch/hw/greet_with_name")
             ),
-            new NamedRouteHandler(DELETE, "/goodbye", routePrefix("goodbye"), Collections.emptySet(), handleDeleteRequest)
+            new NamedRouteHandler(DELETE, "/goodbye", handleDeleteRequest, routePrefix("goodbye"), Collections.emptySet())
         );
     }
 

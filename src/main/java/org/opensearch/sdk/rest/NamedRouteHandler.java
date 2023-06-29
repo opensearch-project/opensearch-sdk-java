@@ -10,6 +10,7 @@
 package org.opensearch.sdk.rest;
 
 import org.opensearch.extensions.rest.ExtensionRestResponse;
+import org.opensearch.rest.NamedRoute;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
@@ -21,7 +22,7 @@ import java.util.function.Function;
 /**
  * A subclass of {@link Route} that includes a handler method for that route.
  */
-public class NamedRouteHandler extends Route {
+public class NamedRouteHandler extends NamedRoute implements RouteHandlerWrapper {
 
     private final String name;
 
@@ -34,18 +35,18 @@ public class NamedRouteHandler extends Route {
      *
      * @param method The {@link Method} to handle.
      * @param path The path to handle.
+     * @param handler The method which handles the REST method and path.
      * @param name The name of the handler.
      * @param actionNames The list of action names to be registered for this handler.
-     * @param handler The method which handles the REST method and path.
      */
     public NamedRouteHandler(
         Method method,
         String path,
+        Function<RestRequest, ExtensionRestResponse> handler,
         String name,
-        Set<String> actionNames,
-        Function<RestRequest, ExtensionRestResponse> handler
+        Set<String> actionNames
     ) {
-        super(method, path);
+        super(method, path, name);
         this.responseHandler = handler;
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Expected route handler to have a unique name, found none.");

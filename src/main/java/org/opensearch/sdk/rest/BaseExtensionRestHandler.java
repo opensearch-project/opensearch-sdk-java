@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.opensearch.rest.BaseRestHandler;
+import org.opensearch.rest.*;
+
 import static org.opensearch.rest.RestStatus.INTERNAL_SERVER_ERROR;
 import static org.opensearch.rest.RestStatus.NOT_FOUND;
 
@@ -29,9 +30,6 @@ import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestHandler.DeprecatedRoute;
 import org.opensearch.rest.RestHandler.ReplacedRoute;
 import org.opensearch.rest.RestHandler.Route;
-import org.opensearch.rest.DeprecationRestHandler;
-import org.opensearch.rest.RestRequest;
-import org.opensearch.rest.RestStatus;
 
 /**
  * Provides convenience methods to reduce boilerplate code in an {@link ExtensionRestHandler} implementation.
@@ -46,7 +44,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     public static final String JSON_CONTENT_TYPE = APPLICATION_JSON.withCharset(StandardCharsets.UTF_8).toString();
 
     /**
-     * Defines a list of methods which handle each rest {@link Route}. Override this in a subclass to use the functional syntax.
+     * Defines a list of methods which handle each rest {@link NamedRoute}. Override this in a subclass to use the functional syntax.
      *
      * @return a list of {@link NamedRouteHandler} with corresponding methods to each route.
      */
@@ -60,25 +58,25 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     }
 
     /**
-     * Defines a list of methods which handle each rest {@link DeprecatedRoute}. Override this in a subclass to use the functional syntax.
+     * Defines a list of methods which handle each rest {@link DeprecatedNamedRoute}. Override this in a subclass to use the functional syntax.
      *
      * @return a list of {@link DeprecatedNamedRouteHandler} with corresponding methods to each route.
      */
-    protected List<DeprecatedNamedRouteHandler> deprecatedRouteHandlers() {
+    protected List<DeprecatedNamedRouteHandler> deprecatedNamedRouteHandlers() {
         return Collections.emptyList();
     }
 
     @Override
     public List<DeprecatedRoute> deprecatedRoutes() {
-        return List.copyOf(deprecatedRouteHandlers());
+        return List.copyOf(deprecatedNamedRouteHandlers());
     }
 
     /**
-     * Defines a list of methods which handle each rest {@link ReplacedRoute}. Override this in a subclass to use the functional syntax.
+     * Defines a list of methods which handle each rest {@link ReplacedNamedRoute}. Override this in a subclass to use the functional syntax.
      *
      * @return a list of {@link ReplacedNamedRouteHandler} with corresponding methods to each route.
      */
-    protected List<ReplacedNamedRouteHandler> replacedRouteHandlers() {
+    protected List<ReplacedNamedRouteHandler> replacedNamedRouteHandlers() {
         return Collections.emptyList();
     }
 
@@ -97,7 +95,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
 
     @Override
     public List<ReplacedRoute> replacedRoutes() {
-        return List.copyOf(replacedRouteHandlers());
+        return List.copyOf(replacedNamedRouteHandlers());
     }
 
     @Override
@@ -109,21 +107,21 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
         if (handler.isPresent()) {
             return handler.get().handleRequest(request);
         }
-        Optional<DeprecatedNamedRouteHandler> deprecatedHandler = deprecatedRouteHandlers().stream()
+        Optional<DeprecatedNamedRouteHandler> deprecatedHandler = deprecatedNamedRouteHandlers().stream()
             .filter(rh -> rh.getMethod().equals(request.method()))
             .filter(rh -> restPathMatches(request.path(), rh.getPath()))
             .findFirst();
         if (deprecatedHandler.isPresent()) {
             return deprecatedHandler.get().handleRequest(request);
         }
-        Optional<ReplacedNamedRouteHandler> replacedHandler = replacedRouteHandlers().stream()
+        Optional<ReplacedNamedRouteHandler> replacedHandler = replacedNamedRouteHandlers().stream()
             .filter(rh -> rh.getMethod().equals(request.method()))
             .filter(rh -> restPathMatches(request.path(), rh.getPath()))
             .findFirst();
         if (replacedHandler.isPresent()) {
             return replacedHandler.get().handleRequest(request);
         }
-        replacedHandler = replacedRouteHandlers().stream()
+        replacedHandler = replacedNamedRouteHandlers().stream()
             .filter(rh -> rh.getDeprecatedMethod().equals(request.method()))
             .filter(rh -> restPathMatches(request.path(), rh.getDeprecatedPath()))
             .findFirst();

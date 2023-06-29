@@ -22,7 +22,7 @@ import org.opensearch.rest.RestRequest.Method;
 /**
  * A subclass of {@link ReplacedRoute} that includes a handler method for that route.
  */
-public class ReplacedNamedRouteHandler extends ReplacedRoute {
+public class ReplacedNamedRouteHandler extends ReplacedRoute implements RouteHandlerWrapper {
 
     private final String name;
     private final Set<String> actionNames;
@@ -33,11 +33,11 @@ public class ReplacedNamedRouteHandler extends ReplacedRoute {
      *
      * @param method route method
      * @param path new route path
-     * @param name The name of the handler.
-     * @param actionNames The list of action names to be registered for this handler.
      * @param deprecatedMethod deprecated method
      * @param deprecatedPath deprecated path
      * @param handler The method which handles the REST method and path.
+     * @param name The name of the handler.
+     * @param actionNames The list of action names to be registered for this handler.
      */
     public ReplacedNamedRouteHandler(
         Method method,
@@ -60,10 +60,10 @@ public class ReplacedNamedRouteHandler extends ReplacedRoute {
      *
      * @param method route method
      * @param path new route path
-     * @param name The name of the handler.
-     * @param actionNames The list of action names to be registered for this handler.
      * @param deprecatedPath deprecated path
      * @param handler The method which handles the REST method and path.
+     * @param name The name of the handler.
+     * @param actionNames The list of action names to be registered for this handler.
      */
     public ReplacedNamedRouteHandler(
         Method method,
@@ -80,11 +80,11 @@ public class ReplacedNamedRouteHandler extends ReplacedRoute {
      * Handle replaced routes using route, new and deprecated prefixes.
      *
      * @param route route
-     * @param name The name of the handler.
-     * @param actionNames The list of action names to be registered for this handler.
      * @param prefix new route prefix
      * @param deprecatedPrefix deprecated prefix
      * @param handler The method which handles the REST method and path.
+     * @param name The name of the handler.
+     * @param actionNames The list of action names to be registered for this handler.
      */
     public ReplacedNamedRouteHandler(
         Route route,
