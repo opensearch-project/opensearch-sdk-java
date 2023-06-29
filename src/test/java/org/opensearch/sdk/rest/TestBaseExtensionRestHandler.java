@@ -28,25 +28,25 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
     private final BaseExtensionRestHandler handler = new BaseExtensionRestHandler() {
         @Override
         public List<NamedRouteHandler> namedRouteHandlers() {
-            return List.of(new NamedRouteHandler(Method.GET, "/foo", "foo", Collections.emptySet(), handleFoo));
+            return List.of(new NamedRouteHandler(Method.GET, "/foo", handleFoo, "foo", Collections.emptySet()));
         }
 
         @Override
-        public List<DeprecatedNamedRouteHandler> deprecatedRouteHandlers() {
+        public List<DeprecatedNamedRouteHandler> deprecatedNamedRouteHandlers() {
             return List.of(
                 new DeprecatedNamedRouteHandler(
                     Method.GET,
                     "/deprecated/foo",
-                    "newfoo",
-                    Collections.emptySet(),
                     "It's deprecated",
-                    handleFoo
+                    handleFoo,
+                    "newfoo",
+                    Collections.emptySet()
                 )
             );
         }
 
         @Override
-        public List<ReplacedNamedRouteHandler> replacedRouteHandlers() {
+        public List<ReplacedNamedRouteHandler> replacedNamedRouteHandlers() {
             return List.of(
                 new ReplacedNamedRouteHandler(
                     Method.GET,
@@ -291,9 +291,9 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
                     new NamedRouteHandler(
                         Method.GET,
                         "/emptyJsonResponse",
+                        handleEmptyJsonResponse,
                         "emptyresponse",
-                        Collections.emptySet(),
-                        handleEmptyJsonResponse
+                        Collections.emptySet()
                     )
                 );
             }
