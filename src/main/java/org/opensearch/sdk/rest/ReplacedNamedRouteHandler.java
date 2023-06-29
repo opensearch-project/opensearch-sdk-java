@@ -42,11 +42,11 @@ public class ReplacedNamedRouteHandler extends ReplacedRoute implements RouteHan
     public ReplacedNamedRouteHandler(
         Method method,
         String path,
-        String name,
-        Set<String> actionNames,
         Method deprecatedMethod,
         String deprecatedPath,
-        Function<RestRequest, ExtensionRestResponse> handler
+        Function<RestRequest, ExtensionRestResponse> handler,
+        String name,
+        Set<String> actionNames
     ) {
         super(method, path, deprecatedMethod, deprecatedPath);
         this.responseHandler = handler;
@@ -68,12 +68,12 @@ public class ReplacedNamedRouteHandler extends ReplacedRoute implements RouteHan
     public ReplacedNamedRouteHandler(
         Method method,
         String path,
-        String name,
-        Set<String> actionNames,
         String deprecatedPath,
-        Function<RestRequest, ExtensionRestResponse> handler
+        Function<RestRequest, ExtensionRestResponse> handler,
+        String name,
+        Set<String> actionNames
     ) {
-        this(method, path, name, actionNames, method, deprecatedPath, handler);
+        this(method, path, method, deprecatedPath, handler, name, actionNames);
     }
 
     /**
@@ -88,13 +88,13 @@ public class ReplacedNamedRouteHandler extends ReplacedRoute implements RouteHan
      */
     public ReplacedNamedRouteHandler(
         Route route,
-        String name,
-        Set<String> actionNames,
         String prefix,
         String deprecatedPrefix,
-        Function<RestRequest, ExtensionRestResponse> handler
+        Function<RestRequest, ExtensionRestResponse> handler,
+        String name,
+        Set<String> actionNames
     ) {
-        this(route.getMethod(), prefix + route.getPath(), name, actionNames, deprecatedPrefix + route.getPath(), handler);
+        this(route.getMethod(), prefix + route.getPath(), deprecatedPrefix + route.getPath(), handler, name, actionNames);
     }
 
     /**

@@ -17,27 +17,31 @@ import org.opensearch.test.OpenSearchTestCase;
 import java.util.Collections;
 import java.util.Set;
 
-public class NamedRouteHandlerTests extends OpenSearchTestCase {
-    public void testUnnamedRouteHandler() {
+public class TestReplacedNamedRouteHandler extends OpenSearchTestCase {
+    public void testUnnamedReplacedRouteHandler() {
         assertThrows(
             IllegalArgumentException.class,
-            () -> new NamedRouteHandler(
+            () -> new ReplacedNamedRouteHandler(
                 RestRequest.Method.GET,
                 "/foo/bar",
+                RestRequest.Method.GET,
+                "/deprecated/foo/bar",
+                req -> new ExtensionRestResponse(req, RestStatus.OK, "content"),
                 "",
-                Collections.emptySet(),
-                req -> new ExtensionRestResponse(req, RestStatus.OK, "content")
+                Collections.emptySet()
             )
         );
     }
 
-    public void testNamedRouteHandler() {
-        NamedRouteHandler rh = new NamedRouteHandler(
+    public void testReplacedNamedRouteHandler() {
+        ReplacedNamedRouteHandler rh = new ReplacedNamedRouteHandler(
             RestRequest.Method.GET,
             "/foo/bar",
+            RestRequest.Method.GET,
+            "/deprecated/foo/bar",
+            req -> new ExtensionRestResponse(req, RestStatus.OK, "content"),
             "foo",
-            Set.of("cluster:admin/opensearch/ab/foo"),
-            req -> new ExtensionRestResponse(req, RestStatus.OK, "content")
+            Set.of("cluster:admin/opensearch/ab/foo")
         );
 
         assertEquals("foo", rh.name());
