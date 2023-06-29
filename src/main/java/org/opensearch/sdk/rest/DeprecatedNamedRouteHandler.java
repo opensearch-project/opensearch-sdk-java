@@ -10,7 +10,6 @@
 package org.opensearch.sdk.rest;
 
 import org.opensearch.extensions.rest.ExtensionRestResponse;
-import org.opensearch.rest.DeprecatedNamedRoute;
 import org.opensearch.rest.RestHandler;
 import org.opensearch.rest.RestRequest;
 
@@ -21,7 +20,7 @@ import java.util.function.Function;
 /**
  * A subclass of {@link RestHandler.DeprecatedRoute} .
  */
-public class DeprecatedNamedRouteHandler extends DeprecatedNamedRoute implements RouteHandlerWrapper {
+public class DeprecatedNamedRouteHandler extends RestHandler.DeprecatedRoute implements RouteHandlerWrapper {
     private final String name;
     private final Set<String> actionNames;
     private final Function<RestRequest, ExtensionRestResponse> responseHandler;
@@ -44,7 +43,7 @@ public class DeprecatedNamedRouteHandler extends DeprecatedNamedRoute implements
         String name,
         Set<String> actionNames
     ) {
-        super(method, path, deprecationMessage, name);
+        super(method, path, deprecationMessage);
         this.name = name;
         this.actionNames = actionNames == null ? Collections.emptySet() : actionNames;
         this.responseHandler = handler;

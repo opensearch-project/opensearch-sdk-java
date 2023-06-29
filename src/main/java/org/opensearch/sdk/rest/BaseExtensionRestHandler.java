@@ -26,10 +26,8 @@ import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.BaseRestHandler;
-import org.opensearch.rest.DeprecatedNamedRoute;
 import org.opensearch.rest.DeprecationRestHandler;
 import org.opensearch.rest.NamedRoute;
-import org.opensearch.rest.ReplacedNamedRoute;
 import org.opensearch.rest.RestHandler.DeprecatedRoute;
 import org.opensearch.rest.RestHandler.ReplacedRoute;
 import org.opensearch.rest.RestHandler.Route;
@@ -63,7 +61,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     }
 
     /**
-     * Defines a list of methods which handle each rest {@link DeprecatedNamedRoute}. Override this in a subclass to use the functional syntax.
+     * Defines a list of methods which handle each rest {@link DeprecatedRoute}. Override this in a subclass to use the functional syntax.
      *
      * @return a list of {@link DeprecatedNamedRouteHandler} with corresponding methods to each route.
      */
@@ -77,7 +75,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     }
 
     /**
-     * Defines a list of methods which handle each rest {@link ReplacedNamedRoute}. Override this in a subclass to use the functional syntax.
+     * Defines a list of methods which handle each rest {@link ReplacedRoute}. Override this in a subclass to use the functional syntax.
      *
      * @return a list of {@link ReplacedNamedRouteHandler} with corresponding methods to each route.
      */
