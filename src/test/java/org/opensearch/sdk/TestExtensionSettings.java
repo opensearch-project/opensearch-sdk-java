@@ -29,7 +29,6 @@ public class TestExtensionSettings extends OpenSearchTestCase {
     @Test
     public void testSettingsStrings() {
         assertEquals("sample-extension", extensionSettings.getExtensionName());
-        assertEquals("se", extensionSettings.getShortExtensionName());
         assertEquals("127.0.0.1", extensionSettings.getHostAddress());
         assertEquals("4532", extensionSettings.getHostPort());
         assertEquals("127.0.0.1", extensionSettings.getOpensearchAddress());
@@ -43,9 +42,8 @@ public class TestExtensionSettings extends OpenSearchTestCase {
 
     @Test
     public void testConstructorWithArgs() {
-        ExtensionSettings settings = new ExtensionSettings("foo", "abbr", "bar", "baz", "os", "port");
+        ExtensionSettings settings = new ExtensionSettings("foo", "bar", "baz", "os", "port");
         assertEquals("foo", settings.getExtensionName());
-        assertEquals("abbr", settings.getShortExtensionName());
         assertEquals("bar", settings.getHostAddress());
         assertEquals("baz", settings.getHostPort());
         assertEquals("os", settings.getOpensearchAddress());

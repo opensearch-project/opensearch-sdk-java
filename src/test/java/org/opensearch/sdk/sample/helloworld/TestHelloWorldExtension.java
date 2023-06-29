@@ -57,7 +57,7 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
     private SDKClient sdkClient;
     private SDKRestClient sdkRestClient;
     private OpenSearchAsyncClient javaAsyncClient;
-    private final ExtensionSettings extensionSettings = new ExtensionSettings("", "hw", "", "", "localhost", "9200");
+    private final ExtensionSettings extensionSettings = new ExtensionSettings("", "", "", "localhost", "9200");
 
     static class UnregisteredAction extends ActionType<SampleResponse> {
         public static final String NAME = "helloworld/unregistered";
@@ -108,7 +108,7 @@ public class TestHelloWorldExtension extends OpenSearchTestCase {
     public void testExtensionSettings() {
         // This effectively tests the Extension interface helper method
         ExtensionSettings extensionSettings = extension.getExtensionSettings();
-        ExtensionSettings expected = new ExtensionSettings("hello-world", "hw", "127.0.0.1", "4532", "127.0.0.1", "9200");
+        ExtensionSettings expected = new ExtensionSettings("hello-world", "127.0.0.1", "4532", "127.0.0.1", "9200");
         assertEquals(expected.getExtensionName(), extensionSettings.getExtensionName());
         assertEquals(expected.getHostAddress(), extensionSettings.getHostAddress());
         assertEquals(expected.getHostPort(), extensionSettings.getHostPort());

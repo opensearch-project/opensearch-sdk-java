@@ -49,7 +49,6 @@ import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_TRUSTSTORE
 public class ExtensionSettings {
 
     private String extensionName;
-    private String shortExtensionName;
     private String hostAddress;
     private String hostPort;
     private String opensearchAddress;
@@ -97,23 +96,14 @@ public class ExtensionSettings {
      * Instantiate this class using the specified parameters.
      *
      * @param extensionName  The extension name. Provided to OpenSearch as a response to initialization query. Must match the defined extension name in OpenSearch.
-     * @param shortExtensionName  The shortened name for the extension
      * @param hostAddress  The IP Address to bind this extension to.
      * @param hostPort  The port to bind this extension to.
      * @param opensearchAddress  The IP Address on which OpenSearch is running.
      * @param opensearchPort  The port on which OpenSearch is running.
      */
-    public ExtensionSettings(
-        String extensionName,
-        String shortExtensionName,
-        String hostAddress,
-        String hostPort,
-        String opensearchAddress,
-        String opensearchPort
-    ) {
+    public ExtensionSettings(String extensionName, String hostAddress, String hostPort, String opensearchAddress, String opensearchPort) {
         super();
         this.extensionName = extensionName;
-        this.shortExtensionName = shortExtensionName;
         this.hostAddress = hostAddress;
         this.hostPort = hostPort;
         this.opensearchAddress = opensearchAddress;
@@ -125,7 +115,6 @@ public class ExtensionSettings {
      * Instantiate this class using the specified parameters.
      *
      * @param extensionName  The extension name. Provided to OpenSearch as a response to initialization query. Must match the defined extension name in OpenSearch.
-     * @param shortExtensionName  The shortened name for the extension
      * @param hostAddress  The IP Address to bind this extension to.
      * @param hostPort  The port to bind this extension to.
      * @param opensearchAddress  The IP Address on which OpenSearch is running.
@@ -134,14 +123,13 @@ public class ExtensionSettings {
      */
     public ExtensionSettings(
         String extensionName,
-        String shortExtensionName,
         String hostAddress,
         String hostPort,
         String opensearchAddress,
         String opensearchPort,
         Map<String, String> securitySettings
     ) {
-        this(extensionName, shortExtensionName, hostAddress, hostPort, opensearchAddress, opensearchPort);
+        this(extensionName, hostAddress, hostPort, opensearchAddress, opensearchPort);
         this.securitySettings = securitySettings;
     }
 
@@ -151,10 +139,6 @@ public class ExtensionSettings {
      */
     public String getExtensionName() {
         return extensionName;
-    }
-
-    public String getShortExtensionName() {
-        return shortExtensionName;
     }
 
     /**
@@ -218,8 +202,6 @@ public class ExtensionSettings {
     public String toString() {
         return "ExtensionSettings{extensionName="
             + extensionName
-            + ", shortName="
-            + shortExtensionName
             + ", hostAddress="
             + hostAddress
             + ", hostPort="
@@ -259,7 +241,6 @@ public class ExtensionSettings {
             }
             return new ExtensionSettings(
                 extensionMap.get("extensionName").toString(),
-                extensionMap.get("shortExtensionName").toString(),
                 extensionMap.get("hostAddress").toString(),
                 extensionMap.get("hostPort").toString(),
                 extensionMap.get("opensearchAddress").toString(),

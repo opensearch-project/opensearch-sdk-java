@@ -41,7 +41,7 @@ import org.opensearch.rest.RestStatus;
  */
 public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
 
-    private String extensionShortName;
+    private String extensionName;
 
     /**
      * Constant for JSON content type
@@ -85,17 +85,17 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
         return Collections.emptyList();
     }
 
-    public void setExtensionShortName(String extensionShortName) {
-        this.extensionShortName = extensionShortName;
+    public void setExtensionName(String extensionName) {
+        this.extensionName = extensionName;
     }
 
     /**
-     * Generates a name for the handler prepended with the extension's shortName
+     * Generates a name for the handler prepended with the extension's name
      * @param name The human-readable name for a route registered by this extension
-     * @return Returns a name prepended with the extension's shortName
+     * @return Returns a name prepended with the extension's name
      */
     protected String routePrefix(String name) {
-        return extensionShortName + ":" + name;
+        return extensionName + ":" + name;
     }
 
     @Override
