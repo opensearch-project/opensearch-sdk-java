@@ -235,8 +235,8 @@ public class ExtensionRestPathRegistry {
      * @return A string appending the method and path.
      */
     public static String restPathToString(Method method, String path, String name, Set<String> actionNames) {
-        StringBuilder sb = new StringBuilder(method.name() + " " + path + " " + name);
-        actionNames.forEach(act -> sb.append(" ").append(act));
+        StringBuilder sb = new StringBuilder(method.name() + " " + path + " " + name + " ");
+        actionNames.forEach(act -> sb.append(act).append(","));
         return sb.toString();
     }
 }

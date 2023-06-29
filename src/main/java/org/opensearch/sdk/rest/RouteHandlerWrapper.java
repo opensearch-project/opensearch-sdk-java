@@ -14,6 +14,9 @@ import org.opensearch.rest.RestRequest;
 
 import java.util.Set;
 
+/**
+ * Wrapper interface for named route handlers
+ */
 public interface RouteHandlerWrapper {
 
     /**

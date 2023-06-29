@@ -51,14 +51,14 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
                 new ReplacedNamedRouteHandler(
                     Method.GET,
                     "/new/foo",
-                    "getnewfoo",
-                    Collections.emptySet(),
                     Method.GET,
                     "/old/foo",
-                    handleFoo
+                    handleFoo,
+                    "getnewfoo",
+                    Collections.emptySet()
                 ),
-                new ReplacedNamedRouteHandler(Method.PUT, "/new/put/foo", "putnewfoo", Collections.emptySet(), "/old/put/foo", handleFoo),
-                new ReplacedNamedRouteHandler(new Route(Method.POST, "/foo"), "newfoo", Collections.emptySet(), "/new", "/old", handleFoo)
+                new ReplacedNamedRouteHandler(Method.PUT, "/new/put/foo", "/old/put/foo", handleFoo, "putnewfoo", Collections.emptySet()),
+                new ReplacedNamedRouteHandler(new Route(Method.POST, "/foo"), "/new", "/old", handleFoo, "newfoo", Collections.emptySet())
             );
         }
 

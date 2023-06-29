@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.opensearch.rest.*;
-
 import static org.opensearch.rest.RestStatus.INTERNAL_SERVER_ERROR;
 import static org.opensearch.rest.RestStatus.NOT_FOUND;
 
@@ -27,9 +25,16 @@ import static org.apache.hc.core5.http.ContentType.APPLICATION_JSON;
 import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
+import org.opensearch.rest.BaseRestHandler;
+import org.opensearch.rest.DeprecatedNamedRoute;
+import org.opensearch.rest.DeprecationRestHandler;
+import org.opensearch.rest.NamedRoute;
+import org.opensearch.rest.ReplacedNamedRoute;
 import org.opensearch.rest.RestHandler.DeprecatedRoute;
 import org.opensearch.rest.RestHandler.ReplacedRoute;
 import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.rest.RestRequest;
+import org.opensearch.rest.RestStatus;
 
 /**
  * Provides convenience methods to reduce boilerplate code in an {@link ExtensionRestHandler} implementation.
@@ -135,7 +140,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
      * Determines if the request's path is a match for the configured handler path.
      *
      * @param requestPath The path from the {@link RestRequest}
-     * @param handlerPath The path from the {@link NamedRouteHandler} or {@link DeprecatedNamedRouteHandler}
+     * @param handlerPath The path from the {@link NamedRouteHandler} or {@link DeprecatedNamedRouteHandler} or {@link ReplacedNamedRouteHandler}
      * @return true if the request path matches the route
      */
     private boolean restPathMatches(String requestPath, String handlerPath) {
