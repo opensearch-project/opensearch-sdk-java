@@ -135,7 +135,7 @@ dependencies {
     def log4jVersion = "2.20.0"
     def nettyVersion = "4.1.94.Final"
     def jacksonDatabindVersion = "2.15.2"
-    def guavaVersion = "32.0.1-jre"
+    def guavaVersion = "32.1.1-jre"
     def guiceVersion = "7.0.0"
     def junit4Version = "4.13.2"
     def junit5Version = "5.9.3"
@@ -146,6 +146,7 @@ dependencies {
     def javaxVersion  = "1"
     def guavaFailureAccessVersion = "1.0.1"
     def aopallianceVersion = "1.0"
+    def slf4jVersion = "1.7.36"
 
     api("org.opensearch:opensearch:${opensearchVersion}")
     implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
@@ -195,8 +196,7 @@ dependencies {
             force("org.apache.logging.log4j:log4j-api:${log4jVersion}")
             force("org.apache.logging.log4j:log4j-core:${log4jVersion}")
             force("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
-            force("org.opensearch.client:opensearch-rest-client:${opensearchVersion}")
-            force("org.slf4j:slf4j-api:${versions.slf4j}")
+            force("org.slf4j:slf4j-api:${versions.slf4jVersion}")
         }
     }
 }
