@@ -14,13 +14,14 @@ import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
+import org.opensearch.rest.NamedRoute;
 import org.opensearch.rest.RestRequest;
+import org.opensearch.rest.RestResponse;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.SDKClient;
 import org.opensearch.sdk.action.RemoteExtensionAction;
 import org.opensearch.sdk.action.RemoteExtensionActionRequest;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler;
-import org.opensearch.sdk.rest.NamedRouteHandler;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleResponse;
@@ -51,19 +52,19 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
     }
 
     @Override
-    public List<NamedRouteHandler> namedRouteHandlers() {
+    public List<NamedRoute> routes() {
         return List.of(
-            new NamedRouteHandler(
-                GET,
-                "/hello/{name}",
-                handleRemoteGetRequest,
-                routePrefix("remote_greet_with_name"),
-                Collections.emptySet()
-            )
+
+            new NamedRoute.Builder().method(GET)
+                .path("/hello/{name}")
+                .handler(handleRemoteGetRequest)
+                .uniqueName(routePrefix("remote_greet_with_name"))
+                .legacyActionNames(Collections.emptySet())
+                .build()
         );
     }
 
-    private Function<RestRequest, ExtensionRestResponse> handleRemoteGetRequest = (request) -> {
+    private Function<RestRequest, RestResponse> handleRemoteGetRequest = (request) -> {
         SDKClient client = extensionsRunner.getSdkClient();
 
         String name = request.param("name");

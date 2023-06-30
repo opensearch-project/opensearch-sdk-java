@@ -15,10 +15,11 @@ import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
+import org.opensearch.rest.NamedRoute;
 import org.opensearch.rest.RestRequest;
+import org.opensearch.rest.RestResponse;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler;
 import org.opensearch.sdk.rest.ExtensionRestHandler;
-import org.opensearch.sdk.rest.NamedRouteHandler;
 
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -60,29 +61,43 @@ public class RestHelloAction extends BaseExtensionRestHandler {
     public RestHelloAction() {}
 
     @Override
-    public List<NamedRouteHandler> namedRouteHandlers() {
+    public List<NamedRoute> routes() {
         return List.of(
-            new NamedRouteHandler(GET, "/hello", handleGetRequest, routePrefix("greet"), Set.of("cluster:admin/opensearch/hw/greet")),
-            new NamedRouteHandler(POST, "/hello", handlePostRequest, routePrefix("greet_with_adjective"), Collections.emptySet()),
-            new NamedRouteHandler(
-                PUT,
-                "/hello/{name}",
-                handlePutRequest,
-                routePrefix("greet_with_name"),
-                Set.of("cluster:admin/opensearch/hw/greet_with_name")
-            ),
-            new NamedRouteHandler(DELETE, "/goodbye", handleDeleteRequest, routePrefix("goodbye"), Collections.emptySet())
+            new NamedRoute.Builder().method(GET)
+                .path("/hello")
+                .handler(handleGetRequest)
+                .uniqueName(routePrefix("greet"))
+                .legacyActionNames(Set.of("cluster:admin/opensearch/hw/greet"))
+                .build(),
+            new NamedRoute.Builder().method(POST)
+                .path("/hello")
+                .handler(handlePostRequest)
+                .uniqueName(routePrefix("greet_with_adjective"))
+                .legacyActionNames(Collections.emptySet())
+                .build(),
+            new NamedRoute.Builder().method(PUT)
+                .path("/hello/{name}")
+                .handler(handlePutRequest)
+                .uniqueName(routePrefix("greet_with_name"))
+                .legacyActionNames(Set.of("cluster:admin/opensearch/hw/greet_with_name"))
+                .build(),
+            new NamedRoute.Builder().method(DELETE)
+                .path("/goodbye")
+                .handler(handleDeleteRequest)
+                .uniqueName(routePrefix("goodbye"))
+                .legacyActionNames(Collections.emptySet())
+                .build()
         );
     }
 
-    private Function<RestRequest, ExtensionRestResponse> handleGetRequest = (request) -> {
+    private Function<RestRequest, RestResponse> handleGetRequest = (request) -> {
         String worldNameWithRandomAdjective = worldAdjectives.isEmpty()
             ? worldName
             : String.join(" ", worldAdjectives.get(rand.nextInt(worldAdjectives.size())), worldName);
         return new ExtensionRestResponse(request, OK, String.format(GREETING, worldNameWithRandomAdjective));
     };
 
-    private Function<RestRequest, ExtensionRestResponse> handlePostRequest = (request) -> {
+    private Function<RestRequest, RestResponse> handlePostRequest = (request) -> {
         if (request.hasContent()) {
             String adjective = "";
             XContentType contentType = request.getXContentType();
@@ -130,7 +145,7 @@ public class RestHelloAction extends BaseExtensionRestHandler {
         return new ExtensionRestResponse(request, BAD_REQUEST, TEXT_CONTENT_TYPE, noContent);
     };
 
-    private Function<RestRequest, ExtensionRestResponse> handlePutRequest = (request) -> {
+    private Function<RestRequest, RestResponse> handlePutRequest = (request) -> {
         String name = request.param("name");
         try {
             worldName = URLDecoder.decode(name, StandardCharsets.UTF_8);
@@ -140,7 +155,7 @@ public class RestHelloAction extends BaseExtensionRestHandler {
         return new ExtensionRestResponse(request, OK, "Updated the world's name to " + worldName);
     };
 
-    private Function<RestRequest, ExtensionRestResponse> handleDeleteRequest = (request) -> {
+    private Function<RestRequest, RestResponse> handleDeleteRequest = (request) -> {
         this.worldName = DEFAULT_NAME;
         this.worldAdjectives.clear();
         return new ExtensionRestResponse(request, OK, "Goodbye, cruel world! Restored default values.");

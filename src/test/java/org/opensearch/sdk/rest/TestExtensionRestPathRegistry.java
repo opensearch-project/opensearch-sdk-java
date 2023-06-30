@@ -30,7 +30,7 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
 
     private ExtensionRestHandler fooHandler = new ExtensionRestHandler() {
         @Override
-        public List<Route> routes() {
+        public List<NamedRoute> routes() {
             return List.of(new NamedRoute.Builder().method(Method.GET).path("/foo").uniqueName("foo").build());
         }
 
@@ -71,7 +71,7 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
     };
     private ExtensionRestHandler barHandler = new ExtensionRestHandler() {
         @Override
-        public List<Route> routes() {
+        public List<NamedRoute> routes() {
             return List.of(new NamedRoute.Builder().method(Method.PUT).path("/bar/{planet}").uniqueName("bar_planet").build());
         }
 
@@ -82,7 +82,7 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
     };
     private ExtensionRestHandler bazHandler = new ExtensionRestHandler() {
         @Override
-        public List<Route> routes() {
+        public List<NamedRoute> routes() {
             return List.of(
                 new NamedRoute.Builder().method(Method.POST).path("/baz/{moon}/qux").uniqueName("bar_qux_for_moon").build(),
                 new NamedRoute.Builder().method(Method.PUT).path("/bar/baz").uniqueName("bar_baz").build()
@@ -110,7 +110,7 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
         // Can't register same exact name
         ExtensionRestHandler duplicateFooHandler = new ExtensionRestHandler() {
             @Override
-            public List<Route> routes() {
+            public List<NamedRoute> routes() {
                 return List.of(new NamedRoute.Builder().method(Method.GET).path("/foo").uniqueName("foo").build());
             }
 
@@ -123,7 +123,7 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
         // Can't register conflicting named wildcards, even if method is different
         ExtensionRestHandler barNoneHandler = new ExtensionRestHandler() {
             @Override
-            public List<Route> routes() {
+            public List<NamedRoute> routes() {
                 return List.of(new NamedRoute.Builder().method(Method.GET).path("/bar/{none}").uniqueName("bar_none").build());
             }
 

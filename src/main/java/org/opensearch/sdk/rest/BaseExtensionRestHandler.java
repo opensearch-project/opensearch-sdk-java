@@ -30,7 +30,6 @@ import org.opensearch.rest.DeprecationRestHandler;
 import org.opensearch.rest.NamedRoute;
 import org.opensearch.rest.RestHandler.DeprecatedRoute;
 import org.opensearch.rest.RestHandler.ReplacedRoute;
-import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestStatus;
 
@@ -46,18 +45,9 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
      */
     public static final String JSON_CONTENT_TYPE = APPLICATION_JSON.withCharset(StandardCharsets.UTF_8).toString();
 
-    /**
-     * Defines a list of methods which handle each rest {@link NamedRoute}. Override this in a subclass to use the functional syntax.
-     *
-     * @return a list of {@link NamedRouteHandler} with corresponding methods to each route.
-     */
-    protected List<NamedRouteHandler> namedRouteHandlers() {
-        return Collections.emptyList();
-    }
-
     @Override
-    public List<Route> routes() {
-        return List.copyOf(namedRouteHandlers());
+    public List<NamedRoute> routes() {
+        return Collections.emptyList();
     }
 
     /**
@@ -103,12 +93,12 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
 
     @Override
     public ExtensionRestResponse handleRequest(RestRequest request) {
-        Optional<NamedRouteHandler> handler = namedRouteHandlers().stream()
+        Optional<NamedRoute> route = routes().stream()
             .filter(rh -> rh.getMethod().equals(request.method()))
             .filter(rh -> restPathMatches(request.path(), rh.getPath()))
             .findFirst();
-        if (handler.isPresent()) {
-            return handler.get().handleRequest(request);
+        if (route.isPresent() && route.get().handler() != null) {
+            return (ExtensionRestResponse) route.get().handler().apply(request);
         }
         Optional<DeprecatedNamedRouteHandler> deprecatedHandler = deprecatedNamedRouteHandlers().stream()
             .filter(rh -> rh.getMethod().equals(request.method()))
@@ -138,7 +128,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
      * Determines if the request's path is a match for the configured handler path.
      *
      * @param requestPath The path from the {@link RestRequest}
-     * @param handlerPath The path from the {@link NamedRouteHandler} or {@link DeprecatedNamedRouteHandler} or {@link ReplacedNamedRouteHandler}
+     * @param handlerPath The path from the {@link NamedRoute} or {@link DeprecatedNamedRouteHandler} or {@link ReplacedNamedRouteHandler}
      * @return true if the request path matches the route
      */
     private boolean restPathMatches(String requestPath, String handlerPath) {

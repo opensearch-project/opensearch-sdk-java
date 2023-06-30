@@ -41,12 +41,11 @@ public class ExtensionRestPathRegistry {
      */
     public void registerHandler(ExtensionRestHandler restHandler) {
         restHandler.routes().forEach(route -> {
-            NamedRouteHandler namedRouteHandler = ((NamedRouteHandler) route);
-            String routeActionName = namedRouteHandler.name();
+            String routeActionName = route.name();
             if (routeActionName == null) {
                 throw new IllegalArgumentException("Route handler must have a name associated with it.");
             }
-            Set<String> associatedActions = namedRouteHandler.actionNames();
+            Set<String> associatedActions = route.actionNames();
             registerHandler(route.getMethod(), route.getPath(), routeActionName, associatedActions, restHandler);
         });
         restHandler.deprecatedRoutes().forEach(route -> {

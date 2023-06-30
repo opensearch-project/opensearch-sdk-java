@@ -10,36 +10,36 @@
 package org.opensearch.sdk.rest;
 
 import org.opensearch.extensions.rest.ExtensionRestResponse;
-import org.opensearch.rest.RestRequest;
+import org.opensearch.rest.NamedRoute;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.test.OpenSearchTestCase;
 
 import java.util.Collections;
-import java.util.Set;
+
+import static org.opensearch.rest.RestRequest.Method.GET;
 
 public class TestNamedRouteHandler extends OpenSearchTestCase {
     public void testUnnamedRouteHandler() {
         assertThrows(
             IllegalArgumentException.class,
-            () -> new NamedRouteHandler(
-                RestRequest.Method.GET,
-                "/foo/bar",
-                req -> new ExtensionRestResponse(req, RestStatus.OK, "content"),
-                "",
-                Collections.emptySet()
-            )
+            () -> new NamedRoute.Builder().method(GET)
+                .path("/foo/bar")
+                .handler(req -> new ExtensionRestResponse(req, RestStatus.OK, "content"))
+                .uniqueName("")
+                .legacyActionNames(Collections.emptySet())
+                .build()
         );
     }
 
     public void testNamedRouteHandler() {
-        NamedRouteHandler rh = new NamedRouteHandler(
-            RestRequest.Method.GET,
-            "/foo/bar",
-            req -> new ExtensionRestResponse(req, RestStatus.OK, "content"),
-            "foo",
-            Set.of("cluster:admin/opensearch/ab/foo")
-        );
+        NamedRoute nr = new NamedRoute.Builder().method(GET)
+            .path("/foo/bar")
+            .handler(req -> new ExtensionRestResponse(req, RestStatus.OK, "content"))
+            .uniqueName("")
+            .legacyActionNames(Collections.emptySet())
+            .build();
 
-        assertEquals("foo", rh.name());
+        assertEquals("foo", nr.name());
+        assertNotNull(nr.handler());
     }
 }
