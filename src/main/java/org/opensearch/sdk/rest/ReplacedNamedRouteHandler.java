@@ -22,7 +22,7 @@ import org.opensearch.rest.RestRequest.Method;
 /**
  * A subclass of {@link ReplacedRoute} that includes a handler method for that route.
  */
-public class ReplacedNamedRouteHandler extends ReplacedRoute implements RouteHandlerWrapper {
+public class ReplacedNamedRouteHandler extends ReplacedRoute {
 
     private final String name;
     private final Set<String> actionNames;

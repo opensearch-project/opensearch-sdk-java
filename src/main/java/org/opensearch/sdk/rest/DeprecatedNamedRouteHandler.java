@@ -20,7 +20,7 @@ import java.util.function.Function;
 /**
  * A subclass of {@link RestHandler.DeprecatedRoute} .
  */
-public class DeprecatedNamedRouteHandler extends RestHandler.DeprecatedRoute implements RouteHandlerWrapper {
+public class DeprecatedNamedRouteHandler extends RestHandler.DeprecatedRoute {
     private final String name;
     private final Set<String> actionNames;
     private final Function<RestRequest, ExtensionRestResponse> responseHandler;

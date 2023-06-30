@@ -15,19 +15,13 @@ import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.function.Function;
 
 /**
  * A subclass of {@link Route} that includes a handler method for that route.
  */
-public class NamedRouteHandler extends NamedRoute implements RouteHandlerWrapper {
-
-    private final String name;
-
-    private final Set<String> actionNames;
-
+public class NamedRouteHandler extends NamedRoute {
     private final Function<RestRequest, ExtensionRestResponse> responseHandler;
 
     /**
@@ -46,13 +40,11 @@ public class NamedRouteHandler extends NamedRoute implements RouteHandlerWrapper
         String name,
         Set<String> actionNames
     ) {
-        super(method, path, name);
+        super(new Builder().method(method).path(path).uniqueName(name).legacyActionNames(actionNames));
         this.responseHandler = handler;
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Expected route handler to have a unique name, found none.");
         }
-        this.name = name;
-        this.actionNames = actionNames == null ? Collections.emptySet() : actionNames;
     }
 
     /**
@@ -64,21 +56,4 @@ public class NamedRouteHandler extends NamedRoute implements RouteHandlerWrapper
     public ExtensionRestResponse handleRequest(RestRequest request) {
         return responseHandler.apply(request);
     }
-
-    /**
-     * The name of the RouteHandler. Must be unique across route handlers.
-     * @return the name of this handler
-     */
-    public String name() {
-        return this.name;
-    }
-
-    /**
-     * The action names associate with the RouteHandler.
-     * @return the set of action names registered for this route handler
-     */
-    public Set<String> actionNames() {
-        return this.actionNames;
-    }
-
 }
