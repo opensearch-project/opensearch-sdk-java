@@ -147,6 +147,7 @@ dependencies {
     def javaxVersion  = "1"
     def guavaFailureAccessVersion = "1.0.1"
     def aopallianceVersion = "1.0"
+    def slf4jVersion = "1.7.36"
 
     api("org.opensearch:opensearch:${opensearchVersion}")
     implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
@@ -196,7 +197,7 @@ dependencies {
         resolutionStrategy.force("org.apache.logging.log4j:log4j-api:${log4jVersion}")
         resolutionStrategy.force("org.apache.logging.log4j:log4j-core:${log4jVersion}")
         resolutionStrategy.force("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
-        resolutionStrategy.force("org.opensearch.client:opensearch-rest-client:${opensearchVersion}")
+        resolutionStrategy.force("org.slf4j:slf4j-api:${slf4jVersion}")
     }
 }
 
