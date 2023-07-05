@@ -143,7 +143,7 @@ To **run OpenSearch from a compiled binary**, follow these steps:
 
 - Start a separate terminal and navigate to the directory where OpenSearch has been cloned using `cd OpenSearch`.
 - Run `./gradlew assemble` to create a local distribution.
-- Start OpenSearch using `./bin/opensearch`. Ensure that extensions feature f
+- Start OpenSearch using `./bin/opensearch`. Ensure that extensions feature flag is enabled.
 - Send the below sample REST API to initialize an extension
 ```bash
 curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data '{
@@ -163,7 +163,7 @@ To **run OpenSearch from Gradle**, follow these steps:
 - Send the below sample REST API to initialize an extension
 ```bash
 curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data '{
-"name":"hw",
+"name":"hello-world",
 "uniqueId":"hello-world",
 "hostAddress":"127.0.0.1",
 "port":"4532",
