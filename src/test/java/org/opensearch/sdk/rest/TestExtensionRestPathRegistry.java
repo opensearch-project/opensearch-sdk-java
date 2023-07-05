@@ -48,24 +48,9 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
         @Override
         public List<ReplacedRoute> replacedRoutes() {
             return List.of(
-                new ReplacedNamedRouteHandler(
-                    Method.GET,
-                    "/new/foo",
-                    Method.GET,
-                    "/old/foo",
-                    r -> null,
-                    "getnewfoo",
-                    Collections.emptySet()
-                ),
-                new ReplacedNamedRouteHandler(Method.PUT, "/new/put/foo", "/old/put/foo", r -> null, "putnewfoo", Collections.emptySet()),
-                new ReplacedNamedRouteHandler(
-                    new Route(Method.POST, "/foo"),
-                    "/new",
-                    "/old",
-                    r -> null,
-                    "replacefoo",
-                    Collections.emptySet()
-                )
+                new ReplacedRouteHandler(Method.GET, "/new/foo", Method.GET, "/old/foo", r -> null),
+                new ReplacedRouteHandler(Method.PUT, "/new/put/foo", "/old/put/foo", r -> null),
+                new ReplacedRouteHandler(new Route(Method.POST, "/foo"), "/new", "/old", r -> null)
             );
         }
     };

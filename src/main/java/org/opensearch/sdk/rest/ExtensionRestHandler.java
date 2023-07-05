@@ -39,7 +39,7 @@ public interface ExtensionRestHandler {
     ExtensionRestResponse handleRequest(RestRequest restRequest);
 
     /**
-     * A list of {@link NamedRoute}s that this ExtensionRestHandler is responsible for handling.
+     * A list of {@link Route}s that this ExtensionRestHandler is responsible for handling.
      *
      * @return The routes this handler will handle.
      */

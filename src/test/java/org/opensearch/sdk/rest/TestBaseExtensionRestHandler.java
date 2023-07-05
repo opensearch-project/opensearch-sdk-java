@@ -43,18 +43,16 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
         }
 
         @Override
-        public List<DeprecatedNamedRouteHandler> deprecatedNamedRouteHandlers() {
-            return List.of(
-                new DeprecatedNamedRouteHandler(GET, "/deprecated/foo", "It's deprecated", handleBar, "newfoo", Collections.emptySet())
-            );
+        public List<DeprecatedRouteHandler> deprecatedRouteHandlers() {
+            return List.of(new DeprecatedRouteHandler(GET, "/deprecated/foo", "It's deprecated", handleBar));
         }
 
         @Override
-        public List<ReplacedNamedRouteHandler> replacedNamedRouteHandlers() {
+        public List<ReplacedRouteHandler> replacedRouteHandlers() {
             return List.of(
-                new ReplacedNamedRouteHandler(GET, "/new/foo", GET, "/old/foo", handleBar, "getnewfoo", Collections.emptySet()),
-                new ReplacedNamedRouteHandler(Method.PUT, "/new/put/foo", "/old/put/foo", handleBar, "putnewfoo", Collections.emptySet()),
-                new ReplacedNamedRouteHandler(new Route(Method.POST, "/foo"), "/new", "/old", handleBar, "newfoo", Collections.emptySet())
+                new ReplacedRouteHandler(GET, "/new/foo", GET, "/old/foo", handleBar),
+                new ReplacedRouteHandler(Method.PUT, "/new/put/foo", "/old/put/foo", handleBar),
+                new ReplacedRouteHandler(new Route(Method.POST, "/foo"), "/new", "/old", handleBar)
             );
         }
 
