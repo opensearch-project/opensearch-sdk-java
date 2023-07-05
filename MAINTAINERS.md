@@ -5,12 +5,13 @@ This document contains a list of maintainers in this repo. See [opensearch-proje
 ## Current Maintainers
 
 | Maintainer        | GitHub ID                                               | Affiliation |
-| ----------------- | ------------------------------------------------------- | ----------- |
+|-------------------|---------------------------------------------------------| ----------- |
 | Josh Palis        | [joshpalis](https://github.com/joshpalis)               | Amazon      |
 | Owais Kazi        | [owaiskazi19](https://github.com/owaiskazi19)           | Amazon      |
 | Ryan Bogan        | [ryanbogan](https://github.com/ryanbogan)               | Amazon      |
 | Sarat Vemulapalli | [saratvemulapalli](https://github.com/saratvemulapalli) | Amazon      |
 | Dan Widdis        | [dbwiddis](https://github.com/dbwiddis)                 | Amazon      |
+| Minal Shah        | [minalsha](https://github.com/minalsha)                 | Amazon      |
 
 ## Emeritus Maintainers
 
