@@ -143,7 +143,7 @@ To **run OpenSearch from a compiled binary**, follow these steps:
 
 - Start a separate terminal and navigate to the directory where OpenSearch has been cloned using `cd OpenSearch`.
 - Run `./gradlew assemble` to create a local distribution.
-- Start OpenSearch using `./bin/opensearch`. Ensure that extensions feature flag is enabled.
+- Start OpenSearch using `./bin/opensearch`.
 - Send the below sample REST API to initialize an extension
 ```bash
 curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data '{
@@ -174,7 +174,7 @@ curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application
 }'
 ```
 
-Note: If Security plugin is initialized in OpenSearch, use admin credentials to send extension initialization request.
+Note: If the Security plugin is initialized in OpenSearch, use admin credentials to send extension initialization request.
 
 In response to the REST `/initialize` request, `ExtensionsManager` discovers the extension listening on a predefined port and executes the TCP handshake protocol to establish a data transfer connection. Then OpenSearch sends a request to the OpenSearch SDK for Java and, upon acknowledgment, the extension responds with its name. This name is logged in the terminal where OpenSearch is running:
 
