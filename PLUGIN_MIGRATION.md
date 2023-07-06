@@ -67,14 +67,37 @@ XContentParser parser = XContentType.JSON
 Other potential initialization values are:
 ```java
 this.environmentSettings = extensionsRunner.getEnvironmentSettings();
-this.transportService = extensionsRunner.getExtensionTransportService();
+this.transportService = extensionsRunner.getSdkTransportService().getTransportService();
 this.restClient = anomalyDetectorExtension.getRestClient();
 this.sdkClusterService = new SDKClusterService(extensionsRunner);
 ```
 
 Many of these components are also available via Guice injection.
 
-Optionally, change the `routes()` to `routeHandlers()`. Change `prepareRequest()` to `handleRequest()`.
+### Replace `Route` with `NamedRoute`
+Change `routes()` to be NamedRoutes. Here is a sample of an existing route converted to a named route:
+Before:
+```
+public List<Route> routes() {
+    return ImmutableList.of(
+            new Route(GET, "/uri")
+        );
+}
+```
+With new scheme:
+```
+private Function<RestRequest, RestResponse> uriHandler = () -> {};
+public List<NamedRoute> routes() {
+    return ImmutableList.of(
+            new NamedRoute.Builder().method(GET).path("/uri").uniqueName("extension:uri").handler(uriHandler).build()
+        );
+}
+```
+
+You can optionally also add `actionNames()` to this route. These should correspond to any current actions defined as permissions in roles.
+Ensure that these name-to-route mappings are easily accessible to the cluster admins to allow granting access to these APIs.
+
+Change `prepareRequest()` to `handleRequest()`.
 
 ### Replace `BytesRestResponse` with `ExtensionRestResponse`
 
