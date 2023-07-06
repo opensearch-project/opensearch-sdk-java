@@ -61,12 +61,12 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
                 if ("foo".equals(request.content().utf8ToString())) {
                     return createJsonResponse(request, RestStatus.OK, "success", "named foo");
                 }
-                throw new IllegalArgumentException("no bar");
+                throw new IllegalArgumentException("no foo");
             } catch (Exception e) {
                 return exceptionalRequest(request, e);
             }
         };
-        private final Function<RestRequest, ExtensionRestResponse> handleBar = (request) -> {
+        private final Function<RestRequest, RestResponse> handleBar = (request) -> {
             try {
                 if ("bar".equals(request.content().utf8ToString())) {
                     return createJsonResponse(request, RestStatus.OK, "success", "bar");

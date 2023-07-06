@@ -16,13 +16,14 @@ import org.opensearch.rest.RestHandler.ReplacedRoute;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
+import org.opensearch.rest.RestResponse;
 
 /**
  * A subclass of {@link ReplacedRoute} that includes a handler method for that route.
  */
 public class ReplacedRouteHandler extends ReplacedRoute {
 
-    private final Function<RestRequest, ExtensionRestResponse> responseHandler;
+    private final Function<RestRequest, RestResponse> responseHandler;
 
     /**
      * Handle replaced routes using new and deprecated methods and new and deprecated paths.
@@ -38,7 +39,7 @@ public class ReplacedRouteHandler extends ReplacedRoute {
         String path,
         Method deprecatedMethod,
         String deprecatedPath,
-        Function<RestRequest, ExtensionRestResponse> handler
+        Function<RestRequest, RestResponse> handler
     ) {
         super(method, path, deprecatedMethod, deprecatedPath);
         this.responseHandler = handler;
@@ -53,7 +54,7 @@ public class ReplacedRouteHandler extends ReplacedRoute {
      * @param deprecatedPath deprecated path
      * @param handler The method which handles the REST method and path.
      */
-    public ReplacedRouteHandler(Method method, String path, String deprecatedPath, Function<RestRequest, ExtensionRestResponse> handler) {
+    public ReplacedRouteHandler(Method method, String path, String deprecatedPath, Function<RestRequest, RestResponse> handler) {
         this(method, path, method, deprecatedPath, handler);
     }
 
@@ -65,7 +66,7 @@ public class ReplacedRouteHandler extends ReplacedRoute {
      * @param deprecatedPrefix deprecated prefix
      * @param handler The method which handles the REST method and path.
      */
-    public ReplacedRouteHandler(Route route, String prefix, String deprecatedPrefix, Function<RestRequest, ExtensionRestResponse> handler) {
+    public ReplacedRouteHandler(Route route, String prefix, String deprecatedPrefix, Function<RestRequest, RestResponse> handler) {
         this(route.getMethod(), prefix + route.getPath(), deprecatedPrefix + route.getPath(), handler);
     }
 
@@ -76,6 +77,6 @@ public class ReplacedRouteHandler extends ReplacedRoute {
      * @return the {@link ExtensionRestResponse} result from the handler for this route.
      */
     public ExtensionRestResponse handleRequest(RestRequest request) {
-        return responseHandler.apply(request);
+        return (ExtensionRestResponse) responseHandler.apply(request);
     }
 }

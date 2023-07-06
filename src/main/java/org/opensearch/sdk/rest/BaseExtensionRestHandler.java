@@ -33,7 +33,7 @@ import org.opensearch.rest.RestHandler.DeprecatedRoute;
 import org.opensearch.rest.RestHandler.ReplacedRoute;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
-import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.rest.RestResponse;
 import org.opensearch.rest.RestStatus;
 
 /**
@@ -41,7 +41,7 @@ import org.opensearch.rest.RestStatus;
  */
 public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
 
-    private String extensionName;
+    private static String extensionName;
 
     /**
      * Constant for JSON content type
@@ -77,7 +77,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     }
 
     public void setExtensionName(String extensionName) {
-        this.extensionName = extensionName;
+        BaseExtensionRestHandler.extensionName = extensionName;
     }
 
     /**
@@ -85,7 +85,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
      * @param name The human-readable name for a route registered by this extension
      * @return Returns a name prepended with the extension's name
      */
-    protected String routePrefix(String name) {
+    protected static String routePrefix(String name) {
         return extensionName + ":" + name;
     }
 
@@ -237,7 +237,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
      */
     public static class DeprecatedRouteHandler extends DeprecatedRoute {
 
-        private final Function<RestRequest, ExtensionRestResponse> responseHandler;
+        private final Function<RestRequest, RestResponse> responseHandler;
 
         /**
          * Handle the method and path with the specified handler.
@@ -247,12 +247,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
          * @param deprecationMessage The message to log with the deprecation logger
          * @param handler The method which handles the method and path.
          */
-        public DeprecatedRouteHandler(
-            Method method,
-            String path,
-            String deprecationMessage,
-            Function<RestRequest, ExtensionRestResponse> handler
-        ) {
+        public DeprecatedRouteHandler(Method method, String path, String deprecationMessage, Function<RestRequest, RestResponse> handler) {
             super(method, path, deprecationMessage);
             this.responseHandler = handler;
         }
@@ -264,7 +259,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
          * @return the {@link ExtensionRestResponse} result from the handler for this route.
          */
         public ExtensionRestResponse handleRequest(RestRequest request) {
-            return responseHandler.apply(request);
+            return (ExtensionRestResponse) responseHandler.apply(request);
         }
     }
 
