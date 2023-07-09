@@ -2,13 +2,13 @@
 
 * [Initial setup](#initial-setup)
 * [Obtain network address and port information](#obtain-network-address-and-port-information)
-* [Implement the _`Extension`_ interface](#implement-the-extension-interface)
+* [Implement the _`Extension`_ interface](#implement-the-_-extension-_-interface)
 * [Implement other interfaces and extension points](#implement-other-interfaces-and-extension-points)
 * [Use OpenSearch clients to implement functionality](#use-opensearch-clients-to-implement-functionality)
-  * [Creating (PUT) a document in an index](#creating--put--a-document-in-an-index)
-  * [Reading (GET) a document in an index](#reading--get--a-document-in-an-index)
-  * [Updating (POST) a document in an index](#updating--post--a-document-in-an-index)
-  * [Deleting (DELETE) a document in an index](#deleting--delete--a-document-in-an-index)
+  * [Creating (PUT) a document in an index](#creating-put-a-document-in-an-index)
+  * [Reading (GET) a document in an index](#reading-get-a-document-in-an-index)
+  * [Updating (POST) a document in an index](#updating-post-a-document-in-an-index)
+  * [Deleting (DELETE) a document in an index](#deleting-delete-a-document-in-an-index)
 
 *Note*: This document is evolving and is in draft state.
 
@@ -147,45 +147,62 @@ public class CRUDExtension extends BaseExtension implements ActionExtension {
 
 These classes must implement _`ExtensionRestHandler`_, which is a functional interface that requires the implementation of the `handleRequest()` method with the signature `public ExtensionRestResponse handleRequest(RestRequest request)`.
 
-The `BaseExtensionRestHandler` class provides many useful methods for exception handling in requests, including a `RouteHandler` class that eases logical separation of multiple `Route` choices.
+The `BaseExtensionRestHandler` class provides many useful methods for exception handling in requests.
 
-For the CRUD extension example, you'll implement one REST route for each option and delegate it to the appropriate handler function, although each one could be stored in its own file:
+For the CRUD extension example, you'll implement one REST route for each option and delegate it to the appropriate handler function.  Each route is an instance of `NamedRoute` and requires at least a method, path, and globally unique name.
 
 ```java
 import java.util.List;
 import java.util.function.Function;
 
-import org.opensearch.extensions.rest.ExtensionRestResponse;
-import org.opensearch.rest.RestRequest.Method;
+import org.opensearch.rest.NamedRoute;
 import org.opensearch.rest.RestRequest;
+import org.opensearch.rest.RestRequest.Method;
+import org.opensearch.rest.RestResponse;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler;
 
 public class CrudAction extends BaseExtensionRestHandler {
 
     @Override
-    protected List<RouteHandler> routeHandlers() {
+    public List<NamedRoute> routes() {
         return List.of(
-            new RouteHandler(Method.PUT, "/sample", createHandler),
-            new RouteHandler(Method.GET, "/sample/{id}", readHandler),
-            new RouteHandler(Method.POST, "/sample/{id}", updateHandler),
-            new RouteHandler(Method.DELETE, "/sample/{id}", deleteHandler)
+            new NamedRoute.Builder().method(Method.PUT)
+                .path("/sample")
+                .uniqueName("crud_extension:sample/create")
+                .handler(createHandler)
+                .build(),
+            new NamedRoute.Builder().method(Method.GET)
+                .path("/sample/{id}")
+                .uniqueName("crud_extension:sample/get")
+                .handler(readHandler)
+                .build(),
+            new NamedRoute.Builder().method(Method.POST)
+                .path("/sample/{id}")
+                .uniqueName("crud_extension:sample/post")
+                .handler(updateHandler)
+                .build(),
+            new NamedRoute.Builder().method(Method.DELETE)
+                .path("/sample/{id}")
+                .uniqueName("crud_extension:sample/delete")
+                .handler(deleteHandler)
+                .build()
         );
     }
 
-    Function<RestRequest, ExtensionRestResponse> createHandler = (request) -> {
+    Function<RestRequest, RestResponse> createHandler = (request) -> {
         return new ExtensionRestResponse(request, RestStatus.OK, "To be implemented");
     };
 
-    Function<RestRequest, ExtensionRestResponse> readHandler = (request) -> {
+    Function<RestRequest, RestResponse> readHandler = (request) -> {
         return new ExtensionRestResponse(request, RestStatus.OK, "To be implemented");
     };
 
-    Function<RestRequest, ExtensionRestResponse> updateHandler = (request) -> {
+    Function<RestRequest, RestResponse> updateHandler = (request) -> {
         return new ExtensionRestResponse(request, RestStatus.OK, "To be implemented");
     };
 
-    Function<RestRequest, ExtensionRestResponse> deleteHandler = (request) -> {
+    Function<RestRequest, RestResponse> deleteHandler = (request) -> {
         return new ExtensionRestResponse(request, RestStatus.OK, "To be implemented");
     };
 }
@@ -193,7 +210,11 @@ public class CrudAction extends BaseExtensionRestHandler {
 
 ## Use OpenSearch clients to implement functionality
 
-During the initial creation of the extension, you either implemented `setExtensionsRunner()` yourself or used the `BaseExtension` class, which does it for you. This gives you access to the `ExtensionsRunner` object that is running this extension. The `ExtensionsRunner` has getters that provide access to many objects you will need, one of which is the `SDKClient`. The `SDKClient` class allows initialization of the OpenSearch Java client, which has synchronous and asynchronous versions. For simplicity, this example uses the synchronous client.
+To use the OpenSearch REST API, you will need an instance of the OpenSearch Java Client.
+
+If you require SSL and TLS capability, refer to the OpenSearch Java Client documentation for either [Apache HttpClient 5 Transport](https://opensearch.org/docs/latest/clients/java/#initializing-the-client-with-ssl-and-tls-enabled-using-apache-httpclient-5-transport) or [OpenSearch RestClient Transport](https://opensearch.org/docs/latest/clients/java/#initializing-the-client-with-ssl-and-tls-enabled-using-restclient-transport).
+
+The `SDKClient` class allows initialization of the OpenSearch Java client without SSL or TLS. For simplicity, this example uses the synchronous client.  During the initial creation of the extension, you either implemented `setExtensionsRunner()` yourself or used the `BaseExtension` class, which does it for you. This gives you access to the `ExtensionsRunner` object that is running this extension. The `ExtensionsRunner` has getters that provide access to many objects you will need, one of which is the `SDKClient`.
 
 First, update `CRUDExtension` to send a copy of this `ExtensionsRunner` instance to our handler class:
 
@@ -214,9 +235,27 @@ public CrudAction(ExtensionsRunner extensionsRunner) {
 }
 ```
 
+### Define a Document class
+
+For our CRUD sample we will create a simple Java class with a single field.
+
+```java
+public static class CrudData {
+    private String value;
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+}
+```
+
 ### Creating (PUT) a document in an index
 
-Now in our handler function, create an index (if it doesn't exist):
+Now in our create handler function, create an index (if it doesn't exist):
 
 ```java
 BooleanResponse exists = client.indices().exists(new ExistsRequest.Builder().index("crudsample").build());
@@ -228,9 +267,9 @@ if (!exists.value()) {
 Next, you add a document to it:
 
 ```java
-Document doc = new Document();
-doc.add(new StringField("field", "value", Field.Store.YES));
-IndexResponse response = client.index(new IndexRequest.Builder<Document>().index("crudsample").document(doc).build());
+CrudData crudData = new CrudData();
+crudData.setValue("value");
+IndexResponse response = client.index(new IndexRequest.Builder<CrudData>().index("crudsample").document(crudData).build());
 ```
 
 The `BaseExtensionRestHandler` provides an `exceptionalRequest()` method to handle exceptions:
@@ -245,34 +284,103 @@ The user needs the ID of the created document (`response.id()`) for further hand
 return createJsonResponse(request, RestStatus.OK, "_id", response.id());
 ```
 
-Finally, you have the following code:
+Finally, you have the following code for the create handler method:
 
 ```java
-Function<RestRequest, ExtensionRestResponse> createHandler = (request) -> {
+Function<RestRequest, RestResponse> createHandler = (request) -> {
     IndexResponse response;
     try {
+        // Create index if it doesn't exist
         BooleanResponse exists = client.indices().exists(new ExistsRequest.Builder().index("crudsample").build());
         if (!exists.value()) {
             client.indices().create(new CreateIndexRequest.Builder().index("crudsample").build());
         }
-        Document doc = new Document();
-        doc.add(new StringField("field", "value", Field.Store.YES));
-        response = client.index(new IndexRequest.Builder<Document>().index("crudsample").document(doc).build());
+        // Now add our document
+        CrudData crudData = new CrudData();
+        crudData.setValue("value");
+        response = client.index(new IndexRequest.Builder<CrudData>().index("crudsample").document(crudData).build());
     } catch (OpenSearchException | IOException e) {
         return exceptionalRequest(request, e);
     }
-    return createJsonResponse(request, RestStatus.OK, "_id", response.id());
+    if (response.result() == Result.Created) {
+        return createJsonResponse(request, RestStatus.OK, "_id", response.id());
+    }
+    return createJsonResponse(request, RestStatus.INTERNAL_SERVER_ERROR, "failed", response.result().toString());
 };
 ```
 
 ### Reading (GET) a document in an index
 
-TBD
+We can now use the read handler function to get the document we just created, using its ID, which we will pass as a named parameter in the path.  We can then get the document by ID.
+
+```java
+String id = request.param("id");
+GetResponse<CrudData> response = client.get(new GetRequest.Builder().index("crudsample").id(id).build(), CrudData.class);
+```
+
+Adding in exception handling, the full handler method is:
+
+```java
+Function<RestRequest, RestResponse> readHandler = (request) -> {
+    GetResponse<CrudData> response;
+    // Parse ID from request
+    String id = request.param("id");
+    try {
+        response = client.get(new GetRequest.Builder().index("crudsample").id(id).build(), CrudData.class);
+    } catch (OpenSearchException | IOException e) {
+        return exceptionalRequest(request, e);
+    }
+    if (response.found()) {
+        return createJsonResponse(request, RestStatus.OK, "value", response.source().getValue());
+    }
+    return createJsonResponse(request, RestStatus.NOT_FOUND, "error", "not_found");
+};
+```
 
 ### Updating (POST) a document in an index
 
-TBD
+We will create a new document similar to what we did in the create handler, and parse the ID as we did in the read handler, and then update that document.  With exception handling, the update handler method is:
+
+```java
+Function<RestRequest, RestResponse> updateHandler = (request) -> {
+    UpdateResponse<CrudData> response;
+    // Parse ID from request
+    String id = request.param("id");
+    // Now create the new document to update with
+    CrudData crudData = new CrudData();
+    crudData.setValue("new value");
+    try {
+        response = client.update(
+            new UpdateRequest.Builder<CrudData, CrudData>().index("crudsample").id(id).doc(crudData).build(),
+            CrudData.class
+        );
+    } catch (OpenSearchException | IOException e) {
+        return exceptionalRequest(request, e);
+    }
+    if (response.result() == Result.Updated) {
+        return createEmptyJsonResponse(request, RestStatus.OK);
+    }
+    return createJsonResponse(request, RestStatus.INTERNAL_SERVER_ERROR, "failed", response.result().toString());
+};
+```
 
 ### Deleting (DELETE) a document in an index
 
-TBD
+We only need the ID to delete a document, so the delete handler method is:
+
+```java
+Function<RestRequest, RestResponse> deleteHandler = (request) -> {
+    DeleteResponse response;
+    // Parse ID from request
+    String id = request.param("id");
+    try {
+        response = client.delete(new DeleteRequest.Builder().index("crudsample").id(id).build());
+    } catch (OpenSearchException | IOException e) {
+        return exceptionalRequest(request, e);
+    }
+    if (response.result() == Result.Deleted) {
+        return createEmptyJsonResponse(request, RestStatus.OK);
+    }
+    return createJsonResponse(request, RestStatus.INTERNAL_SERVER_ERROR, "failed", response.result().toString());
+};
+```
