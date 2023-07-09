@@ -326,7 +326,7 @@ task closeTestExtension (type: Exec) {
 tasks.named("integTest").configure { finalizedBy(closeTestExtension) }
 
 testClusters.integTest {
-    extension(new ExtensionsProperties("${testExtensionYml.name}", "${testExtensionYml.uniqueId}", "${testExtensionYml.hostAddress}", "${testExtensionYml.port}", "${testExtensionYml.version}", "${testExtensionYml.opensearchVersion}", "${testExtensionYml.minimumCompatibleVersion}"))
+    extension(true)
     testDistribution = "ARCHIVE"
     // Cluster shrink exception thrown if we try to set numberOfNodes to 1, so only apply if > 1
     if (_numNodes > 1) numberOfNodes = _numNodes
