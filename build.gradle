@@ -200,8 +200,6 @@ dependencies {
             force("org.apache.logging.log4j:log4j-core:${log4jVersion}")
             force("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
             force("org.slf4j:slf4j-api:${slf4jVersion}")
-            force("org.apache.httpcomponents.core5:httpcore5:5.2.2")
-            force("org.apache.httpcomponents.core5:httpcore5-h2:5.2.2")
         }
     }
 }
