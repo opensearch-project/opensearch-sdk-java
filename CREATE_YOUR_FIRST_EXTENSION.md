@@ -212,26 +212,16 @@ public class CrudAction extends BaseExtensionRestHandler {
 
 To use the OpenSearch REST API, you will need an instance of the OpenSearch Java Client.
 
-If you require SSL and TLS capability, refer to the OpenSearch Java Client documentation for either [Apache HttpClient 5 Transport](https://opensearch.org/docs/latest/clients/java/#initializing-the-client-with-ssl-and-tls-enabled-using-apache-httpclient-5-transport) or [OpenSearch RestClient Transport](https://opensearch.org/docs/latest/clients/java/#initializing-the-client-with-ssl-and-tls-enabled-using-restclient-transport).
+Refer to the OpenSearch Java Client documentation for either [Apache HttpClient 5 Transport](https://opensearch.org/docs/latest/clients/java/#initializing-the-client-with-ssl-and-tls-enabled-using-apache-httpclient-5-transport) or [OpenSearch RestClient Transport](https://opensearch.org/docs/latest/clients/java/#initializing-the-client-with-ssl-and-tls-enabled-using-restclient-transport).
 
-The `SDKClient` class allows initialization of the OpenSearch Java client without SSL or TLS. For simplicity, this example uses the synchronous client.  During the initial creation of the extension, you either implemented `setExtensionsRunner()` yourself or used the `BaseExtension` class, which does it for you. This gives you access to the `ExtensionsRunner` object that is running this extension. The `ExtensionsRunner` has getters that provide access to many objects you will need, one of which is the `SDKClient`.
-
-First, update `CRUDExtension` to send a copy of this `ExtensionsRunner` instance to our handler class:
+The remainder of this example assumes you have implemented one of the above options in your constructor:
 
 ```java
-@Override
-public List<ExtensionRestHandler> getExtensionRestHandlers() {
-    return List.of(new CrudAction(extensionsRunner()));
-}
-```
+private final OpenSearchClient client;
 
-Next, you'll create an instance field for the client in the handler class and set its value in the constructor:
-
-```java
-private OpenSearchClient client;
-
-public CrudAction(ExtensionsRunner extensionsRunner) {
-    this.client = extensionsRunner.getSdkClient().initializeJavaClient();
+public CrudAction() {
+    final OpenSearchTransport transport = // implement per documentation
+    this.client = new OpenSearchClient(transport);
 }
 ```
 
