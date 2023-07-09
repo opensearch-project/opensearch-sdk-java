@@ -38,7 +38,6 @@ import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.settings.Setting.Property;
 import org.opensearch.common.transport.TransportAddress;
-import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.discovery.InitializeExtensionRequest;
 import org.opensearch.discovery.InitializeExtensionResponse;
 import org.opensearch.extensions.DiscoveryExtensionNode;
@@ -261,9 +260,9 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
         assertEquals("test.value", extensionsRunner.getEnvironmentSettings().get("test.key"));
 
         assertTrue(extensionsRunner.getCustomNamedXContent().isEmpty());
-        assertTrue(extensionsRunner.getNamedXContentRegistry().getRegistry() instanceof NamedXContentRegistry);
+        assertNotNull(extensionsRunner.getNamedXContentRegistry().getRegistry());
         extensionsRunner.updateNamedXContentRegistry();
-        assertTrue(extensionsRunner.getNamedXContentRegistry().getRegistry() instanceof NamedXContentRegistry);
+        assertNotNull(extensionsRunner.getNamedXContentRegistry().getRegistry());
         assertTrue(extensionsRunner.getExtension() instanceof BaseExtension);
         assertEquals(extensionsRunner, ((BaseExtension) extensionsRunner.getExtension()).extensionsRunner());
         assertNotNull(extensionsRunner.getThreadPool());

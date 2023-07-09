@@ -15,7 +15,7 @@ import org.opensearch.rest.RestRequest;
 import org.opensearch.test.OpenSearchTestCase;
 
 public class TestExtensionRestHandler extends OpenSearchTestCase {
-    private class NoOpExtensionRestHandler implements ExtensionRestHandler {
+    private static class NoOpExtensionRestHandler implements ExtensionRestHandler {
 
         @Override
         public ExtensionRestResponse handleRequest(RestRequest request) {
