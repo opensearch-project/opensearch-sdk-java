@@ -4,7 +4,8 @@
 * [Obtain network address and port information](#obtain-network-address-and-port-information)
 * [Implement the _`Extension`_ interface](#implement-the-_-extension-_-interface)
 * [Implement other interfaces and extension points](#implement-other-interfaces-and-extension-points)
-* [Use OpenSearch clients to implement functionality](#use-opensearch-clients-to-implement-functionality)
+* [Use OpenSearch Java Client to implement functionality](#use-opensearch-java-client-to-implement-functionality)
+  * [Defining a Document class](#defining-a-document-class)
   * [Creating (PUT) a document in an index](#creating-put-a-document-in-an-index)
   * [Reading (GET) a document in an index](#reading-get-a-document-in-an-index)
   * [Updating (POST) a document in an index](#updating-post-a-document-in-an-index)
@@ -208,7 +209,7 @@ public class CrudAction extends BaseExtensionRestHandler {
 }
 ```
 
-## Use OpenSearch clients to implement functionality
+## Use OpenSearch Java Client to implement functionality
 
 To use the OpenSearch REST API, you will need an instance of the OpenSearch Java Client.
 
@@ -225,7 +226,7 @@ public CrudAction() {
 }
 ```
 
-### Define a Document class
+### Defining a Document class
 
 For our CRUD sample we will create a simple Java class with a single field.
 
