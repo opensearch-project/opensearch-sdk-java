@@ -95,6 +95,7 @@ public List<NamedRoute> routes() {
 ```
 
 You can optionally also add `actionNames()` to this route. These should correspond to any current actions defined as permissions in roles.
+`actionNames()` serve as a valuable tool for converting plugins into extensions while maintaining compatibility with pre-defined reserved roles.
 Ensure that these name-to-route mappings are easily accessible to the cluster admins to allow granting access to these APIs.
 
 Change `prepareRequest()` to `handleRequest()`.

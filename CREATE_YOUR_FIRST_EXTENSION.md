@@ -164,7 +164,7 @@ import org.opensearch.sdk.rest.BaseExtensionRestHandler;
 public class CrudAction extends BaseExtensionRestHandler {
 
     @Override
-    protected List<NamedRoute> routes() {
+    public List<NamedRoute> routes() {
         return List.of(
             new NamedRoute.Builder().method(Method.PUT).path("/sample").uniqueName("extension1:sample/create").handler(createHandler).build(),
             new NamedRoute.Builder().method(Method.GET).path("/sample/{id}").uniqueName("extension1:sample/get").handler(readHandler).build(),
