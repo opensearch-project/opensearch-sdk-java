@@ -11,10 +11,14 @@ package org.opensearch.sdk;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opensearch.client.Request;
+import org.opensearch.client.Response;
 import org.opensearch.common.component.Lifecycle;
 import org.opensearch.common.network.NetworkAddress;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
+import org.opensearch.rest.RestRequest;
+import org.opensearch.test.rest.OpenSearchRestTestCase;
 import org.opensearch.transport.netty4.Netty4Transport;
 import org.opensearch.test.OpenSearchIntegTestCase;
 import org.opensearch.threadpool.ThreadPool;
