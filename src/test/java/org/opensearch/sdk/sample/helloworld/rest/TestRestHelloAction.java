@@ -16,7 +16,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.rest.NamedRoute;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.common.bytes.BytesArray;
@@ -47,7 +47,7 @@ public class TestRestHelloAction extends OpenSearchTestCase {
 
     @Test
     public void testRoutes() {
-        List<Route> routes = restHelloAction.routes();
+        List<NamedRoute> routes = restHelloAction.routes();
         assertEquals(4, routes.size());
         assertEquals(Method.GET, routes.get(0).getMethod());
         assertEquals("/hello", routes.get(0).getPath());
