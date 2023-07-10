@@ -85,7 +85,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
      * @param prefix the prefix to be used
      */
     public void setRouteNamePrefix(String prefix) {
-        // we by-pass null assignment as routePrefixes are not mandatory
+        // we by-pass null assignment as routeNamePrefixes are not mandatory
         if (prefix != null && !prefix.matches(VALID_ROUTE_PREFIX_PATTERN)) {
             throw new OpenSearchException(
                 "Invalid extension name specified. The extension name may include the following characters"
@@ -100,7 +100,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
      * @param routeName The human-readable name for a route registered by this extension
      * @return Returns a name conditionally prepended with the valid route prefix
      */
-    protected String addRoutePrefix(String routeName) {
+    protected String addRouteNamePrefix(String routeName) {
         if (routeNamePrefix == null || routeNamePrefix.isBlank()) {
             return routeName;
         }

@@ -53,7 +53,7 @@ public class ExtensionSettings {
     private String hostPort;
     private String opensearchAddress;
     private String opensearchPort;
-    private String routePrefix;
+    private String routeNamePrefix;
     private Map<String, String> securitySettings;
 
     /**
@@ -121,7 +121,7 @@ public class ExtensionSettings {
      * @param hostPort  The port to bind this extension to.
      * @param opensearchAddress  The IP Address on which OpenSearch is running.
      * @param opensearchPort  The port on which OpenSearch is running.
-     * @param routePrefix The prefix to be pre-pended to a NamedRoute being registered
+     * @param routeNamePrefix The prefix to be pre-pended to a NamedRoute being registered
      * @param securitySettings A generic map of any settings set in the config file that are not default setting keys
      */
     public ExtensionSettings(
@@ -130,11 +130,11 @@ public class ExtensionSettings {
         String hostPort,
         String opensearchAddress,
         String opensearchPort,
-        String routePrefix,
+        String routeNamePrefix,
         Map<String, String> securitySettings
     ) {
         this(extensionName, hostAddress, hostPort, opensearchAddress, opensearchPort);
-        this.routePrefix = routePrefix;
+        this.routeNamePrefix = routeNamePrefix;
         this.securitySettings = securitySettings;
     }
 
@@ -199,7 +199,7 @@ public class ExtensionSettings {
      * @return A string representing the route prefix of this extension
      */
     public String getRoutePrefix() {
-        return routePrefix;
+        return routeNamePrefix;
     }
 
     /**
@@ -253,10 +253,10 @@ public class ExtensionSettings {
                 }
             }
 
-            // Making routePrefix an optional setting
-            String routePrefix = null;
-            if (extensionMap.containsKey("routePrefix")) {
-                routePrefix = extensionMap.get("routePrefix").toString();
+            // Making routeNamePrefix an optional setting
+            String routeNamePrefix = null;
+            if (extensionMap.containsKey("routeNamePrefix")) {
+                routeNamePrefix = extensionMap.get("routeNamePrefix").toString();
             }
             return new ExtensionSettings(
                 extensionMap.get("extensionName").toString(),
@@ -264,7 +264,7 @@ public class ExtensionSettings {
                 extensionMap.get("hostPort").toString(),
                 extensionMap.get("opensearchAddress").toString(),
                 extensionMap.get("opensearchPort").toString(),
-                routePrefix,
+                routeNamePrefix,
                 securitySettings
             );
         } catch (URISyntaxException e) {
