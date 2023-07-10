@@ -69,7 +69,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static org.opensearch.rest.RestRequest.Method.GET;
-import static org.opensearch.rest.RestRequest.Method.PUT;
 import static org.opensearch.rest.RestStatus.OK;
 
 /**
@@ -90,18 +89,18 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
     @Override
     public List<NamedRoute> routes() {
         return List.of(
-                new NamedRoute.Builder().method(GET)
-                        .path("/hello/{name}")
-                        .handler(handleRemoteGetRequest)
-                        .uniqueName(routePrefix("remote_greet_with_name"))
-                        .legacyActionNames(Collections.emptySet())
-                        .build(),
-                new NamedRoute.Builder().method(GET)
-                        .path("/schedule/hello")
-                        .handler(handleScheduleRequest)
-                        .uniqueName(routePrefix("scheduled_greet"))
-                        .legacyActionNames(Collections.emptySet())
-                        .build()
+            new NamedRoute.Builder().method(GET)
+                .path("/hello/{name}")
+                .handler(handleRemoteGetRequest)
+                .uniqueName(routePrefix("remote_greet_with_name"))
+                .legacyActionNames(Collections.emptySet())
+                .build(),
+            new NamedRoute.Builder().method(GET)
+                .path("/schedule/hello")
+                .handler(handleScheduleRequest)
+                .uniqueName(routePrefix("scheduled_greet"))
+                .legacyActionNames(Collections.emptySet())
+                .build()
         );
     }
 
