@@ -27,6 +27,7 @@ import static org.apache.hc.core5.http.ContentType.APPLICATION_JSON;
 import org.opensearch.OpenSearchException;
 import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.xcontent.json.JsonXContent;
+import org.opensearch.core.common.Strings;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.DeprecationRestHandler;
@@ -88,7 +89,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
         // we by-pass null assignment as routeNamePrefixes are not mandatory
         if (prefix != null && !prefix.matches(VALID_ROUTE_PREFIX_PATTERN)) {
             throw new OpenSearchException(
-                "Invalid extension name specified. The extension name may include the following characters"
+                "Invalid route name prefix specified. The prefix may include the following characters"
                     + " 'a-z', 'A-Z', '0-9', ':', '/', '*', '_'"
             );
         }
@@ -101,7 +102,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
      * @return Returns a name conditionally prepended with the valid route prefix
      */
     protected String addRouteNamePrefix(String routeName) {
-        if (routeNamePrefix == null || routeNamePrefix.isBlank()) {
+        if (Strings.isNullOrEmpty(routeNamePrefix)) {
             return routeName;
         }
         return routeNamePrefix + ":" + routeName;
