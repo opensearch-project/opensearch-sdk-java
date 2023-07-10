@@ -53,7 +53,6 @@ public class ExtensionSettings {
     private String hostPort;
     private String opensearchAddress;
     private String opensearchPort;
-    private Map<String, String> securitySettings;
 
     /**
      * A set of keys for security settings related to SSL transport, keystore and truststore files, and hostname verification.
@@ -83,6 +82,8 @@ public class ExtensionSettings {
         SSL_TRANSPORT_TRUSTSTORE_FILEPATH,
         SSL_TRANSPORT_TRUSTSTORE_TYPE
     );
+
+    private Map<String, String> securitySettings;
 
     /**
      * Jackson requires a no-arg constructor.

@@ -189,18 +189,16 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:${junitPlatform}")
 
     configurations.all {
-        resolutionStrategy {
-            force("jakarta.json:jakarta.json-api:${jakartaVersion}")
-            force("com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}")
-            force("com.fasterxml.jackson.core:jackson-core:${jacksonDatabindVersion}")
-            force("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonDatabindVersion}")
-            force("com.fasterxml.jackson.dataformat:jackson-dataformat-smile:${jacksonDatabindVersion}")
-            force("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:${jacksonDatabindVersion}")
-            force("org.apache.logging.log4j:log4j-api:${log4jVersion}")
-            force("org.apache.logging.log4j:log4j-core:${log4jVersion}")
-            force("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
-            force("org.slf4j:slf4j-api:${slf4jVersion}")
-        }
+        resolutionStrategy.force("jakarta.json:jakarta.json-api:${jakartaVersion}")
+        resolutionStrategy.force("com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}")
+        resolutionStrategy.force("com.fasterxml.jackson.core:jackson-core:${jacksonDatabindVersion}")
+        resolutionStrategy.force("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonDatabindVersion}")
+        resolutionStrategy.force("com.fasterxml.jackson.dataformat:jackson-dataformat-smile:${jacksonDatabindVersion}")
+        resolutionStrategy.force("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:${jacksonDatabindVersion}")
+        resolutionStrategy.force("org.apache.logging.log4j:log4j-api:${log4jVersion}")
+        resolutionStrategy.force("org.apache.logging.log4j:log4j-core:${log4jVersion}")
+        resolutionStrategy.force("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
+        resolutionStrategy.force("org.slf4j:slf4j-api:${slf4jVersion}")
     }
 }
 
@@ -324,7 +322,7 @@ task closeTestExtension (type: Exec) {
 tasks.named("integTest").configure { finalizedBy(closeTestExtension) }
 
 testClusters.integTest {
-    extension(true)
+    extension(new ExtensionsProperties("${testExtensionYml.name}", "${testExtensionYml.uniqueId}", "${testExtensionYml.hostAddress}", "${testExtensionYml.port}", "${testExtensionYml.version}", "${testExtensionYml.opensearchVersion}", "${testExtensionYml.minimumCompatibleVersion}"))
     testDistribution = "ARCHIVE"
     // Cluster shrink exception thrown if we try to set numberOfNodes to 1, so only apply if > 1
     if (_numNodes > 1) numberOfNodes = _numNodes

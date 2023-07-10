@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.BaseRestHandler;
-import org.opensearch.rest.NamedRoute;
 import org.opensearch.rest.RestHandler;
 import org.opensearch.rest.RestHandler.DeprecatedRoute;
 import org.opensearch.rest.RestHandler.ReplacedRoute;
@@ -43,7 +42,7 @@ public interface ExtensionRestHandler {
      *
      * @return The routes this handler will handle.
      */
-    default List<NamedRoute> routes() {
+    default List<Route> routes() {
         return Collections.emptyList();
     }
 

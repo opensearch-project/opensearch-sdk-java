@@ -14,9 +14,7 @@ import org.opensearch.common.io.stream.StreamInput;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
-import org.opensearch.rest.NamedRoute;
 import org.opensearch.rest.RestRequest;
-import org.opensearch.rest.RestResponse;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.SDKClient;
 import org.opensearch.sdk.action.RemoteExtensionAction;
@@ -26,7 +24,6 @@ import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleResponse;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -52,19 +49,11 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
     }
 
     @Override
-    public List<NamedRoute> routes() {
-        return List.of(
-
-            new NamedRoute.Builder().method(GET)
-                .path("/hello/{name}")
-                .handler(handleRemoteGetRequest)
-                .uniqueName(routePrefix("remote_greet_with_name"))
-                .legacyActionNames(Collections.emptySet())
-                .build()
-        );
+    public List<RouteHandler> routeHandlers() {
+        return List.of(new RouteHandler(GET, "/hello/{name}", handleRemoteGetRequest));
     }
 
-    private Function<RestRequest, RestResponse> handleRemoteGetRequest = (request) -> {
+    private Function<RestRequest, ExtensionRestResponse> handleRemoteGetRequest = (request) -> {
         SDKClient client = extensionsRunner.getSdkClient();
 
         String name = request.param("name");
@@ -91,7 +80,7 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
                 TimeUnit.SECONDS
             ).get();
             if (!response.isSuccess()) {
-                return new ExtensionRestResponse(request, OK, "Remote extension response failed: " + response.getResponseBytesAsString());
+                return new ExtensionRestResponse(request, OK, "Remote extension reponse failed: " + response.getResponseBytesAsString());
             }
             // Parse out the expected response class from the bytes
             SampleResponse sampleResponse = new SampleResponse(StreamInput.wrap(response.getResponseBytes()));
