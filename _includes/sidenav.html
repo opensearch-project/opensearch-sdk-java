@@ -1,0 +1,7 @@
+<div class="link-wrapper">
+    <ul class="link">
+      {%- for topic in site.sidenav %}
+        <li><a href="{{ topic.link | replace:'.md','.html' }}">{{ topic.name }}</a></li>
+      {%- endfor %}
+    </ul>
+</div>
