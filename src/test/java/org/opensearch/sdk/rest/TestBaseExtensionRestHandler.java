@@ -17,35 +17,56 @@ import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
+import org.opensearch.rest.NamedRoute;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
+import org.opensearch.rest.RestResponse;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.test.OpenSearchTestCase;
+
+import static org.opensearch.rest.RestRequest.Method.GET;
 
 public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
 
     private final BaseExtensionRestHandler handler = new BaseExtensionRestHandler() {
         @Override
-        public List<RouteHandler> routeHandlers() {
-            return List.of(new RouteHandler(Method.GET, "/foo", handleFoo));
+        public List<NamedRoute> routes() {
+            return List.of(
+                new NamedRoute.Builder().method(GET)
+                    .path("/foo")
+                    .handler(handleFoo)
+                    .uniqueName("foo")
+                    .legacyActionNames(Collections.emptySet())
+                    .build()
+            );
         }
 
         @Override
         public List<DeprecatedRouteHandler> deprecatedRouteHandlers() {
-            return List.of(new DeprecatedRouteHandler(Method.GET, "/deprecated/foo", "It's deprecated", handleFoo));
+            return List.of(new DeprecatedRouteHandler(GET, "/deprecated/foo", "It's deprecated", handleBar));
         }
 
         @Override
         public List<ReplacedRouteHandler> replacedRouteHandlers() {
             return List.of(
-                new ReplacedRouteHandler(Method.GET, "/new/foo", Method.GET, "/old/foo", handleFoo),
-                new ReplacedRouteHandler(Method.PUT, "/new/put/foo", "/old/put/foo", handleFoo),
-                new ReplacedRouteHandler(new Route(Method.POST, "/foo"), "/new", "/old", handleFoo)
+                new ReplacedRouteHandler(GET, "/new/foo", GET, "/old/foo", handleBar),
+                new ReplacedRouteHandler(Method.PUT, "/new/put/foo", "/old/put/foo", handleBar),
+                new ReplacedRouteHandler(new Route(Method.POST, "/foo"), "/new", "/old", handleBar)
             );
         }
 
-        private final Function<RestRequest, ExtensionRestResponse> handleFoo = (request) -> {
+        private final Function<RestRequest, RestResponse> handleFoo = (request) -> {
+            try {
+                if ("foo".equals(request.content().utf8ToString())) {
+                    return createJsonResponse(request, RestStatus.OK, "success", "named foo");
+                }
+                throw new IllegalArgumentException("no foo");
+            } catch (Exception e) {
+                return exceptionalRequest(request, e);
+            }
+        };
+        private final Function<RestRequest, RestResponse> handleBar = (request) -> {
             try {
                 if ("bar".equals(request.content().utf8ToString())) {
                     return createJsonResponse(request, RestStatus.OK, "success", "bar");
@@ -62,13 +83,12 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
         BaseExtensionRestHandler defaultHandler = new BaseExtensionRestHandler() {
         };
         assertTrue(defaultHandler.routes().isEmpty());
-        assertTrue(defaultHandler.routeHandlers().isEmpty());
     }
 
     @Test
     public void testJsonResponse() {
         RestRequest successfulRequest = TestSDKRestRequest.createTestRestRequest(
-            Method.GET,
+            GET,
             "/foo",
             "/foo",
             Collections.emptyMap(),
@@ -86,7 +106,7 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
     @Test
     public void testJsonDeprecatedResponse() {
         RestRequest successfulRequest = TestSDKRestRequest.createTestRestRequest(
-            Method.GET,
+            GET,
             "/deprecated/foo",
             "/deprecated/foo",
             Collections.emptyMap(),
@@ -104,7 +124,7 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
     @Test
     public void testJsonReplacedResponseGet() {
         RestRequest successfulRequestOld = TestSDKRestRequest.createTestRestRequest(
-            Method.GET,
+            GET,
             "/old/foo",
             "/old/foo",
             Collections.emptyMap(),
@@ -115,7 +135,7 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
             null
         );
         RestRequest successfulRequestNew = TestSDKRestRequest.createTestRestRequest(
-            Method.GET,
+            GET,
             "/new/foo",
             "/new/foo",
             Collections.emptyMap(),
@@ -203,7 +223,7 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
     @Test
     public void testErrorResponseOnException() {
         RestRequest exceptionalRequest = TestSDKRestRequest.createTestRestRequest(
-            Method.GET,
+            GET,
             "/foo",
             "/foo",
             Collections.emptyMap(),
@@ -243,7 +263,7 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
         );
 
         RestRequest unhandledRequestPath = TestSDKRestRequest.createTestRestRequest(
-            Method.GET,
+            GET,
             "foobar",
             "foobar",
             Collections.emptyMap(),
@@ -269,18 +289,25 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
     public void testCreateEmptyJsonResponse() {
         BaseExtensionRestHandler handlerWithEmptyJsonResponse = new BaseExtensionRestHandler() {
             @Override
-            public List<RouteHandler> routeHandlers() {
-                return List.of(new RouteHandler(Method.GET, "/emptyJsonResponse", handleEmptyJsonResponse));
+            public List<NamedRoute> routes() {
+                return List.of(
+                    new NamedRoute.Builder().method(GET)
+                        .path("/emptyJsonResponse")
+                        .handler(handleEmptyJsonResponse)
+                        .uniqueName("emptyresponse")
+                        .legacyActionNames(Collections.emptySet())
+                        .build()
+                );
             }
 
-            private final Function<RestRequest, ExtensionRestResponse> handleEmptyJsonResponse = (request) -> createEmptyJsonResponse(
+            private final Function<RestRequest, RestResponse> handleEmptyJsonResponse = (request) -> createEmptyJsonResponse(
                 request,
                 RestStatus.OK
             );
         };
 
         RestRequest emptyJsonResponseRequest = TestSDKRestRequest.createTestRestRequest(
-            Method.GET,
+            GET,
             "/emptyJsonResponse",
             "/emptyJsonResponse",
             Collections.emptyMap(),
