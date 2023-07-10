@@ -1,0 +1,36 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+@media screen and (min-width: 1200px) {
+  .wrapper {
+    width:1200px;
+    margin:0 auto;
+  }
+  
+  section {
+    width:900px;
+    float:right;
+    padding-bottom:50px;
+  }
+}
+
+.link-wrapper {
+   margin-top: 2.5rem;
+}
+
+ul.link {
+    list-style-type: none; 
+    margin: 0; 
+    padding: 0;
+}
+
+ul.link li + li {
+    margin-top: 1rem;
+}
+
+ul.link:last-child {
+    margin-bottom: 2.5rem;
+}
+
