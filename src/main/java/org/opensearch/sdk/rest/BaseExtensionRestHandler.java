@@ -43,9 +43,9 @@ import org.opensearch.rest.RestStatus;
  */
 public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
 
-    private static String extensionName;
-
     private static final String VALID_EXTENSION_NAME_PATTERN = "^[a-zA-Z0-9:/*_]*$";
+
+    private static String extensionName;
 
     /**
      * Constant for JSON content type
@@ -80,6 +80,10 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
         return Collections.emptyList();
     }
 
+    /**
+     * Sets the extension name that can be used for logging and optionally used in routePrefix
+     * @param extensionName the name of this extension
+     */
     public void setExtensionName(String extensionName) {
         if (extensionName == null || extensionName.isBlank() || !extensionName.matches(VALID_EXTENSION_NAME_PATTERN)) {
             throw new OpenSearchException(
