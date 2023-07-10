@@ -2,9 +2,9 @@
 
 * [Initial setup](#initial-setup)
 * [Obtain network address and port information](#obtain-network-address-and-port-information)
-* [Implement the _`Extension`_ interface](#implement-the-_-extension-_-interface)
+* [Implement the _`Extension`_ interface](#implement-the-extension-interface)
 * [Implement other interfaces and extension points](#implement-other-interfaces-and-extension-points)
-* [Use OpenSearch Java Client to implement functionality](#use-opensearch-java-client-to-implement-functionality)
+* [Use the OpenSearch Java client to implement functionality](#use-the-opensearch-java-client-to-implement-functionality)
   * [Defining a Document class](#defining-a-document-class)
   * [Creating (PUT) a document in an index](#creating-put-a-document-in-an-index)
   * [Reading (GET) a document in an index](#reading-get-a-document-in-an-index)
@@ -73,7 +73,7 @@ dependencies {
 
 An extension requires host and port information for both the extension and OpenSearch.
 
-You may either define these in code in an `ExtensionSettings` object, or in a YAML file.  The following are equivalent:
+You may either define these in code in an `ExtensionSettings` object, or in a YAML file. The following are equivalent:
 
 - Java import and instantiation:
 
@@ -125,7 +125,7 @@ public class CRUDExtension extends BaseExtension {
 
 At this point, you have a working extension! Start it by executing the `main()` method, and then start your OpenSearch cluster.
 
-But it doesn't _do_ anything yet.  Here is where you can start defining your own functionality.
+But it doesn't _do_ anything yet. Here is where you can start defining your own functionality.
 
 ## Implement other interfaces and extension points
 
@@ -150,7 +150,7 @@ These classes must implement _`ExtensionRestHandler`_, which is a functional int
 
 The `BaseExtensionRestHandler` class provides many useful methods for exception handling in requests.
 
-For the CRUD extension example, you'll implement one REST route for each option and delegate it to the appropriate handler function.  Each route is an instance of `NamedRoute` and requires at least a method, path, and globally unique name.
+For the CRUD extension example, you'll implement one REST route for each option and delegate it to the appropriate handler function. Each route is an instance of `NamedRoute` and requires at least a method, path, and globally unique name.
 
 ```java
 import java.util.List;
@@ -209,13 +209,13 @@ public class CrudAction extends BaseExtensionRestHandler {
 }
 ```
 
-## Use OpenSearch Java Client to implement functionality
+## Use the OpenSearch Java client to implement functionality
 
-To use the OpenSearch REST API, you will need an instance of the OpenSearch Java Client.
+To use the OpenSearch REST API, you will need an instance of the OpenSearch Java client.
 
-Refer to the OpenSearch Java Client documentation for either [Apache HttpClient 5 Transport](https://opensearch.org/docs/latest/clients/java/#initializing-the-client-with-ssl-and-tls-enabled-using-apache-httpclient-5-transport) or [OpenSearch RestClient Transport](https://opensearch.org/docs/latest/clients/java/#initializing-the-client-with-ssl-and-tls-enabled-using-restclient-transport).
+Refer to the OpenSearch Java client documentation for either [Apache HttpClient 5 Transport](https://opensearch.org/docs/latest/clients/java/#initializing-the-client-with-ssl-and-tls-enabled-using-apache-httpclient-5-transport) or [OpenSearch RestClient Transport](https://opensearch.org/docs/latest/clients/java/#initializing-the-client-with-ssl-and-tls-enabled-using-restclient-transport).
 
-The remainder of this example assumes you have implemented one of the above options in your constructor:
+The remainder of this example assumes you have implemented one of the preceding options in your constructor:
 
 ```java
 private final OpenSearchClient client;
@@ -228,7 +228,7 @@ public CrudAction() {
 
 ### Defining a Document class
 
-For our CRUD sample we will create a simple Java class with a single field.
+For your CRUD sample you will create a simple Java class with a single field:
 
 ```java
 public static class CrudData {
@@ -246,7 +246,7 @@ public static class CrudData {
 
 ### Creating (PUT) a document in an index
 
-Now in our create handler function, create an index (if it doesn't exist):
+Now in the create handler function, create an index (if it doesn't exist):
 
 ```java
 BooleanResponse exists = client.indices().exists(new ExistsRequest.Builder().index("crudsample").build());
@@ -302,14 +302,14 @@ Function<RestRequest, RestResponse> createHandler = (request) -> {
 
 ### Reading (GET) a document in an index
 
-We can now use the read handler function to get the document we just created, using its ID, which we will pass as a named parameter in the path.  We can then get the document by ID.
+You can now use the read handler function to get the document you just created, using its ID, which you will pass as a named parameter in the path. You can then get the document by ID.
 
 ```java
 String id = request.param("id");
 GetResponse<CrudData> response = client.get(new GetRequest.Builder().index("crudsample").id(id).build(), CrudData.class);
 ```
 
-Adding in exception handling, the full handler method is:
+Adding exception handling, the following is the full handler method:
 
 ```java
 Function<RestRequest, RestResponse> readHandler = (request) -> {
@@ -330,7 +330,7 @@ Function<RestRequest, RestResponse> readHandler = (request) -> {
 
 ### Updating (POST) a document in an index
 
-We will create a new document similar to what we did in the create handler, and parse the ID as we did in the read handler, and then update that document.  With exception handling, the update handler method is:
+You will create a new document similar to the one you created in the create handler, parse the ID as you did in the read handler, and then update that document. With exception handling, the following is the update handler method:
 
 ```java
 Function<RestRequest, RestResponse> updateHandler = (request) -> {
@@ -357,7 +357,7 @@ Function<RestRequest, RestResponse> updateHandler = (request) -> {
 
 ### Deleting (DELETE) a document in an index
 
-We only need the ID to delete a document, so the delete handler method is:
+You only need the ID to delete a document, so the delete handler method is implemented as follows:
 
 ```java
 Function<RestRequest, RestResponse> deleteHandler = (request) -> {
