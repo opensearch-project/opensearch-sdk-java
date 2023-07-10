@@ -13,16 +13,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.cluster.ClusterSettingsResponse;
 import org.opensearch.common.io.stream.StreamInput;
-import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportException;
 import org.opensearch.transport.TransportResponseHandler;
-import org.opensearch.transport.TransportService;
 
 import java.io.IOException;
 
 /**
- * This class handles the response from OpenSearch to a {@link ExtensionsRunner#sendClusterSettingsRequest(TransportService)} call.
+ * This class handles the response from OpenSearch to a {@link org.opensearch.sdk.SDKTransportService#sendClusterSettingsRequest()} call.
  */
 public class ClusterSettingsResponseHandler implements TransportResponseHandler<ClusterSettingsResponse> {
     private static final Logger logger = LogManager.getLogger(ClusterSettingsResponseHandler.class);
