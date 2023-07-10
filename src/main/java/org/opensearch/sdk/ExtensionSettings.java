@@ -53,6 +53,7 @@ public class ExtensionSettings {
     private String hostPort;
     private String opensearchAddress;
     private String opensearchPort;
+    private Map<String, String> securitySettings;
 
     public static final Set<String> SECURITY_SETTINGS_KEYS = Set.of(
         "path.home", // TODO Find the right place to put this setting
@@ -78,8 +79,6 @@ public class ExtensionSettings {
         SSL_TRANSPORT_TRUSTSTORE_FILEPATH,
         SSL_TRANSPORT_TRUSTSTORE_TYPE
     );
-
-    private Map<String, String> securitySettings;
 
     /**
      * Jackson requires a no-arg constructor.
