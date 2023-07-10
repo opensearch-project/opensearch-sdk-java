@@ -23,6 +23,8 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import static org.apache.hc.core5.http.ContentType.APPLICATION_JSON;
+
+import org.opensearch.OpenSearchException;
 import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
@@ -42,6 +44,8 @@ import org.opensearch.rest.RestStatus;
 public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
 
     private static String extensionName;
+
+    private static final String VALID_EXTENSION_NAME_PATTERN = "^[a-zA-Z0-9:/*_]*$";
 
     /**
      * Constant for JSON content type
@@ -77,6 +81,12 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     }
 
     public void setExtensionName(String extensionName) {
+        if (extensionName == null || extensionName.isBlank() || !extensionName.matches(VALID_EXTENSION_NAME_PATTERN)) {
+            throw new OpenSearchException(
+                "Invalid extension name specified. The extension name may include the following characters"
+                    + " 'a-z', 'A-Z', '0-9', ':', '/', '*', '_'"
+            );
+        }
         BaseExtensionRestHandler.extensionName = extensionName;
     }
 
