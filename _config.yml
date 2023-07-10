@@ -2,6 +2,7 @@ title: OpenSearch SDK for Java
 description: Extension Documentation
 theme: jekyll-theme-minimal
 logo: /assets/img/logo.png
+include: CONTRIBUTING.md
 
 sidenav:
   - name: Design
