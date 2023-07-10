@@ -164,7 +164,7 @@ To **run OpenSearch from Gradle**, follow these steps:
 ```bash
 curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data '{
 "name":"helloWorld",
-"uniqueId":"helloWorld",
+"uniqueId":"hello-world",
 "hostAddress":"127.0.0.1",
 "port":"4532",
 "version":"1.0",
