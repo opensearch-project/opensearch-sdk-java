@@ -58,7 +58,7 @@ git clone https://github.com/<your username>/opensearch-sdk-java.git
 
 Navigate to the directory to which you cloned the OpenSearch SDK for Java repository.
 
-You can run the sample Hello World extension using the `hello-world` task:
+You can run the sample Hello World extension using the `helloWorld` task:
 
 ```bash
 ./gradlew helloWorld
