@@ -147,7 +147,7 @@ To **run OpenSearch from a compiled binary**, follow these steps:
 - Send the below sample REST API to initialize an extension
 ```bash
 curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data '{
-"name":"hello-world",
+"name":"helloWorld",
 "uniqueId":"hello-world",
 "hostAddress":"127.0.0.1",
 "port":"4532",
@@ -163,8 +163,8 @@ To **run OpenSearch from Gradle**, follow these steps:
 - Send the below sample REST API to initialize an extension
 ```bash
 curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data '{
-"name":"hello-world",
-"uniqueId":"hello-world",
+"name":"helloWorld",
+"uniqueId":"helloWorld",
 "hostAddress":"127.0.0.1",
 "port":"4532",
 "version":"1.0",
@@ -296,7 +296,7 @@ tar -xvf opensearch-sdk-java-1.0.0-SNAPSHOT.tar
 The artifact will include extension settings for the sample Hello World extension on the class path under the path `/sample/extension-settings.yml`:
 
 ```yaml
-  extensionName: hello-world
+  extensionName: helloWorld
   hostAddress: 127.0.0.1
   hostPort: 4532
   opensearchAddress: 127.0.0.1

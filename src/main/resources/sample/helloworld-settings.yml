@@ -1,4 +1,4 @@
-extensionName: hello-world
+extensionName: helloWorld
 hostAddress: 127.0.0.1
 hostPort: 4500
 opensearchAddress: 127.0.0.1
