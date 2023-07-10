@@ -38,7 +38,9 @@ import org.opensearch.jobscheduler.JobSchedulerPlugin;
 import org.opensearch.jobscheduler.rest.request.GetJobDetailsRequest;
 import org.opensearch.jobscheduler.spi.schedule.IntervalSchedule;
 import org.opensearch.jobscheduler.spi.schedule.Schedule;
+import org.opensearch.rest.NamedRoute;
 import org.opensearch.rest.RestRequest;
+import org.opensearch.rest.RestResponse;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.SDKClient;
@@ -58,6 +60,7 @@ import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -85,10 +88,20 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
     }
 
     @Override
-    public List<RouteHandler> routeHandlers() {
+    public List<NamedRoute> routes() {
         return List.of(
-            new RouteHandler(GET, "/hello/{name}", handleRemoteGetRequest),
-            new RouteHandler(PUT, "/schedule/hello", handleScheduleRequest)
+                new NamedRoute.Builder().method(GET)
+                        .path("/hello/{name}")
+                        .handler(handleRemoteGetRequest)
+                        .uniqueName(routePrefix("remote_greet_with_name"))
+                        .legacyActionNames(Collections.emptySet())
+                        .build(),
+                new NamedRoute.Builder().method(GET)
+                        .path("/schedule/hello")
+                        .handler(handleScheduleRequest)
+                        .uniqueName(routePrefix("scheduled_greet"))
+                        .legacyActionNames(Collections.emptySet())
+                        .build()
         );
     }
 
@@ -100,7 +113,7 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
         requestBody.field(GetJobDetailsRequest.JOB_TYPE, GreetJob.PARSE_FIELD_NAME);
         requestBody.field(GetJobDetailsRequest.JOB_PARAMETER_ACTION, HWJobParameterAction.class.getName());
         requestBody.field(GetJobDetailsRequest.JOB_RUNNER_ACTION, HWJobRunnerAction.class.getName());
-        requestBody.field(GetJobDetailsRequest.EXTENSION_UNIQUE_ID, extensionsRunner.getUniqueId());
+        requestBody.field(GetJobDetailsRequest.EXTENSION_UNIQUE_ID, extensionsRunner.getSdkTransportService().getUniqueId());
         requestBody.endObject();
 
         Request request = new Request("PUT", String.format(Locale.ROOT, "%s/%s", JobSchedulerPlugin.JS_BASE_URI, "_job_details"));
@@ -156,7 +169,7 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
         return mapper.deserialize(parser, clazz);
     }
 
-    private Function<RestRequest, ExtensionRestResponse> handleScheduleRequest = (request) -> {
+    private Function<RestRequest, RestResponse> handleScheduleRequest = (request) -> {
         SDKClient client = extensionsRunner.getSdkClient();
         SDKClient.SDKRestClient restClient = client.initializeRestClient();
         OpenSearchClient javaClient = client.initializeJavaClient();
@@ -223,7 +236,7 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
         return new ExtensionRestResponse(request, OK, "GreetJob successfully scheduled");
     };
 
-    private Function<RestRequest, ExtensionRestResponse> handleRemoteGetRequest = (request) -> {
+    private Function<RestRequest, RestResponse> handleRemoteGetRequest = (request) -> {
         SDKClient client = extensionsRunner.getSdkClient();
 
         String name = request.param("name");
@@ -250,7 +263,7 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
                 TimeUnit.SECONDS
             ).get();
             if (!response.isSuccess()) {
-                return new ExtensionRestResponse(request, OK, "Remote extension reponse failed: " + response.getResponseBytesAsString());
+                return new ExtensionRestResponse(request, OK, "Remote extension response failed: " + response.getResponseBytesAsString());
             }
             // Parse out the expected response class from the bytes
             SampleResponse sampleResponse = new SampleResponse(StreamInput.wrap(response.getResponseBytes()));
