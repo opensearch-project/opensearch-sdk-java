@@ -41,7 +41,7 @@ Extensions are registered through the below REST request within OpenSearch.
 
 ```bash
 curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data '{ \
-"name":"helloWorld", \                 // extension name
+"name":"hello-world", \                 // extension name
 "uniqueId":"hello-world", \             // identifier for the extension
 "hostAddress":"127.0.0.1", \            // host address
 "port":"4532", \                        // port number

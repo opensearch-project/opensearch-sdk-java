@@ -36,7 +36,7 @@ public class TestRestHelloAction extends OpenSearchTestCase {
 
     private ExtensionRestHandler restHelloAction;
     // Temporarily removed pending integration of feature/identity branch
-    // private static final String EXTENSION_NAME = "helloWorld";
+    // private static final String EXTENSION_NAME = "hello-world";
 
     @Override
     @BeforeEach

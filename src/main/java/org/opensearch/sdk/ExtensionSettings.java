@@ -53,6 +53,7 @@ public class ExtensionSettings {
     private String hostPort;
     private String opensearchAddress;
     private String opensearchPort;
+    private String routePrefix;
     private Map<String, String> securitySettings;
 
     /**
@@ -96,6 +97,7 @@ public class ExtensionSettings {
      * Instantiate this class using the specified parameters.
      *
      * @param extensionName  The extension name. Provided to OpenSearch as a response to initialization query. Must match the defined extension name in OpenSearch.
+     *
      * @param hostAddress  The IP Address to bind this extension to.
      * @param hostPort  The port to bind this extension to.
      * @param opensearchAddress  The IP Address on which OpenSearch is running.
@@ -119,6 +121,7 @@ public class ExtensionSettings {
      * @param hostPort  The port to bind this extension to.
      * @param opensearchAddress  The IP Address on which OpenSearch is running.
      * @param opensearchPort  The port on which OpenSearch is running.
+     * @param routePrefix The prefix to be pre-pended to a NamedRoute being registered
      * @param securitySettings A generic map of any settings set in the config file that are not default setting keys
      */
     public ExtensionSettings(
@@ -127,9 +130,11 @@ public class ExtensionSettings {
         String hostPort,
         String opensearchAddress,
         String opensearchPort,
+        String routePrefix,
         Map<String, String> securitySettings
     ) {
         this(extensionName, hostAddress, hostPort, opensearchAddress, opensearchPort);
+        this.routePrefix = routePrefix;
         this.securitySettings = securitySettings;
     }
 
@@ -190,6 +195,14 @@ public class ExtensionSettings {
     }
 
     /**
+     * Returns the route Prefix for all routes registered by this extension
+     * @return A string representing the route prefix of this extension
+     */
+    public String getRoutePrefix() {
+        return routePrefix;
+    }
+
+    /**
      * Returns the security settings as a map of key-value pairs.
      * The keys represent the different security settings available, and the values represent the values set for each key.
      * @return A map of security settings and their values.
@@ -239,12 +252,19 @@ public class ExtensionSettings {
                     securitySettings.put(settingKey, extensionMap.get(settingKey).toString());
                 }
             }
+
+            // Making routePrefix an optional setting
+            String routePrefix = null;
+            if (extensionMap.containsKey("routePrefix")) {
+                routePrefix = extensionMap.get("routePrefix").toString();
+            }
             return new ExtensionSettings(
                 extensionMap.get("extensionName").toString(),
                 extensionMap.get("hostAddress").toString(),
                 extensionMap.get("hostPort").toString(),
                 extensionMap.get("opensearchAddress").toString(),
                 extensionMap.get("opensearchPort").toString(),
+                routePrefix,
                 securitySettings
             );
         } catch (URISyntaxException e) {

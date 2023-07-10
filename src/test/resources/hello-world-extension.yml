@@ -1,4 +1,4 @@
-name: helloWorld
+name: hello-world
 uniqueId: opensearch-sdk-java-1
 hostAddress: '127.0.0.1'
 port: '4500'

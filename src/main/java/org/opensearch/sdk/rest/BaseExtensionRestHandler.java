@@ -43,9 +43,9 @@ import org.opensearch.rest.RestStatus;
  */
 public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
 
-    private static final String VALID_EXTENSION_NAME_PATTERN = "^[a-zA-Z0-9:/*_]*$";
+    private static final String VALID_ROUTE_PREFIX_PATTERN = "^[a-zA-Z0-9:/*_]*$";
 
-    private static String extensionName;
+    private String routeNamePrefix;
 
     /**
      * Constant for JSON content type
@@ -81,26 +81,30 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     }
 
     /**
-     * Sets the extension name that can be used for logging and optionally used in routePrefix
-     * @param extensionName the name of this extension
+     * Sets the route prefix that can be used to prepend route names
+     * @param prefix the prefix to be used
      */
-    public void setExtensionName(String extensionName) {
-        if (extensionName == null || extensionName.isBlank() || !extensionName.matches(VALID_EXTENSION_NAME_PATTERN)) {
+    public void setRouteNamePrefix(String prefix) {
+        // we by-pass null assignment as routePrefixes are not mandatory
+        if (prefix != null && !prefix.matches(VALID_ROUTE_PREFIX_PATTERN)) {
             throw new OpenSearchException(
                 "Invalid extension name specified. The extension name may include the following characters"
                     + " 'a-z', 'A-Z', '0-9', ':', '/', '*', '_'"
             );
         }
-        BaseExtensionRestHandler.extensionName = extensionName;
+        routeNamePrefix = prefix;
     }
 
     /**
-     * Generates a name for the handler prepended with the extension's name
-     * @param name The human-readable name for a route registered by this extension
-     * @return Returns a name prepended with the extension's name
+     * Generates a name for the handler prepended with the route prefix
+     * @param routeName The human-readable name for a route registered by this extension
+     * @return Returns a name conditionally prepended with the valid route prefix
      */
-    protected static String routePrefix(String name) {
-        return extensionName + ":" + name;
+    protected String addRoutePrefix(String routeName) {
+        if (routeNamePrefix == null || routeNamePrefix.isBlank()) {
+            return routeName;
+        }
+        return routeNamePrefix + ":" + routeName;
     }
 
     @Override
