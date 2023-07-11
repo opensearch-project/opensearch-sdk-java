@@ -36,6 +36,7 @@ import org.opensearch.sdk.handlers.ExtensionsIndicesModuleRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
+import org.opensearch.sdk.rest.BaseExtensionRestHandler;
 import org.opensearch.sdk.rest.ExtensionRestHandler;
 import org.opensearch.sdk.rest.ExtensionRestPathRegistry;
 import org.opensearch.tasks.TaskManager;
@@ -233,6 +234,9 @@ public class ExtensionsRunner {
         if (extension instanceof ActionExtension) {
             // store REST handlers in the registry
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
+                if (extensionRestHandler instanceof BaseExtensionRestHandler) {
+                    ((BaseExtensionRestHandler) extensionRestHandler).setRouteNamePrefix(extensionSettings.getRoutePrefix());
+                }
                 extensionRestPathRegistry.registerHandler(extensionRestHandler);
             }
         }
