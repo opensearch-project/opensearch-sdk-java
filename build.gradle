@@ -33,6 +33,7 @@ buildscript {
 }
 
 plugins {
+    id 'java'
     id 'java-library'
     id "com.diffplug.spotless" version "6.19.0" apply false
     id 'jacoco'
@@ -85,7 +86,6 @@ allprojects {
     }
 }
 
-
 group 'org.opensearch.sdk'
 
 publishing {
@@ -129,6 +129,15 @@ repositories {
     maven { url "https://d1nvenhzbhpy0q.cloudfront.net/snapshots/lucene/"}
 }
 
+subprojects {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
+        maven { url "https://d1nvenhzbhpy0q.cloudfront.net/snapshots/lucene/"}
+    }
+}
+
 dependencies {
 
     def opensearchVersion = "${opensearch_version}"
@@ -149,6 +158,7 @@ dependencies {
     def slf4jVersion = "1.7.36"
 
     api("org.opensearch:opensearch:${opensearchVersion}")
+
     implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
     implementation("org.apache.logging.log4j:log4j-core:${log4jVersion}")
     implementation("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
@@ -172,17 +182,17 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava:${jacksonDatabindVersion}")
     implementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonDatabindVersion}")
 
-    implementation("com.google.guava:guava:${guavaVersion}")
+    api("com.google.guava:guava:${guavaVersion}")
     implementation("javax.inject:javax.inject:${javaxVersion}")
     implementation("com.google.guava:failureaccess:${guavaFailureAccessVersion}")
     implementation("aopalliance:aopalliance:${aopallianceVersion}")
 
     constraints {
-        implementation("com.google.guava:guava:${guavaVersion}") {
+        api("com.google.guava:guava:${guavaVersion}") {
             because 'versions below 30.0 have active CVE'
         }
     }
-    implementation("com.google.inject:guice:${guiceVersion}")
+    api("com.google.inject:guice:${guiceVersion}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junit5Version}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junit5Version}")
     testImplementation("org.opensearch.test:framework:${opensearchVersion}")
@@ -204,13 +214,6 @@ dependencies {
     }
 }
 
-// this task runs the helloworld sample extension
-task helloWorld(type: JavaExec) {
-    group = 'Execution'
-    description = 'Run HelloWorld Extension.'
-    mainClass = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
-    classpath = sourceSets.main.runtimeClasspath
-}
 
 task getVersion() {
     doLast {

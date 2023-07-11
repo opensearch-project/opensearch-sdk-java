@@ -1,0 +1,50 @@
+{
+  ".hello-world-jobs": {
+    "mappings": {
+      "properties": {
+        "schema_version": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "keyword"
+        },
+        "schedule": {
+          "properties": {
+            "interval": {
+              "properties": {
+                "start_time": {
+                  "type": "date",
+                  "format": "strict_date_time||epoch_millis"
+                },
+                "period": {
+                  "type": "integer"
+                },
+                "unit": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "enabled_time": {
+          "type": "date",
+          "format": "strict_date_time||epoch_millis"
+        },
+        "disabled_time": {
+          "type": "date",
+          "format": "strict_date_time||epoch_millis"
+        },
+        "last_update_time": {
+          "type": "date",
+          "format": "strict_date_time||epoch_millis"
+        },
+        "lock_duration_seconds": {
+          "type": "long"
+        }
+      }
+    }
+  }
+}

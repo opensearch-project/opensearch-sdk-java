@@ -11,19 +11,29 @@ package org.opensearch.sdk.sample.helloworld;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
 import org.opensearch.common.settings.Setting;
+import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.sdk.BaseExtension;
 import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.ExtensionSettings;
 import org.opensearch.sdk.ExtensionsRunner;
+import org.opensearch.sdk.SDKClient;
 import org.opensearch.sdk.api.ActionExtension;
 import org.opensearch.sdk.rest.ExtensionRestHandler;
 import org.opensearch.sdk.sample.helloworld.rest.RestHelloAction;
 import org.opensearch.sdk.sample.helloworld.rest.RestRemoteHelloAction;
+import org.opensearch.sdk.sample.helloworld.schedule.GreetJob;
+import org.opensearch.sdk.sample.helloworld.transport.HWJobParameterAction;
+import org.opensearch.sdk.sample.helloworld.transport.HWJobParameterTransportAction;
+import org.opensearch.sdk.sample.helloworld.transport.HWJobRunnerAction;
+import org.opensearch.sdk.sample.helloworld.transport.HWJobRunnerTransportAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleTransportAction;
 
@@ -61,7 +71,30 @@ public class HelloWorldExtension extends BaseExtension implements ActionExtensio
 
     @Override
     public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
-        return Arrays.asList(new ActionHandler<>(SampleAction.INSTANCE, SampleTransportAction.class));
+        return Arrays.asList(
+            new ActionHandler<>(SampleAction.INSTANCE, SampleTransportAction.class),
+            new ActionHandler<>(HWJobRunnerAction.INSTANCE, HWJobRunnerTransportAction.class),
+            new ActionHandler<>(HWJobParameterAction.INSTANCE, HWJobParameterTransportAction.class)
+        );
+    }
+
+    @Override
+    public List<NamedXContentRegistry.Entry> getNamedXContent() {
+        return ImmutableList.of(GreetJob.XCONTENT_REGISTRY);
+    }
+
+    @Deprecated
+    private SDKClient.SDKRestClient createRestClient(ExtensionsRunner runner) {
+        @SuppressWarnings("resource")
+        SDKClient.SDKRestClient client = runner.getSdkClient().initializeRestClient();
+        return client;
+    }
+
+    @Override
+    public Collection<Object> createComponents(ExtensionsRunner runner) {
+        SDKClient.SDKRestClient sdkRestClient = createRestClient(runner);
+
+        return Collections.singletonList(sdkRestClient);
     }
 
     /**
