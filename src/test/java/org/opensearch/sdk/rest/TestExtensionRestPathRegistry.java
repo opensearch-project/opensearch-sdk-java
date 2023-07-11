@@ -9,16 +9,14 @@
 
 package org.opensearch.sdk.rest;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
-import org.opensearch.rest.NamedRoute;
-import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestHandler.DeprecatedRoute;
 import org.opensearch.rest.RestHandler.ReplacedRoute;
+import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler.ExtensionDeprecationRestHandler;
@@ -30,8 +28,8 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
 
     private ExtensionRestHandler fooHandler = new ExtensionRestHandler() {
         @Override
-        public List<NamedRoute> routes() {
-            return List.of(new NamedRoute.Builder().method(Method.GET).path("/foo").uniqueName("foo").build());
+        public List<Route> routes() {
+            return List.of(new Route(Method.GET, "/foo"));
         }
 
         @Override
@@ -48,16 +46,18 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
         @Override
         public List<ReplacedRoute> replacedRoutes() {
             return List.of(
-                new ReplacedRouteHandler(Method.GET, "/new/foo", Method.GET, "/old/foo", r -> null),
-                new ReplacedRouteHandler(Method.PUT, "/new/put/foo", "/old/put/foo", r -> null),
-                new ReplacedRouteHandler(new Route(Method.POST, "/foo"), "/new", "/old", r -> null)
+                new ReplacedRouteHandler(Method.GET, "/new/foo", Method.GET, "/old/foo", r -> { return null; }),
+                new ReplacedRouteHandler(Method.PUT, "/new/put/foo", "/old/put/foo", r -> {
+                    return null;
+                }),
+                new ReplacedRouteHandler(new Route(Method.POST, "/foo"), "/new", "/old", r -> { return null; })
             );
         }
     };
     private ExtensionRestHandler barHandler = new ExtensionRestHandler() {
         @Override
-        public List<NamedRoute> routes() {
-            return List.of(new NamedRoute.Builder().method(Method.PUT).path("/bar/{planet}").uniqueName("bar_planet").build());
+        public List<Route> routes() {
+            return List.of(new Route(Method.PUT, "/bar/{planet}"));
         }
 
         @Override
@@ -67,11 +67,8 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
     };
     private ExtensionRestHandler bazHandler = new ExtensionRestHandler() {
         @Override
-        public List<NamedRoute> routes() {
-            return List.of(
-                new NamedRoute.Builder().method(Method.POST).path("/baz/{moon}/qux").uniqueName("bar_qux_for_moon").build(),
-                new NamedRoute.Builder().method(Method.PUT).path("/bar/baz").uniqueName("bar_baz").build()
-            );
+        public List<Route> routes() {
+            return List.of(new Route(Method.POST, "/baz/{moon}/qux"), new Route(Method.PUT, "/bar/baz"));
         }
 
         @Override
@@ -95,8 +92,8 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
         // Can't register same exact name
         ExtensionRestHandler duplicateFooHandler = new ExtensionRestHandler() {
             @Override
-            public List<NamedRoute> routes() {
-                return List.of(new NamedRoute.Builder().method(Method.GET).path("/foo").uniqueName("foo").build());
+            public List<Route> routes() {
+                return List.of(new Route(Method.GET, "/foo"));
             }
 
             @Override
@@ -108,8 +105,8 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
         // Can't register conflicting named wildcards, even if method is different
         ExtensionRestHandler barNoneHandler = new ExtensionRestHandler() {
             @Override
-            public List<NamedRoute> routes() {
-                return List.of(new NamedRoute.Builder().method(Method.GET).path("/bar/{none}").uniqueName("bar_none").build());
+            public List<Route> routes() {
+                return List.of(new Route(Method.GET, "/bar/{none}"));
             }
 
             @Override
@@ -184,11 +181,6 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
 
     @Test
     public void testRestPathToString() {
-        assertEquals("GET /foo", ExtensionRestPathRegistry.restPathToString(Method.GET, "/foo", "", Collections.emptySet()));
-    }
-
-    @Test
-    public void testRestPathWithNameToString() {
-        assertEquals("GET /foo foo", ExtensionRestPathRegistry.restPathToString(Method.GET, "/foo", "foo", Collections.emptySet()));
+        assertEquals("GET /foo", ExtensionRestPathRegistry.restPathToString(Method.GET, "/foo"));
     }
 }
