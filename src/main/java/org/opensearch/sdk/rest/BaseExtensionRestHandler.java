@@ -44,7 +44,7 @@ import org.opensearch.rest.RestStatus;
  */
 public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
 
-    private static final String VALID_ROUTE_PREFIX_PATTERN = "^[a-zA-Z0-9:/*_]*$";
+    private static final String VALID_ROUTE_PREFIX_PATTERN = "^[a-zA-Z0-9-_]*$";
 
     private String routeNamePrefix;
 
