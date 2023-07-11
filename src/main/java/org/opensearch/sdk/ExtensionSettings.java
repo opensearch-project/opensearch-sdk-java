@@ -53,8 +53,13 @@ public class ExtensionSettings {
     private String hostPort;
     private String opensearchAddress;
     private String opensearchPort;
+    private String routeNamePrefix;
     private Map<String, String> securitySettings;
 
+    /**
+     * A set of keys for security settings related to SSL transport, keystore and truststore files, and hostname verification.
+     * These settings are used in OpenSearch to secure network communication and ensure data privacy.
+     */
     public static final Set<String> SECURITY_SETTINGS_KEYS = Set.of(
         "path.home", // TODO Find the right place to put this setting
         SSL_TRANSPORT_CLIENT_PEMCERT_FILEPATH,
@@ -115,6 +120,7 @@ public class ExtensionSettings {
      * @param hostPort  The port to bind this extension to.
      * @param opensearchAddress  The IP Address on which OpenSearch is running.
      * @param opensearchPort  The port on which OpenSearch is running.
+     * @param routeNamePrefix The prefix to be pre-pended to a NamedRoute being registered
      * @param securitySettings A generic map of any settings set in the config file that are not default setting keys
      */
     public ExtensionSettings(
@@ -123,40 +129,83 @@ public class ExtensionSettings {
         String hostPort,
         String opensearchAddress,
         String opensearchPort,
+        String routeNamePrefix,
         Map<String, String> securitySettings
     ) {
         this(extensionName, hostAddress, hostPort, opensearchAddress, opensearchPort);
+        this.routeNamePrefix = routeNamePrefix;
         this.securitySettings = securitySettings;
     }
 
+    /**
+     * Returns the name of the extension.
+     * @return A string representing the name of the extension.
+     */
     public String getExtensionName() {
         return extensionName;
     }
 
+    /**
+     * Returns the host address associated with this object.
+     * @return The host address as a string.
+     */
     public String getHostAddress() {
         return hostAddress;
     }
 
+    /**
+     * Returns the host and port number of the server.
+     * @return A string representation of the host and port number of the server.
+     */
     public String getHostPort() {
         return hostPort;
     }
 
+    /**
+     * Sets the OpenSearch server address to use for connecting to OpenSearch.
+     * @param opensearchAddress the URL or IP address of the OpenSearch server.
+     */
     public void setOpensearchAddress(String opensearchAddress) {
         this.opensearchAddress = opensearchAddress;
     }
 
+    /**
+     * Returns the address of the OpenSearch instance being used by the application.
+     * @return The address of the OpenSearch instance.
+     */
     public String getOpensearchAddress() {
         return opensearchAddress;
     }
 
+    /**
+     * Sets the OpenSearch port number to be used for communication.
+     * @param opensearchPort The port number to set.
+     */
     public void setOpensearchPort(String opensearchPort) {
         this.opensearchPort = opensearchPort;
     }
 
+    /**
+     * Returns the OpenSearch port number.
+     * @return The OpenSearch port number as a String.
+     */
     public String getOpensearchPort() {
         return opensearchPort;
     }
 
+    /**
+     * Returns the route Prefix for all routes registered by this extension
+     * @return A string representing the route prefix of this extension
+     */
+    public String getRoutePrefix() {
+        return routeNamePrefix;
+    }
+
+    /**
+     * Returns the security settings as a map of key-value pairs.
+     * The keys represent the different security settings available, and the values represent the values set for each key.
+     * @return A map of security settings and their values.
+     */
     public Map<String, String> getSecuritySettings() {
         return securitySettings;
     }
@@ -202,12 +251,19 @@ public class ExtensionSettings {
                     securitySettings.put(settingKey, extensionMap.get(settingKey).toString());
                 }
             }
+
+            // Making routeNamePrefix an optional setting
+            String routeNamePrefix = null;
+            if (extensionMap.containsKey("routeNamePrefix")) {
+                routeNamePrefix = extensionMap.get("routeNamePrefix").toString();
+            }
             return new ExtensionSettings(
                 extensionMap.get("extensionName").toString(),
                 extensionMap.get("hostAddress").toString(),
                 extensionMap.get("hostPort").toString(),
                 extensionMap.get("opensearchAddress").toString(),
                 extensionMap.get("opensearchPort").toString(),
+                routeNamePrefix,
                 securitySettings
             );
         } catch (URISyntaxException e) {

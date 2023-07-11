@@ -235,7 +235,7 @@ public class ExtensionsRunner {
             // store REST handlers in the registry
             for (ExtensionRestHandler extensionRestHandler : ((ActionExtension) extension).getExtensionRestHandlers()) {
                 if (extensionRestHandler instanceof BaseExtensionRestHandler) {
-                    ((BaseExtensionRestHandler) extensionRestHandler).setExtensionName(extensionSettings.getExtensionName());
+                    ((BaseExtensionRestHandler) extensionRestHandler).setRouteNamePrefix(extensionSettings.getRoutePrefix());
                 }
                 extensionRestPathRegistry.registerHandler(extensionRestHandler);
             }
