@@ -44,7 +44,7 @@ import org.opensearch.rest.RestStatus;
  */
 public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
 
-    private static final String VALID_ROUTE_PREFIX_PATTERN = "^[a-zA-Z0-9-_]*$";
+    private static final String VALID_ROUTE_PREFIX_PATTERN = "^[a-zA-Z0-9_]*$";
 
     private String routeNamePrefix;
 
@@ -89,8 +89,7 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
         // we by-pass null assignment as routeNamePrefixes are not mandatory
         if (prefix != null && !prefix.matches(VALID_ROUTE_PREFIX_PATTERN)) {
             throw new OpenSearchException(
-                "Invalid route name prefix specified. The prefix may include the following characters"
-                    + " 'a-z', 'A-Z', '0-9', ':', '/', '*', '_'"
+                "Invalid route name prefix specified. The prefix may include the following characters" + " 'a-z', 'A-Z', '0-9', '_'"
             );
         }
         routeNamePrefix = prefix;
