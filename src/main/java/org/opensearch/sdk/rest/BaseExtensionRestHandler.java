@@ -23,8 +23,11 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import static org.apache.hc.core5.http.ContentType.APPLICATION_JSON;
+
+import org.opensearch.OpenSearchException;
 import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.xcontent.json.JsonXContent;
+import org.opensearch.core.common.Strings;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.DeprecationRestHandler;
@@ -41,7 +44,9 @@ import org.opensearch.rest.RestStatus;
  */
 public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
 
-    private static String extensionName;
+    private static final String VALID_ROUTE_PREFIX_PATTERN = "^[a-zA-Z0-9_]*$";
+
+    private String routeNamePrefix;
 
     /**
      * Constant for JSON content type
@@ -76,17 +81,30 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
         return Collections.emptyList();
     }
 
-    public void setExtensionName(String extensionName) {
-        BaseExtensionRestHandler.extensionName = extensionName;
+    /**
+     * Sets the route prefix that can be used to prepend route names
+     * @param prefix the prefix to be used
+     */
+    public void setRouteNamePrefix(String prefix) {
+        // we by-pass null assignment as routeNamePrefixes are not mandatory
+        if (prefix != null && !prefix.matches(VALID_ROUTE_PREFIX_PATTERN)) {
+            throw new OpenSearchException(
+                "Invalid route name prefix specified. The prefix may include the following characters" + " 'a-z', 'A-Z', '0-9', '_'"
+            );
+        }
+        routeNamePrefix = prefix;
     }
 
     /**
-     * Generates a name for the handler prepended with the extension's name
-     * @param name The human-readable name for a route registered by this extension
-     * @return Returns a name prepended with the extension's name
+     * Generates a name for the handler prepended with the route prefix
+     * @param routeName The human-readable name for a route registered by this extension
+     * @return Returns a name conditionally prepended with the valid route prefix
      */
-    protected static String routePrefix(String name) {
-        return extensionName + ":" + name;
+    protected String addRouteNamePrefix(String routeName) {
+        if (Strings.isNullOrEmpty(routeNamePrefix)) {
+            return routeName;
+        }
+        return routeNamePrefix + ":" + routeName;
     }
 
     @Override
