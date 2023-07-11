@@ -303,9 +303,6 @@ The artifact will include extension settings for the sample Hello World extensio
   opensearchPort: 9200
 ```
 
-You can optionally add `routeNamePrefix:` as a value to the yml. This setting allows you to prefix all your registered NamedRoute names.
-The value must be alphanumeric and can contain `_` in the name.
-
 Start the sample extension with `./bin/opensearch-sdk-java`
 
 ### Submitting changes

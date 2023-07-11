@@ -58,7 +58,7 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
             new NamedRoute.Builder().method(GET)
                 .path("/hello/{name}")
                 .handler(handleRemoteGetRequest)
-                .uniqueName(addRouteNamePrefix("remote_greet_with_name"))
+                .uniqueName(routePrefix("remote_greet_with_name"))
                 .legacyActionNames(Collections.emptySet())
                 .build()
         );
