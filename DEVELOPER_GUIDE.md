@@ -146,14 +146,14 @@ To **run OpenSearch from a compiled binary**, follow these steps:
 - Start OpenSearch using `./bin/opensearch`.
 - Send the below sample REST API to initialize an extension
 ```bash
-curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data '{ \
-"name":"hello-world", \
-"uniqueId":"hello-world", \
-"hostAddress":"127.0.0.1", \
-"port":"4532", \
-"version":"1.0", \
-"opensearchVersion":"3.0.0", \
-"minimumCompatibleVersion":"3.0.0", \
+curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data '{
+"name":"hello-world",
+"uniqueId":"hello-world",
+"hostAddress":"127.0.0.1",
+"port":"4532",
+"version":"1.0",
+"opensearchVersion":"3.0.0",
+"minimumCompatibleVersion":"3.0.0",
 "dependencies":[{"uniqueId":"test1","version":"2.0.0"},{"uniqueId":"test2","version":"3.0.0"}] \
 }'
 ```
@@ -162,17 +162,19 @@ To **run OpenSearch from Gradle**, follow these steps:
 - Run `./gradlew run` to start OpenSearch.
 - Send the below sample REST API to initialize an extension
 ```bash
-curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data '{ \
-"name":"hello-world", \
-"uniqueId":"hello-world", \
-"hostAddress":"127.0.0.1", \
-"port":"4532", \
-"version":"1.0", \
-"opensearchVersion":"3.0.0", \
-"minimumCompatibleVersion":"3.0.0", \
-"dependencies":[{"uniqueId":"test1","version":"2.0.0"},{"uniqueId":"test2","version":"3.0.0"}] \
+curl -XPOST "localhost:9200/_extensions/initialize" -H "Content-Type:application/json" --data '{
+"name":"hello-world",
+"uniqueId":"hello-world",
+"hostAddress":"127.0.0.1",
+"port":"4532",
+"version":"1.0",
+"opensearchVersion":"3.0.0",
+"minimumCompatibleVersion":"3.0.0",
+"dependencies":[{"uniqueId":"test1","version":"2.0.0"},{"uniqueId":"test2","version":"3.0.0"}]
 }'
 ```
+
+Note: If the Security plugin is initialized in OpenSearch, use admin credentials to send extension initialization request.
 
 In response to the REST `/initialize` request, `ExtensionsManager` discovers the extension listening on a predefined port and executes the TCP handshake protocol to establish a data transfer connection. Then OpenSearch sends a request to the OpenSearch SDK for Java and, upon acknowledgment, the extension responds with its name. This name is logged in the terminal where OpenSearch is running:
 
@@ -300,6 +302,9 @@ The artifact will include extension settings for the sample Hello World extensio
   opensearchAddress: 127.0.0.1
   opensearchPort: 9200
 ```
+
+You can optionally add `routeNamePrefix:` as a value to the yml. This setting allows you to prefix all your registered NamedRoute names.
+The value must be alphanumeric and can contain `_` in the name.
 
 Start the sample extension with `./bin/opensearch-sdk-java`
 

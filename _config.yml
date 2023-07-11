@@ -1,0 +1,15 @@
+title: OpenSearch SDK for Java
+description: Extension Documentation
+theme: jekyll-theme-minimal
+logo: /assets/img/logo.png
+include: CONTRIBUTING.md
+
+sidenav:
+  - name: Design
+    link: DESIGN.md
+  - name: Developer Guide
+    link: DEVELOPER_GUIDE.md
+  - name: Create your first extension
+    link: CREATE_YOUR_FIRST_EXTENSION.md
+  - name: Plugin migration
+    link: PLUGIN_MIGRATION.md
