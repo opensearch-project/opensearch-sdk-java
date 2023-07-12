@@ -116,7 +116,6 @@ public class TestHelloWorldIT extends OpenSearchRestTestCase {
             if (e.getClass() != clazz) {
                 throw e;
             }
-            logger.info("TESTING MESSAGE : " + e.getMessage());
             if (message != null && !e.getMessage().contains(message)) {
                 throw e;
             }
