@@ -12,14 +12,13 @@ package org.opensearch.sdk.sample.helloworld.rest;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
+import org.junit.Test;
 import org.opensearch.client.Request;
 import org.opensearch.client.Response;
 import org.opensearch.client.RestClient;
@@ -29,38 +28,30 @@ import org.opensearch.test.rest.OpenSearchRestTestCase;
 public class TestHelloWorldIT extends OpenSearchRestTestCase {
     private static final Logger logger = LogManager.getLogger(TestHelloWorldIT.class);
 
-    public static boolean initialized = false;
     public static final String EXTENSION_INIT_URI = "/_extensions/initialize/";
     public static final String HELLO_WORLD_EXTENSION_BASE_URI = "/_extensions/_hello-world";
     public static final String HELLO_BASE_URI = HELLO_WORLD_EXTENSION_BASE_URI + "/hello";
     public static final String HELLO_NAME_URI = HELLO_BASE_URI + "/%s";
     public static final String GOODBYE_URI = HELLO_WORLD_EXTENSION_BASE_URI + "/goodbye";
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
+    // TODO : Move extension initialization to setUp method prior to adding addtional tests
 
-        if (!initialized) {
-            // Send initialization request
-            String helloWorldInitRequestBody = "{\"name\":\"hello-world\""
-                + ",\"uniqueId\":\"hello-world\""
-                + ",\"hostAddress\":\"127.0.0.1\""
-                + ",\"port\":\"4500\""
-                + ",\"version\":\"1.0\""
-                + ",\"opensearchVersion\":\"3.0.0\""
-                + ",\"minimumCompatibleVersion\":\"3.0.0\"}";
-            Response response = makeRequest(client(), "POST", EXTENSION_INIT_URI, null, toHttpEntity(helloWorldInitRequestBody));
+    @Test
+    public void testInitializeExtension() throws Exception {
+        // Send initialization request
+        String helloWorldInitRequestBody = "{\"name\":\"hello-world\""
+            + ",\"uniqueId\":\"hello-world\""
+            + ",\"hostAddress\":\"127.0.0.1\""
+            + ",\"port\":\"4500\""
+            + ",\"version\":\"1.0\""
+            + ",\"opensearchVersion\":\"3.0.0\""
+            + ",\"minimumCompatibleVersion\":\"3.0.0\"}";
+        Response response = makeRequest(client(), "POST", EXTENSION_INIT_URI, null, toHttpEntity(helloWorldInitRequestBody));
 
-            assertEquals(RestStatus.ACCEPTED, restStatus(response));
-            Map<String, Object> responseMap = entityAsMap(response);
-            String initializationResponse = (String) responseMap.get("success");
-            assertEquals("A request to initialize an extension has been sent.", initializationResponse);
-            initialized = true;
-
-            // Wait for extension settings/rest handlers to complete registration before any subsequent requests
-            Thread.sleep(TimeUnit.SECONDS.toMillis(5));
-        }
+        assertEquals(RestStatus.ACCEPTED, restStatus(response));
+        Map<String, Object> responseMap = entityAsMap(response);
+        String initializationResponse = (String) responseMap.get("success");
+        assertEquals("A request to initialize an extension has been sent.", initializationResponse);
     }
 
     /**
