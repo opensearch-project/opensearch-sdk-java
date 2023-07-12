@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.opensearch.client.Request;
 import org.opensearch.client.Response;
 import org.opensearch.client.RestClient;
-import org.opensearch.rest.RestStatus;
+import org.opensearch.core.rest.RestStatus;
 import org.opensearch.test.rest.OpenSearchRestTestCase;
 
 public class TestHelloWorldIT extends OpenSearchRestTestCase {
