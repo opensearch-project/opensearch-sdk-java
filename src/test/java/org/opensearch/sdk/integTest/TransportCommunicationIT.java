@@ -7,7 +7,7 @@
  * compatible open source license.
  */
 
-package org.opensearch.sdk;
+package org.opensearch.sdk.integTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +15,10 @@ import org.opensearch.common.component.Lifecycle;
 import org.opensearch.common.network.NetworkAddress;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.transport.TransportAddress;
+import org.opensearch.sdk.ExtensionsRunner;
+import org.opensearch.sdk.ExtensionsRunnerForTest;
+import org.opensearch.sdk.NettyTransport;
+import org.opensearch.sdk.TestThreadPool;
 import org.opensearch.transport.netty4.Netty4Transport;
 import org.opensearch.test.OpenSearchIntegTestCase;
 import org.opensearch.threadpool.ThreadPool;

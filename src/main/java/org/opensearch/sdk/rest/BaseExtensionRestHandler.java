@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.opensearch.rest.RestStatus.INTERNAL_SERVER_ERROR;
-import static org.opensearch.rest.RestStatus.NOT_FOUND;
+import static org.opensearch.core.rest.RestStatus.INTERNAL_SERVER_ERROR;
+import static org.opensearch.core.rest.RestStatus.NOT_FOUND;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -37,7 +37,7 @@ import org.opensearch.rest.RestHandler.ReplacedRoute;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestResponse;
-import org.opensearch.rest.RestStatus;
+import org.opensearch.core.rest.RestStatus;
 
 /**
  * Provides convenience methods to reduce boilerplate code in an {@link ExtensionRestHandler} implementation.
