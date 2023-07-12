@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.AccessController;
 import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -457,6 +458,13 @@ public class DefaultSslKeyStore implements SslKeyStore {
         final List<String> newCertDNList = Arrays.stream(newX509Certs).map(formatDNString).sorted().collect(Collectors.toList());
 
         return currentCertDNList.equals(newCertDNList);
+    }
+
+    public boolean hasValidDNs(String dn) {
+        return Arrays.stream(this.transportCerts)
+                .map(X509Certificate::getSubjectX500Principal)
+                .map(Principal::getName)
+                .anyMatch(dn::equals);
     }
 
     /**

@@ -17,7 +17,10 @@ import org.opensearch.discovery.InitializeExtensionRequest;
 import org.opensearch.discovery.InitializeExtensionResponse;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.SDKTransportService;
+import org.opensearch.sdk.ssl.DefaultSslKeyStore;
 import org.opensearch.transport.TransportService;
+
+import java.nio.file.Path;
 
 import static org.opensearch.sdk.ExtensionsRunner.NODE_NAME_SETTING;
 
@@ -53,6 +56,8 @@ public class ExtensionsInitRequestHandler {
      */
     public InitializeExtensionResponse handleExtensionInitRequest(InitializeExtensionRequest extensionInitRequest) {
         logger.info("Registering Extension Request received from OpenSearch");
+        validateDNs(extensionInitRequest);
+
         extensionsRunner.getThreadPool().getThreadContext().putHeader("extension_unique_id", extensionInitRequest.getExtension().getId());
         SDKTransportService sdkTransportService = extensionsRunner.getSdkTransportService();
         sdkTransportService.setOpensearchNode(extensionInitRequest.getSourceNode());
@@ -92,6 +97,14 @@ public class ExtensionsInitRequestHandler {
 
             // Trigger pending updates requiring completion of the above actions
             extensionsRunner.getSdkClusterService().getClusterSettings().sendPendingSettingsUpdateConsumers();
+        }
+    }
+
+    private void validateDNs(InitializeExtensionRequest extensionInitRequest) {
+        DefaultSslKeyStore sks = new DefaultSslKeyStore(extensionsRunner.getSettings(), Path.of("").toAbsolutePath().resolve("config"));
+        String distingishedName = extensionInitRequest.getExtension().getDistinguishedNames();
+        if(!sks.hasValidDNs(distingishedName)) {
+            throw new IllegalArgumentException("DN: " + distingishedName + " is different then transport certificate DN.");
         }
     }
 }
