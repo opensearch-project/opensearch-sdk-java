@@ -150,60 +150,43 @@ These classes must implement _`ExtensionRestHandler`_, which is a functional int
 
 The `BaseExtensionRestHandler` class provides many useful methods for exception handling in requests.
 
-For the CRUD extension example, you'll implement one REST route for each option and delegate it to the appropriate handler function. Each route is an instance of `NamedRoute` and requires at least a method, path, and globally unique name.
+For the CRUD extension example, you'll implement one REST route for each option and delegate it to the appropriate handler function.
 
 ```java
 import java.util.List;
 import java.util.function.Function;
 
-import org.opensearch.rest.NamedRoute;
-import org.opensearch.rest.RestRequest;
+import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestRequest.Method;
-import org.opensearch.rest.RestResponse;
+import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler;
 
 public class CrudAction extends BaseExtensionRestHandler {
 
     @Override
-    public List<NamedRoute> routes() {
+    protected List<RouteHandler> routeHandlers() {
         return List.of(
-            new NamedRoute.Builder().method(Method.PUT)
-                .path("/sample")
-                .uniqueName("crud_extension:sample/create")
-                .handler(createHandler)
-                .build(),
-            new NamedRoute.Builder().method(Method.GET)
-                .path("/sample/{id}")
-                .uniqueName("crud_extension:sample/get")
-                .handler(readHandler)
-                .build(),
-            new NamedRoute.Builder().method(Method.POST)
-                .path("/sample/{id}")
-                .uniqueName("crud_extension:sample/post")
-                .handler(updateHandler)
-                .build(),
-            new NamedRoute.Builder().method(Method.DELETE)
-                .path("/sample/{id}")
-                .uniqueName("crud_extension:sample/delete")
-                .handler(deleteHandler)
-                .build()
+            new RouteHandler(Method.PUT, "/sample", createHandler),
+            new RouteHandler(Method.GET, "/sample/{id}", readHandler),
+            new RouteHandler(Method.POST, "/sample/{id}", updateHandler),
+            new RouteHandler(Method.DELETE, "/sample/{id}", deleteHandler)
         );
     }
 
-    Function<RestRequest, RestResponse> createHandler = (request) -> {
+    Function<RestRequest, ExtensionRestResponse> createHandler = (request) -> {
         return new ExtensionRestResponse(request, RestStatus.OK, "To be implemented");
     };
 
-    Function<RestRequest, RestResponse> readHandler = (request) -> {
+    Function<RestRequest, ExtensionRestResponse> readHandler = (request) -> {
         return new ExtensionRestResponse(request, RestStatus.OK, "To be implemented");
     };
 
-    Function<RestRequest, RestResponse> updateHandler = (request) -> {
+    Function<RestRequest, ExtensionRestResponse> updateHandler = (request) -> {
         return new ExtensionRestResponse(request, RestStatus.OK, "To be implemented");
     };
 
-    Function<RestRequest, RestResponse> deleteHandler = (request) -> {
+    Function<RestRequest, ExtensionRestResponse> deleteHandler = (request) -> {
         return new ExtensionRestResponse(request, RestStatus.OK, "To be implemented");
     };
 }
@@ -278,7 +261,7 @@ return createJsonResponse(request, RestStatus.OK, "_id", response.id());
 Finally, you have the following code for the create handler method:
 
 ```java
-Function<RestRequest, RestResponse> createHandler = (request) -> {
+Function<RestRequest, ExtensionRestResponse> createHandler = (request) -> {
     IndexResponse response;
     try {
         // Create index if it doesn't exist
@@ -312,7 +295,7 @@ GetResponse<CrudData> response = client.get(new GetRequest.Builder().index("crud
 Adding exception handling, the following is the full handler method:
 
 ```java
-Function<RestRequest, RestResponse> readHandler = (request) -> {
+Function<RestRequest, ExtensionRestResponse> readHandler = (request) -> {
     GetResponse<CrudData> response;
     // Parse ID from request
     String id = request.param("id");
@@ -333,7 +316,7 @@ Function<RestRequest, RestResponse> readHandler = (request) -> {
 You will create a new document similar to the one you created in the create handler, parse the ID as you did in the read handler, and then update that document. With exception handling, the following is the update handler method:
 
 ```java
-Function<RestRequest, RestResponse> updateHandler = (request) -> {
+Function<RestRequest, ExtensionRestResponse> updateHandler = (request) -> {
     UpdateResponse<CrudData> response;
     // Parse ID from request
     String id = request.param("id");
@@ -360,7 +343,7 @@ Function<RestRequest, RestResponse> updateHandler = (request) -> {
 You only need the ID to delete a document, so the delete handler method is implemented as follows:
 
 ```java
-Function<RestRequest, RestResponse> deleteHandler = (request) -> {
+Function<RestRequest, ExtensionRestResponse> deleteHandler = (request) -> {
     DeleteResponse response;
     // Parse ID from request
     String id = request.param("id");

@@ -11,12 +11,10 @@ package org.opensearch.sdk.rest;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.opensearch.common.Nullable;
 import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.path.PathTrie;
-
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestUtils;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler.ExtensionDeprecationRestHandler;
@@ -40,18 +38,9 @@ public class ExtensionRestPathRegistry {
      * @param restHandler The RestHandler to register routes.
      */
     public void registerHandler(ExtensionRestHandler restHandler) {
-        restHandler.routes().forEach(route -> {
-            String routeActionName = route.name();
-            if (routeActionName == null) {
-                throw new IllegalArgumentException("Route handler must have a name associated with it.");
-            }
-            Set<String> associatedActions = route.actionNames();
-            registerHandler(route.getMethod(), route.getPath(), routeActionName, associatedActions, restHandler);
-        });
-
+        restHandler.routes().forEach(route -> registerHandler(route.getMethod(), route.getPath(), restHandler));
         restHandler.deprecatedRoutes()
             .forEach(route -> registerAsDeprecatedHandler(route.getMethod(), route.getPath(), restHandler, route.getDeprecationMessage()));
-
         restHandler.replacedRoutes()
             .forEach(
                 route -> registerWithDeprecatedHandler(
@@ -68,28 +57,20 @@ public class ExtensionRestPathRegistry {
      * Registers a REST handler to be executed when one of the provided methods and path match the request.
      *
      * @param path Path to handle (e.g., "/{index}/{type}/_bulk")
-     * @param extensionRestHandler The handler to actually execute
-     * @param name The name corresponding to this handler
-     * @param actionNames The set of actions to be registered with this handler
+     * @param handler The handler to actually execute
      * @param method GET, POST, etc.
      */
-    public void registerHandler(
-        Method method,
-        String path,
-        String name,
-        Set<String> actionNames,
-        ExtensionRestHandler extensionRestHandler
-    ) {
+    private void registerHandler(Method method, String path, ExtensionRestHandler extensionRestHandler) {
         pathTrie.insertOrUpdate(
             path,
             new SDKMethodHandlers(path, extensionRestHandler, method),
             (mHandlers, newMHandler) -> mHandlers.addMethods(extensionRestHandler, method)
         );
         if (extensionRestHandler instanceof ExtensionDeprecationRestHandler) {
-            registeredDeprecatedPaths.add(restPathToString(method, path, name, actionNames));
+            registeredDeprecatedPaths.add(restPathToString(method, path));
             registeredDeprecatedPaths.add(((ExtensionDeprecationRestHandler) extensionRestHandler).getDeprecationMessage());
         } else {
-            registeredPaths.add(restPathToString(method, path, name, actionNames));
+            registeredPaths.add(restPathToString(method, path));
         }
     }
 
@@ -104,7 +85,7 @@ public class ExtensionRestPathRegistry {
     private void registerAsDeprecatedHandler(Method method, String path, ExtensionRestHandler handler, String deprecationMessage) {
         assert (handler instanceof ExtensionDeprecationRestHandler) == false;
 
-        registerHandler(method, path, null, null, new ExtensionDeprecationRestHandler(handler, deprecationMessage, deprecationLogger));
+        registerHandler(method, path, new ExtensionDeprecationRestHandler(handler, deprecationMessage, deprecationLogger));
     }
 
     /**
@@ -148,7 +129,7 @@ public class ExtensionRestPathRegistry {
             + path
             + "] instead.";
 
-        registerHandler(method, path, null, null, handler);
+        registerHandler(method, path, handler);
         registerAsDeprecatedHandler(deprecatedMethod, deprecatedPath, handler, deprecationMessage);
     }
 
@@ -190,18 +171,9 @@ public class ExtensionRestPathRegistry {
      *
      * @param method  the method.
      * @param path  the path.
-     * @param name  the name corresponding to this route.
-     * @param actionNames the set of actions registered with this route
      * @return A string appending the method and path.
      */
-    public static String restPathToString(Method method, String path, String name, Set<String> actionNames) {
-        StringBuilder sb = new StringBuilder(method.name() + " " + path + " ");
-        if (name != null && !name.isEmpty()) {
-            sb.append(name).append(" ");
-        }
-        if (actionNames != null) {
-            actionNames.forEach(act -> sb.append(act).append(","));
-        }
-        return sb.toString();
+    public static String restPathToString(Method method, String path) {
+        return method.name() + " " + path;
     }
 }
