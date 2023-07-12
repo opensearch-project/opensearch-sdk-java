@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.opensearch.common.bytes.BytesArray;
-import org.opensearch.common.bytes.BytesReference;
+import org.opensearch.core.common.bytes.BytesArray;
+import org.opensearch.core.common.bytes.BytesReference;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.http.HttpRequest;

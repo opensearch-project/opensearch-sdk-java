@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.opensearch.common.io.stream.StreamInput;
+import org.opensearch.core.common.io.stream.StreamInput;
 import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.extensions.ExtensionDependencyResponse;
 import org.opensearch.extensions.ExtensionsManager;

@@ -9,12 +9,12 @@
 
 package org.opensearch.sdk.rest;
 
-import org.opensearch.common.bytes.BytesReference;
+import org.opensearch.core.common.bytes.BytesReference;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.http.HttpRequest;
 import org.opensearch.http.HttpResponse;
 import org.opensearch.rest.RestRequest;
-import org.opensearch.rest.RestStatus;
+import org.opensearch.core.rest.RestStatus;
 
 import java.util.List;
 import java.util.Map;

@@ -15,14 +15,14 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
-import org.opensearch.common.bytes.BytesArray;
+import org.opensearch.core.common.bytes.BytesArray;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.NamedRoute;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestResponse;
-import org.opensearch.rest.RestStatus;
+import org.opensearch.core.rest.RestStatus;
 import org.opensearch.test.OpenSearchTestCase;
 
 import static org.opensearch.rest.RestRequest.Method.GET;

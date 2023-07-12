@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.admin.cluster.state.ClusterStateResponse;
 import org.opensearch.cluster.ClusterState;
-import org.opensearch.common.io.stream.StreamInput;
+import org.opensearch.core.common.io.stream.StreamInput;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportException;
