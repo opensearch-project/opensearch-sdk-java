@@ -18,6 +18,7 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Before;
 import org.junit.Test;
 import org.opensearch.client.Request;
 import org.opensearch.client.Response;
@@ -35,6 +36,11 @@ public class TestHelloWorldIT extends OpenSearchRestTestCase {
     public static final String GOODBYE_URI = HELLO_WORLD_EXTENSION_BASE_URI + "/goodbye";
 
     // TODO : Move extension initialization to setUp method prior to adding addtional tests
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
 
     @Test
     public void testInitializeExtension() throws Exception {
