@@ -286,25 +286,12 @@ task startTestExtension(type: Exec) {
 
 integTest {
     dependsOn(startTestExtension)
-
-    //TODO: find a way to add permissions for the tests
-    systemProperty 'tests.security.manager', 'false'
-
-    systemProperty "https", System.getProperty("https")
-    systemProperty "user", System.getProperty("user")
-    systemProperty "password", System.getProperty("password")
-
-
-    // The --debug-jvm command-line option makes the cluster debuggable; this makes the tests debuggable
-    if (System.getProperty("test.debug") != null) {
-        jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005'
-    }
 }
 
 def testExtensionYml = new org.yaml.snakeyaml.Yaml().load(new File("src/test/resources/hello-world-extension.yml").newInputStream())
 
 task closeTestExtension (type: Exec) {
-    commandLine 'bash', '-c', "kill \$(lsof -i:${testExtensionYml.port})"
+    commandLine 'bash', '-c', "kill -9 \$(lsof -i:${testExtensionYml.port})"
 }
 
 tasks.named("integTest").configure { finalizedBy(closeTestExtension) }
@@ -312,17 +299,4 @@ tasks.named("integTest").configure { finalizedBy(closeTestExtension) }
 testClusters.integTest {
     extension(true)
     testDistribution = "ARCHIVE"
-    // Cluster shrink exception thrown if we try to set numberOfNodes to 1, so only apply if > 1
-    if (_numNodes > 1) numberOfNodes = _numNodes
-    // When running integration tests it doesn't forward the --debug-jvm to the cluster anymore
-    // i.e. we have to use a custom property to flag when we want to debug elasticsearch JVM
-    // since we also support multi node integration tests we increase debugPort per node
-    if (System.getProperty("opensearch.debug") != null) {
-        def debugPort = 5005
-        nodes.forEach { node ->
-            node.jvmArgs("-agentlib:jdwp=transport=dt_socket,server=n,suspend=y,address=*:${debugPort}")
-            debugPort += 1
-        }
-    }
-
 }
