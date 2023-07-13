@@ -294,20 +294,6 @@ integTest {
     systemProperty "user", System.getProperty("user")
     systemProperty "password", System.getProperty("password")
 
-    // The 'doFirst' delays till execution time.
-    doFirst {
-        // Tell the test JVM if the cluster JVM is running under a debugger so that tests can
-        // use longer timeouts for requests.
-        def isDebuggingCluster = getDebug() || System.getProperty("test.debug") != null
-        systemProperty 'cluster.debug', isDebuggingCluster
-        // Set number of nodes system property to be used in tests
-        systemProperty 'cluster.number_of_nodes', "1"
-        // There seems to be an issue when running multi node run or integ tasks with unicast_hosts
-        // not being written, the waitForAllConditions ensures it's written
-        getClusters().forEach { cluster ->
-            cluster.waitForAllConditions()
-        }
-    }
 
     // The --debug-jvm command-line option makes the cluster debuggable; this makes the tests debuggable
     if (System.getProperty("test.debug") != null) {
