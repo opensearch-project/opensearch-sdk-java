@@ -278,10 +278,15 @@ task integTest(type: RestIntegTestTask) {
     testClassesDirs = sourceSets.test.output.classesDirs
     classpath = sourceSets.test.runtimeClasspath
 }
-//tasks.named("check").configure { dependsOn(integTest) }
+tasks.named("check").configure { dependsOn(integTest) }
 
-task startTestExtension(type: Exec) {
-    commandLine 'bash', '-c', "./gradlew helloWorld &"
+task startTestExtension {
+    doFirst{
+        ext.process = new ProcessBuilder()
+                .directory(projectDir)
+                .command("./gradlew", "helloWorld")
+                .start()
+    }
 }
 
 integTest {
@@ -315,10 +320,12 @@ integTest {
     }
 }
 
-def testExtensionYml = new org.yaml.snakeyaml.Yaml().load(new File("src/test/resources/hello-world-extension.yml").newInputStream())
-
-task closeTestExtension (type: Exec) {
-    commandLine 'bash', '-c', "kill \$(lsof -i:${testExtensionYml.port})"
+task closeTestExtension {
+    doFirst {
+        if (tasks.startTestExtension.process != null) {
+            tasks.startTestExtension.process.destroy()
+        }
+    }
 }
 
 tasks.named("integTest").configure { finalizedBy(closeTestExtension) }
@@ -338,5 +345,4 @@ testClusters.integTest {
             debugPort += 1
         }
     }
-
 }
