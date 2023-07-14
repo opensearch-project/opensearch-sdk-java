@@ -13,6 +13,5 @@
             <AppenderRef ref="ConsoleAppender" />
             <AppenderRef ref="FileAppender"/>
         </Root>i
-    <logger name="io.netty.util" level="ERROR"/>
     </Loggers>
 </Configuration>
