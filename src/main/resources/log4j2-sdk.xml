@@ -12,6 +12,6 @@
         <Root level="debug">
             <AppenderRef ref="ConsoleAppender" />
             <AppenderRef ref="FileAppender"/>
-        </Root>i
+        </Root>
     </Loggers>
 </Configuration>
