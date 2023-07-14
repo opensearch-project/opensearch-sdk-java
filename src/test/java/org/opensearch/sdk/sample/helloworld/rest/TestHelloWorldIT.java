@@ -13,16 +13,16 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.http.HttpEntity;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.opensearch.client.Request;
 import org.opensearch.client.Response;
 import org.opensearch.client.RestClient;
-import org.opensearch.core.rest.RestStatus;
+import org.opensearch.rest.RestStatus;
 import org.opensearch.test.rest.OpenSearchRestTestCase;
 
 public class TestHelloWorldIT extends OpenSearchRestTestCase {
@@ -44,8 +44,8 @@ public class TestHelloWorldIT extends OpenSearchRestTestCase {
             + ",\"hostAddress\":\"127.0.0.1\""
             + ",\"port\":\"4500\""
             + ",\"version\":\"1.0\""
-            + ",\"opensearchVersion\":\"3.0.0\""
-            + ",\"minimumCompatibleVersion\":\"3.0.0\"}";
+            + ",\"opensearchVersion\":\"2.9.0\""
+            + ",\"minimumCompatibleVersion\":\"2.9.0\"}";
         Response response = makeRequest(client(), "POST", EXTENSION_INIT_URI, null, toHttpEntity(helloWorldInitRequestBody));
 
         assertEquals(RestStatus.ACCEPTED, restStatus(response));
