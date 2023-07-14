@@ -23,11 +23,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import org.apache.hc.core5.function.Factory;
+import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
 import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
+import org.apache.hc.core5.http.message.BasicHeader;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.reactor.ssl.TlsDetails;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
@@ -165,7 +167,7 @@ public class SDKClient implements Closeable {
      * @return An instance of the builder
      */
     private static RestClientBuilder builder(String hostAddress, int port) {
-        RestClientBuilder builder = RestClient.builder(new HttpHost(hostAddress, port));
+        RestClientBuilder builder = RestClient.builder(new HttpHost("https", hostAddress, port));
         builder.setStrictDeprecationMode(true);
         builder.setHttpClientConfigCallback(httpClientBuilder -> {
             try {
@@ -201,8 +203,9 @@ public class SDKClient implements Closeable {
      * @param port The port of OpenSearch cluster
      * @return The OpenSearchTransport implementation of RestClientTransport.
      */
-    private OpenSearchTransport initializeTransport(String hostAddress, int port) {
+    private OpenSearchTransport initializeTransport(String hostAddress, int port, Map<String, String> headers) {
         RestClientBuilder builder = builder(hostAddress, port);
+        builder.setDefaultHeaders(headers.keySet().stream().map(k -> new BasicHeader(k, headers.get(k))).toArray(Header[]::new));
 
         restClient = builder.build();
         ObjectMapper mapper = new ObjectMapper();
@@ -230,13 +233,41 @@ public class SDKClient implements Closeable {
     /**
      * Initializes an OpenSearchClient using OpenSearch JavaClient
      *
+     * @return The SDKClient implementation of OpenSearchClient. The user is responsible for calling
+     *         {@link #doCloseJavaClients()} when finished with the client
+     */
+    public OpenSearchClient initializeJavaClientWithHeaders(Map<String, String> headers) {
+        return initializeJavaClientWithHeaders(
+            extensionSettings.getOpensearchAddress(),
+            Integer.parseInt(extensionSettings.getOpensearchPort()),
+            headers
+        );
+    }
+
+    /**
+     * Initializes an OpenSearchClient using OpenSearch JavaClient
+     *
      * @param hostAddress The address of OpenSearch cluster, client can connect to
      * @param port The port of OpenSearch cluster
      * @return The SDKClient implementation of OpenSearchClient. The user is responsible for calling
      *         {@link #doCloseJavaClients()} when finished with the client
      */
     public OpenSearchClient initializeJavaClient(String hostAddress, int port) {
-        OpenSearchTransport transport = initializeTransport(hostAddress, port);
+        OpenSearchTransport transport = initializeTransport(hostAddress, port, Map.of());
+        javaClient = new OpenSearchClient(transport);
+        return javaClient;
+    }
+
+    /**
+     * Initializes an OpenSearchClient using OpenSearch JavaClient
+     *
+     * @param hostAddress The address of OpenSearch cluster, client can connect to
+     * @param port The port of OpenSearch cluster
+     * @return The SDKClient implementation of OpenSearchClient. The user is responsible for calling
+     *         {@link #doCloseJavaClients()} when finished with the client
+     */
+    public OpenSearchClient initializeJavaClientWithHeaders(String hostAddress, int port, Map<String, String> headers) {
+        OpenSearchTransport transport = initializeTransport(hostAddress, port, headers);
         javaClient = new OpenSearchClient(transport);
         return javaClient;
     }
@@ -260,7 +291,7 @@ public class SDKClient implements Closeable {
      *         {@link #doCloseJavaClients()} when finished with the client
      */
     public OpenSearchAsyncClient initalizeJavaAsyncClient(String hostAddress, int port) {
-        OpenSearchTransport transport = initializeTransport(hostAddress, port);
+        OpenSearchTransport transport = initializeTransport(hostAddress, port, Map.of());
         javaAsyncClient = new OpenSearchAsyncClient(transport);
         return javaAsyncClient;
     }
@@ -556,7 +587,7 @@ public class SDKClient implements Closeable {
          * @return the response returned by OpenSearch
          * @throws IOException in case of a problem or the connection was aborted
          */
-        public Response performRequest(Request request) throws IOException {
+        public Response uest(Request request) throws IOException {
             return restHighLevelClient.getLowLevelClient().performRequest(request);
         }
 

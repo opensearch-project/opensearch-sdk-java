@@ -19,6 +19,7 @@ import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
 import org.opensearch.core.common.io.stream.NamedWriteableRegistry;
+import org.opensearch.discovery.InitializeExtensionSecurityRequest;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
@@ -401,6 +402,15 @@ public class ExtensionsRunner {
             false,
             InitializeExtensionRequest::new,
             (request, channel, task) -> channel.sendResponse(extensionsInitRequestHandler.handleExtensionInitRequest(request))
+        );
+
+        transportService.registerRequestHandler(
+            ExtensionsManager.REQUEST_EXTENSION_REGISTER_SECURITY_SETTINGS,
+            ThreadPool.Names.GENERIC,
+            false,
+            false,
+            InitializeExtensionSecurityRequest::new,
+            (request, channel, task) -> channel.sendResponse(extensionsInitRequestHandler.handleExtensionSecurityInitRequest(request))
         );
 
         transportService.registerRequestHandler(
