@@ -12,7 +12,6 @@
         <Root level="debug">
             <AppenderRef ref="ConsoleAppender" />
             <AppenderRef ref="FileAppender"/>
-        </Root>i
-    <logger name="io.netty.util" level="ERROR"/>
+        </Root>
     </Loggers>
 </Configuration>

@@ -205,6 +205,7 @@ task helloWorld(type: JavaExec) {
     description = 'Run HelloWorld Extension.'
     mainClass = 'org.opensearch.sdk.sample.helloworld.HelloWorldExtension'
     classpath = sourceSets.main.runtimeClasspath
+    systemProperty 'log4j2.configurationFile', 'log4j2-sdk.xml'
 }
 
 task getVersion() {
