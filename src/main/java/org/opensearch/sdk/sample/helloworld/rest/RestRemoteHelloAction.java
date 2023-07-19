@@ -10,6 +10,9 @@
 package org.opensearch.sdk.sample.helloworld.rest;
 
 import org.opensearch.action.ActionListener;
+import org.opensearch.client.WarningFailureException;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch.indices.CreateIndexRequest;
 import org.opensearch.core.common.io.stream.StreamInput;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RemoteExtensionActionResponse;
@@ -22,18 +25,25 @@ import org.opensearch.sdk.SDKClient;
 import org.opensearch.sdk.action.RemoteExtensionAction;
 import org.opensearch.sdk.action.RemoteExtensionActionRequest;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler;
+import org.opensearch.sdk.rest.SDKRestRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleResponse;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static org.opensearch.rest.RestRequest.Method.GET;
 import static org.opensearch.core.rest.RestStatus.OK;
+import static org.opensearch.sdk.sample.helloworld.rest.RestHelloAction.GREETING;
 
 /**
  * Sample REST Handler demonstrating proxy actions to another extension
@@ -60,7 +70,13 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
                 .handler(handleRemoteGetRequest)
                 .uniqueName(addRouteNamePrefix("remote_greet_with_name"))
                 .legacyActionNames(Collections.emptySet())
-                .build()
+                .build(),
+            new NamedRoute.Builder().method(GET)
+                    .path("/greet/{name}")
+                    .handler(handleLocalGetRequest)
+                    .uniqueName(addRouteNamePrefix("local_greet_with_name"))
+                    .legacyActionNames(Collections.emptySet())
+                    .build()
         );
     }
 
@@ -99,6 +115,29 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
         } catch (Exception e) {
             return exceptionalRequest(request, e);
         }
+    };
+
+    private Function<RestRequest, RestResponse> handleLocalGetRequest = (request) -> {
+        SDKRestRequest sdkRestRequest = (SDKRestRequest) request;
+        List<String> authorizationHeaders = sdkRestRequest.getHeaders().get("Authorization");
+        Map<String, String> headers = new HashMap<>();
+        if (!authorizationHeaders.isEmpty()) {
+            headers.put("Authorization", authorizationHeaders.get(0));
+        }
+        OpenSearchClient restClient1 = extensionsRunner.getSdkClient()
+                .initializeJavaClientWithHeaders(headers);
+
+        try {
+            restClient1.indices().create(new CreateIndexRequest.Builder().index(".my-index").build());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } catch (WarningFailureException e2) {
+            System.out.println(e2.getMessage());
+        }
+
+        String name = request.param("name");
+
+        return new ExtensionRestResponse(request, OK, String.format(GREETING, name));
     };
 
 }

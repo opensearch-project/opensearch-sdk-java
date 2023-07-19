@@ -10,6 +10,8 @@
 package org.opensearch.sdk.sample.helloworld.rest;
 
 import org.opensearch.OpenSearchParseException;
+import org.opensearch.client.WarningFailureException;
+import org.opensearch.client.opensearch.indices.CreateIndexRequest;
 import org.opensearch.core.common.bytes.BytesReference;
 import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.common.xcontent.XContentType;
@@ -48,7 +50,7 @@ import static org.opensearch.core.rest.RestStatus.OK;
 public class RestHelloAction extends BaseExtensionRestHandler {
 
     private static final String TEXT_CONTENT_TYPE = "text/plain; charset=UTF-8";
-    private static final String GREETING = "Hello, %s!";
+    public static final String GREETING = "Hello, %s!";
     private static final String DEFAULT_NAME = "World";
 
     private String worldName = DEFAULT_NAME;

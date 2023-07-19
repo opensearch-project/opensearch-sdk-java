@@ -9,6 +9,7 @@
 
 package org.opensearch.sdk.handlers;
 
+import joptsimple.internal.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.core.common.bytes.BytesReference;
@@ -21,6 +22,10 @@ import org.opensearch.sdk.rest.ExtensionRestHandler;
 import org.opensearch.sdk.rest.ExtensionRestPathRegistry;
 import org.opensearch.sdk.rest.SDKHttpRequest;
 import org.opensearch.sdk.rest.SDKRestRequest;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
@@ -68,11 +73,19 @@ public class ExtensionsRestRequestHandler {
             );
         }
 
+        String oboToken = request.getRequestIssuerIdentity();
+        Map<String, List<String>> headers = new HashMap<>();
+        headers.putAll(request.headers());
+        System.out.println("oboToken: " + oboToken);
+        if (!Strings.isNullOrEmpty(oboToken)) {
+            headers.put("Authorization", List.of("Bearer " + oboToken));
+        }
+
         SDKRestRequest sdkRestRequest = new SDKRestRequest(
             sdkNamedXContentRegistry.getRegistry(),
             request.params(),
             request.path(),
-            request.headers(),
+            headers,
             new SDKHttpRequest(request),
             null
         );
