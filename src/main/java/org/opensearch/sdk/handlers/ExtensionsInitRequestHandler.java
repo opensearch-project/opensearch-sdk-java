@@ -9,11 +9,16 @@
 
 package org.opensearch.sdk.handlers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
+import org.opensearch.client.RequestOptions;
 import org.opensearch.client.WarningFailureException;
 import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch.core.IndexRequest;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.indices.CreateIndexRequest;
 import org.opensearch.client.opensearch.indices.DeleteIndexRequest;
 import org.opensearch.common.settings.Settings;
@@ -119,30 +124,95 @@ public class ExtensionsInitRequestHandler {
 
         System.out.println("Service Account Token: " + extensionInitSecurityRequest.getServiceAccountToken());
 
-        OpenSearchClient restClient1 = extensionsRunner.getSdkClient()
-            .initializeJavaClientWithHeaders(
-                Map.of("Authorization", "Basic " + Base64.getEncoder().encodeToString("admin:admin".getBytes(StandardCharsets.UTF_8)))
-            );
+        // Uncomment the lines below to try out different actions utilizing the service account token
 
-        try {
-            restClient1.indices().create(new CreateIndexRequest.Builder().index(".hello-world-jobs").build());
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        } catch (WarningFailureException e2) {
-            System.out.println(e2.getMessage());
-        }
-
-        OpenSearchClient restClient2 = extensionsRunner.getSdkClient()
-            .initializeJavaClientWithHeaders(Map.of("Authorization", "Bearer " + extensionInitSecurityRequest.getServiceAccountToken()));
-
-        try {
-            restClient2.indices().delete(new DeleteIndexRequest.Builder().index(".hello-world-jobs").build());
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        } catch (WarningFailureException e2) {
-            System.out.println(e2.getMessage());
-        }
+//        OpenSearchClient restClient1 = extensionsRunner.getSdkClient()
+//            .initializeJavaClientWithHeaders(
+//                Map.of("Authorization", "Basic " + Base64.getEncoder().encodeToString("admin:admin".getBytes(StandardCharsets.UTF_8)))
+//            );
+//
+//        try {
+//            restClient1.indices().create(new CreateIndexRequest.Builder().index(".hello-world-jobs").build());
+//        } catch (IOException e) {
+//            System.out.println(e.getMessage());
+//        } catch (WarningFailureException e2) {
+//            System.out.println(e2.getMessage());
+//        }
+//
+//        OpenSearchClient restClient2 = extensionsRunner.getSdkClient()
+//            .initializeJavaClientWithHeaders(Map.of("Authorization", "Bearer " + extensionInitSecurityRequest.getServiceAccountToken()));
+//
+//        try {
+//            restClient2.indices().delete(new DeleteIndexRequest.Builder().index(".hello-world-jobs").build());
+//        } catch (IOException e) {
+//            System.out.println(e.getMessage());
+//        } catch (WarningFailureException e2) {
+//            System.out.println(e2.getMessage());
+//        }
+//
+//        // Try reading from index with service account token
+//
+//        try {
+//            restClient1.indices().create(new CreateIndexRequest.Builder().index("logs-123").build());
+//        } catch (IOException e) {
+//            System.out.println(e.getMessage());
+//        } catch (WarningFailureException e2) {
+//            System.out.println(e2.getMessage());
+//        }
+//
+//        try {
+//            SearchRequest searchRequest = new SearchRequest.Builder()
+//                    .index("logs-123")
+//                    .build();
+//            SearchResponse<JsonNode> searchResponse = restClient2.search(searchRequest, JsonNode.class);
+//            System.out.println("SearchResponse: " + searchResponse);
+//        } catch (IOException e) {
+//            System.out.println(e.getMessage());
+//        } catch (WarningFailureException e2) {
+//            System.out.println(e2.getMessage());
+//        }
+//
+//        try {
+//            IndexData indexData = new IndexData("John", "Doe");
+//            IndexRequest<IndexData> indexRequest = new IndexRequest.Builder<IndexData>().index("logs-123").id("1").document(indexData).build();
+//            restClient2.index(indexRequest);
+//        } catch (IOException e) {
+//            System.out.println(e.getMessage());
+//        } catch (WarningFailureException e2) {
+//            System.out.println(e2.getMessage());
+//        }
 
         return new InitializeExtensionSecurityResponse(extensionsRunner.getExtensionNode().getId());
+    }
+
+    static class IndexData {
+        private String firstName;
+        private String lastName;
+
+        public IndexData(String firstName, String lastName) {
+            this.firstName = firstName;
+            this.lastName = lastName;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public void setFirstName(String firstName) {
+            this.firstName = firstName;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+
+        public void setLastName(String lastName) {
+            this.lastName = lastName;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("IndexData{first name='%s', last name='%s'}", firstName, lastName);
+        }
     }
 }

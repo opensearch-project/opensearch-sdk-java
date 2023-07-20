@@ -10,8 +10,6 @@
 package org.opensearch.sdk.sample.helloworld.rest;
 
 import org.opensearch.OpenSearchParseException;
-import org.opensearch.client.WarningFailureException;
-import org.opensearch.client.opensearch.indices.CreateIndexRequest;
 import org.opensearch.core.common.bytes.BytesReference;
 import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.common.xcontent.XContentType;

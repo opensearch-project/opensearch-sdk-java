@@ -31,8 +31,6 @@ import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleResponse;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -72,11 +70,11 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
                 .legacyActionNames(Collections.emptySet())
                 .build(),
             new NamedRoute.Builder().method(GET)
-                    .path("/greet/{name}")
-                    .handler(handleLocalGetRequest)
-                    .uniqueName(addRouteNamePrefix("local_greet_with_name"))
-                    .legacyActionNames(Collections.emptySet())
-                    .build()
+                .path("/greet/{name}")
+                .handler(handleLocalGetRequest)
+                .uniqueName(addRouteNamePrefix("local_greet_with_name"))
+                .legacyActionNames(Collections.emptySet())
+                .build()
         );
     }
 
@@ -124,8 +122,7 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
         if (!authorizationHeaders.isEmpty()) {
             headers.put("Authorization", authorizationHeaders.get(0));
         }
-        OpenSearchClient restClient1 = extensionsRunner.getSdkClient()
-                .initializeJavaClientWithHeaders(headers);
+        OpenSearchClient restClient1 = extensionsRunner.getSdkClient().initializeJavaClientWithHeaders(headers);
 
         try {
             restClient1.indices().create(new CreateIndexRequest.Builder().index(".my-index").build());
