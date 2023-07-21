@@ -17,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
+import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
 import org.opensearch.core.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.discovery.InitializeExtensionSecurityRequest;
@@ -126,6 +127,7 @@ public class ExtensionsRunner {
     private final SDKNamedXContentRegistry sdkNamedXContentRegistry;
     private final SDKNamedWriteableRegistry sdkNamedWriteableRegistry;
     private final SDKClient sdkClient;
+    private OpenSearchClient extensionRestClient;
     private final SDKClusterService sdkClusterService;
     private final SDKTransportService sdkTransportService;
     private final SDKActionModule sdkActionModule;
@@ -346,6 +348,19 @@ public class ExtensionsRunner {
     }
 
     /**
+     * Initializes a REST Client for this extension to interact with an OpenSearch cluster on its own behalf
+     *
+     * @param serviceAccountToken Access token that permits an extension to make requests on its own behalf.
+     *                            Common examples of usages of service account tokens include interacting with
+     *                            an extension's reserved indices.
+     */
+    public void initializeExtensionRestClient(String serviceAccountToken) {
+        OpenSearchClient restClient = getSdkClient()
+                .initializeJavaClientWithHeaders(Map.of("Authorization", "Bearer " + serviceAccountToken));
+        this.extensionRestClient = restClient;
+    }
+
+    /**
      * Returns the discovery extension node set during extension initialization
      *
      * @return the extensionNode
@@ -536,6 +551,15 @@ public class ExtensionsRunner {
      */
     public SDKClient getSdkClient() {
         return sdkClient;
+    }
+
+    /**
+     * Returns the Extension rest client instance used by this extension.
+     *
+     * @return The Extension rest client instance.
+     */
+    public OpenSearchClient getExtensionRestClient() {
+        return extensionRestClient;
     }
 
     /**

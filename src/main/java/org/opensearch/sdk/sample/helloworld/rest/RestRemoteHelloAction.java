@@ -13,6 +13,7 @@ import org.opensearch.action.ActionListener;
 import org.opensearch.client.WarningFailureException;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch.indices.CreateIndexRequest;
+import org.opensearch.client.opensearch.indices.DeleteIndexRequest;
 import org.opensearch.core.common.io.stream.StreamInput;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RemoteExtensionActionResponse;
@@ -31,6 +32,8 @@ import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleResponse;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +59,7 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
      * @param runner The ExtensionsRunner instance
      */
     public RestRemoteHelloAction(ExtensionsRunner runner) {
+        super(runner.getSdkClient());
         this.extensionsRunner = runner;
     }
 
@@ -73,6 +77,12 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
                 .path("/greet/{name}")
                 .handler(handleLocalGetRequest)
                 .uniqueName(addRouteNamePrefix("local_greet_with_name"))
+                .legacyActionNames(Collections.emptySet())
+                .build(),
+            new NamedRoute.Builder().method(GET)
+                .path("/service_account_token_example")
+                .handler(handleServiceAccountTokenExampleRequest)
+                .uniqueName(addRouteNamePrefix("service_account_token_example"))
                 .legacyActionNames(Collections.emptySet())
                 .build()
         );
@@ -116,16 +126,9 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
     };
 
     private Function<RestRequest, RestResponse> handleLocalGetRequest = (request) -> {
-        SDKRestRequest sdkRestRequest = (SDKRestRequest) request;
-        List<String> authorizationHeaders = sdkRestRequest.getHeaders().get("Authorization");
-        Map<String, String> headers = new HashMap<>();
-        if (!authorizationHeaders.isEmpty()) {
-            headers.put("Authorization", authorizationHeaders.get(0));
-        }
-        OpenSearchClient restClient1 = extensionsRunner.getSdkClient().initializeJavaClientWithHeaders(headers);
-
+        // Example usage of userRestClient
         try {
-            restClient1.indices().create(new CreateIndexRequest.Builder().index(".my-index").build());
+            userRestClient.indices().create(new CreateIndexRequest.Builder().index(".my-index").build());
         } catch (IOException e) {
             System.out.println(e.getMessage());
         } catch (WarningFailureException e2) {
@@ -136,5 +139,96 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
 
         return new ExtensionRestResponse(request, OK, String.format(GREETING, name));
     };
+
+    private Function<RestRequest, RestResponse> handleServiceAccountTokenExampleRequest = (request) -> {
+        // Uncomment the lines below to try out different actions utilizing the service account token
+
+        OpenSearchClient adminRestClient = extensionsRunner.getSdkClient()
+                .initializeJavaClientWithHeaders(
+                        Map.of("Authorization", "Basic " + Base64.getEncoder().encodeToString("admin:admin".getBytes(StandardCharsets.UTF_8)))
+                );
+
+        try {
+            adminRestClient.indices().create(new CreateIndexRequest.Builder().index(".hello-world-jobs").build());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } catch (WarningFailureException e2) {
+            System.out.println(e2.getMessage());
+        }
+
+        // Example usage of extension rest client - utilizing service account token
+        try {
+            extensionsRunner.getExtensionRestClient().indices().delete(new DeleteIndexRequest.Builder().index(".hello-world-jobs").build());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } catch (WarningFailureException e2) {
+            System.out.println(e2.getMessage());
+        }
+
+        // Try reading from index with service account token
+
+//        try {
+//            adminRestClient.indices().create(new CreateIndexRequest.Builder().index("logs-123").build());
+//        } catch (IOException e) {
+//            System.out.println(e.getMessage());
+//        } catch (WarningFailureException e2) {
+//            System.out.println(e2.getMessage());
+//        }
+//
+//        try {
+//            SearchRequest searchRequest = new SearchRequest.Builder()
+//                    .index("logs-123")
+//                    .build();
+//            SearchResponse<JsonNode> searchResponse = userRestClient.search(searchRequest, JsonNode.class);
+//            System.out.println("SearchResponse: " + searchResponse);
+//        } catch (IOException e) {
+//            System.out.println(e.getMessage());
+//        } catch (WarningFailureException e2) {
+//            System.out.println(e2.getMessage());
+//        }
+//
+//        try {
+//            IndexData indexData = new IndexData("John", "Doe");
+//            IndexRequest<IndexData> indexRequest = new IndexRequest.Builder<IndexData>().index("logs-123").id("1").document(indexData).build();
+//            userRestClient.index(indexRequest);
+//        } catch (IOException e) {
+//            System.out.println(e.getMessage());
+//        } catch (WarningFailureException e2) {
+//            System.out.println(e2.getMessage());
+//        }
+
+        return new ExtensionRestResponse(request, OK, String.format(GREETING, "World"));
+    };
+
+    static class IndexData {
+        private String firstName;
+        private String lastName;
+
+        public IndexData(String firstName, String lastName) {
+            this.firstName = firstName;
+            this.lastName = lastName;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public void setFirstName(String firstName) {
+            this.firstName = firstName;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+
+        public void setLastName(String lastName) {
+            this.lastName = lastName;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("IndexData{first name='%s', last name='%s'}", firstName, lastName);
+        }
+    }
 
 }

@@ -18,6 +18,7 @@ import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.NamedRoute;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestResponse;
+import org.opensearch.sdk.SDKClient;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler;
 import org.opensearch.sdk.rest.ExtensionRestHandler;
 
@@ -58,7 +59,9 @@ public class RestHelloAction extends BaseExtensionRestHandler {
     /**
      * Instantiate this action
      */
-    public RestHelloAction() {}
+    public RestHelloAction(SDKClient sdkClient) {
+        super(sdkClient);
+    }
 
     @Override
     public List<NamedRoute> routes() {

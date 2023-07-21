@@ -97,6 +97,9 @@ import org.opensearch.index.reindex.DeleteByQueryRequest;
 
 import javax.net.ssl.SSLEngine;
 
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_HTTP_ENABLED;
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_ENABLED;
+
 /**
  * This class creates SDKClient for an extension to make requests to OpenSearch
  */
@@ -166,8 +169,11 @@ public class SDKClient implements Closeable {
      * @param port The port the client should connect to
      * @return An instance of the builder
      */
-    private static RestClientBuilder builder(String hostAddress, int port) {
-        RestClientBuilder builder = RestClient.builder(new HttpHost("https", hostAddress, port));
+    private static RestClientBuilder builder(String hostAddress, int port, ExtensionSettings extensionSettings) {
+        boolean httpsEnabled = extensionSettings.getSecuritySettings().containsKey(SSL_HTTP_ENABLED)
+                && "true".equals(extensionSettings.getSecuritySettings().get(SSL_HTTP_ENABLED));
+        String scheme = httpsEnabled ? "https" : "http";
+        RestClientBuilder builder = RestClient.builder(new HttpHost(scheme, hostAddress, port));
         builder.setStrictDeprecationMode(true);
         builder.setHttpClientConfigCallback(httpClientBuilder -> {
             try {
@@ -204,7 +210,7 @@ public class SDKClient implements Closeable {
      * @return The OpenSearchTransport implementation of RestClientTransport.
      */
     private OpenSearchTransport initializeTransport(String hostAddress, int port, Map<String, String> headers) {
-        RestClientBuilder builder = builder(hostAddress, port);
+        RestClientBuilder builder = builder(hostAddress, port, extensionSettings);
         builder.setDefaultHeaders(headers.keySet().stream().map(k -> new BasicHeader(k, headers.get(k))).toArray(Header[]::new));
 
         restClient = builder.build();
@@ -331,7 +337,7 @@ public class SDKClient implements Closeable {
      */
     @Deprecated
     public SDKRestClient initializeRestClient(String hostAddress, int port) {
-        this.sdkRestClient = new SDKRestClient(this, new RestHighLevelClient(builder(hostAddress, port)));
+        this.sdkRestClient = new SDKRestClient(this, new RestHighLevelClient(builder(hostAddress, port, extensionSettings)));
         return this.sdkRestClient;
     }
 

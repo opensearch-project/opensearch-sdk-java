@@ -11,7 +11,9 @@ package org.opensearch.sdk.rest;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -25,6 +27,7 @@ import java.util.function.Function;
 import static org.apache.hc.core5.http.ContentType.APPLICATION_JSON;
 
 import org.opensearch.OpenSearchException;
+import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.core.common.Strings;
@@ -38,6 +41,7 @@ import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestResponse;
 import org.opensearch.core.rest.RestStatus;
+import org.opensearch.sdk.SDKClient;
 
 /**
  * Provides convenience methods to reduce boilerplate code in an {@link ExtensionRestHandler} implementation.
@@ -47,6 +51,14 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
     private static final String VALID_ROUTE_PREFIX_PATTERN = "^[a-zA-Z0-9_]*$";
 
     private String routeNamePrefix;
+
+    private SDKClient sdkClient;
+
+    protected OpenSearchClient userRestClient;
+
+    public BaseExtensionRestHandler(SDKClient sdkClient) {
+        this.sdkClient = sdkClient;
+    }
 
     /**
      * Constant for JSON content type
@@ -114,6 +126,15 @@ public abstract class BaseExtensionRestHandler implements ExtensionRestHandler {
 
     @Override
     public ExtensionRestResponse handleRequest(RestRequest request) {
+        if (request instanceof SDKRestRequest) {
+            SDKRestRequest sdkRestRequest = (SDKRestRequest) request;
+            List<String> authorizationHeaders = sdkRestRequest.getHeaders().get("Authorization");
+            Map<String, String> headers = new HashMap<>();
+            if (!authorizationHeaders.isEmpty()) {
+                headers.put("Authorization", authorizationHeaders.get(0));
+            }
+            this.userRestClient = sdkClient.initializeJavaClientWithHeaders(headers);
+        }
         Optional<NamedRoute> route = routes().stream()
             .filter(rh -> rh.getMethod().equals(request.method()))
             .filter(rh -> restPathMatches(request.path(), rh.getPath()))
