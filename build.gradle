@@ -78,7 +78,7 @@ allprojects {
     project.ext.licenseName = 'The Apache Software License, Version 2.0'
     project.ext.licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
     group = 'org.opensearch'
-    version = '0.1.0'
+    version = '0.2.0'
     if (buildVersionQualifier) {
         version += "-${buildVersionQualifier}"
     }
