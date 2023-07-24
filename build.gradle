@@ -15,8 +15,11 @@ import org.opensearch.gradle.test.RestIntegTestTask
 
 buildscript {
     ext {
-        opensearch_version = System.getProperty("opensearch.version", "2.9.0-SNAPSHOT")
+        opensearch_version = System.getProperty("opensearch.version", "2.9.0")
         isSnapshot = "true" == System.getProperty("build.snapshot", "true")
+        if (isSnapshot) {
+            opensearch_version += "-SNAPSHOT"
+        }
         buildVersionQualifier = System.getProperty("build.version_qualifier", "")
     }
 
