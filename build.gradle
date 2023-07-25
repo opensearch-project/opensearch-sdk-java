@@ -88,6 +88,34 @@ allprojects {
 
 group 'org.opensearch.sdk'
 
+allprojects {
+    // Default to the apache license
+    project.ext.licenseName = 'The Apache Software License, Version 2.0'
+    project.ext.licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    publishing {
+        publications {
+            // add license information to generated poms
+            all {
+                pom {
+                    name = "opensearch-sdk-java"
+                }
+                pom.withXml { XmlProvider xml ->
+                    Node node = xml.asNode()
+                    node.appendNode('description', 'OpenSearch Java SDK Client')
+
+                    Node license = node.appendNode('licenses').appendNode('license')
+                    license.appendNode('name', project.licenseName)
+                    license.appendNode('url', project.licenseUrl)
+
+                    Node developer = node.appendNode('developers').appendNode('developer')
+                    developer.appendNode('name', 'OpenSearch')
+                    developer.appendNode('url', 'https://github.com/opensearch-project/opensearch-sdk-java')
+                }
+            }
+        }
+    }
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
