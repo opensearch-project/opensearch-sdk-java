@@ -89,11 +89,6 @@ allprojects {
 group 'org.opensearch.sdk'
 
 publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
 
     repositories {
         if (version.toString().endsWith("SNAPSHOT")) {
@@ -109,6 +104,29 @@ publishing {
         maven {
             name = "localRepo"
             url = "$buildDir/localRepo"
+        }
+    }
+
+    publications {
+        mavenJava(MavenPublication) {
+            pom {
+                name = project.name
+                description = 'OpenSearch Software Development Kit'
+                url = "https://github.com/opensearch-project/opensearch-sdk-java"
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                        distribution = 'repo'
+                    }
+                }
+                developers {
+                    developer {
+                        name = "OpenSearch"
+                        url = "https://github.com/opensearch-project/opensearch-sdk-java"
+                    }
+                }
+            }
         }
     }
 }
