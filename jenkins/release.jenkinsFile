@@ -10,8 +10,8 @@ standardReleasePipelineWithGenericTrigger(
     downloadReleaseAsset: true,
     publishRelease: false) {
         publishToMaven(
-            signingArtifactsPath: "$WORKSPACE/repository/",
-            mavenArtifactsPath: "$WORKSPACE/repository/",
+            signingArtifactsPath: "$WORKSPACE/localRepo/",
+            mavenArtifactsPath: "$WORKSPACE/localRepo/",
             autoPublish: false
         )
     }
