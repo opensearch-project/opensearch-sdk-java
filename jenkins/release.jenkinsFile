@@ -8,10 +8,10 @@ standardReleasePipelineWithGenericTrigger(
     tokenIdCredential: 'jenkins-opensearch-sdk-java-generic-webhook-token',
     causeString: 'A tag was cut on opensearch-project/opensearch-sdk-java repository causing this workflow to run',
     downloadReleaseAsset: true,
-    publishRelease: false) {
+    publishRelease: true) {
         publishToMaven(
             signingArtifactsPath: "$WORKSPACE/localRepo/",
             mavenArtifactsPath: "$WORKSPACE/localRepo/",
-            autoPublish: false
+            autoPublish: true
         )
     }
