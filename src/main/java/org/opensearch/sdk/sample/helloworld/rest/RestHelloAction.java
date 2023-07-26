@@ -11,6 +11,7 @@ package org.opensearch.sdk.sample.helloworld.rest;
 
 import org.opensearch.OpenSearchParseException;
 import org.opensearch.core.common.bytes.BytesReference;
+import org.opensearch.core.xcontent.MediaType;
 import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.common.xcontent.json.JsonXContent;
@@ -100,11 +101,11 @@ public class RestHelloAction extends BaseExtensionRestHandler {
     private Function<RestRequest, RestResponse> handlePostRequest = (request) -> {
         if (request.hasContent()) {
             String adjective = "";
-            XContentType contentType = request.getXContentType();
-            if (contentType == null) {
+            MediaType mediaType = request.getMediaType();
+            if (mediaType == null) {
                 // Plain text
                 adjective = request.content().utf8ToString();
-            } else if (contentType.equals(XContentType.JSON)) {
+            } else if (mediaType.equals(XContentType.JSON)) {
                 try {
                     adjective = request.contentParser().mapStrings().get("adjective");
                 } catch (IOException | OpenSearchParseException e) {

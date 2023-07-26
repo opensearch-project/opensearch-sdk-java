@@ -91,6 +91,34 @@ allprojects {
 
 group 'org.opensearch.sdk'
 
+allprojects {
+    // Default to the apache license
+    project.ext.licenseName = 'The Apache Software License, Version 2.0'
+    project.ext.licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    publishing {
+        publications {
+            // add license information to generated poms
+            all {
+                pom {
+                    name = "opensearch-sdk-java"
+                }
+                pom.withXml { XmlProvider xml ->
+                    Node node = xml.asNode()
+                    node.appendNode('description', 'OpenSearch Java SDK Client')
+
+                    Node license = node.appendNode('licenses').appendNode('license')
+                    license.appendNode('name', project.licenseName)
+                    license.appendNode('url', project.licenseUrl)
+
+                    Node developer = node.appendNode('developers').appendNode('developer')
+                    developer.appendNode('name', 'OpenSearch')
+                    developer.appendNode('url', 'https://github.com/opensearch-project/opensearch-sdk-java')
+                }
+            }
+        }
+    }
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -141,8 +169,8 @@ dependencies {
     def guavaVersion = "32.1.1-jre"
     def guiceVersion = "7.0.0"
     def junit4Version = "4.13.2"
-    def junit5Version = "5.9.3"
-    def junitPlatform = "1.9.3"
+    def junit5Version = "5.10.0"
+    def junitPlatform = "1.10.0"
     def jaxbVersion = "2.3.1"
     def jakartaVersion = "2.1.2"
     def jakartaInjectVersion = "2.0.1"
