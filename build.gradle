@@ -16,8 +16,11 @@ import org.opensearch.gradle.testclusters.ExtensionsProperties
 
 buildscript {
     ext {
-        opensearch_version = System.getProperty("opensearch.version", "3.0.0-SNAPSHOT")
+        opensearch_version = System.getProperty("opensearch.version", "3.0.0")
         isSnapshot = "true" == System.getProperty("build.snapshot", "true")
+        if (isSnapshot) {
+            opensearch_version += "-SNAPSHOT"
+        }
         buildVersionQualifier = System.getProperty("build.version_qualifier", "")
     }
 
