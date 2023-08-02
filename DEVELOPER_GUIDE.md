@@ -124,7 +124,6 @@ testClusters {
 Add the experimental feature flag as a command line argument:
 
 - `./bin/opensearch -E opensearch.experimental.feature.extensions.enabled=true` when running from a local distribution
-- `./gradlew run -Dopensearch.experimental.feature.extensions.enabled=true` when running using Gradle in developer mode
 
 ##### Option 3
 
