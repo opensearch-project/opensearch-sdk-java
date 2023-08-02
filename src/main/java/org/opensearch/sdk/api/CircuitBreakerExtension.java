@@ -9,10 +9,10 @@
 
 package org.opensearch.sdk.api;
 
-import org.opensearch.common.breaker.CircuitBreaker;
+import org.opensearch.core.common.breaker.CircuitBreaker;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.indices.breaker.BreakerSettings;
-import org.opensearch.indices.breaker.CircuitBreakerService;
+import org.opensearch.core.indices.breaker.CircuitBreakerService;
 import org.opensearch.sdk.Extension;
 
 /**
