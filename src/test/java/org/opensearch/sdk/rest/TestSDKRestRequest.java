@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.opensearch.common.bytes.BytesArray;
-import org.opensearch.common.bytes.BytesReference;
+import org.opensearch.core.common.bytes.BytesArray;
+import org.opensearch.core.common.bytes.BytesReference;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.extensions.rest.ExtensionRestRequest;
 import org.opensearch.http.HttpRequest;
@@ -56,7 +56,7 @@ public class TestSDKRestRequest extends OpenSearchTestCase {
         assertEquals(expectedPath, sdkRestRequest.path());
         assertEquals(expectedParams, sdkRestRequest.params());
         assertEquals(expectedHeaders, sdkRestRequest.getHeaders());
-        assertEquals(exptectedXContentType, sdkRestRequest.getXContentType());
+        assertEquals(exptectedXContentType, sdkRestRequest.getMediaType());
         assertEquals(expectedContent, sdkRestRequest.content());
 
         Map<String, String> source = sdkRestRequest.contentParser().mapStrings();

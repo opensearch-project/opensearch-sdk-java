@@ -10,7 +10,7 @@
 package org.opensearch.sdk.sample.helloworld.rest;
 
 import org.opensearch.action.ActionListener;
-import org.opensearch.common.io.stream.StreamInput;
+import org.opensearch.core.common.io.stream.StreamInput;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static org.opensearch.rest.RestRequest.Method.GET;
-import static org.opensearch.rest.RestStatus.OK;
+import static org.opensearch.core.rest.RestStatus.OK;
 
 /**
  * Sample REST Handler demonstrating proxy actions to another extension

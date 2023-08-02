@@ -102,7 +102,7 @@ git clone https://github.com/<your username>/OpenSearch.git
 
 #### Enable the extensions feature flag
 
-Extensions are experimental in OpenSearch 2.8, so you must enable them either before or when you run OpenSearch. You can enable the feature flag using one of the following options.
+Extensions are experimental in OpenSearch 2.9, so you must enable them either before or when you run OpenSearch. You can enable the feature flag using one of the following options.
 
 ##### Option 1
 

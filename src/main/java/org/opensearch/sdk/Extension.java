@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.Collection;
 import java.util.List;
 
-import org.opensearch.common.io.stream.NamedWriteableRegistry;
+import org.opensearch.core.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.threadpool.ExecutorBuilder;

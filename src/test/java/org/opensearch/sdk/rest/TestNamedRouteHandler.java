@@ -11,7 +11,7 @@ package org.opensearch.sdk.rest;
 
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.NamedRoute;
-import org.opensearch.rest.RestStatus;
+import org.opensearch.core.rest.RestStatus;
 import org.opensearch.test.OpenSearchTestCase;
 
 import java.util.Collections;
