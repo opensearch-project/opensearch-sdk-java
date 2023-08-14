@@ -9,7 +9,7 @@
 
 package org.opensearch.sdk.sample.helloworld.rest;
 
-import org.opensearch.action.ActionListener;
+import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.common.io.stream.StreamInput;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RemoteExtensionActionResponse;

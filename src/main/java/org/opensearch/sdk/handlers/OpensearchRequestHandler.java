@@ -11,7 +11,7 @@ package org.opensearch.sdk.handlers;
 
 import org.opensearch.extensions.OpenSearchRequest;
 import org.opensearch.sdk.ExtensionsRunner;
-import org.opensearch.transport.TransportResponse;
+import org.opensearch.core.transport.TransportResponse;
 
 /**
  * This class handles the request from OpenSearch to a {@link ExtensionsRunner#startTransportService(TransportService transportService)} call.
