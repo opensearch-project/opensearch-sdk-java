@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.opensearch.action.ActionRequest;
-import org.opensearch.action.ActionResponse;
+import org.opensearch.core.action.ActionResponse;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.sdk.BaseExtension;
 import org.opensearch.sdk.Extension;

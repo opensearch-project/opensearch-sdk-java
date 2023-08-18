@@ -9,18 +9,9 @@
 
 package org.opensearch.sdk.handlers;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
-import org.opensearch.client.RequestOptions;
-import org.opensearch.client.WarningFailureException;
-import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.opensearch.core.IndexRequest;
-import org.opensearch.client.opensearch.core.SearchRequest;
-import org.opensearch.client.opensearch.core.SearchResponse;
-import org.opensearch.client.opensearch.indices.CreateIndexRequest;
-import org.opensearch.client.opensearch.indices.DeleteIndexRequest;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.discovery.InitializeExtensionRequest;
 import org.opensearch.discovery.InitializeExtensionResponse;
@@ -29,11 +20,6 @@ import org.opensearch.discovery.InitializeExtensionSecurityResponse;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.SDKTransportService;
 import org.opensearch.transport.TransportService;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Map;
 
 import static org.opensearch.sdk.ExtensionsRunner.NODE_NAME_SETTING;
 

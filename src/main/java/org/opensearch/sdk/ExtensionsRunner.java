@@ -355,8 +355,9 @@ public class ExtensionsRunner {
      *                            an extension's reserved indices.
      */
     public void initializeExtensionRestClient(String serviceAccountToken) {
-        OpenSearchClient restClient = getSdkClient()
-                .initializeJavaClientWithHeaders(Map.of("Authorization", "Bearer " + serviceAccountToken));
+        OpenSearchClient restClient = getSdkClient().initializeJavaClientWithHeaders(
+            Map.of("Authorization", "Bearer " + serviceAccountToken)
+        );
         this.extensionRestClient = restClient;
     }
 

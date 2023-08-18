@@ -26,6 +26,7 @@ import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.core.transport.TransportResponse;
 import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
 import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.extensions.ExtensionRequest;
@@ -47,7 +48,6 @@ import org.opensearch.sdk.handlers.ExtensionActionResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionDependencyResponseHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
 import org.opensearch.sdk.rest.ExtensionRestPathRegistry;
-import org.opensearch.transport.TransportResponse;
 import org.opensearch.transport.TransportResponseHandler;
 import org.opensearch.transport.TransportService;
 

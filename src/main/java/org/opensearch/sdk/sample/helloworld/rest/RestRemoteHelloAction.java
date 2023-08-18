@@ -9,7 +9,7 @@
 
 package org.opensearch.sdk.sample.helloworld.rest;
 
-import org.opensearch.action.ActionListener;
+import org.opensearch.core.action.ActionListener;
 import org.opensearch.client.WarningFailureException;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch.indices.CreateIndexRequest;
@@ -26,7 +26,6 @@ import org.opensearch.sdk.SDKClient;
 import org.opensearch.sdk.action.RemoteExtensionAction;
 import org.opensearch.sdk.action.RemoteExtensionActionRequest;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler;
-import org.opensearch.sdk.rest.SDKRestRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleResponse;
@@ -35,7 +34,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -144,9 +142,9 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
         // Uncomment the lines below to try out different actions utilizing the service account token
 
         OpenSearchClient adminRestClient = extensionsRunner.getSdkClient()
-                .initializeJavaClientWithHeaders(
-                        Map.of("Authorization", "Basic " + Base64.getEncoder().encodeToString("admin:admin".getBytes(StandardCharsets.UTF_8)))
-                );
+            .initializeJavaClientWithHeaders(
+                Map.of("Authorization", "Basic " + Base64.getEncoder().encodeToString("admin:admin".getBytes(StandardCharsets.UTF_8)))
+            );
 
         try {
             adminRestClient.indices().create(new CreateIndexRequest.Builder().index(".hello-world-jobs").build());
@@ -167,35 +165,36 @@ public class RestRemoteHelloAction extends BaseExtensionRestHandler {
 
         // Try reading from index with service account token
 
-//        try {
-//            adminRestClient.indices().create(new CreateIndexRequest.Builder().index("logs-123").build());
-//        } catch (IOException e) {
-//            System.out.println(e.getMessage());
-//        } catch (WarningFailureException e2) {
-//            System.out.println(e2.getMessage());
-//        }
-//
-//        try {
-//            SearchRequest searchRequest = new SearchRequest.Builder()
-//                    .index("logs-123")
-//                    .build();
-//            SearchResponse<JsonNode> searchResponse = userRestClient.search(searchRequest, JsonNode.class);
-//            System.out.println("SearchResponse: " + searchResponse);
-//        } catch (IOException e) {
-//            System.out.println(e.getMessage());
-//        } catch (WarningFailureException e2) {
-//            System.out.println(e2.getMessage());
-//        }
-//
-//        try {
-//            IndexData indexData = new IndexData("John", "Doe");
-//            IndexRequest<IndexData> indexRequest = new IndexRequest.Builder<IndexData>().index("logs-123").id("1").document(indexData).build();
-//            userRestClient.index(indexRequest);
-//        } catch (IOException e) {
-//            System.out.println(e.getMessage());
-//        } catch (WarningFailureException e2) {
-//            System.out.println(e2.getMessage());
-//        }
+        // try {
+        // adminRestClient.indices().create(new CreateIndexRequest.Builder().index("logs-123").build());
+        // } catch (IOException e) {
+        // System.out.println(e.getMessage());
+        // } catch (WarningFailureException e2) {
+        // System.out.println(e2.getMessage());
+        // }
+        //
+        // try {
+        // SearchRequest searchRequest = new SearchRequest.Builder()
+        // .index("logs-123")
+        // .build();
+        // SearchResponse<JsonNode> searchResponse = userRestClient.search(searchRequest, JsonNode.class);
+        // System.out.println("SearchResponse: " + searchResponse);
+        // } catch (IOException e) {
+        // System.out.println(e.getMessage());
+        // } catch (WarningFailureException e2) {
+        // System.out.println(e2.getMessage());
+        // }
+        //
+        // try {
+        // IndexData indexData = new IndexData("John", "Doe");
+        // IndexRequest<IndexData> indexRequest = new
+        // IndexRequest.Builder<IndexData>().index("logs-123").id("1").document(indexData).build();
+        // userRestClient.index(indexRequest);
+        // } catch (IOException e) {
+        // System.out.println(e.getMessage());
+        // } catch (WarningFailureException e2) {
+        // System.out.println(e2.getMessage());
+        // }
 
         return new ExtensionRestResponse(request, OK, String.format(GREETING, "World"));
     };

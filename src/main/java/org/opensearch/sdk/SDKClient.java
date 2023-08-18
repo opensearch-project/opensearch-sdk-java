@@ -33,9 +33,9 @@ import org.apache.hc.core5.http.message.BasicHeader;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.reactor.ssl.TlsDetails;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
-import org.opensearch.action.ActionListener;
+import org.opensearch.core.action.ActionListener;
 import org.opensearch.action.ActionRequest;
-import org.opensearch.action.ActionResponse;
+import org.opensearch.core.action.ActionResponse;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -98,7 +98,6 @@ import org.opensearch.index.reindex.DeleteByQueryRequest;
 import javax.net.ssl.SSLEngine;
 
 import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_HTTP_ENABLED;
-import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_ENABLED;
 
 /**
  * This class creates SDKClient for an extension to make requests to OpenSearch
@@ -171,7 +170,7 @@ public class SDKClient implements Closeable {
      */
     private static RestClientBuilder builder(String hostAddress, int port, ExtensionSettings extensionSettings) {
         boolean httpsEnabled = extensionSettings.getSecuritySettings().containsKey(SSL_HTTP_ENABLED)
-                && "true".equals(extensionSettings.getSecuritySettings().get(SSL_HTTP_ENABLED));
+            && "true".equals(extensionSettings.getSecuritySettings().get(SSL_HTTP_ENABLED));
         String scheme = httpsEnabled ? "https" : "http";
         RestClientBuilder builder = RestClient.builder(new HttpHost(scheme, hostAddress, port));
         builder.setStrictDeprecationMode(true);
@@ -593,7 +592,7 @@ public class SDKClient implements Closeable {
          * @return the response returned by OpenSearch
          * @throws IOException in case of a problem or the connection was aborted
          */
-        public Response uest(Request request) throws IOException {
+        public Response performRequest(Request request) throws IOException {
             return restHighLevelClient.getLowLevelClient().performRequest(request);
         }
 

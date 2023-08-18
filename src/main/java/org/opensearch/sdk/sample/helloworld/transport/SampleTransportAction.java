@@ -9,7 +9,7 @@
 
 package org.opensearch.sdk.sample.helloworld.transport;
 
-import org.opensearch.action.ActionListener;
+import org.opensearch.core.action.ActionListener;
 import org.opensearch.action.support.ActionFilters;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.tasks.Task;
