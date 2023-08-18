@@ -102,7 +102,7 @@ git clone https://github.com/<your username>/OpenSearch.git
 
 #### Enable the extensions feature flag
 
-Extensions are experimental in OpenSearch 2.8, so you must enable them either before or when you run OpenSearch. You can enable the feature flag using one of the following options.
+Extensions are experimental in OpenSearch 2.9, so you must enable them either before or when you run OpenSearch. You can enable the feature flag using one of the following options.
 
 ##### Option 1
 
@@ -124,7 +124,6 @@ testClusters {
 Add the experimental feature flag as a command line argument:
 
 - `./bin/opensearch -E opensearch.experimental.feature.extensions.enabled=true` when running from a local distribution
-- `./gradlew run -Dopensearch.experimental.feature.extensions.enabled=true` when running using Gradle in developer mode
 
 ##### Option 3
 
