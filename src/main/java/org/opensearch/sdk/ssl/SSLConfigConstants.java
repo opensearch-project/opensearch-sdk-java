@@ -19,6 +19,7 @@ import org.opensearch.common.settings.Settings;
  * Class containing constants for SSL
  */
 public final class SSLConfigConstants {
+    public static final String SSL_HTTP_ENABLED = "ssl.http.enabled";
     public static final String SSL_TRANSPORT_ENABLED = "ssl.transport.enabled";
     // TODO Replace this with true when security changes are complete
     public static final boolean SSL_TRANSPORT_ENABLED_DEFAULT = false;

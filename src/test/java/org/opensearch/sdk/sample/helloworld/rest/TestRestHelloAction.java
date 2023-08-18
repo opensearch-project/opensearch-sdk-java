@@ -25,6 +25,8 @@ import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.http.HttpRequest.HttpVersion;
 import org.opensearch.rest.RestResponse;
 import org.opensearch.core.rest.RestStatus;
+import org.opensearch.sdk.ExtensionSettings;
+import org.opensearch.sdk.SDKClient;
 import org.opensearch.sdk.rest.ExtensionRestHandler;
 import org.opensearch.sdk.rest.TestSDKRestRequest;
 import org.opensearch.test.OpenSearchTestCase;
@@ -34,6 +36,9 @@ public class TestRestHelloAction extends OpenSearchTestCase {
     private static final String TEXT_CONTENT_TYPE = "text/plain; charset=UTF-8";
     private static final String JSON_CONTENT_TYPE = "application/json; charset=UTF-8";
 
+    private final ExtensionSettings extensionSettings = new ExtensionSettings("", "", "", "localhost", "9200");
+    private final SDKClient sdkClient = new SDKClient(extensionSettings);
+
     private ExtensionRestHandler restHelloAction;
     // Temporarily removed pending integration of feature/identity branch
     // private static final String EXTENSION_NAME = "hello-world";
@@ -42,7 +47,7 @@ public class TestRestHelloAction extends OpenSearchTestCase {
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        restHelloAction = new RestHelloAction();
+        restHelloAction = new RestHelloAction(sdkClient);
     }
 
     @Test

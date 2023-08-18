@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.yaml.snakeyaml.Yaml;
 
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_HTTP_ENABLED;
 import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMCERT_FILEPATH;
 import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMKEY_FILEPATH;
 import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_TRANSPORT_CLIENT_PEMTRUSTEDCAS_FILEPATH;
@@ -62,6 +63,7 @@ public class ExtensionSettings {
      */
     public static final Set<String> SECURITY_SETTINGS_KEYS = Set.of(
         "path.home", // TODO Find the right place to put this setting
+        SSL_HTTP_ENABLED,
         SSL_TRANSPORT_CLIENT_PEMCERT_FILEPATH,
         SSL_TRANSPORT_CLIENT_PEMKEY_FILEPATH,
         SSL_TRANSPORT_CLIENT_PEMTRUSTEDCAS_FILEPATH,

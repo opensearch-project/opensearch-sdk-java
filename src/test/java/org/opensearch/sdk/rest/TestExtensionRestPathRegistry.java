@@ -21,6 +21,8 @@ import org.opensearch.rest.RestHandler.DeprecatedRoute;
 import org.opensearch.rest.RestHandler.ReplacedRoute;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
+import org.opensearch.sdk.ExtensionSettings;
+import org.opensearch.sdk.SDKClient;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler.ExtensionDeprecationRestHandler;
 import org.opensearch.test.OpenSearchTestCase;
 
@@ -44,7 +46,9 @@ public class TestExtensionRestPathRegistry extends OpenSearchTestCase {
             return null;
         }
     };
-    private BaseExtensionRestHandler replacedFooHandler = new BaseExtensionRestHandler() {
+
+    private final ExtensionSettings extensionSettings = new ExtensionSettings("", "", "", "localhost", "9200");
+    private BaseExtensionRestHandler replacedFooHandler = new BaseExtensionRestHandler(new SDKClient(extensionSettings)) {
         @Override
         public List<ReplacedRoute> replacedRoutes() {
             return List.of(

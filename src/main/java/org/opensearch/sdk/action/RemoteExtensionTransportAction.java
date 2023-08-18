@@ -9,7 +9,7 @@
 
 package org.opensearch.sdk.action;
 
-import org.opensearch.action.ActionListener;
+import org.opensearch.core.action.ActionListener;
 import org.opensearch.action.support.ActionFilters;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.extensions.action.RemoteExtensionActionResponse;

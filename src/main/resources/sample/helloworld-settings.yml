@@ -1,11 +1,12 @@
 extensionName: hello-world
 hostAddress: 127.0.0.1
-hostPort: 4500
+hostPort: 4532
 opensearchAddress: 127.0.0.1
 opensearchPort: 9200
+#ssl.http.enabled: true
 #ssl.transport.enabled: true
 #ssl.transport.pemcert_filepath: certs/extension-01.pem
 #ssl.transport.pemkey_filepath: certs/extension-01-key.pem
 #ssl.transport.pemtrustedcas_filepath: certs/root-ca.pem
 #ssl.transport.enforce_hostname_verification: false
-#path.home: <path/to/extension>
+#path.home: /Users/cwperx/Projects/opensearch/opensearch-sdk-java

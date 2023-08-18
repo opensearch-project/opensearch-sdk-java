@@ -23,17 +23,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import org.apache.hc.core5.function.Factory;
+import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
 import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
+import org.apache.hc.core5.http.message.BasicHeader;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.reactor.ssl.TlsDetails;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
-import org.opensearch.action.ActionListener;
+import org.opensearch.core.action.ActionListener;
 import org.opensearch.action.ActionRequest;
-import org.opensearch.action.ActionResponse;
+import org.opensearch.core.action.ActionResponse;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -94,6 +96,8 @@ import org.opensearch.index.reindex.BulkByScrollResponse;
 import org.opensearch.index.reindex.DeleteByQueryRequest;
 
 import javax.net.ssl.SSLEngine;
+
+import static org.opensearch.sdk.ssl.SSLConfigConstants.SSL_HTTP_ENABLED;
 
 /**
  * This class creates SDKClient for an extension to make requests to OpenSearch
@@ -164,8 +168,11 @@ public class SDKClient implements Closeable {
      * @param port The port the client should connect to
      * @return An instance of the builder
      */
-    private static RestClientBuilder builder(String hostAddress, int port) {
-        RestClientBuilder builder = RestClient.builder(new HttpHost(hostAddress, port));
+    private static RestClientBuilder builder(String hostAddress, int port, ExtensionSettings extensionSettings) {
+        boolean httpsEnabled = extensionSettings.getSecuritySettings().containsKey(SSL_HTTP_ENABLED)
+            && "true".equals(extensionSettings.getSecuritySettings().get(SSL_HTTP_ENABLED));
+        String scheme = httpsEnabled ? "https" : "http";
+        RestClientBuilder builder = RestClient.builder(new HttpHost(scheme, hostAddress, port));
         builder.setStrictDeprecationMode(true);
         builder.setHttpClientConfigCallback(httpClientBuilder -> {
             try {
@@ -201,8 +208,9 @@ public class SDKClient implements Closeable {
      * @param port The port of OpenSearch cluster
      * @return The OpenSearchTransport implementation of RestClientTransport.
      */
-    private OpenSearchTransport initializeTransport(String hostAddress, int port) {
-        RestClientBuilder builder = builder(hostAddress, port);
+    private OpenSearchTransport initializeTransport(String hostAddress, int port, Map<String, String> headers) {
+        RestClientBuilder builder = builder(hostAddress, port, extensionSettings);
+        builder.setDefaultHeaders(headers.keySet().stream().map(k -> new BasicHeader(k, headers.get(k))).toArray(Header[]::new));
 
         restClient = builder.build();
         ObjectMapper mapper = new ObjectMapper();
@@ -230,13 +238,41 @@ public class SDKClient implements Closeable {
     /**
      * Initializes an OpenSearchClient using OpenSearch JavaClient
      *
+     * @return The SDKClient implementation of OpenSearchClient. The user is responsible for calling
+     *         {@link #doCloseJavaClients()} when finished with the client
+     */
+    public OpenSearchClient initializeJavaClientWithHeaders(Map<String, String> headers) {
+        return initializeJavaClientWithHeaders(
+            extensionSettings.getOpensearchAddress(),
+            Integer.parseInt(extensionSettings.getOpensearchPort()),
+            headers
+        );
+    }
+
+    /**
+     * Initializes an OpenSearchClient using OpenSearch JavaClient
+     *
      * @param hostAddress The address of OpenSearch cluster, client can connect to
      * @param port The port of OpenSearch cluster
      * @return The SDKClient implementation of OpenSearchClient. The user is responsible for calling
      *         {@link #doCloseJavaClients()} when finished with the client
      */
     public OpenSearchClient initializeJavaClient(String hostAddress, int port) {
-        OpenSearchTransport transport = initializeTransport(hostAddress, port);
+        OpenSearchTransport transport = initializeTransport(hostAddress, port, Map.of());
+        javaClient = new OpenSearchClient(transport);
+        return javaClient;
+    }
+
+    /**
+     * Initializes an OpenSearchClient using OpenSearch JavaClient
+     *
+     * @param hostAddress The address of OpenSearch cluster, client can connect to
+     * @param port The port of OpenSearch cluster
+     * @return The SDKClient implementation of OpenSearchClient. The user is responsible for calling
+     *         {@link #doCloseJavaClients()} when finished with the client
+     */
+    public OpenSearchClient initializeJavaClientWithHeaders(String hostAddress, int port, Map<String, String> headers) {
+        OpenSearchTransport transport = initializeTransport(hostAddress, port, headers);
         javaClient = new OpenSearchClient(transport);
         return javaClient;
     }
@@ -260,7 +296,7 @@ public class SDKClient implements Closeable {
      *         {@link #doCloseJavaClients()} when finished with the client
      */
     public OpenSearchAsyncClient initalizeJavaAsyncClient(String hostAddress, int port) {
-        OpenSearchTransport transport = initializeTransport(hostAddress, port);
+        OpenSearchTransport transport = initializeTransport(hostAddress, port, Map.of());
         javaAsyncClient = new OpenSearchAsyncClient(transport);
         return javaAsyncClient;
     }
@@ -300,7 +336,7 @@ public class SDKClient implements Closeable {
      */
     @Deprecated
     public SDKRestClient initializeRestClient(String hostAddress, int port) {
-        this.sdkRestClient = new SDKRestClient(this, new RestHighLevelClient(builder(hostAddress, port)));
+        this.sdkRestClient = new SDKRestClient(this, new RestHighLevelClient(builder(hostAddress, port, extensionSettings)));
         return this.sdkRestClient;
     }
 

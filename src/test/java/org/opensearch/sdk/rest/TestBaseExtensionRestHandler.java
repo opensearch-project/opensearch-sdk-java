@@ -23,13 +23,17 @@ import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestResponse;
 import org.opensearch.core.rest.RestStatus;
+import org.opensearch.sdk.ExtensionSettings;
+import org.opensearch.sdk.SDKClient;
 import org.opensearch.test.OpenSearchTestCase;
 
 import static org.opensearch.rest.RestRequest.Method.GET;
 
 public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
 
-    private final BaseExtensionRestHandler handler = new BaseExtensionRestHandler() {
+    private final ExtensionSettings extensionSettings = new ExtensionSettings("", "", "", "localhost", "9200");
+    private final SDKClient sdkClient = new SDKClient(extensionSettings);
+    private final BaseExtensionRestHandler handler = new BaseExtensionRestHandler(sdkClient) {
         @Override
         public List<NamedRoute> routes() {
             return List.of(
@@ -80,7 +84,7 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
 
     @Test
     public void testHandlerDefaultRoutes() {
-        BaseExtensionRestHandler defaultHandler = new BaseExtensionRestHandler() {
+        BaseExtensionRestHandler defaultHandler = new BaseExtensionRestHandler(sdkClient) {
         };
         assertTrue(defaultHandler.routes().isEmpty());
     }
@@ -287,7 +291,7 @@ public class TestBaseExtensionRestHandler extends OpenSearchTestCase {
 
     @Test
     public void testCreateEmptyJsonResponse() {
-        BaseExtensionRestHandler handlerWithEmptyJsonResponse = new BaseExtensionRestHandler() {
+        BaseExtensionRestHandler handlerWithEmptyJsonResponse = new BaseExtensionRestHandler(sdkClient) {
             @Override
             public List<NamedRoute> routes() {
                 return List.of(
