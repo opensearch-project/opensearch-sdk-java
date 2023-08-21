@@ -9,21 +9,19 @@
 
 package org.opensearch.sdk.action;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.MapBinder;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.support.ActionFilters;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.common.NamedRegistry;
-import org.opensearch.sdk.api.ActionExtension.ActionHandler;
 import org.opensearch.sdk.Extension;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.MapBinder;
-
 import org.opensearch.sdk.api.ActionExtension;
+import org.opensearch.sdk.api.ActionExtension.ActionHandler;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.unmodifiableMap;
 

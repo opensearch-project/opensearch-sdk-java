@@ -9,11 +9,11 @@
 
 package org.opensearch.sdk.sample.helloworld.transport;
 
-import java.io.IOException;
-
 import org.opensearch.core.action.ActionResponse;
 import org.opensearch.core.common.io.stream.StreamInput;
 import org.opensearch.core.common.io.stream.StreamOutput;
+
+import java.io.IOException;
 
 /**
  * A sample response class to demonstrate extension actions

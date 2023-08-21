@@ -32,8 +32,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-import static org.opensearch.rest.RestRequest.Method.GET;
 import static org.opensearch.core.rest.RestStatus.OK;
+import static org.opensearch.rest.RestRequest.Method.GET;
 
 /**
  * Sample REST Handler demonstrating proxy actions to another extension

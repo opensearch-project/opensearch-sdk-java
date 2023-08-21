@@ -9,21 +9,21 @@
 
 package org.opensearch.sdk.sample.helloworld.rest;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Test;
 import org.opensearch.client.Request;
 import org.opensearch.client.Response;
 import org.opensearch.client.RestClient;
 import org.opensearch.core.rest.RestStatus;
 import org.opensearch.test.rest.OpenSearchRestTestCase;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.Callable;
 
 public class TestHelloWorldIT extends OpenSearchRestTestCase {
     private static final Logger logger = LogManager.getLogger(TestHelloWorldIT.class);

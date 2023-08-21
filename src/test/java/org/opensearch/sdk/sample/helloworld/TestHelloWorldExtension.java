@@ -9,43 +9,42 @@
 
 package org.opensearch.sdk.sample.helloworld;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
 import org.apache.hc.core5.http.HttpHost;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.opensearch.core.action.ActionListener;
 import org.opensearch.action.ActionRequest;
-import org.opensearch.core.action.ActionResponse;
 import org.opensearch.action.ActionType;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.client.Node;
 import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.core.action.ActionListener;
+import org.opensearch.core.action.ActionResponse;
+import org.opensearch.sdk.ExtensionSettings;
+import org.opensearch.sdk.ExtensionsRunner;
+import org.opensearch.sdk.SDKClient;
+import org.opensearch.sdk.SDKClient.SDKRestClient;
+import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.sdk.api.ActionExtension.ActionHandler;
 import org.opensearch.sdk.rest.ExtensionRestHandler;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleRequest;
 import org.opensearch.sdk.sample.helloworld.transport.SampleResponse;
 import org.opensearch.tasks.TaskManager;
-import org.opensearch.sdk.ExtensionSettings;
-import org.opensearch.sdk.ExtensionsRunner;
-import org.opensearch.sdk.SDKClient;
-import org.opensearch.sdk.SDKClient.SDKRestClient;
-import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.threadpool.ThreadPool;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Key;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static org.opensearch.sdk.sample.helloworld.ExampleCustomSettingConfig.VALIDATED_SETTING;
 

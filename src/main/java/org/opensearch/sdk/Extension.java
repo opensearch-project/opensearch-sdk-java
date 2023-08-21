@@ -9,15 +9,15 @@
 
 package org.opensearch.sdk;
 
-import java.util.Collections;
-import java.util.Collection;
-import java.util.List;
-
-import org.opensearch.core.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.common.settings.Setting;
+import org.opensearch.common.settings.Settings;
+import org.opensearch.core.common.io.stream.NamedWriteableRegistry;
 import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.threadpool.ExecutorBuilder;
-import org.opensearch.common.settings.Settings;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This interface defines methods which an extension must provide. Extensions

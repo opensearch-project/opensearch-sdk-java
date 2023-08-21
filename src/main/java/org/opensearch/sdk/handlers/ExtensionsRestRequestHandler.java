@@ -23,10 +23,10 @@ import org.opensearch.sdk.rest.SDKHttpRequest;
 import org.opensearch.sdk.rest.SDKRestRequest;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptyList;
-import static org.opensearch.rest.BytesRestResponse.TEXT_CONTENT_TYPE;
+import static java.util.Collections.emptyMap;
 import static org.opensearch.core.rest.RestStatus.NOT_FOUND;
+import static org.opensearch.rest.BytesRestResponse.TEXT_CONTENT_TYPE;
 
 /**
  * This class handles the request from OpenSearch to a {@link ExtensionsRunner#startTransportService(TransportService transportService)} call.

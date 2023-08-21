@@ -9,16 +9,6 @@
 
 package org.opensearch.sdk;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeoutException;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
 import com.google.protobuf.ByteString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,6 +16,7 @@ import org.opensearch.cluster.ClusterState;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.core.transport.TransportResponse;
 import org.opensearch.extensions.AddSettingsUpdateConsumerRequest;
 import org.opensearch.extensions.DiscoveryExtensionNode;
 import org.opensearch.extensions.ExtensionRequest;
@@ -36,9 +27,9 @@ import org.opensearch.extensions.action.TransportActionRequestFromExtension;
 import org.opensearch.extensions.proto.ExtensionRequestProto;
 import org.opensearch.extensions.rest.RegisterRestActionsRequest;
 import org.opensearch.extensions.settings.RegisterCustomSettingsRequest;
-import org.opensearch.sdk.api.ActionExtension.ActionHandler;
 import org.opensearch.sdk.action.RemoteExtensionActionRequest;
 import org.opensearch.sdk.action.SDKActionModule;
+import org.opensearch.sdk.api.ActionExtension.ActionHandler;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
 import org.opensearch.sdk.handlers.ClusterSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ClusterStateResponseHandler;
@@ -47,9 +38,18 @@ import org.opensearch.sdk.handlers.ExtensionActionResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionDependencyResponseHandler;
 import org.opensearch.sdk.handlers.UpdateSettingsRequestHandler;
 import org.opensearch.sdk.rest.ExtensionRestPathRegistry;
-import org.opensearch.core.transport.TransportResponse;
 import org.opensearch.transport.TransportResponseHandler;
 import org.opensearch.transport.TransportService;
+
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Wrapper class for {@link TransportService} and associated methods.
