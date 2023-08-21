@@ -15,7 +15,7 @@ import org.mockito.ArgumentCaptor;
 import org.opensearch.Version;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.settings.Settings;
-import org.opensearch.common.transport.TransportAddress;
+import org.opensearch.core.common.transport.TransportAddress;
 import org.opensearch.extensions.ExtensionsManager;
 import org.opensearch.extensions.action.RegisterTransportActionsRequest;
 import org.opensearch.sdk.action.RemoteExtensionAction;

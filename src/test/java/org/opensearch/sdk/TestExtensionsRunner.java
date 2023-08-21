@@ -37,7 +37,7 @@ import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.core.common.bytes.BytesArray;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.settings.Setting.Property;
-import org.opensearch.common.transport.TransportAddress;
+import org.opensearch.core.common.transport.TransportAddress;
 import org.opensearch.discovery.InitializeExtensionRequest;
 import org.opensearch.discovery.InitializeExtensionResponse;
 import org.opensearch.extensions.DiscoveryExtensionNode;

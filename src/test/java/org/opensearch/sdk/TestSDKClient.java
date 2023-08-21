@@ -10,7 +10,7 @@
 package org.opensearch.sdk;
 
 import org.junit.jupiter.api.Test;
-import org.opensearch.action.ActionListener;
+import org.opensearch.core.action.ActionListener;
 import org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.opensearch.action.admin.indices.alias.get.GetAliasesRequest;
