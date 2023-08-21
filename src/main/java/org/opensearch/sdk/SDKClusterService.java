@@ -9,21 +9,21 @@
 
 package org.opensearch.sdk;
 
+import org.opensearch.cluster.ClusterName;
+import org.opensearch.cluster.ClusterState;
+import org.opensearch.common.settings.AbstractScopedSettings;
+import org.opensearch.common.settings.Setting;
+import org.opensearch.common.settings.Setting.Property;
+import org.opensearch.common.settings.SettingUpgrader;
+import org.opensearch.common.settings.Settings;
+import org.opensearch.extensions.DiscoveryExtensionNode;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-
-import org.opensearch.cluster.ClusterName;
-import org.opensearch.cluster.ClusterState;
-import org.opensearch.common.settings.Setting;
-import org.opensearch.common.settings.SettingUpgrader;
-import org.opensearch.common.settings.Settings;
-import org.opensearch.common.settings.AbstractScopedSettings;
-import org.opensearch.common.settings.Setting.Property;
-import org.opensearch.extensions.DiscoveryExtensionNode;
 
 /**
  * This class simulates methods normally called from OpenSearch ClusterService class.

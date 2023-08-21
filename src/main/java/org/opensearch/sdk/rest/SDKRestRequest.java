@@ -9,13 +9,13 @@
 
 package org.opensearch.sdk.rest;
 
-import java.util.List;
-import java.util.Map;
-
 import org.opensearch.core.xcontent.NamedXContentRegistry;
 import org.opensearch.http.HttpChannel;
 import org.opensearch.http.HttpRequest;
 import org.opensearch.rest.RestRequest;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class helps to get instance of RestRequest

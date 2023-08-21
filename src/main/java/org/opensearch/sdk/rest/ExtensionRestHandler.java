@@ -9,9 +9,6 @@
 
 package org.opensearch.sdk.rest;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.BaseRestHandler;
 import org.opensearch.rest.NamedRoute;
@@ -20,6 +17,9 @@ import org.opensearch.rest.RestHandler.DeprecatedRoute;
 import org.opensearch.rest.RestHandler.ReplacedRoute;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This interface defines methods which an extension REST handler (action) must provide.

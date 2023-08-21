@@ -9,19 +9,19 @@
 
 package org.opensearch.sdk.handlers;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Consumer;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.Version;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.WriteableSetting;
-import org.opensearch.core.common.unit.ByteSizeValue;
 import org.opensearch.common.unit.TimeValue;
+import org.opensearch.core.common.unit.ByteSizeValue;
 import org.opensearch.extensions.AcknowledgedResponse;
 import org.opensearch.extensions.UpdateSettingsRequest;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Handles requests to update settings

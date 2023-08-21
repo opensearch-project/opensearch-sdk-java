@@ -9,9 +9,6 @@
 
 package org.opensearch.sdk;
 
-import java.nio.file.Path;
-import java.util.Collections;
-
 import org.opensearch.Version;
 import org.opensearch.cluster.node.DiscoveryNode;
 import org.opensearch.common.network.NetworkService;
@@ -28,6 +25,9 @@ import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.transport.TransportInterceptor;
 import org.opensearch.transport.TransportService;
 import org.opensearch.transport.netty4.Netty4Transport;
+
+import java.nio.file.Path;
+import java.util.Collections;
 
 import static java.util.Collections.emptySet;
 import static org.opensearch.common.UUIDs.randomBase64UUID;

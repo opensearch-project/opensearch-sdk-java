@@ -9,9 +9,9 @@
 
 package org.opensearch.sdk;
 
+import org.opensearch.test.OpenSearchTestCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opensearch.test.OpenSearchTestCase;
 
 import java.io.IOException;
 

@@ -9,15 +9,14 @@
 
 package org.opensearch.sdk.ssl;
 
-import java.util.Optional;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import org.opensearch.common.settings.SecureSetting;
-import org.opensearch.core.common.settings.SecureString;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.core.common.settings.SecureString;
+
+import java.util.Optional;
 
 import static org.opensearch.sdk.ssl.SSLConfigConstants.DEFAULT_STORE_PASSWORD;
 

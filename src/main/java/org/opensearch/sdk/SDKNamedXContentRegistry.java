@@ -9,21 +9,21 @@
 
 package org.opensearch.sdk;
 
-import static java.util.stream.Collectors.toList;
+import org.opensearch.cluster.ClusterModule;
+import org.opensearch.common.network.NetworkModule;
+import org.opensearch.common.settings.Settings;
+import org.opensearch.core.xcontent.NamedXContentRegistry;
+import org.opensearch.core.xcontent.NamedXContentRegistry.Entry;
+import org.opensearch.core.xcontent.XContentParser;
+import org.opensearch.indices.IndicesModule;
+import org.opensearch.search.SearchModule;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.opensearch.cluster.ClusterModule;
-import org.opensearch.common.network.NetworkModule;
-import org.opensearch.common.settings.Settings;
-import org.opensearch.core.xcontent.NamedXContentRegistry;
-import org.opensearch.core.xcontent.XContentParser;
-import org.opensearch.core.xcontent.NamedXContentRegistry.Entry;
-import org.opensearch.indices.IndicesModule;
-import org.opensearch.search.SearchModule;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Combines Extension NamedXContent with core OpenSearch NamedXContent

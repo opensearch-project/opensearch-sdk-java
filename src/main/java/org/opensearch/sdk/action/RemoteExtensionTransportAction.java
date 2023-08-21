@@ -9,15 +9,14 @@
 
 package org.opensearch.sdk.action;
 
-import org.opensearch.core.action.ActionListener;
+import com.google.inject.Inject;
 import org.opensearch.action.support.ActionFilters;
 import org.opensearch.action.support.TransportAction;
+import org.opensearch.core.action.ActionListener;
 import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 import org.opensearch.sdk.SDKTransportService;
 import org.opensearch.tasks.Task;
 import org.opensearch.tasks.TaskManager;
-
-import com.google.inject.Inject;
 
 /**
  * Sends a request to OpenSearch for a remote extension to execute an action.

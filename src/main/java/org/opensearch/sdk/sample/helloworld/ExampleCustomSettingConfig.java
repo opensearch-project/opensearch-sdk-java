@@ -10,8 +10,8 @@
 package org.opensearch.sdk.sample.helloworld;
 
 import org.opensearch.common.settings.Setting;
-import org.opensearch.common.settings.Setting.RegexValidator;
 import org.opensearch.common.settings.Setting.Property;
+import org.opensearch.common.settings.Setting.RegexValidator;
 
 /**
  * {@link ExampleCustomSettingConfig} contains the custom settings value and their static declarations.
