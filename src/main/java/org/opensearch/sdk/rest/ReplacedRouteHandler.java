@@ -9,13 +9,13 @@
 
 package org.opensearch.sdk.rest;
 
-import java.util.function.Function;
-
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestHandler.ReplacedRoute;
 import org.opensearch.rest.RestHandler.Route;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.rest.RestRequest.Method;
+
+import java.util.function.Function;
 
 /**
  * A subclass of {@link ReplacedRoute} that includes a handler method for that route.

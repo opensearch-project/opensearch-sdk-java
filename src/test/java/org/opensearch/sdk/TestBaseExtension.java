@@ -9,10 +9,10 @@
 
 package org.opensearch.sdk;
 
-import java.io.IOException;
-
-import org.junit.jupiter.api.Test;
 import org.opensearch.test.OpenSearchTestCase;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
 
 /*
  * Most of the code in BaseExtension is tested by HelloWorld extension tests.

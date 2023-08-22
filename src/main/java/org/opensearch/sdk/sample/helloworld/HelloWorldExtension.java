@@ -9,10 +9,6 @@
 
 package org.opensearch.sdk.sample.helloworld;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
 import org.opensearch.common.settings.Setting;
@@ -26,6 +22,10 @@ import org.opensearch.sdk.sample.helloworld.rest.RestHelloAction;
 import org.opensearch.sdk.sample.helloworld.rest.RestRemoteHelloAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleAction;
 import org.opensearch.sdk.sample.helloworld.transport.SampleTransportAction;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Sample class to demonstrate how to use the OpenSearch SDK for Java to create

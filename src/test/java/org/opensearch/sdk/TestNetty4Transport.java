@@ -9,16 +9,16 @@
 
 package org.opensearch.sdk;
 
-import java.io.IOException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.opensearch.common.component.Lifecycle;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.TransportSettings;
-
 import org.opensearch.transport.netty4.Netty4Transport;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
 
 public class TestNetty4Transport extends OpenSearchTestCase {
 

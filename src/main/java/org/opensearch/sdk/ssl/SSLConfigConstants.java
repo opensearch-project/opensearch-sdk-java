@@ -9,11 +9,11 @@
 
 package org.opensearch.sdk.ssl;
 
+import org.opensearch.common.settings.Settings;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import org.opensearch.common.settings.Settings;
 
 /**
  * Class containing constants for SSL

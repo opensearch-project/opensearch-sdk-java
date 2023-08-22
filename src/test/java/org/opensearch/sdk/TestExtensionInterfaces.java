@@ -9,13 +9,6 @@
 
 package org.opensearch.sdk;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-
-import java.util.Collections;
-import java.util.Map;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.opensearch.common.breaker.CircuitBreaker;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.index.mapper.Mapper;
@@ -35,10 +28,15 @@ import org.opensearch.sdk.api.RepositoryExtension;
 import org.opensearch.sdk.api.ScriptExtension;
 import org.opensearch.sdk.api.SearchExtension;
 import org.opensearch.sdk.api.SystemIndexExtension;
-
 import org.opensearch.test.OpenSearchTestCase;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.function.Predicate;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class TestExtensionInterfaces extends OpenSearchTestCase {
 

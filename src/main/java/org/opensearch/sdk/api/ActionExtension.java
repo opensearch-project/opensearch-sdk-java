@@ -9,17 +9,17 @@
 
 package org.opensearch.sdk.api;
 
-import org.opensearch.action.ActionType;
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
+import org.opensearch.action.ActionType;
 import org.opensearch.action.RequestValidators;
 import org.opensearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.opensearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.opensearch.action.support.ActionFilter;
 import org.opensearch.action.support.TransportAction;
 import org.opensearch.action.support.TransportActions;
-import org.opensearch.core.common.Strings;
 import org.opensearch.common.util.concurrent.ThreadContext;
+import org.opensearch.core.common.Strings;
 import org.opensearch.rest.RestHeaderDefinition;
 import org.opensearch.sdk.Extension;
 import org.opensearch.sdk.rest.ExtensionRestHandler;

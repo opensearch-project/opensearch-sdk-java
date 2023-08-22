@@ -9,10 +9,10 @@
 
 package org.opensearch.sdk.rest;
 
-import org.junit.jupiter.api.Test;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
 import org.opensearch.rest.RestRequest;
 import org.opensearch.test.OpenSearchTestCase;
+import org.junit.jupiter.api.Test;
 
 public class TestExtensionRestHandler extends OpenSearchTestCase {
     private static class NoOpExtensionRestHandler implements ExtensionRestHandler {

@@ -23,8 +23,8 @@ import org.opensearch.sdk.rest.SDKHttpRequest;
 import org.opensearch.sdk.rest.SDKRestRequest;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.opensearch.rest.BytesRestResponse.TEXT_CONTENT_TYPE;
 import static org.opensearch.rest.RestStatus.NOT_FOUND;
 
