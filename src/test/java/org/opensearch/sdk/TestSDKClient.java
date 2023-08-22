@@ -9,7 +9,6 @@
 
 package org.opensearch.sdk;
 
-import org.junit.jupiter.api.Test;
 import org.opensearch.action.ActionListener;
 import org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
@@ -45,14 +44,14 @@ import org.opensearch.sdk.SDKClient.SDKClusterAdminClient;
 import org.opensearch.sdk.SDKClient.SDKIndicesClient;
 import org.opensearch.sdk.SDKClient.SDKRestClient;
 import org.opensearch.test.OpenSearchTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.net.ConnectException;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-
-import java.net.ConnectException;
 
 @SuppressWarnings("deprecation")
 public class TestSDKClient extends OpenSearchTestCase {

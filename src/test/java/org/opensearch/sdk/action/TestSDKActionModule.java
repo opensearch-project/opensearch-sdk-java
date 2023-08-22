@@ -9,15 +9,15 @@
 
 package org.opensearch.sdk.action;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.opensearch.action.ActionRequest;
 import org.opensearch.action.ActionResponse;
 import org.opensearch.action.ActionType;
-import org.opensearch.sdk.api.ActionExtension;
 import org.opensearch.sdk.BaseExtension;
 import org.opensearch.sdk.ExtensionSettings;
+import org.opensearch.sdk.api.ActionExtension;
 import org.opensearch.test.OpenSearchTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;

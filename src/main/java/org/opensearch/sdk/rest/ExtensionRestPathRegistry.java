@@ -9,15 +9,15 @@
 
 package org.opensearch.sdk.rest;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.opensearch.common.Nullable;
 import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.path.PathTrie;
 import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestUtils;
 import org.opensearch.sdk.rest.BaseExtensionRestHandler.ExtensionDeprecationRestHandler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class registers REST paths from extension Rest Handlers.

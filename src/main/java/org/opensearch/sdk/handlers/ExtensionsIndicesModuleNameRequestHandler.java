@@ -12,8 +12,8 @@ package org.opensearch.sdk.handlers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opensearch.extensions.AcknowledgedResponse;
-import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.index.IndicesModuleRequest;
+import org.opensearch.sdk.ExtensionsRunner;
 
 /**
  * This class handles the request from OpenSearch to a {@link ExtensionsRunner#startTransportService(TransportService transportService)} call.

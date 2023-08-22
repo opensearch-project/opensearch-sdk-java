@@ -9,22 +9,8 @@
 
 package org.opensearch.sdk.ssl;
 
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLException;
-
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
-import io.netty.channel.ChannelPromise;
-import io.netty.handler.codec.DecoderException;
-import io.netty.handler.ssl.SslHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import org.opensearch.ExceptionsHelper;
 import org.opensearch.Version;
 import org.opensearch.cluster.node.DiscoveryNode;
@@ -37,6 +23,20 @@ import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.transport.TcpChannel;
 import org.opensearch.transport.netty4.Netty4Transport;
+
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLException;
+
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
+import io.netty.handler.codec.DecoderException;
+import io.netty.handler.ssl.SslHandler;
 
 /**
  * Class that setups up secure TLS channel for this extension to use with transport requests

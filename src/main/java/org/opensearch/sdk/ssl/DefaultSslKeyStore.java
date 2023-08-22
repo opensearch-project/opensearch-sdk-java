@@ -9,6 +9,27 @@
 
 package org.opensearch.sdk.ssl;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.opensearch.OpenSearchException;
+import org.opensearch.OpenSearchSecurityException;
+import org.opensearch.SpecialPermission;
+import org.opensearch.common.settings.Settings;
+import org.opensearch.env.Environment;
+import org.opensearch.sdk.ssl.util.CertFileProps;
+import org.opensearch.sdk.ssl.util.CertFromFile;
+import org.opensearch.sdk.ssl.util.CertFromKeystore;
+import org.opensearch.sdk.ssl.util.CertFromTruststore;
+import org.opensearch.sdk.ssl.util.ExceptionUtils;
+import org.opensearch.sdk.ssl.util.KeystoreProps;
+import org.opensearch.transport.NettyAllocator;
+
+import javax.crypto.Cipher;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLParameters;
+
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -35,12 +56,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import javax.crypto.Cipher;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLParameters;
-
 import io.netty.handler.codec.http2.Http2SecurityUtil;
 import io.netty.handler.ssl.ApplicationProtocolConfig;
 import io.netty.handler.ssl.ApplicationProtocolConfig.Protocol;
@@ -52,27 +67,6 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslProvider;
 import io.netty.handler.ssl.SupportedCipherSuiteFilter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-//import org.bouncycastle.asn1.ASN1InputStream;
-//import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-//import org.bouncycastle.asn1.ASN1Primitive;
-//import org.bouncycastle.asn1.ASN1Sequence;
-//import org.bouncycastle.asn1.ASN1String;
-//import org.bouncycastle.asn1.ASN1TaggedObject;
-
-import org.opensearch.OpenSearchException;
-import org.opensearch.OpenSearchSecurityException;
-import org.opensearch.SpecialPermission;
-import org.opensearch.common.settings.Settings;
-import org.opensearch.env.Environment;
-import org.opensearch.sdk.ssl.util.CertFileProps;
-import org.opensearch.sdk.ssl.util.CertFromFile;
-import org.opensearch.sdk.ssl.util.CertFromKeystore;
-import org.opensearch.sdk.ssl.util.CertFromTruststore;
-import org.opensearch.sdk.ssl.util.ExceptionUtils;
-import org.opensearch.sdk.ssl.util.KeystoreProps;
-import org.opensearch.transport.NettyAllocator;
 
 import static org.opensearch.sdk.ssl.SecureSSLSettings.SSLSetting.SSL_TRANSPORT_CLIENT_KEYSTORE_KEYPASSWORD;
 import static org.opensearch.sdk.ssl.SecureSSLSettings.SSLSetting.SSL_TRANSPORT_CLIENT_PEMKEY_PASSWORD;

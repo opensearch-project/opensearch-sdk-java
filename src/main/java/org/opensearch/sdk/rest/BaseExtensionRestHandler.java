@@ -9,30 +9,30 @@
 
 package org.opensearch.sdk.rest;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import org.opensearch.rest.BaseRestHandler;
-import static org.opensearch.rest.RestStatus.INTERNAL_SERVER_ERROR;
-import static org.opensearch.rest.RestStatus.NOT_FOUND;
-
-import java.io.IOException;
-import java.util.Objects;
-import java.util.function.Function;
-
-import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.xcontent.json.JsonXContent;
 import org.opensearch.extensions.rest.ExtensionRestResponse;
+import org.opensearch.rest.BaseRestHandler;
+import org.opensearch.rest.DeprecationRestHandler;
 import org.opensearch.rest.RestHandler.DeprecatedRoute;
 import org.opensearch.rest.RestHandler.ReplacedRoute;
 import org.opensearch.rest.RestHandler.Route;
-import org.opensearch.rest.RestRequest.Method;
-import org.opensearch.rest.DeprecationRestHandler;
 import org.opensearch.rest.RestRequest;
+import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestStatus;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+
+import static org.opensearch.rest.RestStatus.INTERNAL_SERVER_ERROR;
+import static org.opensearch.rest.RestStatus.NOT_FOUND;
+import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
 /**
  * Provides convenience methods to reduce boilerplate code in an {@link ExtensionRestHandler} implementation.

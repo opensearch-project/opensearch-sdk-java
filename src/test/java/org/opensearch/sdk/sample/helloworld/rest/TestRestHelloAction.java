@@ -9,25 +9,25 @@
 
 package org.opensearch.sdk.sample.helloworld.rest;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.opensearch.rest.RestHandler.Route;
-import org.opensearch.rest.RestRequest;
-import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.common.bytes.BytesArray;
 import org.opensearch.common.bytes.BytesReference;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.http.HttpRequest.HttpVersion;
+import org.opensearch.rest.RestHandler.Route;
+import org.opensearch.rest.RestRequest;
+import org.opensearch.rest.RestRequest.Method;
 import org.opensearch.rest.RestResponse;
 import org.opensearch.rest.RestStatus;
 import org.opensearch.sdk.rest.ExtensionRestHandler;
 import org.opensearch.sdk.rest.TestSDKRestRequest;
 import org.opensearch.test.OpenSearchTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class TestRestHelloAction extends OpenSearchTestCase {
 
