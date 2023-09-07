@@ -8,7 +8,7 @@ jobs:
   add_labels:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions-ecosystem/action-add-labels@v1
         with:
           labels: backport 1.x
