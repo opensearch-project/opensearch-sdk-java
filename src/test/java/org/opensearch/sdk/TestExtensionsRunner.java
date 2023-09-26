@@ -36,6 +36,7 @@ import org.opensearch.sdk.handlers.EnvironmentSettingsResponseHandler;
 import org.opensearch.sdk.handlers.ExtensionsInitRequestHandler;
 import org.opensearch.sdk.handlers.ExtensionsRestRequestHandler;
 import org.opensearch.sdk.rest.ExtensionRestPathRegistry;
+import org.opensearch.telemetry.tracing.noop.NoopTracer;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.Transport;
 import org.opensearch.transport.TransportService;
@@ -92,7 +93,8 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
                     TransportService.NOOP_TRANSPORT_INTERCEPTOR,
                     x -> null,
                     null,
-                    Collections.emptySet()
+                    Collections.emptySet(),
+                    NoopTracer.INSTANCE
                 )
             )
         );
@@ -136,7 +138,7 @@ public class TestExtensionsRunner extends OpenSearchTestCase {
 
         doNothing().when(sdkTransportService.getTransportService()).connectToNodeAsExtension(sourceNode, "opensearch-sdk-1");
 
-        InitializeExtensionRequest extensionInitRequest = new InitializeExtensionRequest(sourceNode, extension);
+        InitializeExtensionRequest extensionInitRequest = new InitializeExtensionRequest(sourceNode, extension, "test");
 
         InitializeExtensionResponse response = extensionsInitRequestHandler.handleExtensionInitRequest(extensionInitRequest);
         // Test if name and unique ID are set
