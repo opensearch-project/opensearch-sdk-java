@@ -20,6 +20,7 @@ import org.opensearch.sdk.ssl.DefaultSslKeyStore;
 import org.opensearch.sdk.ssl.SSLConfigConstants;
 import org.opensearch.sdk.ssl.SSLNettyTransport;
 import org.opensearch.sdk.ssl.SslKeyStore;
+import org.opensearch.telemetry.tracing.noop.NoopTracer;
 import org.opensearch.threadpool.ThreadPool;
 import org.opensearch.transport.SharedGroupFactory;
 import org.opensearch.transport.TransportInterceptor;
@@ -120,7 +121,8 @@ public class NettyTransport {
                 randomBase64UUID()
             ),
             null,
-            emptySet()
+            emptySet(),
+            NoopTracer.INSTANCE
         );
         extensionsRunner.startTransportService(transportService);
         return transportService;
