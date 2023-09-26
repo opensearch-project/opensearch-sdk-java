@@ -23,6 +23,7 @@ import org.opensearch.extensions.action.RemoteExtensionActionResponse;
 import org.opensearch.sdk.ExtensionsRunner;
 import org.opensearch.sdk.ExtensionsRunnerForTest;
 import org.opensearch.sdk.SDKTransportService;
+import org.opensearch.telemetry.tracing.noop.NoopTracer;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.Transport;
 import org.opensearch.transport.TransportService;
@@ -55,7 +56,8 @@ public class TestProxyActionRequest extends OpenSearchTestCase {
                     TransportService.NOOP_TRANSPORT_INTERCEPTOR,
                     x -> null,
                     null,
-                    Collections.emptySet()
+                    Collections.emptySet(),
+                    NoopTracer.INSTANCE
                 )
             )
         );

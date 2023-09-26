@@ -19,6 +19,7 @@ import org.opensearch.sdk.action.RemoteExtensionAction;
 import org.opensearch.sdk.action.SDKActionModule;
 import org.opensearch.sdk.action.TestSDKActionModule;
 import org.opensearch.sdk.handlers.AcknowledgedResponseHandler;
+import org.opensearch.telemetry.tracing.noop.NoopTracer;
 import org.opensearch.test.OpenSearchTestCase;
 import org.opensearch.transport.Transport;
 import org.opensearch.transport.TransportService;
@@ -60,7 +61,8 @@ public class TestSDKTransportService extends OpenSearchTestCase {
                 TransportService.NOOP_TRANSPORT_INTERCEPTOR,
                 x -> null,
                 null,
-                Collections.emptySet()
+                Collections.emptySet(),
+                NoopTracer.INSTANCE
             )
         );
         this.opensearchNode = new DiscoveryNode(
