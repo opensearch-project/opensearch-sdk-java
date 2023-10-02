@@ -1,0 +1,19 @@
+{
+    "name": "Hello World",
+    "uniqueId": "hello-world-java",
+    "hostAddress": "127.0.0.1",
+    "port": "4500",
+    "version": "1.0",
+    "opensearchVersion": "3.0.0",
+    "minimumCompatibleVersion": "3.0.0",
+    "dependencies": [
+        {
+            "uniqueId": "test1",
+            "version": "2.0.0"
+        },
+        {
+            "uniqueId": "test2",
+            "version": "3.0.0"
+        }
+    ]
+}
