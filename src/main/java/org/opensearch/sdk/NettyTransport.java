@@ -76,7 +76,8 @@ public class NettyTransport {
             pageCacheRecycler,
             extensionsRunner.getNamedWriteableRegistry().getRegistry(),
             circuitBreakerService,
-            new SharedGroupFactory(settings)
+            new SharedGroupFactory(settings),
+            NoopTracer.INSTANCE
         );
 
         if (transportSSLEnabled) {
