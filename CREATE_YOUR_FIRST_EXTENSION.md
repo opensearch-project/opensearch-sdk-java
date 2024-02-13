@@ -28,7 +28,7 @@ In your dependency management, set up a dependency on the OpenSearch SDK for Jav
 
 At general availability, dependencies will be released to the Central Repository. To use SNAPSHOT versions, add these repositories:
  - OpenSearch SNAPSHOT repository: https://aws.oss.sonatype.org/content/repositories/snapshots/
- - Lucene snapshot repository: https://artifacts.opensearch.org/snapshots/lucene/
+ - Lucene snapshot repository: https://ci.opensearch.org/ci/dbc/snapshots/lucene/
 
 If you use Maven, the following POM entries will work:
 
@@ -42,7 +42,7 @@ If you use Maven, the following POM entries will work:
   <repository>
     <id>lucene.snapshots</id>
     <name>Lucene Snapshot Repository</name>
-    <url>https://artifacts.opensearch.org/snapshots/lucene/</url>
+    <url>https://ci.opensearch.org/ci/dbc/snapshots/lucene/</url>
   </repository>
 </repositories>
 
@@ -61,7 +61,7 @@ For Gradle, specify dependencies as follows:
 repositories {
   mavenCentral()
   maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots/" }
-  maven { url "https://artifacts.opensearch.org/snapshots/lucene/"}
+  maven { url "https://ci.opensearch.org/ci/dbc/snapshots/lucene/"}
 }
 
 dependencies {

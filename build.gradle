@@ -157,7 +157,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
-    maven { url "https://artifacts.opensearch.org/snapshots/lucene/"}
+    maven { url "https://ci.opensearch.org/ci/dbc/snapshots/lucene/"}
 }
 
 dependencies {
