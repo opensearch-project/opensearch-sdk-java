@@ -178,6 +178,7 @@ dependencies {
     def guavaFailureAccessVersion = "1.0.2"
     def aopallianceVersion = "1.0"
     def slf4jVersion = "1.7.36"
+    def commonsLoggingVersion = "1.2"
 
     api("org.opensearch:opensearch:${opensearchVersion}")
     implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
@@ -231,8 +232,14 @@ dependencies {
             force("org.apache.logging.log4j:log4j-core:${log4jVersion}")
             force("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
             force("org.slf4j:slf4j-api:${slf4jVersion}")
+            force("commons-logging:commons-logging:${commonsLoggingVersion}")
         }
     }
+}
+
+// Compile SDK 2.x for JDK 21
+tasks.withType(JavaCompile) {
+    options.release.set(21)
 }
 
 // this task runs the helloworld sample extension
