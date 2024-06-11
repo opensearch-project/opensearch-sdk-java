@@ -172,7 +172,7 @@ public class TestExtensionInterfaces extends OpenSearchTestCase {
     void testIngestExtension() {
         IngestExtension ingestExtension = new IngestExtension() {
         };
-        Processor.Parameters parameters = new Processor.Parameters(null, null, null, null, null, null, null, null, null);
+        Processor.Parameters parameters = new Processor.Parameters(null, null, null, null, null, null, null, null, null, null);
         assertTrue(ingestExtension.getProcessors(parameters).isEmpty());
     }
 
