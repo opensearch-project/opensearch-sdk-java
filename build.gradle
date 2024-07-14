@@ -178,7 +178,7 @@ dependencies {
     def guavaFailureAccessVersion = "1.0.2"
     def aopallianceVersion = "1.0"
     def slf4jVersion = "1.7.36"
-    def commonsLoggingVersion = "1.2"
+    def commonsLoggingVersion = "1.3.3"
 
     api("org.opensearch:opensearch:${opensearchVersion}")
     implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
