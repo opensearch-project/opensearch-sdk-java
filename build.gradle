@@ -27,6 +27,7 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
+        maven { url "https://central.sonatype.com/repository/maven-snapshots/" }
         maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
     }
 
@@ -130,7 +131,7 @@ publishing {
         if (version.toString().endsWith("SNAPSHOT")) {
             maven {
                 name = "Snapshots" //  optional target repository name
-                url = "https://aws.oss.sonatype.org/content/repositories/snapshots"
+                url = "https://central.sonatype.com/repository/maven-snapshots/"
                 credentials {
                     username "$System.env.SONATYPE_USERNAME"
                     password "$System.env.SONATYPE_PASSWORD"
@@ -156,6 +157,7 @@ javadoc {
 repositories {
     mavenLocal()
     mavenCentral()
+    maven { url "https://central.sonatype.com/repository/maven-snapshots/" }
     maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
     maven { url "https://ci.opensearch.org/ci/dbc/snapshots/lucene/"}
 }
