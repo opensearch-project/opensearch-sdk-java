@@ -35,4 +35,4 @@ The release process is standard across repositories in this org and is run by a 
 5. Increment "version" in [build.gradle](https://github.com/opensearch-project/opensearch-sdk-java/blob/main/build.gradle#L79) to the next iteration, e.g. v1.0.1.
 
 ## Snapshot Builds
-The [snapshots builds](https://aws.oss.sonatype.org/content/repositories/snapshots/org/opensearch/sdk/opensearch-sdk-java/) are published to sonatype using [publish-snapshots.yml](./.github/workflows/publish-snapshots.yml) workflow. Each `push` event to the main branch triggers this workflow.
+The [snapshots builds](https://ci.opensearch.org/ci/dbc/snapshots/maven/org/opensearch/sdk/opensearch-sdk-java/) are published to sonatype using [publish-snapshots.yml](./.github/workflows/publish-snapshots.yml) workflow. Each `push` event to the main branch triggers this workflow.

@@ -12,12 +12,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
       - name: Spotless Check
         run: ./gradlew spotlessCheck
   javadoc:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
       - name: Javadoc CheckStyle
         run: ./gradlew checkstyleMain
       - name: Javadoc Check
@@ -43,6 +53,11 @@ jobs:
     needs: [check]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Publish to Maven Local
-      run: ./gradlew publishToMavenLocal
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+      - name: Publish to Maven Local
+        run: ./gradlew publishToMavenLocal
